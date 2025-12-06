@@ -42,7 +42,18 @@ with open(os.path.join(os.path.dirname(me), "csr_country_codes.tsv"), encoding="
 		code, name = line.strip().split("\t")[0:2]
 		csr_country_codes.append((code, name))
 
-app = Flask(__name__, template_folder=os.path.abspath(os.path.join(os.path.dirname(me), "templates")))
+template_dir = os.path.abspath(os.path.join(os.path.dirname(me), "templates"))
+static_dir = os.path.abspath(os.path.join(os.path.dirname(me), "static"))
+
+app = Flask(
+    __name__,
+    template_folder=template_dir,
+    static_folder=static_dir
+)
+
+# app.config['TEMPLATES_AUTO_RELOAD'] = True
+# app.debug = True
+# app.jinja_env.auto_reload = True
 
 # Decorator to protect views that require a user with 'admin' privileges.
 def authorized_personnel_only(viewfunc):
@@ -108,6 +119,118 @@ def unauthorized(error):
 def json_response(data, status=200):
 	return Response(json.dumps(data, indent=2, sort_keys=True)+'\n', status=status, mimetype='application/json')
 
+def sanitize_error_message(error_msg):
+	"""
+	Sanitize error messages to prevent information disclosure.
+	Removes file paths, internal details, and other sensitive information.
+	"""
+	if not isinstance(error_msg, str):
+		error_msg = str(error_msg)
+
+	# Remove common file path patterns
+	import re
+	error_msg = re.sub(r'/[a-zA-Z0-9/_\-\.]+\.py', '[file]', error_msg)
+	error_msg = re.sub(r'/var/lib/mailinabox/[^\s]*', '[storage]', error_msg)
+	error_msg = re.sub(r'/home/[^\s]*', '[home]', error_msg)
+	error_msg = re.sub(r'line \d+', 'line [redacted]', error_msg)
+
+	# If the message is too technical (contains Python internals), return generic message
+	if 'Traceback' in error_msg or 'File "' in error_msg:
+		return "An internal error occurred. Please contact your administrator."
+
+	return error_msg
+
+def validate_email(email):
+	"""
+	Validate email address format to prevent injection attacks.
+	Raises ValueError if email is invalid.
+	"""
+	if not email or not isinstance(email, str):
+		raise ValueError("Email address is required")
+
+	# Basic validation - email should not be empty after stripping
+	email = email.strip()
+	if not email:
+		raise ValueError("Email address is required")
+
+	# Check for dangerous characters that could indicate injection attempts
+	if any(char in email for char in [';', '|', '&', '$', '`', '\n', '\r', '\0']):
+		raise ValueError("Email address contains invalid characters")
+
+	# Basic email format validation (more permissive than strict RFC 5322)
+	# Format: localpart@domain
+	if '@' not in email:
+		raise ValueError("Email address must contain @")
+
+	parts = email.rsplit('@', 1)
+	if len(parts) != 2 or not parts[0] or not parts[1]:
+		raise ValueError("Invalid email format")
+
+	localpart, domain = parts
+
+	# Validate localpart length
+	if len(localpart) > 64 or len(localpart) < 1:
+		raise ValueError("Email local part must be between 1 and 64 characters")
+
+	# Validate domain length
+	if len(domain) > 253 or len(domain) < 1:
+		raise ValueError("Email domain must be between 1 and 253 characters")
+
+	# Domain should contain at least one dot (basic TLD check)
+	if '.' not in domain:
+		raise ValueError("Email domain must contain a TLD")
+
+	# Check for consecutive dots
+	if '..' in email:
+		raise ValueError("Email address cannot contain consecutive dots")
+
+	# Check that email doesn't start or end with dot or @
+	if email[0] in ['.', '@'] or email[-1] in ['.', '@']:
+		raise ValueError("Email address has invalid format")
+
+	return email.strip()
+
+def validate_hostname(hostname):
+	"""
+	Validate hostname/domain format to prevent command injection attacks.
+	Raises ValueError if hostname is invalid.
+	"""
+	if not hostname or not isinstance(hostname, str):
+		raise ValueError("Hostname is required")
+
+	hostname = hostname.strip()
+	if not hostname:
+		raise ValueError("Hostname is required")
+
+	# Check for dangerous characters that could indicate injection attempts
+	# Hostnames should only contain alphanumeric, dots, and hyphens
+	if any(char in hostname for char in [';', '|', '&', '$', '`', '\n', '\r', '\0', ' ', '/', '\\', '"', "'", '<', '>', '(', ')', '{', '}', '[', ']']):
+		raise ValueError("Hostname contains invalid characters")
+
+	# Check length constraints (RFC 1035)
+	if len(hostname) > 253:
+		raise ValueError("Hostname must not exceed 253 characters")
+
+	# Check each label (part between dots)
+	labels = hostname.split('.')
+	for label in labels:
+		if not label:
+			raise ValueError("Hostname cannot have empty labels")
+		if len(label) > 63:
+			raise ValueError("Hostname label must not exceed 63 characters")
+		# Label must start and end with alphanumeric
+		if not label[0].isalnum() or not label[-1].isalnum():
+			raise ValueError("Hostname labels must start and end with alphanumeric characters")
+		# Label can only contain alphanumeric and hyphens
+		if not all(c.isalnum() or c == '-' for c in label):
+			raise ValueError("Hostname labels can only contain alphanumeric characters and hyphens")
+
+	# Hostname should have at least one dot (basic TLD check) unless it's a special case
+	if '.' not in hostname:
+		raise ValueError("Hostname must contain a TLD")
+
+	return hostname.strip()
+
 ###################################
 
 # Control Panel (unauthenticated views)
@@ -134,6 +257,11 @@ def index():
 		backup_s3_hosts=backup_s3_hosts,
 		csr_country_codes=csr_country_codes,
 	)
+
+@app.route('/static/<path:filename>')
+def static_files(filename):
+	# Serve static files.
+	return send_from_directory(static_dir, filename)
 
 # Create a session key by checking the username/password in the Authorization header.
 @app.route('/login', methods=["POST"])
@@ -177,6 +305,16 @@ def logout():
 	finally:
 		return json_response({ "status": "ok" })
 
+
+@app.route('/whoami')
+@authorized_personnel_only
+def whoami():
+	return json_response({
+        "email": request.user_email,
+        "privileges": request.user_privs,
+    })
+
+
 # MAIL
 
 @app.route('/mail/users')
@@ -191,62 +329,84 @@ def mail_users():
 def mail_users_add():
 	quota = request.form.get('quota', '0')
 	try:
-		return add_mail_user(request.form.get('email', ''), request.form.get('password', ''), request.form.get('privileges', ''), quota, env)
+		email = validate_email(request.form.get('email', ''))
+		return add_mail_user(email, request.form.get('password', ''), request.form.get('privileges', ''), quota, env)
 	except ValueError as e:
-		return (str(e), 400)
+		return (sanitize_error_message(str(e)), 400)
 
 @app.route('/mail/users/quota', methods=['GET'])
 @authorized_personnel_only
 def get_mail_users_quota():
-	email = request.values.get('email', '')
-	quota = get_mail_quota(email, env)
+	try:
+		email = validate_email(request.values.get('email', ''))
+		quota = get_mail_quota(email, env)
 
-	if request.values.get('text'):
-		return quota
+		if request.values.get('text'):
+			return quota
 
-	return json_response({
-		"email": email,
-		"quota": quota
-	})
+		return json_response({
+			"email": email,
+			"quota": quota
+		})
+	except ValueError as e:
+		return (sanitize_error_message(str(e)), 400)
 
 @app.route('/mail/users/quota', methods=['POST'])
 @authorized_personnel_only
 def mail_users_quota():
 	try:
-		return set_mail_quota(request.form.get('email', ''), request.form.get('quota'), env)
+		email = validate_email(request.form.get('email', ''))
+		return set_mail_quota(email, request.form.get('quota'), env)
 	except ValueError as e:
-		return (str(e), 400)
+		return (sanitize_error_message(str(e)), 400)
 
 @app.route('/mail/users/password', methods=['POST'])
 @authorized_personnel_only
 def mail_users_password():
 	try:
-		return set_mail_password(request.form.get('email', ''), request.form.get('password', ''), env)
+		email = validate_email(request.form.get('email', ''))
+		return set_mail_password(email, request.form.get('password', ''), env)
 	except ValueError as e:
-		return (str(e), 400)
+		return (sanitize_error_message(str(e)), 400)
 
 @app.route('/mail/users/remove', methods=['POST'])
 @authorized_personnel_only
 def mail_users_remove():
-	return remove_mail_user(request.form.get('email', ''), env)
+	try:
+		email = validate_email(request.form.get('email', ''))
+		return remove_mail_user(email, env)
+	except ValueError as e:
+		return (sanitize_error_message(str(e)), 400)
 
 
 @app.route('/mail/users/privileges')
 @authorized_personnel_only
 def mail_user_privs():
-	privs = get_mail_user_privileges(request.args.get('email', ''), env)
-	if isinstance(privs, tuple): return privs # error
-	return "\n".join(privs)
+	try:
+		email = validate_email(request.args.get('email', ''))
+		privs = get_mail_user_privileges(email, env)
+		if isinstance(privs, tuple): return privs # error
+		return "\n".join(privs)
+	except ValueError as e:
+		return (sanitize_error_message(str(e)), 400)
 
 @app.route('/mail/users/privileges/add', methods=['POST'])
 @authorized_personnel_only
 def mail_user_privs_add():
-	return add_remove_mail_user_privilege(request.form.get('email', ''), request.form.get('privilege', ''), "add", env)
+	try:
+		email = validate_email(request.form.get('email', ''))
+		return add_remove_mail_user_privilege(email, request.form.get('privilege', ''), "add", env)
+	except ValueError as e:
+		return (sanitize_error_message(str(e)), 400)
 
 @app.route('/mail/users/privileges/remove', methods=['POST'])
 @authorized_personnel_only
 def mail_user_privs_remove():
-	return add_remove_mail_user_privilege(request.form.get('email', ''), request.form.get('privilege', ''), "remove", env)
+	try:
+		email = validate_email(request.form.get('email', ''))
+		return add_remove_mail_user_privilege(email, request.form.get('privilege', ''), "remove", env)
+	except ValueError as e:
+		return (sanitize_error_message(str(e)), 400)
 
 
 @app.route('/mail/aliases')
@@ -292,7 +452,7 @@ def dns_update():
 	try:
 		return do_dns_update(env, force=request.form.get('force', '') == '1')
 	except Exception as e:
-		return (str(e), 500)
+		return (sanitize_error_message(str(e)), 500)
 
 @app.route('/dns/secondary-nameserver')
 @authorized_personnel_only
@@ -305,9 +465,14 @@ def dns_get_secondary_nameserver():
 def dns_set_secondary_nameserver():
 	from dns_update import set_secondary_dns
 	try:
-		return set_secondary_dns([ns.strip() for ns in re.split(r"[, ]+", request.form.get('hostnames') or "") if ns.strip() != ""], env)
+		# Parse and validate each hostname to prevent command injection
+		hostnames_input = request.form.get('hostnames') or ""
+		hostnames = [ns.strip() for ns in re.split(r"[, ]+", hostnames_input) if ns.strip() != ""]
+		# Validate each hostname
+		validated_hostnames = [validate_hostname(ns) for ns in hostnames]
+		return set_secondary_dns(validated_hostnames, env)
 	except ValueError as e:
-		return (str(e), 400)
+		return (sanitize_error_message(str(e)), 400)
 
 @app.route('/dns/custom')
 @authorized_personnel_only
@@ -407,7 +572,7 @@ def dns_set_record(qname, rtype="A"):
 		return "OK"
 
 	except ValueError as e:
-		return (str(e), 400)
+		return (sanitize_error_message(str(e)), 400)
 
 @app.route('/dns/dump')
 @authorized_personnel_only
@@ -501,7 +666,7 @@ def mfa_get_status():
 				}
 			})
 	except ValueError as e:
-		return (str(e), 400)
+		return (sanitize_error_message(str(e)), 400)
 	return json_response(resp)
 
 @app.route('/mfa/totp/enable', methods=['POST'])
@@ -516,7 +681,7 @@ def totp_post_enable():
 		validate_totp_secret(secret)
 		enable_mfa(request.user_email, "totp", secret, token, label, env)
 	except ValueError as e:
-		return (str(e), 400)
+		return (sanitize_error_message(str(e)), 400)
 	return "OK"
 
 @app.route('/mfa/disable', methods=['POST'])
@@ -524,12 +689,20 @@ def totp_post_enable():
 def totp_post_disable():
 	# Anyone accessing this route is an admin, and we permit them to
 	# disable the MFA status for any user if they submit a 'user' form
-	# field.
-	email = request.form.get('user', request.user_email) # user field if given, otherwise the user making the request
+	# field. However, admins cannot disable MFA for other admin users.
 	try:
+		email = validate_email(request.form.get('user', request.user_email)) # user field if given, otherwise the user making the request
+
+		# Security check: prevent admins from disabling MFA for other admin users
+		# They can only disable their own MFA or MFA for non-admin users
+		if email != request.user_email:
+			target_privs = get_mail_user_privileges(email, env)
+			if isinstance(target_privs, list) and "admin" in target_privs:
+				return ("Cannot disable MFA for other administrator accounts", 403)
+
 		result = disable_mfa(email, request.form.get('mfa-id') or None, env) # convert empty string to None
 	except ValueError as e:
-		return (str(e), 400)
+		return (sanitize_error_message(str(e)), 400)
 	if result: # success
 		return "OK"
 	# error
@@ -558,7 +731,7 @@ def system_version():
 	try:
 		return what_version_is_this(env)
 	except Exception as e:
-		return (str(e), 500)
+		return (sanitize_error_message(str(e)), 500)
 
 @app.route('/system/latest-upstream-version', methods=["POST"])
 @authorized_personnel_only
@@ -567,7 +740,7 @@ def system_latest_upstream_version():
 	try:
 		return get_latest_miab_version()
 	except Exception as e:
-		return (str(e), 500)
+		return (sanitize_error_message(str(e)), 500)
 
 @app.route('/system/status', methods=["POST"])
 @authorized_personnel_only
@@ -751,11 +924,27 @@ def munin_cgi(filename):
 
 	# /usr/lib/munin/cgi/munin-cgi-graph returns both headers and binary png when successful.
 	# A double-Windows-style-newline always indicates the end of HTTP headers.
-	headers, image_bytes = binout.split(b'\r\n\r\n', 1)
+	try:
+		headers, image_bytes = binout.split(b'\r\n\r\n', 1)
+	except ValueError:
+		app.logger.error("munin_cgi: malformed response from munin-cgi-graph (missing header separator)")
+		return ("error processing graph image", 500)
+
+	# Whitelist of safe headers to prevent header injection attacks
+	ALLOWED_HEADERS = {'Content-Type', 'Content-Length', 'Last-Modified', 'Expires', 'Cache-Control', 'Status'}
+
 	response = make_response(image_bytes)
 	for line in headers.splitlines():
-		name, value = line.decode("utf8").split(':', 1)
-		response.headers[name] = value
+		try:
+			name, value = line.decode("utf8").split(':', 1)
+			# Only copy whitelisted headers
+			if name.strip() in ALLOWED_HEADERS:
+				response.headers[name.strip()] = value.strip()
+		except (ValueError, UnicodeDecodeError):
+			# Malformed header line, skip it
+			app.logger.warning("munin_cgi: skipping malformed header line")
+			continue
+
 	if 'Status' in response.headers and '404' in response.headers['Status']:
 		app.logger.warning("munin_cgi: munin-cgi-graph returned 404 status code. PATH_INFO=%s", env['PATH_INFO'])
 	return response

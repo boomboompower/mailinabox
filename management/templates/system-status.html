@@ -1,184 +1,131 @@
-<h2>System Status Checks</h2>
+<div class="panel">
+    <div class="panel-heading">
+        <h2 class="panel-title">System Status Checks</h2>
+    </div>
 
-<style>
-#system-checks .heading td {
-  font-weight: bold;
-  font-size: 120%;
-  padding-top: 1.5em;
-}
-#system-checks .heading.first td {
-  border-top: none;
-  padding-top: 0;
-}
-#system-checks .status-error td, .summary-error {
-  color: #733;
-}
-#system-checks .status-warning td, .summary-warning {
-  color: #770;
-}
-#system-checks .status-ok td, .summary-ok {
-  color: #040;
-}
-#system-checks div.extra {
-  display: none;
-  margin-top: 1em;
-  max-width: 50em;
-  word-wrap: break-word;
-}
-#system-checks a.showhide {
-  display: none;
-  font-size: 85%;
-}
-#system-checks .pre {
-  margin: 1em;
-  font-family: monospace;
-  white-space: pre-wrap;
-}
-</style>
+    <div class="status-layout">
+        <div class="status-sidebar">
+            <div id="system-reboot-required" class="info-card" style="display: none;">
+                <div class="info-card-title">System Reboot</div>
+                <div class="info-card-body">
+                    <div id="reboot-needed" style="display: none;">
+                        <button type="button" id="reboot-box-btn" class="btn btn-danger w-100">Reboot Box</button>
+                        <p class="help-text">A system reboot is required to apply important updates.</p>
+                    </div>
+                    <div id="reboot-not-needed" style="display: none;">No reboot necessary</div>
+                </div>
+            </div>
 
-<div class="row">
-	<div class="col-md-push-9 col-md-3">
+            <div id="system-privacy-setting" class="info-card" style="display: none;">
+                <div class="info-card-title">Privacy Settings</div>
+                <div class="info-card-body">
+                    <a href="#" id="privacy-toggle" class="action-link">
+                        <span id="privacy-toggle-text">Configure Version Check</span>
+                    </a>
+                    <p class="help-text" id="privacy-help-text">Enable automatic checking for new Mail-in-a-Box releases</p>
+                </div>
+            </div>
+        </div>
 
-<div id="system-reboot-required" style="display: none; margin-bottom: 1em;">
-	<button type="button" class="btn btn-danger" onclick="confirm_reboot(); return false;">Reboot Box</button>
-	<div>No reboot is necessary.</div>
-</div>
+        <div class="status-main">
+            <div id="system-checks-summary" class="mb-3"></div>
 
-<div id="system-privacy-setting" style="display: none">
-	<div><a onclick="return enable_privacy(!current_privacy_setting)" href="#"><span>Enable/Disable</span> New-Version Check</a></div>
-	<p style="line-height: 125%"><small>(When enabled, status checks phone-home to check for a new release of Mail-in-a-Box.)</small></p>
-</div>
+            <div id="system-checks-container"></div>
+        </div>
+    </div>
 
-	</div> <!-- /col -->
-	<div class="col-md-pull-3 col-md-8">
-
-          <div id="system-checks-summary">
-          </div>
-
-<table id="system-checks" class="table" style="max-width: 60em">
-  <thead>
-  </thead>
-  <tbody>
-  </tbody>
-</table>
-
-	</div> <!-- /col -->
-</div> <!-- /row -->
-
-<script>
-function show_system_status() {
-  const summary = $('#system-checks-summary');
-  summary.html("");
-
-  $('#system-checks tbody').html("<tr><td colspan='2' class='text-muted'>Loading...</td></tr>")
-
-  api(
-    "/system/privacy",
-    "GET",
-    { },
-    function(r) {
-      current_privacy_setting = r;
-      $('#system-privacy-setting').show();
-      $('#system-privacy-setting a span').text(r ? "Enable" : "Disable");
-      $('#system-privacy-setting p').toggle(r);
-    });
-
-  api(
-    "/system/reboot",
-    "GET",
-    { },
-    function(r) {
-      $('#system-reboot-required').show(); // show when r becomes available
-      $('#system-reboot-required').find('button').toggle(r);
-      $('#system-reboot-required').find('div').toggle(!r);
-    });
-
-  api(
-    "/system/status",
-    "POST",
-    { },
-    function(r) {
-      $('#system-checks tbody').html("");
-      const ok_symbol = "✓";
-      const error_symbol = "✖";
-      const warning_symbol = "?";
-
-      let count_by_status = { ok: 0, error: 0, warning: 0 };
-
-      for (var i = 0; i < r.length; i++) {
-        var n = $("<tr><td class='status'/><td class='message'><p style='margin: 0'/><div class='extra'/><a class='showhide' href='#'/></tr>");
-        if (i == 0) n.addClass('first')
-        if (r[i].type == "heading")
-                n.addClass(r[i].type)
-        else
-                n.addClass("status-" + r[i].type)
-
-        if (r[i].type == "ok") n.find('td.status').text(ok_symbol);
-        if (r[i].type == "error") n.find('td.status').text(error_symbol);
-        if (r[i].type == "warning") n.find('td.status').text(warning_symbol);
-        count_by_status[r[i].type]++;
-
-        n.find('td.message p').text(r[i].text)
-        $('#system-checks tbody').append(n);
-
-        if (r[i].extra.length > 0) {
-          n.find('a.showhide').show().text("show more").click(function() {
-            $(this).hide();
-            $(this).parent().find('.extra').fadeIn();
-            return false;
-          });
+    <style>
+        /* Two-column flexbox layout with sidebar on right */
+        .status-layout {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
         }
 
-        for (var j = 0; j < r[i].extra.length; j++) {
-
-          var m = $("<div/>").text(r[i].extra[j].text)
-          if (r[i].extra[j].monospace)
-            m.addClass("pre");
-          n.find('> td.message > div').append(m);
+        .status-main {
+            flex: 1;
+            min-width: 0;
         }
-      }
 
-      // Summary counts
-      summary.html("Summary: ");
-      if (count_by_status['error'] + count_by_status['warning'] == 0) {
-        summary.append($('<span class="summary-ok"/>').text(`All ${count_by_status['ok']} ${ok_symbol} OK`));
-      } else {
-        summary.append($('<span class="summary-ok"/>').text(`${count_by_status['ok']} ${ok_symbol} OK, `));
-        summary.append($('<span class="summary-error"/>').text(`${count_by_status['error']} ${error_symbol} Error, `));
-        summary.append($('<span class="summary-warning"/>').text(`${count_by_status['warning']} ${warning_symbol} Warning`));
-      }
-    })
-}
+        .status-sidebar {
+            flex: 0 0 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-var current_privacy_setting = null;
-function enable_privacy(status) {
-  api(
-    "/system/privacy",
-    "POST",
-    {
-      value: (status ? "private" : "off")
-    },
-    function(res) {
-      show_system_status();
-    });
-  return false; // disable link
-}
+        /* Mobile: Sidebar appears above main content */
+        @media (max-width: 968px) {
+            .status-layout {
+                flex-direction: column-reverse;
+            }
 
-function confirm_reboot() {
-  show_modal_confirm(
-    "Reboot",
-    $("<p>This will reboot your Mail-in-a-Box <code>{{hostname}}</code>.</p> <p>Until the machine is fully restarted, your users will not be able to send and receive email, and you will not be able to connect to this control panel or with SSH. The reboot cannot be cancelled.</p>"),
-    "Reboot Now",
-    function() {
-      api(
-        "/system/reboot",
-        "POST",
-        { },
-        function(r) {
-          var msg = "<p>Please reload this page after a minute or so.</p>";
-          if (r) msg = "<p>The reboot command said:</p> <pre>" + $("<pre/>").text(r).html() + "</pre>"; // successful reboots don't produce any output; the output must be HTML-escaped
-          show_modal_error("Reboot", msg);
-        });
-    });
-}
-</script>
+            .status-sidebar {
+                flex: 1;
+            }
+        }
+
+        .status-section {
+            margin-bottom: 24px;
+        }
+
+        .status-section-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-strong);
+        }
+
+        .status-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .status-table td.status {
+            width: 40px;
+            font-weight: 600;
+            text-align: center;
+            padding: 16px 8px;
+        }
+
+        .status-table td.message {
+            padding: 16px 16px 16px 1em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-table div.extra {
+            display: none;
+            margin-top: 1em;
+            max-width: 50em;
+            word-wrap: break-word;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .status-table a.showhide {
+            display: none;
+            font-size: 85%;
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .status-table .pre {
+            margin: 1em 0;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: pre-wrap;
+            background: var(--bg-surface);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+        }
+    </style>
+
+    <script type="module" src="/admin/static/js/pages/system-status.js"></script>
+</div>

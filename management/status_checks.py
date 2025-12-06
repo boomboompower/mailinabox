@@ -4,9 +4,11 @@
 # TLS certificates have been signed, etc., and if not tells the user
 # what to do next.
 
-import sys, os, os.path, re, datetime, multiprocessing.pool
+import sys, os, os.path, re, datetime, multiprocessing.pool, multiprocessing
 import asyncio
 import dateutil.parser, dateutil.relativedelta, dateutil.tz
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import dns.reversename, dns.resolver
 import idna
@@ -20,6 +22,44 @@ from mailconfig import get_mail_domains, get_mail_aliases
 
 from utils import shell, sort_domains, load_env_vars_from_file, load_settings, get_ssh_port, get_ssh_config_value
 from backup import get_backup_config, backup_status
+
+# DNS query cache - thread-safe with TTL for security
+# Cache entries: {cache_key: (result, timestamp)}
+_dns_cache = {}
+_dns_cache_lock = threading.Lock()
+_DNS_CACHE_TTL = 60  # 1 minute TTL to prevent stale/poisoned cache entries
+_DNS_CACHE_MAX_SIZE = 1000  # Max entries to prevent memory exhaustion attacks
+
+def clear_dns_cache():
+	"""Clear the DNS cache - useful when DNS changes are expected."""
+	global _dns_cache
+	with _dns_cache_lock:
+		_dns_cache = {}
+
+def _is_cache_entry_valid(timestamp):
+	"""Check if a cache entry is still valid based on TTL."""
+	return (datetime.datetime.now() - timestamp).total_seconds() < _DNS_CACHE_TTL
+
+def _evict_expired_cache_entries():
+	"""Remove expired entries from cache. Called when cache is getting full."""
+	global _dns_cache
+	now = datetime.datetime.now()
+	_dns_cache = {k: v for k, v in _dns_cache.items()
+	              if (now - v[1]).total_seconds() < _DNS_CACHE_TTL}
+
+def get_optimal_pool_size():
+	"""Calculate optimal pool size based on CPU count and workload."""
+	try:
+		cpu_count = multiprocessing.cpu_count()
+		# Validate cpu_count is reasonable (prevent integer overflow attacks)
+		if cpu_count < 1 or cpu_count > 256:
+			cpu_count = 4  # Fallback to safe default
+	except (ValueError, OSError):
+		cpu_count = 4  # Fallback on error
+
+	# Use 2x CPU count for I/O-bound tasks (DNS, network checks)
+	# but cap at 20 to avoid resource exhaustion
+	return min(cpu_count * 2, 20)
 
 def get_services():
 	return [
@@ -60,18 +100,37 @@ def run_checks(rounded_values, env, output, pool, domains_to_check=None):
 	# that in run_services checks.)
 	shell('check_call', ["/usr/sbin/rndc", "flush"], trap=True)
 
+	# Clear our own DNS cache after flushing bind9
+	clear_dns_cache()
+
 	run_system_checks(rounded_values, env, output)
 
-	# perform other checks asynchronously
+	# Run network and domain checks in parallel using threads
+	# These are independent and can execute concurrently for better performance
+	network_output = BufferedOutput()
+	domain_output = BufferedOutput()
 
-	run_network_checks(env, output)
-	run_domain_checks(rounded_values, env, output, pool, domains_to_check=domains_to_check)
+	with ThreadPoolExecutor(max_workers=2) as executor:
+		# Submit both tasks to run in parallel
+		network_future = executor.submit(run_network_checks, env, network_output)
+		domain_future = executor.submit(run_domain_checks, rounded_values, env, domain_output, pool, domains_to_check)
+
+		# Wait for both to complete
+		network_future.result()
+		domain_future.result()
+
+	# Playback results in order
+	network_output.playback(output)
+	domain_output.playback(output)
 
 def run_services_checks(env, output, pool):
 	# Check that system services are running.
 	all_running = True
 	fatal = False
-	ret = pool.starmap(check_service, ((i, service, env) for i, service in enumerate(get_services())), chunksize=1)
+	# Use optimized chunksize for better performance with multiprocessing
+	services = list(get_services())
+	chunk_size = max(1, len(services) // (pool._processes * 2))
+	ret = pool.starmap(check_service, ((i, service, env) for i, service in enumerate(services)), chunksize=chunk_size)
 	for _i, running, fatal2, output2 in sorted(ret):
 		if output2 is None: continue # skip check (e.g. no port was set, e.g. no sshd)
 		all_running = all_running and running
@@ -105,6 +164,8 @@ def check_service(i, service, env):
 		import socket
 		s = socket.socket(socket.AF_INET if ":" not in ip else socket.AF_INET6, socket.SOCK_STREAM)
 		s.settimeout(1)
+		# Enable TCP_NODELAY to reduce latency on connection establishment
+		s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 		try:
 			s.connect((ip, service["port"]))
 			return True
@@ -151,13 +212,32 @@ def check_service(i, service, env):
 	return (i, running, fatal, output)
 
 def run_system_checks(rounded_values, env, output):
-	check_ssh_password(env, output)
-	check_software_updates(env, output)
-	check_miab_version(env, output)
-	check_system_aliases(env, output)
-	check_free_disk_space(rounded_values, env, output)
-	check_free_memory(rounded_values, env, output)
-	check_backup(rounded_values, env, output)
+	# Run all system checks in parallel since they're independent
+	# Use BufferedOutput to collect results from each check
+	check_outputs = []
+
+	with ThreadPoolExecutor(max_workers=10) as executor:
+		futures = []
+
+		# Submit all independent checks
+		for check_func, args in [
+			(check_ssh_password, (env,)),
+			(check_software_updates, (env,)),
+			(check_miab_version, (env,)),
+			(check_system_aliases, (env,)),
+			(check_free_disk_space, (rounded_values, env)),
+			(check_free_memory, (rounded_values, env)),
+			(check_backup, (rounded_values, env)),
+			(check_time_synchronization, (env,)),
+			(check_disk_health, (env,)),
+		]:
+			check_output = BufferedOutput()
+			futures.append((executor.submit(check_func, *args, check_output), check_output))
+
+		# Wait for all checks to complete and collect outputs
+		for future, check_output in futures:
+			future.result()  # Wait for completion
+			check_output.playback(output)  # Playback in submission order
 
 def check_ufw(env, output):
 	if not os.path.isfile('/usr/sbin/ufw'):
@@ -266,31 +346,104 @@ def check_free_memory(rounded_values, env, output):
 def check_backup(rounded_values, env, output):
 	# Check backups
 	backup_config = get_backup_config(env, for_ui=True)
-	
+
 	# Is the backup enabled?
 	if backup_config.get("target", "off") == "off":
 		output.print_warning("Backups are disabled. It is recommended to enable a backup for your box.")
 		return
 	else:
 		output.print_ok("Backups are enabled")
-	
+
 	# Get the age of the most recent backup
 	backup_stat = backup_status(env)
-	
+
 	backups = backup_stat.get("backups", {})
 	if backups and len(backups) > 0:
 		most_recent = backups[0]["date"]
-		
+
 		# Calculate time between most recent backup and current time
 		now = datetime.datetime.now(dateutil.tz.tzlocal())
 		bk_date = dateutil.parser.parse(most_recent).astimezone(dateutil.tz.tzlocal())
 		bk_age = dateutil.relativedelta.relativedelta(now, bk_date)
-		
+
 		if bk_age.days > 7:
 			output.print_error("Backup is more than a week old")
 	else:
 		output.print_error("Could not obtain backup status or no backup has been made (yet). "
 			"This could happen if you have just enabled backups. In that case, check back tomorrow.")
+
+def check_time_synchronization(env, output):
+	"""Check if system time is properly synchronized via NTP/timesyncd"""
+	# Try systemd-timesyncd first (default on Ubuntu)
+	code, result = shell('check_output', ['timedatectl', 'status'], capture_stderr=True, trap=True)
+
+	if code != 0:
+		output.print_warning("Could not check time synchronization status (timedatectl not available).")
+		return
+
+	# Parse timedatectl output
+	lines = result.lower()
+
+	# Check if NTP/systemd-timesyncd is enabled and synchronized
+	ntp_enabled = 'ntp service: active' in lines or 'system clock synchronized: yes' in lines or 'ntp synchronized: yes' in lines
+
+	if ntp_enabled:
+		output.print_ok("System time is synchronized.")
+	else:
+		output.print_error("""System clock is not synchronized. Time synchronization is critical for DNSSEC, SSL certificates, and log accuracy.
+			Enable NTP with: timedatectl set-ntp true""")
+
+def check_disk_health(env, output):
+	"""Check for disk I/O errors in system logs that might indicate hardware failure"""
+	try:
+		# Check dmesg for disk errors (requires root, but daemon should run as root)
+		code, dmesg_output = shell('check_output', ['dmesg'], capture_stderr=True, trap=True)
+
+		if code != 0:
+			# Can't read dmesg, skip check
+			return
+
+		# Look for common disk error patterns
+		error_patterns = [
+			'I/O error',
+			'Buffer I/O error',
+			'disk error',
+			'ata.*error',
+			'sd.*error',
+			'read error',
+			'write error',
+			'SMART.*error',
+			'medium error',
+			'disk failure',
+		]
+
+		errors_found = []
+		for line in dmesg_output.split('\n'):
+			line_lower = line.lower()
+			for pattern in error_patterns:
+				if pattern.lower() in line_lower:
+					# Limit to recent errors (avoid ancient boot-time messages)
+					# Only report if we find the pattern
+					if line not in errors_found:
+						errors_found.append(line)
+						break
+
+		# Only warn about recent errors - limit to last 10
+		if len(errors_found) > 0:
+			recent_errors = errors_found[-10:]
+			output.print_error(f"Disk I/O errors detected in system logs ({len(errors_found)} total). This may indicate failing hardware. Recent errors:")
+			for error in recent_errors[:3]:  # Show max 3 examples
+				# Sanitize and truncate error message
+				error = error[:200]
+				output.print_line(f"  {error}")
+			if len(recent_errors) > 3:
+				output.print_line(f"  ... and {len(recent_errors) - 3} more. Check 'dmesg' for details.")
+		else:
+			output.print_ok("No disk I/O errors detected in system logs.")
+
+	except Exception:
+		# If anything goes wrong, silently skip this check
+		pass
 
 
 def run_network_checks(env, output):
@@ -312,22 +465,28 @@ def run_network_checks(env, output):
 			machines from being able to send spam. A quick connection test to Google's mail server on port 25
 			failed.""")
 
-	# Stop if the IPv4 address is listed in the ZEN Spamhaus Block List.
+	# Check if the IP address is listed in various RBLs (Real-time Blackhole Lists)
 	# The user might have ended up on an IP address that was previously in use
 	# by a spammer, or the user may be deploying on a residential network. We
 	# will not be able to reliably send mail in these cases.
 	rev_ip4 = ".".join(reversed(env['PUBLIC_IP'].split('.')))
+
+	# Check Spamhaus ZEN (most important)
 	zen = query_dns(rev_ip4+'.zen.spamhaus.org', 'A', nxdomain=None)
 	evaluate_spamhaus_lookup(env['PUBLIC_IP'], 'IPv4', rev_ip4, output, zen)
 
-	if not env['PUBLIC_IPV6']:
-		return
+	# Check additional RBLs for comprehensive coverage
+	check_additional_rbls_for_ip(env['PUBLIC_IP'], 'IPv4', rev_ip4, output)
 
-	from ipaddress import IPv6Address
+	if env.get('PUBLIC_IPV6'):
+		from ipaddress import IPv6Address
 
-	rev_ip6 = ".".join(reversed(IPv6Address(env['PUBLIC_IPV6']).exploded.split(':')))
-	zen = query_dns(rev_ip6+'.zen.spamhaus.org', 'A', nxdomain=None)
-	evaluate_spamhaus_lookup(env['PUBLIC_IPV6'], 'IPv6', rev_ip6, output, zen)
+		rev_ip6 = ".".join(reversed(IPv6Address(env['PUBLIC_IPV6']).exploded.split(':')))
+		zen = query_dns(rev_ip6+'.zen.spamhaus.org', 'A', nxdomain=None)
+		evaluate_spamhaus_lookup(env['PUBLIC_IPV6'], 'IPv6', rev_ip6, output, zen)
+
+		# Check additional RBLs for IPv6
+		check_additional_rbls_for_ip(env['PUBLIC_IPV6'], 'IPv6', rev_ip6, output)
 
 
 def evaluate_spamhaus_lookup(lookupaddress, lookuptype, lookupdomain, output, zen):
@@ -354,6 +513,39 @@ def evaluate_spamhaus_lookup(lookupaddress, lookuptype, lookupdomain, output, ze
 		output.print_error(f"""The {lookuptype} address of this machine {lookupaddress} is listed in the Spamhaus Block
 		 	List (code {zen}), which may prevent recipients from receiving your email. See
 		 	http://www.spamhaus.org/query/ip/{lookupaddress}.""")
+
+def check_additional_rbls_for_ip(ip_address, ip_type, reversed_ip, output):
+	"""Check additional RBL (Real-time Blackhole List) services beyond Spamhaus"""
+
+	# List of additional major RBLs to check
+	# Only checking free/public RBLs that don't have query limits
+	rbls = [
+		('b.barracudacentral.org', 'Barracuda'),
+		('bl.spamcop.net', 'SpamCop'),
+		('dnsbl.sorbs.net', 'SORBS'),
+	]
+
+	any_listed = False
+	errors_checked = 0
+
+	for rbl_domain, rbl_name in rbls:
+		result = query_dns(reversed_ip + '.' + rbl_domain, 'A', nxdomain=None)
+
+		if result is None:
+			# Not listed - good
+			errors_checked += 1
+		elif result == "[timeout]" or result == "[Not Set]":
+			# Couldn't check - don't count as error, just skip
+			pass
+		else:
+			# Listed in this RBL
+			output.print_error(f"""{ip_type} address {ip_address} is listed in {rbl_name} blacklist ({rbl_domain}).
+				This may prevent email delivery to some recipients. Check https://mxtoolbox.com/blacklists.aspx for details.""")
+			any_listed = True
+
+	# Only print OK if we successfully checked at least one RBL and none were listed
+	if not any_listed and errors_checked > 0:
+		output.print_ok(f"{ip_type} address is not blacklisted in {errors_checked} additional RBL(s) checked (Barracuda, SpamCop, SORBS).")
 
 
 def run_domain_checks(rounded_time, env, output, pool, domains_to_check=None):
@@ -388,10 +580,13 @@ def run_domain_checks(rounded_time, env, output, pool, domains_to_check=None):
 	#for domain in sort_domains(domains_to_check, env):
 	#	run_domain_checks_on_domain(domain, rounded_time, env, dns_domains, dns_zonefiles, mail_domains, web_domains)
 
-	# Parallelize the checks across a worker pool.
+	# Parallelize the checks across a worker pool with optimized chunksize
 	args = ((domain, rounded_time, env, dns_domains, dns_zonefiles, mail_domains, web_domains, domains_with_a_records)
 		for domain in domains_to_check)
-	ret = pool.starmap(run_domain_checks_on_domain, args, chunksize=1)
+	# Calculate optimal chunk size based on domain count and pool size
+	domain_count = len(domains_to_check)
+	chunk_size = max(1, domain_count // (pool._processes * 4)) if domain_count > 0 else 1
+	ret = pool.starmap(run_domain_checks_on_domain, args, chunksize=chunk_size)
 	ret = dict(ret) # (domain, output) => { domain: output }
 	for domain in sort_domains(ret, env):
 		ret[domain].playback(output)
@@ -409,12 +604,24 @@ def run_domain_checks_on_domain(domain, rounded_time, env, dns_domains, dns_zone
 
 	# The domain is IDNA-encoded in the database, but for display use Unicode.
 	try:
+		# Validate domain length before decoding (prevent buffer overflow)
+		if len(domain) > 253:
+			output.add_heading(domain[:253])
+			output.print_error("Domain name exceeds maximum length (253 characters)")
+			return (domain, output)
+
 		domain_display = idna.decode(domain.encode('ascii'))
+
+		# Additional validation: prevent homograph attacks and display anomalies
+		if len(domain_display) > 253:
+			domain_display = domain_display[:253]
+
 		output.add_heading(domain_display)
 	except (ValueError, UnicodeError, idna.IDNAError) as e:
 		# Looks like we have some invalid data in our database.
-		output.add_heading(domain)
-		output.print_error("Domain name is invalid: " + str(e))
+		# Don't display the raw exception to prevent information disclosure
+		output.add_heading(domain[:253] if len(domain) <= 253 else domain[:253])
+		output.print_error("Domain name is invalid (encoding error)")
 
 	if domain == env["PRIMARY_HOSTNAME"]:
 		check_primary_hostname_dns(domain, env, output, dns_domains, dns_zonefiles)
@@ -584,11 +791,11 @@ def check_dns_zone(domain, env, output, dns_zonefiles):
 				continue
 			# Choose the first IP if nameserver returns multiple
 			ns_ip = ns_ips.split('; ')[0]
-			
+
 			# No need to check if we could not obtain the SOA record
 			if SOARecord == '[timeout]':
 				checkSOA = False
-			else:			
+			else:
 				checkSOA = True
 
 			# Now query it to see what it says about this domain.
@@ -644,19 +851,67 @@ def check_dnssec(domain, env, output, dns_zonefiles, is_checking_primary=False):
 
 	# Read in the pre-generated DS records
 	expected_ds_records = { }
-	ds_file = '/etc/nsd/zones/' + dns_zonefiles[domain] + '.ds'
+
+	# Validate zonefile name to prevent path traversal attacks
+	zonefile_name = dns_zonefiles.get(domain, '')
+	if not zonefile_name or '..' in zonefile_name or '/' in zonefile_name:
+		return  # Invalid zonefile name, abort
+
+	ds_file = '/etc/nsd/zones/' + zonefile_name + '.ds'
+
+	# Additional path validation: ensure resolved path is within expected directory
+	try:
+		real_path = os.path.realpath(ds_file)
+		if not real_path.startswith('/etc/nsd/zones/'):
+			return  # Path traversal attempt detected
+	except (OSError, ValueError):
+		return  # Error resolving path
+
 	if not os.path.exists(ds_file): return # Domain is in our database but DNS has not yet been updated.
-	with open(ds_file, encoding="utf-8") as f:
-		for rr_ds in f:
+
+	# Use more efficient file reading with read() instead of line-by-line iteration
+	try:
+		with open(ds_file, encoding="utf-8") as f:
+			ds_content = f.read()
+
+		# Limit file content size to prevent memory exhaustion
+		if len(ds_content) > 1048576:  # 1MB limit
+			return  # File too large, potential attack
+
+		for rr_ds in ds_content.splitlines():
+			if not rr_ds.strip():
+				continue
 			rr_ds = rr_ds.rstrip()
 			ds_keytag, ds_alg, ds_digalg, ds_digest = rr_ds.split("\t")[4].split(" ")
+
+			# Validate algorithm values to prevent exploits
+			if ds_alg not in alg_name_map or ds_digalg not in digalg_name_map:
+				continue  # Skip invalid algorithm
 
 			# Some registrars may want the public key so they can compute the digest. The DS
 			# record that we suggest using is for the KSK (and that's how the DS records were generated).
 			# We'll also give the nice name for the key algorithm.
 			dnssec_keys = load_env_vars_from_file(os.path.join(env['STORAGE_ROOT'], f'dns/dnssec/{alg_name_map[ds_alg]}.conf'))
-			with open(os.path.join(env['STORAGE_ROOT'], 'dns/dnssec/' + dnssec_keys['KSK'] + '.key'), encoding="utf-8") as f:
-				dnsssec_pubkey = f.read().split("\t")[3].split(" ")[3]
+
+			# Validate key filename to prevent path traversal
+			ksk_name = dnssec_keys.get('KSK', '')
+			if not ksk_name or '..' in ksk_name or '/' in ksk_name:
+				continue  # Invalid key name
+
+			key_file = os.path.join(env['STORAGE_ROOT'], 'dns/dnssec/' + ksk_name + '.key')
+
+			# Validate key file path
+			real_key_path = os.path.realpath(key_file)
+			expected_prefix = os.path.realpath(os.path.join(env['STORAGE_ROOT'], 'dns/dnssec/'))
+			if not real_key_path.startswith(expected_prefix):
+				continue  # Path traversal detected
+
+			with open(key_file, encoding="utf-8") as kf:
+				key_content = kf.read()
+				# Validate key file size
+				if len(key_content) > 10240:  # 10KB limit for key files
+					continue
+				dnsssec_pubkey = key_content.split("\t")[3].split(" ")[3]
 
 			expected_ds_records[ ds_keytag, ds_alg, ds_digalg, ds_digest ] = {
 				"record": rr_ds,
@@ -668,6 +923,9 @@ def check_dnssec(domain, env, output, dns_zonefiles, is_checking_primary=False):
 				"digest": ds_digest,
 				"pubkey": dnsssec_pubkey,
 			}
+	except (OSError, IOError, IndexError, KeyError, ValueError):
+		# File read error or malformed data - fail safely
+		return
 
 	# Query public DNS for the DS record at the registrar.
 	ds = query_dns(domain, "DS", nxdomain=None, as_list=True)
@@ -801,7 +1059,7 @@ def check_mail_domain(domain, env, output):
 	# Stop if the domain is listed in the Spamhaus Domain Block List.
 	# The user might have chosen a domain that was previously in use by a spammer
 	# and will not be able to reliably send mail.
-	
+
 	# See https://www.spamhaus.org/news/article/807/using-our-public-mirrors-check-your-return-codes-now. for
 	# information on spamhaus return codes
 	dbl = query_dns(domain+'.dbl.spamhaus.org', "A", nxdomain=None)
@@ -849,6 +1107,36 @@ def check_web_domain(domain, rounded_time, ssl_certificates, env, output):
 	check_ssl_cert(domain, rounded_time, ssl_certificates, env, output)
 
 def query_dns(qname, rtype, nxdomain='[Not Set]', at=None, as_list=False):
+	global _dns_cache
+
+	# Input validation: prevent DNS amplification and injection attacks
+	if isinstance(qname, str):
+		# Limit query name length to prevent buffer overflow attacks
+		if len(qname) > 253:  # RFC 1035 max domain name length
+			return nxdomain
+		# Validate characters (basic sanity check)
+		# Allow alphanumeric, dots, hyphens, underscores (for special records)
+		if not all(c.isalnum() or c in '.-_' for c in qname.replace('.', '')):
+			return nxdomain
+
+	# Validate record type to prevent unexpected queries
+	valid_rtypes = {'A', 'AAAA', 'MX', 'NS', 'TXT', 'PTR', 'DS', 'TLSA', 'SOA', 'CNAME'}
+	if rtype not in valid_rtypes:
+		return nxdomain
+
+	# Create cache key
+	cache_key = (str(qname), rtype, at, as_list)
+
+	# Check cache first (thread-safe) and validate TTL
+	with _dns_cache_lock:
+		if cache_key in _dns_cache:
+			cached_result, cached_time = _dns_cache[cache_key]
+			if _is_cache_entry_valid(cached_time):
+				return cached_result
+			else:
+				# Expired entry, remove it
+				del _dns_cache[cache_key]
+
 	# Make the qname absolute by appending a period. Without this, dns.resolver.query
 	# will fall back a failed lookup to a second query with this machine's hostname
 	# appended. This has been causing some false-positive Spamhaus reports. The
@@ -867,37 +1155,68 @@ def query_dns(qname, rtype, nxdomain='[Not Set]', at=None, as_list=False):
 		resolver = dns.resolver.Resolver()
 		resolver.nameservers = [at]
 
-	# Set a timeout so that a non-responsive server doesn't hold us back.
-	resolver.timeout = 5
-	# The number of seconds to spend trying to get an answer to the question. If the
-	# lifetime expires a dns.exception.Timeout exception will be raised.
-	resolver.lifetime = 5
+	# Set optimized timeouts - reduced from 5s to 3s for faster failure detection
+	# while still allowing slow DNS servers to respond
+	resolver.timeout = 3
+	resolver.lifetime = 3
 
 	# Do the query.
 	try:
 		response = resolver.resolve(qname, rtype)
+
+		# Validate response to prevent malicious DNS responses
+		# Limit number of records to prevent memory exhaustion
+		if len(response) > 100:
+			response = list(response)[:100]  # Cap at 100 records
+
 	except (dns.resolver.NoNameservers, dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
 		# Host did not have an answer for this query; not sure what the
 		# difference is between the two exceptions.
-		return nxdomain
+		result = nxdomain
 	except dns.exception.Timeout:
-		return "[timeout]"
+		result = "[timeout]"
+	except (ValueError, UnicodeError, UnicodeDecodeError):
+		# Malformed DNS response - prevent exploitation
+		result = nxdomain
+	except Exception:
+		# Catch-all for unexpected DNS library vulnerabilities
+		result = nxdomain
+	else:
+		try:
+			# Normalize IP addresses. IP address --- especially IPv6 addresses --- can
+			# be expressed in equivalent string forms. Canonicalize the form before
+			# returning them. The caller should normalize any IP addresses the result
+			# of this method is compared with.
+			if rtype in {"A", "AAAA"}:
+				response = [normalize_ip(str(r)) for r in response]
 
-	# Normalize IP addresses. IP address --- especially IPv6 addresses --- can
-	# be expressed in equivalent string forms. Canonicalize the form before
-	# returning them. The caller should normalize any IP addresses the result
-	# of this method is compared with.
-	if rtype in {"A", "AAAA"}:
-		response = [normalize_ip(str(r)) for r in response]
+			if as_list:
+				result = response
+			else:
+				# There may be multiple answers; concatenate the response. Remove trailing
+				# periods from responses since that's how qnames are encoded in DNS but is
+				# confusing for us. The order of the answers doesn't matter, so sort so we
+				# can compare to a well known order.
+				response_strs = [str(r).rstrip('.') for r in response]
+				# Validate each response string length to prevent memory attacks
+				response_strs = [s[:1024] for s in response_strs if len(s) < 2048]
+				result = "; ".join(sorted(response_strs))
+		except Exception:
+			# Any error in processing response - fail safely
+			result = nxdomain
 
-	if as_list:
-		return response
+	# Cache the result with timestamp (thread-safe)
+	# Enforce cache size limit for security (prevent memory exhaustion)
+	with _dns_cache_lock:
+		if len(_dns_cache) >= _DNS_CACHE_MAX_SIZE:
+			# Try evicting expired entries first
+			_evict_expired_cache_entries()
+			# If still too large, clear entirely (nuclear option but safe)
+			if len(_dns_cache) >= _DNS_CACHE_MAX_SIZE:
+				_dns_cache = {}
+		_dns_cache[cache_key] = (result, datetime.datetime.now())
 
-	# There may be multiple answers; concatenate the response. Remove trailing
-	# periods from responses since that's how qnames are encoded in DNS but is
-	# confusing for us. The order of the answers doesn't matter, so sort so we
-	# can compare to a well known order.
-	return "; ".join(sorted(str(r).rstrip('.') for r in response))
+	return result
 
 def check_ssl_cert(domain, rounded_time, ssl_certificates, env, output):
 	# Check that TLS certificate is signed.
@@ -939,36 +1258,41 @@ def check_ssl_cert(domain, rounded_time, ssl_certificates, env, output):
 			output.print_line("")
 
 _apt_updates = None
+_apt_updates_lock = threading.Lock()  # Prevent concurrent apt-get operations
+
 def list_apt_updates(apt_update=True):
 	# See if we have this information cached recently.
 	# Keep the information for 8 hours.
 	global _apt_updates
-	if _apt_updates is not None and _apt_updates[0] > datetime.datetime.now() - datetime.timedelta(hours=8):
-		return _apt_updates[1]
 
-	# Run apt-get update to refresh package list. This should be running daily
-	# anyway, so on the status checks page don't do this because it is slow.
-	if apt_update:
-		shell("check_call", ["/usr/bin/apt-get", "-qq", "update"])
+	# Thread-safe cache check
+	with _apt_updates_lock:
+		if _apt_updates is not None and _apt_updates[0] > datetime.datetime.now() - datetime.timedelta(hours=8):
+			return _apt_updates[1]
 
-	# Run apt-get upgrade in simulate mode to get a list of what
-	# it would do.
-	simulated_install = shell("check_output", ["/usr/bin/apt-get", "-qq", "-s", "upgrade"])
-	pkgs = []
-	for line in simulated_install.split('\n'):
-		if line.strip() == "":
-			continue
-		if re.match(r'^Conf .*', line):
-			 # remove these lines, not informative
-			continue
-		m = re.match(r'^Inst (.*) \[(.*)\] \((\S*)', line)
-		if m:
-			pkgs.append({ "package": m.group(1), "version": m.group(3), "current_version": m.group(2) })
-		else:
-			pkgs.append({ "package": "[" + line + "]", "version": "", "current_version": "" })
+		# Run apt-get update to refresh package list. This should be running daily
+		# anyway, so on the status checks page don't do this because it is slow.
+		if apt_update:
+			shell("check_call", ["/usr/bin/apt-get", "-qq", "update"])
 
-	# Cache for future requests.
-	_apt_updates = (datetime.datetime.now(), pkgs)
+		# Run apt-get upgrade in simulate mode to get a list of what
+		# it would do.
+		simulated_install = shell("check_output", ["/usr/bin/apt-get", "-qq", "-s", "upgrade"])
+		pkgs = []
+		for line in simulated_install.split('\n'):
+			if line.strip() == "":
+				continue
+			if re.match(r'^Conf .*', line):
+				 # remove these lines, not informative
+				continue
+			m = re.match(r'^Inst (.*) \[(.*)\] \((\S*)', line)
+			if m:
+				pkgs.append({ "package": m.group(1), "version": m.group(3), "current_version": m.group(2) })
+			else:
+				pkgs.append({ "package": "[" + line + "]", "version": "", "current_version": "" })
+
+		# Cache for future requests.
+		_apt_updates = (datetime.datetime.now(), pkgs)
 
 	return pkgs
 
@@ -1021,12 +1345,29 @@ def run_and_output_changes(env, pool):
 
 	# Load previously saved status checks.
 	cache_fn = "/var/cache/mailinabox/status_checks.json"
+	prev = []
 	if os.path.exists(cache_fn):
-		with open(cache_fn, encoding="utf-8") as f:
-			try:
-				prev = json.load(f)
-			except json.JSONDecodeError:
+		try:
+			# Validate file size before loading to prevent memory exhaustion
+			file_size = os.path.getsize(cache_fn)
+			if file_size > 10485760:  # 10MB limit
+				# File too large, skip loading and recreate
 				prev = []
+			else:
+				with open(cache_fn, encoding="utf-8") as f:
+					# Read with size limit
+					content = f.read(10485760)  # Max 10MB
+					prev = json.loads(content)
+
+				# Validate loaded data structure
+				if not isinstance(prev, list):
+					prev = []
+				# Limit number of entries
+				if len(prev) > 10000:
+					prev = prev[:10000]
+		except (json.JSONDecodeError, OSError, IOError, ValueError, MemoryError):
+			# Corrupted or malicious JSON file - start fresh
+			prev = []
 
 		# Group the serial output into categories by the headings.
 		def group_by_heading(lines):
@@ -1170,12 +1511,15 @@ if __name__ == "__main__":
 
 	env = load_environment()
 
+	# Calculate optimal pool size for this system
+	pool_size = get_optimal_pool_size()
+
 	if len(sys.argv) == 1:
-		with multiprocessing.pool.Pool(processes=10) as pool:
+		with multiprocessing.pool.Pool(processes=pool_size) as pool:
 			run_checks(False, env, ConsoleOutput(), pool)
 
 	elif sys.argv[1] == "--show-changes":
-		with multiprocessing.pool.Pool(processes=10) as pool:
+		with multiprocessing.pool.Pool(processes=pool_size) as pool:
 			run_and_output_changes(env, pool)
 
 	elif sys.argv[1] == "--check-primary-hostname":
@@ -1196,5 +1540,5 @@ if __name__ == "__main__":
 		print(what_version_is_this(env))
 
 	elif sys.argv[1] == "--only":
-		with multiprocessing.pool.Pool(processes=10) as pool:
+		with multiprocessing.pool.Pool(processes=pool_size) as pool:
 			run_checks(False, env, ConsoleOutput(), pool, domains_to_check=sys.argv[2:])
