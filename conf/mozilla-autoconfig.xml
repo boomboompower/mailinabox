@@ -38,28 +38,8 @@
       </documentation>
     </emailProvider>
 
-    <addressbook type="carddav">
-      <username>%EMAILADDRESS%</username>
-      <authentication system="http">basic</authentication>
-      <!-- Redirects to: https://PRIMARY_HOSTNAME/cloud/remote.php/carddav/ -->
-      <url>https://PRIMARY_HOSTNAME/.well-known/carddav</url>
-    </addressbook>
-
-    <calendar type="caldav">
-      <username>%EMAILADDRESS%</username>
-      <authentication system="http">basic</authentication>
-      <!-- Redirects to: https://PRIMARY_HOSTNAME/cloud/remote.php/caldav/ -->
-      <url>https://PRIMARY_HOSTNAME/.well-known/caldav</url>
-    </calendar>
-
     <webMail>
-      <loginPage url="https://PRIMARY_HOSTNAME/mail/" />
-      <loginPageInfo url="https://PRIMARY_HOSTNAME/mail/" >
-        <username>%EMAILADDRESS%</username>
-        <usernameField id="rcmloginuser" name="_user" />
-        <passwordField id="rcmloginpwd" name="_pass" />
-        <loginButton id="rcmloginsubmit" />
-      </loginPageInfo>
+      <loginPage url="https://PRIMARY_HOSTNAME/" />
     </webMail>
 
     <clientConfigUpdate url="https://PRIMARY_HOSTNAME/.well-known/autoconfig/mail/config-v1.1.xml" />
