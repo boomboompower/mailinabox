@@ -301,16 +301,6 @@ def build_zone(domain, domain_properties, additional_records, env, is_zone=True)
 		if not has_rec("_dmarc", "TXT", prefix="v=DMARC1; "):
 			records.append(("_dmarc", "TXT", 'v=DMARC1; p=quarantine;', f"Recommended. Specifies that mail that does not originate from the box but claims to be from @{domain} or which does not have a valid DKIM signature is suspect and should be quarantined by the recipient's mail system."))
 
-	if domain_properties[domain]["user"]:
-		# Add CardDAV/CalDAV SRV records on the non-primary hostname that points to the primary hostname
-		# for autoconfiguration of mail clients (so only domains hosting user accounts need it).
-		# The SRV record format is priority (0, whatever), weight (0, whatever), port, service provider hostname (w/ trailing dot).
-		if domain != env["PRIMARY_HOSTNAME"]:
-			for dav in ("card", "cal"):
-				qname = "_" + dav + "davs._tcp"
-				if not has_rec(qname, "SRV"):
-					records.append((qname, "SRV", "0 0 443 " + env["PRIMARY_HOSTNAME"] + ".", "Recommended. Specifies the hostname of the server that handles CardDAV/CalDAV services for email addresses on this domain."))
-
 	# If this is a domain name that there are email addresses configured for, i.e. "something@"
 	# this domain name, then the domain name is a MTA-STS (https://tools.ietf.org/html/rfc8461)
 	# Policy Domain.

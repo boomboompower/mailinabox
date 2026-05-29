@@ -8,7 +8,7 @@
 define('IMAP_SERVER', '127.0.0.1');
 define('IMAP_PORT', 993);
 define('IMAP_OPTIONS', '/ssl/norsh/novalidate-cert');
-define('IMAP_DEFAULTFROM', 'sql');
+define('IMAP_DEFAULTFROM', 'username');
 
 define('SYSTEM_MIME_TYPES_MAPPING', '/etc/mime.types');
 define('IMAP_AUTOSEEN_ON_DELETE', false);
@@ -52,6 +52,6 @@ global $imap_smtp_params;
 $imap_smtp_params = array('host' => 'ssl://127.0.0.1', 'port' => 465, 'auth' => true, 'username' => 'imap_username', 'password' => 'imap_password');
 
 define('MAIL_MIMEPART_CRLF', "\r\n");
-define('IMAP_MEETING_USE_CALDAV', true);
+define('IMAP_MEETING_USE_CALDAV', false);
 
 ?>
