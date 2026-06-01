@@ -26,26 +26,6 @@ define('IMAP_FOLDER_ARCHIVE', 'ARCHIVE');
 define('IMAP_INLINE_FORWARD', true);
 define('IMAP_EXCLUDED_FOLDERS', '');
 
-define('IMAP_FROM_SQL_DSN', 'sqlite:STORAGE_ROOT/mail/roundcube/roundcube.sqlite');
-define('IMAP_FROM_SQL_USER', '');
-define('IMAP_FROM_SQL_PASSWORD', '');
-define('IMAP_FROM_SQL_OPTIONS', serialize(array(PDO::ATTR_PERSISTENT => true)));
-define('IMAP_FROM_SQL_QUERY', "SELECT name, email FROM identities i INNER JOIN users u ON i.user_id = u.user_id WHERE u.username = '#username' AND i.standard = 1 AND i.del = 0 AND i.name <> ''");
-define('IMAP_FROM_SQL_FIELDS', serialize(array('name', 'email')));
-define('IMAP_FROM_SQL_FROM', '#name <#email>');
-define('IMAP_FROM_SQL_FULLNAME', '#name');
-
-// not used
-define('IMAP_FROM_LDAP_SERVER', '');
-define('IMAP_FROM_LDAP_SERVER_PORT', '389');
-define('IMAP_FROM_LDAP_USER', 'cn=zpush,ou=servers,dc=zpush,dc=org');
-define('IMAP_FROM_LDAP_PASSWORD', 'password');
-define('IMAP_FROM_LDAP_BASE', 'dc=zpush,dc=org');
-define('IMAP_FROM_LDAP_QUERY', '(mail=#username@#domain)');
-define('IMAP_FROM_LDAP_FIELDS', serialize(array('givenname', 'sn', 'mail')));
-define('IMAP_FROM_LDAP_FROM', '#givenname #sn <#mail>');
-define('IMAP_FROM_LDAP_FULLNAME', '#givenname #sn');
-
 define('IMAP_SMTP_METHOD', 'sendmail');
 
 global $imap_smtp_params;
