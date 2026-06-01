@@ -25,6 +25,10 @@ class BackendCombinedConfig {
 				SYNC_FOLDER_TYPE_USER_MAIL => 'i',
 				SYNC_FOLDER_TYPE_UNKNOWN => 'i',
 			),
+			// Calendar, contacts, and task folder types are intentionally not mapped.
+			// Z-Push returns an empty collection for these types; clients will show
+			// no calendar/contacts sync, which is expected. Some Outlook versions may
+			// issue repeated FolderSync requests for unmapped types - this is harmless.
 			'rootcreatefolderbackend' => 'i',
 		);
     }

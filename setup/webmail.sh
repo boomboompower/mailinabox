@@ -35,27 +35,41 @@ OXI_DIR=/usr/local/src/oxi
 if [ ! -d "$OXI_DIR/.git" ]; then
 	git clone https://github.com/c0h1b4/oxi.git "$OXI_DIR"
 fi
-git -C "$OXI_DIR" fetch origin
+# Use --all to ensure the pinned commit is reachable even if it was not on the
+# default fetch refspec (e.g. after a force-push or branch rename).
+git -C "$OXI_DIR" fetch --all
 git -C "$OXI_DIR" checkout "$OXI_COMMIT"
 
-# Build frontend. /mail is oxi's own Next.js route - no basePath needed.
-cd "$OXI_DIR/frontend"
-bun install --frozen-lockfile
-bun run build
+# Skip the build if the installed binary was already built from this commit.
+OXI_BUILD_STAMP=/usr/local/share/oxi-email/built-commit
+if [ ! -f "$OXI_BUILD_STAMP" ] || [ "$(cat "$OXI_BUILD_STAMP")" != "$OXI_COMMIT" ]; then
 
-# Build Rust backend.
-cd "$OXI_DIR/backend"
-cargo build --release
+	# Build frontend and backend in a subshell so the cd calls do not change
+	# the working directory for the rest of start.sh (which sources this script).
+	(
+		# Build frontend. /mail is oxi's own Next.js route - no basePath needed.
+		cd "$OXI_DIR/frontend"
+		bun install --frozen-lockfile
+		bun run build
 
-# Install binary and static files.
-cp "$OXI_DIR/backend/target/release/oxi-email-server" /usr/local/bin/oxi-email-server
-chmod 755 /usr/local/bin/oxi-email-server
-chown root:root /usr/local/bin/oxi-email-server
+		# Build Rust backend.
+		cd "$OXI_DIR/backend"
+		cargo build --release
+	)
 
-mkdir -p /usr/local/share/oxi-email
-rsync -a --delete "$OXI_DIR/frontend/out/" /usr/local/share/oxi-email/static/
-chown -R root:root /usr/local/share/oxi-email
-chmod -R 755 /usr/local/share/oxi-email
+	# Install binary and static files.
+	cp "$OXI_DIR/backend/target/release/oxi-email-server" /usr/local/bin/oxi-email-server
+	chmod 755 /usr/local/bin/oxi-email-server
+	chown root:root /usr/local/bin/oxi-email-server
+
+	mkdir -p /usr/local/share/oxi-email
+	rsync -a --delete "$OXI_DIR/frontend/out/" /usr/local/share/oxi-email/static/
+	chown -R root:root /usr/local/share/oxi-email
+	chmod -R 755 /usr/local/share/oxi-email
+
+	# Record the built commit so re-runs skip the build when nothing changed.
+	echo "$OXI_COMMIT" > "$OXI_BUILD_STAMP"
+fi
 
 # Data directory for per-user SQLite + search indexes - www-data needs write.
 mkdir -p "$STORAGE_ROOT/oxi"

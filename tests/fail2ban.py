@@ -252,13 +252,16 @@ def check_removed_endpoints():
 	for path in removed:
 		url = "https://" + hostname + path
 		try:
+			# Do not follow redirects: a 3xx is as good as a 404 here - the
+			# old nginx rewrite is gone. Following redirects risks landing on
+			# oxi.email's catch-all (200) and flagging a false positive.
 			r = requests.get(url, timeout=8, verify=False,
 				headers={'User-Agent': 'Mail-in-a-Box fail2ban tester'},
-				allow_redirects=True)
-			if r.status_code == 404:
-				print(f"  {path} -> 404 [OK]")
+				allow_redirects=False)
+			if r.status_code in (404, 301, 302):
+				print(f"  {path} -> {r.status_code} [OK]")
 			else:
-				print(f"  {path} -> {r.status_code} [UNEXPECTED - should be 404]")
+				print(f"  {path} -> {r.status_code} [UNEXPECTED - should be 404 or redirect]")
 				ok = False
 		except Exception as e:
 			print(f"  {path} -> connection error: {e}")
