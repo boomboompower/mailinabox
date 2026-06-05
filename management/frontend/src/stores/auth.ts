@@ -3,7 +3,6 @@ import { defineStore } from 'pinia'
 import type { LoginApiResponse } from '@/types'
 
 export const useAuthStore = defineStore('auth', () => {
-  // Session state is read from localStorage (remember me) or sessionStorage (tab-only).
   const sessionKey = ref<string | null>(
     localStorage.getItem('session_key') || sessionStorage.getItem('session_key'),
   )
@@ -19,13 +18,17 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = computed(() => !!sessionKey.value)
   const isAdmin = computed(() => privileges.value.includes('admin'))
 
-  /** Called by all three login paths (password, password+TOTP, passkey) once auth succeeds. */
-  function handleAuthSuccess(key: string, privs: string[], remember: boolean): void {
+  /**
+   * Single function called by all three login paths (password, password+TOTP, passkey).
+   * This is the only place credentials are persisted.
+   */
+  function handleAuthSuccess(key: string, emailAddr: string, privs: string[], remember: boolean): void {
     sessionKey.value = key
+    email.value = emailAddr
     privileges.value = privs
     const store = remember ? localStorage : sessionStorage
     store.setItem('session_key', key)
-    store.setItem('email', email.value ?? '')
+    store.setItem('email', emailAddr)
     store.setItem('privileges', JSON.stringify(privs))
   }
 
@@ -40,10 +43,6 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  /**
-   * Authenticate with email + password (+ optional TOTP token).
-   * Returns 'ok' on success, 'missing-totp-token' if TOTP is required, or an error string.
-   */
   async function login(
     emailAddr: string,
     password: string,
@@ -60,8 +59,7 @@ export const useAuthStore = defineStore('auth', () => {
     const data: LoginApiResponse = await res.json()
 
     if (data.status === 'ok' && data.api_key && data.privileges) {
-      email.value = emailAddr
-      handleAuthSuccess(data.api_key, data.privileges, remember)
+      handleAuthSuccess(data.api_key, emailAddr, data.privileges, remember)
       return 'ok'
     }
     if (data.status === 'missing-totp-token') return 'missing-totp-token'

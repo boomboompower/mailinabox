@@ -4,10 +4,11 @@ import { useRouter, useRoute } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import { useAuthStore } from '@/stores/auth'
 import { useConfigStore } from '@/stores/config'
+import { ref, onMounted, onUnmounted } from 'vue'
 import {
   Users, AtSign, Globe, ExternalLink, Activity, Database, Shield,
   Lock, Layout, BookOpen, RefreshCw, BarChart2,
-  ChevronLeft, ChevronRight, LogOut, Settings,
+  ChevronLeft, ChevronRight, LogOut, Settings, Info,
 } from 'lucide-vue-next'
 import type { NavGroup } from '@/types'
 
@@ -59,11 +60,23 @@ const navGroups: NavGroup[] = [
 
 const collapsed = computed(() => ui.sidebarCollapsed)
 
+const settingsOpen = ref(false)
+const settingsRef = ref<HTMLElement | null>(null)
+
+function onOutsideClick(e: MouseEvent): void {
+  if (settingsOpen.value && settingsRef.value && !settingsRef.value.contains(e.target as Node)) {
+    settingsOpen.value = false
+  }
+}
+onMounted(() => document.addEventListener('click', onOutsideClick))
+onUnmounted(() => document.removeEventListener('click', onOutsideClick))
+
 function isActive(path: string): boolean {
   return route.path === path
 }
 
 async function handleLogout(): Promise<void> {
+  settingsOpen.value = false
   await auth.logout()
   await router.push('/login')
 }
@@ -123,36 +136,47 @@ async function handleLogout(): Promise<void> {
       </div>
     </nav>
 
-    <!-- Bottom: settings + logout -->
-    <div :class="['py-3 space-y-0.5', collapsed ? '' : '']">
-      <button
-        :class="[
-          'flex items-center w-full transition',
-          collapsed
-            ? 'justify-center rounded-xl size-9 hover:bg-gray-100 dark:hover:bg-gray-850'
-            : 'space-x-3 rounded-2xl px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-900',
-        ]"
-        :title="collapsed ? 'Settings' : undefined"
-      >
-        <Settings class="size-4 shrink-0" />
-        <span v-if="!collapsed" class="text-sm">Settings</span>
-      </button>
-      <button
-        :class="[
-          'flex items-center w-full transition text-gray-500 hover:text-gray-700 dark:hover:text-gray-300',
-          collapsed
-            ? 'justify-center rounded-xl size-9 hover:bg-gray-100 dark:hover:bg-gray-850'
-            : 'space-x-3 rounded-2xl px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-900',
-        ]"
-        title="Sign out"
-        @click="handleLogout"
-      >
-        <LogOut class="size-4 shrink-0" />
-        <span v-if="!collapsed" class="text-sm">Sign out</span>
-      </button>
-      <p v-if="!collapsed" class="text-[10px] text-gray-400 px-2.5 pt-1">
-        {{ config.hostname }}
-      </p>
+    <!-- Bottom: settings dropdown -->
+    <div class="py-3">
+      <div ref="settingsRef" class="relative">
+        <button
+          :class="[
+            'flex items-center w-full transition',
+            collapsed
+              ? 'justify-center rounded-xl size-9 hover:bg-gray-100 dark:hover:bg-gray-850'
+              : 'space-x-3 rounded-2xl px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-900',
+          ]"
+          :title="collapsed ? 'Settings' : undefined"
+          @click="settingsOpen = !settingsOpen"
+        >
+          <Settings class="size-4 shrink-0" />
+          <span v-if="!collapsed" class="text-sm">Settings</span>
+        </button>
+
+        <!-- Dropdown -->
+        <div
+          v-if="settingsOpen"
+          :class="[
+            'absolute bottom-full mb-1 z-10',
+            'w-[240px] rounded-2xl px-1 py-1',
+            'border border-gray-100 dark:border-gray-800',
+            'bg-white dark:bg-gray-850 shadow-lg',
+            collapsed ? 'left-0' : 'left-0',
+          ]"
+        >
+          <div class="flex items-center gap-2 px-3 py-2 border-b border-gray-100 dark:border-gray-800 mb-1">
+            <Info class="size-4 text-gray-400 shrink-0" />
+            <div class="text-xs text-gray-500 truncate">{{ config.hostname }}</div>
+          </div>
+          <button
+            class="flex w-full items-center gap-2 rounded-xl py-1.5 px-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-700 dark:text-gray-300"
+            @click="handleLogout"
+          >
+            <LogOut class="size-4 shrink-0" />
+            Sign out
+          </button>
+        </div>
+      </div>
     </div>
   </aside>
 </template>

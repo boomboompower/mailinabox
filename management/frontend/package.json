@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint:tokens": "grep -rn --include='*.vue' -P 'class=\"[^\"]*(?:bg-gray-|rounded-[2-9]xl|dark:bg-gray-)' src/pages/ src/components/shared/ && exit 1 || exit 0"
   },
   "dependencies": {
     "@simplewebauthn/browser": "^13.1.0",

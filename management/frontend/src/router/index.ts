@@ -48,6 +48,9 @@ router.beforeEach((to) => {
   }
 
   const auth = useAuthStore()
+  if (to.path === '/login' && auth.isLoggedIn) {
+    return '/welcome'
+  }
   if (!to.meta.public && !auth.isLoggedIn) {
     return '/login'
   }
