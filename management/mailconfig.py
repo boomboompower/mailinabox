@@ -98,9 +98,10 @@ def open_database(env, with_connection=False):
 
 def get_mail_users(env):
 	# Returns a flat, sorted list of all user accounts.
-	c = open_database(env)
+	conn, c = open_database(env, with_connection=True)
 	c.execute('SELECT email FROM users')
 	users = [ row[0] for row in c.fetchall() ]
+	conn.close()
 	return utils.sort_email_addresses(users, env)
 
 def sizeof_fmt(num):
@@ -136,9 +137,11 @@ def get_mail_users_ex(env, with_archived=False):
 	# Get users and their privileges.
 	users = []
 	active_accounts = set()
-	c = open_database(env)
+	conn, c = open_database(env, with_connection=True)
 	c.execute('SELECT email, privileges, quota FROM users')
-	for email, privileges, quota in c.fetchall():
+	rows = c.fetchall()
+	conn.close()
+	for email, privileges, quota in rows:
 		active_accounts.add(email)
 
 		(user, domain) = email.split('@')
@@ -155,10 +158,10 @@ def get_mail_users_ex(env, with_archived=False):
 
 			try:
 				percent = (box_size / box_quota) * 100
-			except:
+			except ZeroDivisionError:
 				percent = 'Error'
 
-		except:
+		except (OSError, ValueError):
 			box_size = '?'
 			box_quota = '?'
 			percent = '?'
@@ -228,9 +231,10 @@ def get_admins(env):
 
 def get_mail_aliases(env):
 	# Returns a sorted list of tuples of (address, forward-tos, permitted-senders, auto).
-	c = open_database(env)
+	conn, c = open_database(env, with_connection=True)
 	c.execute('SELECT source, destination, permitted_senders, 0 as auto FROM aliases UNION SELECT source, destination, permitted_senders, 1 as auto FROM auto_aliases')
 	aliases = { row[0]: row for row in c.fetchall() } # make dict
+	conn.close()
 
 	# put in a canonical order: sort by domain, then by email address lexicographically
 	return [ aliases[address] for address in utils.sort_email_addresses(aliases.keys(), env) ]
@@ -273,7 +277,7 @@ def get_mail_aliases_ex(env):
 		domains[domain]["aliases"].append({
 			"address": address,
 			"address_display": prettify_idn_email_address(address),
-			"forwards_to": [prettify_idn_email_address(r.strip()) for r in forwards_to.split(",")],
+			"forwards_to": [prettify_idn_email_address(r.strip()) for r in forwards_to.split(",")] if forwards_to else [],
 			"permitted_senders": [prettify_idn_email_address(s.strip()) for s in permitted_senders.split(",")] if permitted_senders is not None else None,
 			"auto": bool(auto),
 		})
@@ -355,10 +359,12 @@ def add_mail_user(email, pw, privs, quota, env):
 		c.execute("INSERT INTO users (email, password, privileges, quota) VALUES (?, ?, ?, ?)",
 			(email, pw, "\n".join(privs), quota))
 	except sqlite3.IntegrityError:
+		conn.close()
 		return ("User already exists.", 400)
 
 	# write databasebefore next step
 	conn.commit()
+	conn.close()
 
 	dovecot_quota_recalc(email)
 
@@ -376,8 +382,10 @@ def set_mail_password(email, pw, env):
 	conn, c = open_database(env, with_connection=True)
 	c.execute("UPDATE users SET password=? WHERE email=?", (pw, email))
 	if c.rowcount != 1:
+		conn.close()
 		return (f"That's not a user ({email}).", 400)
 	conn.commit()
+	conn.close()
 	return "OK"
 
 def hash_password(pw):
@@ -389,9 +397,10 @@ def hash_password(pw):
 
 
 def get_mail_quota(email, env):
-	_conn, c = open_database(env, with_connection=True)
+	conn, c = open_database(env, with_connection=True)
 	c.execute("SELECT quota FROM users WHERE email=?", (email,))
 	rows = c.fetchall()
+	conn.close()
 	if len(rows) != 1:
 		return (f"That's not a user ({email}).", 400)
 
@@ -408,8 +417,10 @@ def set_mail_quota(email, quota, env):
 	conn, c = open_database(env, with_connection=True)
 	c.execute("UPDATE users SET quota=? WHERE email=?", (quota, email))
 	if c.rowcount != 1:
+		conn.close()
 		return (f"That's not a user ({email}).", 400)
 	conn.commit()
+	conn.close()
 
 	dovecot_quota_recalc(email)
 
@@ -446,9 +457,10 @@ def get_mail_password(email, env):
 	# password format, with a prefixed scheme.
 	# http://wiki2.dovecot.org/Authentication/PasswordSchemes
 	# update the database
-	c = open_database(env)
+	conn, c = open_database(env, with_connection=True)
 	c.execute('SELECT password FROM users WHERE email=?', (email,))
 	rows = c.fetchall()
+	conn.close()
 	if len(rows) != 1:
 		msg = f"That's not a user ({email})."
 		raise ValueError(msg)
@@ -459,8 +471,10 @@ def remove_mail_user(email, env):
 	conn, c = open_database(env, with_connection=True)
 	c.execute("DELETE FROM users WHERE email=?", (email,))
 	if c.rowcount != 1:
+		conn.close()
 		return (f"That's not a user ({email}).", 400)
 	conn.commit()
+	conn.close()
 
 	# Update things in case any domains are removed.
 	return kick(env, "mail user removed")
@@ -470,9 +484,10 @@ def parse_privs(value):
 
 def get_mail_user_privileges(email, env, empty_on_error=False):
 	# get privs
-	c = open_database(env)
+	conn, c = open_database(env, with_connection=True)
 	c.execute('SELECT privileges FROM users WHERE email=?', (email,))
 	rows = c.fetchall()
+	conn.close()
 	if len(rows) != 1:
 		if empty_on_error: return []
 		return (f"That's not a user ({email}).", 400)
@@ -505,8 +520,10 @@ def add_remove_mail_user_privilege(email, priv, action, env):
 	conn, c = open_database(env, with_connection=True)
 	c.execute("UPDATE users SET privileges=? WHERE email=?", ("\n".join(privs), email))
 	if c.rowcount != 1:
+		conn.close()
 		return ("Something went wrong.", 400)
 	conn.commit()
+	conn.close()
 
 	return "OK"
 
@@ -591,11 +608,13 @@ def add_mail_alias(address, forwards_to, permitted_senders, env, update_if_exist
 		return_status = "alias added"
 	except sqlite3.IntegrityError:
 		if not update_if_exists:
+			conn.close()
 			return (f"Alias already exists ({address}).", 400)
 		c.execute("UPDATE aliases SET destination = ?, permitted_senders = ? WHERE source = ?", (forwards_to, permitted_senders, address))
 		return_status = "alias updated"
 
 	conn.commit()
+	conn.close()
 
 	if do_kick:
 		# Update things in case any new domains are added.
@@ -610,8 +629,10 @@ def remove_mail_alias(address, env, do_kick=True):
 	conn, c = open_database(env, with_connection=True)
 	c.execute("DELETE FROM aliases WHERE source=?", (address,))
 	if c.rowcount != 1:
+		conn.close()
 		return (f"That's not an alias ({address}).", 400)
 	conn.commit()
+	conn.close()
 
 	if do_kick:
 		# Update things in case any domains are removed.
@@ -624,6 +645,7 @@ def add_auto_aliases(aliases, env):
 	for source, destination in aliases.items():
 		c.execute("INSERT INTO auto_aliases (source, destination) VALUES (?, ?)", (source, destination))
 	conn.commit()
+	conn.close()
 
 def get_system_administrator(env):
 	return "administrator@" + env['PRIMARY_HOSTNAME']

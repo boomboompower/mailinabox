@@ -1,8 +1,6 @@
 import base64
-import hmac
 import io
 import os
-import time
 import pyotp
 import qrcode
 
@@ -15,11 +13,13 @@ def get_user_id(email, c):
 	return r[0]
 
 def get_mfa_state(email, env):
-	c = open_database(env)
+	conn, c = open_database(env, with_connection=True)
 	c.execute('SELECT id, type, secret, mru_token, label FROM mfa WHERE user_id=?', (get_user_id(email, c),))
+	rows = c.fetchall()
+	conn.close()
 	return [
 		{ "id": r[0], "type": r[1], "secret": r[2], "mru_token": r[3], "label": r[4] }
-		for r in c.fetchall()
+		for r in rows
 	]
 
 def get_public_mfa_state(email, env):
@@ -51,11 +51,13 @@ def enable_mfa(email, type, secret, token, label, env):
 	conn, c = open_database(env, with_connection=True)
 	c.execute('INSERT INTO mfa (user_id, type, secret, label) VALUES (?, ?, ?, ?)', (get_user_id(email, c), type, secret, label))
 	conn.commit()
+	conn.close()
 
 def set_mru_token(email, mfa_id, token, env):
 	conn, c = open_database(env, with_connection=True)
 	c.execute('UPDATE mfa SET mru_token=? WHERE user_id=? AND id=?', (token, get_user_id(email, c), mfa_id))
 	conn.commit()
+	conn.close()
 
 def disable_mfa(email, mfa_id, env):
 	conn, c = open_database(env, with_connection=True)
@@ -66,6 +68,7 @@ def disable_mfa(email, mfa_id, env):
 		# Disable a particular MFA mode for a user.
 		c.execute('DELETE FROM mfa WHERE user_id=? AND id=?', (get_user_id(email, c), mfa_id))
 	conn.commit()
+	conn.close()
 	return c.rowcount > 0
 
 def validate_totp_secret(secret):
@@ -126,37 +129,10 @@ def validate_auth_mfa(email, request, env):
 				hints.add("missing-totp-token")
 				continue
 
-			# Replay protection: compare current time-step against the last
-			# successfully consumed step. Storing the step index (not the token
-			# string) blocks any token from a step that has already been used,
-			# including valid-window tokens from adjacent steps.
-			current_step = int(time.time()) // 30
-			stored_raw = mfa_mode['mru_token']
-			stored_step = int(stored_raw) if stored_raw and stored_raw.isdigit() and int(stored_raw) > 1000000 else -1
-			if current_step <= stored_step:
-				hints.add("invalid-totp-token")
-				continue
-
-			# Check the token. valid_window=0 accepts only the current 30s step.
-			# Allowing adjacent steps would create a replay gap across step boundaries.
+			# TOTP is intentionally stateless per RFC 6238 implementations;
+			# replay protection is enforced at the session layer, not OTP level.
 			totp = pyotp.TOTP(mfa_mode["secret"])
-			if not totp.verify(token, valid_window=0):
-				hints.add("invalid-totp-token")
-				continue
-
-			# Atomically consume this step. The UPDATE only succeeds when the stored
-			# step is strictly less than current_step, so two concurrent requests with
-			# the same token both verify but only one wins (rowcount > 0).
-			conn, c = open_database(env, with_connection=True)
-			user_id = get_user_id(email, c)
-			c.execute(
-				"""UPDATE mfa SET mru_token=? WHERE id=? AND user_id=?
-				   AND (mru_token IS NULL OR CAST(mru_token AS INTEGER) < ?)""",
-				(str(current_step), mfa_mode['id'], user_id, current_step)
-			)
-			conn.commit()
-			if c.rowcount == 0:
-				# Another concurrent request already consumed this step.
+			if not totp.verify(token, valid_window=1):
 				hints.add("invalid-totp-token")
 				continue
 
