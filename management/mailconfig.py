@@ -384,7 +384,8 @@ def hash_password(pw):
 	# Turn the plain password into a Dovecot-format hashed password, meaning
 	# something like "{SCHEME}hashedpassworddata".
 	# http://wiki2.dovecot.org/Authentication/PasswordSchemes
-	return utils.shell('check_output', ["/usr/bin/doveadm", "pw", "-s", "SHA512-CRYPT", "-p", pw]).strip()
+	# Pass the password via stdin rather than -p to avoid exposing it in /proc/<pid>/cmdline.
+	return utils.shell('check_output', ["/usr/bin/doveadm", "pw", "-s", "SHA512-CRYPT"], input=(pw + "\n").encode()).strip()
 
 
 def get_mail_quota(email, env):

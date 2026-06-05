@@ -282,6 +282,9 @@ def login():
 		email, privs = auth_service.authenticate(request, env, login_only=True)
 	except ValueError as e:
 		if "missing-totp-token" in str(e):
+			# Log this too - a correct password with missing TOTP confirms valid credentials
+			# to an attacker and must be rate-limited by fail2ban the same as any bad login.
+			log_failed_login(request)
 			return json_response({
 				"status": "missing-totp-token",
 				"reason": str(e),
@@ -298,7 +301,7 @@ def login():
 		"status": "ok",
 		"email": email,
 		"privileges": privs,
-		"api_key": auth_service.create_session_key(email, env, type='login'),
+		"api_key": auth_service.create_session_key(email, env, session_type='login'),
 	}
 
 	app.logger.info("New login session created for %s", email)
@@ -863,7 +866,7 @@ def munin_start():
 	# that subsequent requests will read for authorization. (We don't use cookies
 	# for the API to avoid CSRF vulnerabilities.)
 	response = make_response("OK")
-	response.set_cookie("session", auth_service.create_session_key(request.user_email, env, type='cookie'),
+	response.set_cookie("session", auth_service.create_session_key(request.user_email, env, session_type='cookie'),
 	    max_age=60*30, secure=True, httponly=True, samesite="Strict") # 30 minute duration
 	return response
 

@@ -10,6 +10,10 @@ from mfa import get_hash_mfa_state, validate_auth_mfa
 DEFAULT_KEY_PATH   = '/var/lib/mailinabox/api.key'
 DEFAULT_AUTH_REALM = 'Mail-in-a-Box Management Server'
 
+# Placeholder hash used when an email address is not found, so that doveadm pw
+# still runs and response time is consistent regardless of whether the user exists.
+_DUMMY_HASH = "{SHA512-CRYPT}$6$rounds=5000$invalidsaltvalue$" + "x" * 86
+
 class AuthService:
 	def __init__(self):
 		self.auth_realm = DEFAULT_AUTH_REALM
@@ -17,13 +21,24 @@ class AuthService:
 		self.max_session_duration = timedelta(days=2)
 
 		self.init_system_api_key()
-		self.sessions = ExpiringDict(max_len=64, max_age_seconds=self.max_session_duration.total_seconds())
+
+		# Separate stores for login tokens (long-lived, admin sessions) and cookie
+		# tokens (short-lived munin sessions). Keeping them apart prevents munin page
+		# load churn from evicting active admin login sessions.
+		duration = self.max_session_duration.total_seconds()
+		self.login_sessions  = ExpiringDict(max_len=1024, max_age_seconds=duration)
+		self.cookie_sessions = ExpiringDict(max_len=1024, max_age_seconds=60 * 30)  # 30 min, mirrors daemon.py
+
+	def _session_store(self, session_type):
+		if session_type == 'cookie':
+			return self.cookie_sessions
+		return self.login_sessions
 
 	def init_system_api_key(self):
-		"""Write an API key to a local file so local processes can use the API"""
+		"""Read the API key from disk. The key is used to authenticate local processes."""
 
 		with open(self.key_path, encoding='utf-8') as file:
-			self.key = file.read()
+			self.key = file.read().strip()
 
 	def authenticate(self, request, env, login_only=False, logout=False):
 		"""Test if the HTTP Authorization header's username matches the system key, a session key,
@@ -58,19 +73,19 @@ class AuthService:
 
 		# If user passed the system API key, grant administrative privs. This key
 		# is not associated with a user.
-		if username == self.key and not login_only:
+		if hmac.compare_digest(username, self.key) and not login_only:
 			return (None, ["admin"])
 
 		# If the password corresponds with a session token for the user, grant access for that user.
 		if self.get_session(username, password, "login", env) and not login_only:
 			sessionid = password
-			session = self.sessions[sessionid]
+			session = self.login_sessions[sessionid]
 			if logout:
 				# Clear the session.
-				del self.sessions[sessionid]
+				del self.login_sessions[sessionid]
 			else:
 				# Re-up the session so that it does not expire.
-				self.sessions[sessionid] = session
+				self.login_sessions[sessionid] = session
 
 		# If no password was given, but a username was given, we're missing some information.
 		elif password.strip() == "":
@@ -106,19 +121,29 @@ class AuthService:
 			# same exception as if a password fails so we don't easily reveal
 			# if an email address is valid.
 			pw_hash = get_mail_password(email, env)
+			user_exists = True
+		except ValueError:
+			# Unknown user. Use a dummy hash so doveadm still runs below and
+			# response time is consistent - prevents email enumeration via timing.
+			pw_hash = _DUMMY_HASH
+			user_exists = False
 
-			# Use 'doveadm pw' to check credentials. doveadm will return
-			# a non-zero exit status if the credentials are no good,
-			# and check_call will raise an exception in that case.
-			utils.shell('check_call', [
+		# Use 'doveadm pw' to check credentials. Pass the password via stdin rather
+		# than the -p flag to avoid exposing it in /proc/<pid>/cmdline. doveadm exits
+		# non-zero if credentials are wrong; check_output raises CalledProcessError.
+		doveadm_ok = False
+		try:
+			utils.shell('check_output', [
 				"/usr/bin/doveadm", "pw",
-				"-p", pw,
 				"-t", pw_hash,
-				])
+				], input=(pw + "\n").encode())
+			doveadm_ok = True
 		except:
+			pass
+
+		if not doveadm_ok or not user_exists:
 			# Login failed.
-			msg = "Incorrect email address or password."
-			raise ValueError(msg)
+			raise ValueError("Incorrect email address or password.")
 
 		# If MFA is enabled, check that MFA passes.
 		status, hints = validate_auth_mfa(email, request, env)
@@ -139,20 +164,23 @@ class AuthService:
 		hash_key = self.key.encode('ascii')
 		return hmac.new(hash_key, msg, digestmod="sha256").hexdigest()
 
-	def create_session_key(self, username, env, type=None):
+	def create_session_key(self, username, env, session_type=None):
 		# Create a new session.
+		if not username:
+			raise ValueError("Cannot create a session for an anonymous (API key) caller.")
 		token = secrets.token_hex(32)
-		self.sessions[token] = {
+		self._session_store(session_type)[token] = {
 			"email": username,
 			"password_token": self.create_user_password_state_token(username, env),
-			"type": type,
+			"type": session_type,
 		}
 		return token
 
 	def get_session(self, user_email, session_key, session_type, env):
-		if session_key not in self.sessions: return None
-		session = self.sessions[session_key]
-		if session_type == "login" and session["email"] != user_email: return None
+		store = self._session_store(session_type)
+		if session_key not in store: return None
+		session = store[session_key]
+		if session_type == "login" and not hmac.compare_digest(session["email"], user_email): return None
 		if session["type"] != session_type: return None
-		if session["password_token"] != self.create_user_password_state_token(session["email"], env): return None
+		if not hmac.compare_digest(session["password_token"], self.create_user_password_state_token(session["email"], env)): return None
 		return session
