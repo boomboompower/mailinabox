@@ -144,6 +144,24 @@ if [ ! -f "$STORAGE_ROOT/www/default/index.html" ]; then
 fi
 chown -R "$STORAGE_USER" "$STORAGE_ROOT/www"
 
+# Configure nginx log rotation with copytruncate so fail2ban's inotify watch
+# on /var/log/nginx/access.log remains valid across daily rotation (no inode
+# change means no watch gap between rotation and fail2ban re-opening the file).
+# Override nginx logrotate to use copytruncate so fail2ban's inotify watch
+# on access.log survives daily rotation without an inode-change gap.
+# This replaces the stock /etc/logrotate.d/nginx shipped by the nginx package.
+cat > /etc/logrotate.d/nginx << 'EOF'
+/var/log/nginx/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    copytruncate
+}
+EOF
+
 # Start services.
 restart_service nginx
 restart_service php"$PHP_VER"-fpm

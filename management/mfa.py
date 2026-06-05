@@ -2,6 +2,7 @@ import base64
 import hmac
 import io
 import os
+import time
 import pyotp
 import qrcode
 
@@ -125,9 +126,14 @@ def validate_auth_mfa(email, request, env):
 				hints.add("missing-totp-token")
 				continue
 
-			# Check for a replay attack.
-			if hmac.compare_digest(token, mfa_mode['mru_token'] or ""):
-				# If the token fails, skip this MFA mode.
+			# Replay protection: compare current time-step against the last
+			# successfully consumed step. Storing the step index (not the token
+			# string) blocks any token from a step that has already been used,
+			# including valid-window tokens from adjacent steps.
+			current_step = int(time.time()) // 30
+			stored_raw = mfa_mode['mru_token']
+			stored_step = int(stored_raw) if stored_raw and stored_raw.isdigit() and int(stored_raw) > 1000000 else -1
+			if current_step <= stored_step:
 				hints.add("invalid-totp-token")
 				continue
 
@@ -137,8 +143,8 @@ def validate_auth_mfa(email, request, env):
 				hints.add("invalid-totp-token")
 				continue
 
-			# On success, record the token to prevent a replay attack.
-			set_mru_token(email, mfa_mode['id'], token, env)
+			# On success, record the current time-step to prevent replay.
+			set_mru_token(email, mfa_mode['id'], str(current_step), env)
 			return (True, [])
 
 	# On a failed login, indicate failure and any hints for what the user can do instead.

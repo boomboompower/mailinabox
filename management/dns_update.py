@@ -4,7 +4,7 @@
 # and mail aliases and restarts nsd.
 ########################################################################
 
-import sys, os, os.path, datetime, re, hashlib, base64
+import sys, os, os.path, datetime, re, hashlib, base64, tempfile, shutil
 import ipaddress
 import rtyaml
 import dns.resolver
@@ -667,73 +667,72 @@ def sign_zone(domain, zonefile, env):
 	# the domain _domain_, we have to re-write the files and place
 	# the actual domain name in it, so that ldns-signzone works.
 	#
-	# Patch each key, storing the patched version in /tmp for now.
+	# Patch each key, storing the patched version in a private temp directory.
 	# Each key has a .key and .private file. Collect a list of filenames
 	# for all of the keys (and separately just the key-signing keys).
+	#
+	# Use mkdtemp (mode 0700) rather than predictable /tmp/<keyfn> paths to
+	# prevent a symlink-race attack where a local user pre-creates the path.
+	# Use mkdtemp (mode 0700) rather than predictable /tmp/<keyfn> paths to
+	# prevent a symlink-race where a local user pre-creates the path as a symlink.
+	tmpdir = tempfile.mkdtemp(prefix="miab-dnssec-", dir="/tmp")
+	os.chmod(tmpdir, 0o700)
 	all_keys = []
 	ksk_keys = []
-	for keytype, keyfn in find_dnssec_signing_keys(domain, env):
-		newkeyfn = '/tmp/' + keyfn.replace("_domain_", domain)
+	try:
+		for keytype, keyfn in find_dnssec_signing_keys(domain, env):
+			newkeyfn = os.path.join(tmpdir, keyfn.replace("_domain_", domain))
 
-		for ext in (".private", ".key"):
-			# Copy the .key and .private files to /tmp to patch them up.
-			#
-			# Use os.umask and open().write() to securely create a copy that only
-			# we (root) can read.
-			oldkeyfn = os.path.join(env['STORAGE_ROOT'], 'dns/dnssec', keyfn + ext)
-			with open(oldkeyfn, encoding="utf-8") as fr:
-				keydata = fr.read()
-			keydata = keydata.replace("_domain_", domain)
-			prev_umask = os.umask(0o77) # ensure written file is not world-readable
-			try:
+			for ext in (".private", ".key"):
+				# Copy the .key and .private files to patch them up.
+				oldkeyfn = os.path.join(env['STORAGE_ROOT'], 'dns/dnssec', keyfn + ext)
+				with open(oldkeyfn, encoding="utf-8") as fr:
+					keydata = fr.read()
+				keydata = keydata.replace("_domain_", domain)
 				with open(newkeyfn + ext, "w", encoding="utf-8") as fw:
 					fw.write(keydata)
-			finally:
-				os.umask(prev_umask) # other files we write should be world-readable
 
-		# Put the patched key filename base (without extension) into the list of keys we'll sign with.
-		all_keys.append(newkeyfn)
-		if keytype == "KSK": ksk_keys.append(newkeyfn)
+			# Put the patched key filename base (without extension) into the list of keys we'll sign with.
+			all_keys.append(newkeyfn)
+			if keytype == "KSK": ksk_keys.append(newkeyfn)
 
-	# Do the signing.
-	expiry_date = (datetime.datetime.now() + datetime.timedelta(days=30)).strftime("%Y%m%d")
-	shell('check_call', ["/usr/bin/ldns-signzone",
-		# expire the zone after 30 days
-		"-e", expiry_date,
+		# Do the signing.
+		expiry_date = (datetime.datetime.now() + datetime.timedelta(days=30)).strftime("%Y%m%d")
+		shell('check_call', ["/usr/bin/ldns-signzone",
+			# expire the zone after 30 days
+			"-e", expiry_date,
 
-		# use NSEC3
-		"-n",
+			# use NSEC3
+			"-n",
 
-		# zonefile to sign
-		"/etc/nsd/zones/" + zonefile,
-		# keys to sign with (order doesn't matter -- it'll figure it out)
-		*all_keys
-	]
-	)
+			# zonefile to sign
+			"/etc/nsd/zones/" + zonefile,
+			# keys to sign with (order doesn't matter -- it'll figure it out)
+			*all_keys
+		])
 
-	# Create a DS record based on the patched-up key files. The DS record is specific to the
-	# zone being signed, so we can't use the .ds files generated when we created the keys.
-	# The DS record points to the KSK only. Write this next to the zone file so we can
-	# get it later to give to the user with instructions on what to do with it.
-	#
-	# Generate a DS record for each key. There are also several possible hash algorithms that may
-	# be used, so we'll pre-generate all for each key. One DS record per line. Only one
-	# needs to actually be deployed at the registrar. We'll select the preferred one
-	# in the status checks.
-	with open("/etc/nsd/zones/" + zonefile + ".ds", "w", encoding="utf-8") as f:
-		for key in ksk_keys:
-			for digest_type in ('1', '2', '4'):
-				rr_ds = shell('check_output', ["/usr/bin/ldns-key2ds",
-					"-n", # output to stdout
-					"-" + digest_type, # 1=SHA1, 2=SHA256, 4=SHA384
-					key + ".key"
-				])
-				f.write(rr_ds)
+		# Create a DS record based on the patched-up key files. The DS record is specific to the
+		# zone being signed, so we can't use the .ds files generated when we created the keys.
+		# The DS record points to the KSK only. Write this next to the zone file so we can
+		# get it later to give to the user with instructions on what to do with it.
+		#
+		# Generate a DS record for each key. There are also several possible hash algorithms that may
+		# be used, so we'll pre-generate all for each key. One DS record per line. Only one
+		# needs to actually be deployed at the registrar. We'll select the preferred one
+		# in the status checks.
+		with open("/etc/nsd/zones/" + zonefile + ".ds", "w", encoding="utf-8") as f:
+			for key in ksk_keys:
+				for digest_type in ('1', '2', '4'):
+					rr_ds = shell('check_output', ["/usr/bin/ldns-key2ds",
+						"-n", # output to stdout
+						"-" + digest_type, # 1=SHA1, 2=SHA256, 4=SHA384
+						key + ".key"
+					])
+					f.write(rr_ds)
 
-	# Remove the temporary patched key files.
-	for fn in all_keys:
-		os.unlink(fn + ".private")
-		os.unlink(fn + ".key")
+	finally:
+		# Remove the private temp directory and all patched key files.
+		shutil.rmtree(tmpdir, ignore_errors=True)
 
 ########################################################################
 

@@ -46,7 +46,7 @@ FB_DB="$STORAGE_ROOT/filebrowser/filebrowser.db"
 # Exit codes: 0=ok, 1=bad credentials, 2=backend unavailable (Dovecot down).
 cat > /usr/local/lib/filebrowser-auth.py << 'EOF'
 #!/usr/bin/env python3
-import sys, json, imaplib, ssl, socket
+import sys, json, imaplib, ssl, socket, re
 
 socket.setdefaulttimeout(5)
 
@@ -56,6 +56,12 @@ try:
     password = data.get('password', '')
 
     if not username or not password:
+        sys.exit(1)
+
+    # Reject usernames containing CRLF or characters outside normal email
+    # address syntax to prevent IMAP command injection (imaplib passes the
+    # username raw and unquoted into the LOGIN wire command).
+    if not re.fullmatch(r'[A-Za-z0-9._%+\-@]+', username):
         sys.exit(1)
 
     ctx = ssl.create_default_context()
@@ -124,7 +130,6 @@ ProtectControlGroups=true
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 RestrictNamespaces=true
 LockPersonality=true
-MemoryDenyWriteExecute=true
 SystemCallFilter=@system-service
 CapabilityBoundingSet=
 
