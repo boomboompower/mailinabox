@@ -10,9 +10,9 @@ const ui = useUiStore()
     <!-- Backdrop -->
     <Transition
       enter-from-class="opacity-0"
-      enter-active-class="transition duration-[10ms]"
+      enter-active-class="transition duration-150"
       leave-to-class="opacity-0"
-      leave-active-class="transition duration-[10ms]"
+      leave-active-class="transition duration-150"
     >
       <div
         v-if="ui.mobileSidebarOpen"
@@ -24,9 +24,9 @@ const ui = useUiStore()
     <!-- Drawer -->
     <Transition
       enter-from-class="-translate-x-full"
-      enter-active-class="transition-transform duration-250"
+      enter-active-class="transition-transform duration-200"
       leave-to-class="-translate-x-full"
-      leave-active-class="transition-transform duration-250"
+      leave-active-class="transition-transform duration-200"
     >
       <div v-if="ui.mobileSidebarOpen" class="fixed inset-y-0 left-0 z-50 md:hidden">
         <AppSidebar class="flex" />

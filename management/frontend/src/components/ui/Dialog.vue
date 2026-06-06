@@ -11,9 +11,9 @@ defineProps<{
     <!-- Backdrop -->
     <Transition
       enter-from-class="opacity-0"
-      enter-active-class="transition duration-[10ms]"
+      enter-active-class="transition duration-150"
       leave-to-class="opacity-0"
-      leave-active-class="transition duration-[10ms]"
+      leave-active-class="transition duration-150"
     >
       <div
         v-if="open"
