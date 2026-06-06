@@ -44,6 +44,10 @@ defineProps<{ title?: string }>()
         <div class="flex-1 overflow-y-auto p-6">
           <slot />
         </div>
+        <!-- danger slot: adds a top border divider before destructive actions -->
+        <div v-if="$slots.danger" class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 shrink-0">
+          <slot name="danger" />
+        </div>
         <div v-if="$slots.footer" class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 shrink-0">
           <slot name="footer" />
         </div>

@@ -10,6 +10,8 @@ import TableRow from '@/components/ui/TableRow.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import Badge from '@/components/ui/Badge.vue'
+import TableHead from '@/components/ui/TableHead.vue'
+import Th from '@/components/ui/Th.vue'
 import Sheet from '@/components/ui/Sheet.vue'
 import Dialog from '@/components/ui/Dialog.vue'
 import Textarea from '@/components/ui/Textarea.vue'
@@ -124,14 +126,12 @@ onMounted(load)
     </div>
 
     <Table>
-      <thead>
-        <tr class="border-b border-gray-100 dark:border-gray-800">
-          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Address</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Forwards To</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Type</th>
-          <th class="px-4 py-3"></th>
-        </tr>
-      </thead>
+      <TableHead>
+        <Th>Address</Th>
+        <Th>Forwards To</Th>
+        <Th class="hidden sm:table-cell">Type</Th>
+        <th class="px-4 py-3"></th>
+      </TableHead>
       <tbody>
         <template v-if="loading">
           <TableRow v-for="i in 4" :key="i">
@@ -175,6 +175,9 @@ onMounted(load)
     </EmptyState>
 
     <Sheet v-model="sheetOpen" :title="editingAlias ? 'Edit Alias' : 'Add Alias'">
+      <template v-if="editingAlias && !editingAlias.auto" #danger>
+        <Button variant="destructive" class="w-full" @click="deleteOpen = true">Remove Alias</Button>
+      </template>
       <div class="space-y-5">
         <div>
           <label class="block text-sm font-medium mb-1.5">Address</label>
@@ -208,11 +211,6 @@ onMounted(load)
           {{ saving ? 'Saving...' : editingAlias ? 'Update Alias' : 'Add Alias' }}
         </Button>
 
-        <div v-if="editingAlias && !editingAlias.auto" class="pt-4 border-t border-gray-100 dark:border-gray-800">
-          <Button variant="destructive" class="w-full" @click="deleteOpen = true">
-            Remove Alias
-          </Button>
-        </div>
       </div>
     </Sheet>
 

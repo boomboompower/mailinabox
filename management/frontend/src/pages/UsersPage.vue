@@ -10,6 +10,8 @@ import TableRow from '@/components/ui/TableRow.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import Badge from '@/components/ui/Badge.vue'
+import TableHead from '@/components/ui/TableHead.vue'
+import Th from '@/components/ui/Th.vue'
 import Sheet from '@/components/ui/Sheet.vue'
 import Dialog from '@/components/ui/Dialog.vue'
 import { useApi } from '@/composables/useApi'
@@ -152,14 +154,12 @@ onMounted(load)
     </div>
 
     <Table>
-      <thead>
-        <tr class="border-b border-gray-100 dark:border-gray-800">
-          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-full">Email</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Privileges</th>
-          <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Quota</th>
-          <th class="px-4 py-3"></th>
-        </tr>
-      </thead>
+      <TableHead>
+        <Th class="w-full">Email</Th>
+        <Th class="whitespace-nowrap">Privileges</Th>
+        <Th class="whitespace-nowrap">Quota</Th>
+        <th class="px-4 py-3"></th>
+      </TableHead>
       <tbody>
         <template v-if="loading">
           <TableRow v-for="i in 4" :key="i">
@@ -204,6 +204,9 @@ onMounted(load)
     </EmptyState>
 
     <Sheet v-model="sheetOpen" :title="editingUser ? 'Edit User' : 'Add User'">
+      <template v-if="editingUser" #danger>
+        <Button variant="destructive" class="w-full" @click="deleteOpen = true">Archive User</Button>
+      </template>
       <div class="space-y-5">
         <div>
           <label class="block text-sm font-medium mb-1.5">Email</label>
@@ -249,11 +252,6 @@ onMounted(load)
           {{ saving ? 'Saving...' : editingUser ? 'Save Changes' : 'Add User' }}
         </Button>
 
-        <div v-if="editingUser" class="pt-4 border-t border-gray-100 dark:border-gray-800">
-          <Button variant="destructive" class="w-full" @click="deleteOpen = true">
-            Archive User
-          </Button>
-        </div>
       </div>
     </Sheet>
 
