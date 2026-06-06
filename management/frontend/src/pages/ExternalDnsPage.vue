@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
+import { WifiOff } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import Select from '@/components/ui/Select.vue'
@@ -9,6 +10,7 @@ import TableRow from '@/components/ui/TableRow.vue'
 import TableHead from '@/components/ui/TableHead.vue'
 import Th from '@/components/ui/Th.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
+import EmptyState from '@/components/ui/EmptyState.vue'
 import { useApi } from '@/composables/useApi'
 import type { ExternalDnsEntry } from '@/types'
 
@@ -21,9 +23,11 @@ const zones = ref<ZoneData[]>([])
 const dnsZones = ref<string[]>([])
 const selectedZone = ref('')
 const loading = ref(true)
+const loadError = ref(false)
 
 async function load(): Promise<void> {
   loading.value = true
+  loadError.value = false
   try {
     const [dumpRes, zonesRes] = await Promise.all([
       api.get('/admin/dns/dump'),
@@ -33,6 +37,7 @@ async function load(): Promise<void> {
     dnsZones.value = await zonesRes.json()
     if (dnsZones.value.length) selectedZone.value = dnsZones.value[0]
   } catch {
+    loadError.value = true
     toast.error('Failed to load DNS records.')
   } finally {
     loading.value = false
@@ -89,6 +94,17 @@ onMounted(load)
         </div>
       </div>
     </template>
+
+    <EmptyState
+      v-else-if="loadError"
+      title="Could not load DNS records"
+      description="The server did not respond. Check your connection and try again."
+    >
+      <template #icon><WifiOff /></template>
+      <template #action>
+        <Button variant="secondary" @click="load">Try again</Button>
+      </template>
+    </EmptyState>
 
     <template v-else>
       <div v-for="[zoneName, zoneRecords] in zones" :key="zoneName" class="mb-8">
