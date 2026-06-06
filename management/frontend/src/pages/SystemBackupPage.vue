@@ -276,13 +276,13 @@ onMounted(() => Promise.all([loadStatus(), loadConfig()]))
           </TableRow>
         </tbody>
       </Table>
-      <p v-if="totalSize" class="text-xs text-gray-400 mt-2 text-right px-1">
+      <p v-if="totalSize" class="text-xs text-gray-500 mt-2 text-right px-1">
         Total storage: {{ totalSize }}
       </p>
     </template>
 
     <!-- Configuration -->
-    <h2 class="text-base font-semibold mt-8 mb-3">Configuration</h2>
+    <h2 class="text-base font-semibold mt-6 mb-3">Configuration</h2>
 
     <Card class="p-5">
       <template v-if="loadingConfig">
@@ -295,8 +295,8 @@ onMounted(() => Promise.all([loadStatus(), loadConfig()]))
       <template v-else>
         <div class="space-y-5">
           <div>
-            <label class="block text-sm font-medium mb-1.5">Backup target</label>
-            <Select v-model="targetType">
+            <label for="targetType" class="block text-sm font-medium mb-1.5">Backup target</label>
+            <Select id="targetType" v-model="targetType">
               <option value="off">Disabled</option>
               <option value="local">Local storage (on this machine)</option>
               <option value="rsync">Rsync to remote server</option>
@@ -317,16 +317,16 @@ onMounted(() => Promise.all([loadStatus(), loadConfig()]))
           <template v-if="targetType === 'rsync'">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium mb-1.5">Remote user</label>
-                <Input v-model="rsyncUser" placeholder="backup-user" />
+                <label for="rsyncUser" class="block text-sm font-medium mb-1.5">Remote user</label>
+                <Input id="rsyncUser" v-model="rsyncUser" placeholder="backup-user" />
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1.5">Remote host</label>
-                <Input v-model="rsyncHost" placeholder="backup.example.com" />
+                <label for="rsyncHost" class="block text-sm font-medium mb-1.5">Remote host</label>
+                <Input id="rsyncHost" v-model="rsyncHost" placeholder="backup.example.com" />
               </div>
               <div class="sm:col-span-2">
-                <label class="block text-sm font-medium mb-1.5">Remote path</label>
-                <Input v-model="rsyncPath" placeholder="backups/mailinabox" />
+                <label for="rsyncPath" class="block text-sm font-medium mb-1.5">Remote path</label>
+                <Input id="rsyncPath" v-model="rsyncPath" placeholder="backups/mailinabox" />
               </div>
             </div>
             <div v-if="sshPubKey" class="rounded-lg bg-gray-50 dark:bg-gray-900 px-4 py-3">
@@ -339,28 +339,28 @@ onMounted(() => Promise.all([loadStatus(), loadConfig()]))
           <template v-if="targetType === 's3'">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium mb-1.5">S3 endpoint / host</label>
-                <Select v-if="s3HostOptions.length" v-model="s3Host">
+                <label for="s3Host" class="block text-sm font-medium mb-1.5">S3 endpoint / host</label>
+                <Select v-if="s3HostOptions.length" id="s3Host" v-model="s3Host">
                   <option v-for="o in s3HostOptions" :key="o.host" :value="o.host">{{ o.host }}</option>
                   <option value="">Other...</option>
                 </Select>
-                <Input v-else v-model="s3Host" placeholder="s3.amazonaws.com" />
+                <Input v-else id="s3Host" v-model="s3Host" placeholder="s3.amazonaws.com" />
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1.5">Region name</label>
-                <Input v-model="s3Region" placeholder="us-east-1" />
+                <label for="s3Region" class="block text-sm font-medium mb-1.5">Region name</label>
+                <Input id="s3Region" v-model="s3Region" placeholder="us-east-1" />
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1.5">Bucket path</label>
-                <Input v-model="s3Path" placeholder="my-bucket/mailinabox" />
+                <label for="s3Path" class="block text-sm font-medium mb-1.5">Bucket path</label>
+                <Input id="s3Path" v-model="s3Path" placeholder="my-bucket/mailinabox" />
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1.5">Access key ID</label>
-                <Input v-model="s3AccessKey" autocomplete="off" />
+                <label for="s3AccessKey" class="block text-sm font-medium mb-1.5">Access key ID</label>
+                <Input id="s3AccessKey" v-model="s3AccessKey" autocomplete="off" placeholder="AKIA..." />
               </div>
               <div class="sm:col-span-2">
-                <label class="block text-sm font-medium mb-1.5">Secret access key</label>
-                <Input v-model="s3SecretKey" type="password" autocomplete="off" />
+                <label for="s3SecretKey" class="block text-sm font-medium mb-1.5">Secret access key</label>
+                <Input id="s3SecretKey" v-model="s3SecretKey" type="password" autocomplete="off" placeholder="wJalEXAMPLExFE..." />
               </div>
             </div>
           </template>
@@ -369,25 +369,25 @@ onMounted(() => Promise.all([loadStatus(), loadConfig()]))
           <template v-if="targetType === 'b2'">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium mb-1.5">Application key ID</label>
-                <Input v-model="b2AppKeyId" autocomplete="off" />
+                <label for="b2AppKeyId" class="block text-sm font-medium mb-1.5">Application key ID</label>
+                <Input id="b2AppKeyId" v-model="b2AppKeyId" autocomplete="off" placeholder="4a1b2c3d4e5f6g7h8i9j0k" />
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1.5">Application key</label>
-                <Input v-model="b2AppKey" type="password" autocomplete="off" />
+                <label for="b2AppKey" class="block text-sm font-medium mb-1.5">Application key</label>
+                <Input id="b2AppKey" v-model="b2AppKey" type="password" autocomplete="off" placeholder="b2_app_key_..." />
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1.5">Bucket name</label>
-                <Input v-model="b2Bucket" placeholder="my-mailinabox-bucket" />
+                <label for="b2Bucket" class="block text-sm font-medium mb-1.5">Bucket name</label>
+                <Input id="b2Bucket" v-model="b2Bucket" placeholder="my-mailinabox-bucket" />
               </div>
             </div>
           </template>
 
           <!-- Min age (shown for all enabled targets) -->
           <div v-if="targetType !== 'off'">
-            <label class="block text-sm font-medium mb-1.5">Minimum backup age (days)</label>
-            <Input v-model="minAge" type="number" class="max-w-xs" placeholder="3" />
-            <p class="text-xs text-gray-400 mt-1">Backups are kept for at least this many days before being deleted.</p>
+            <label for="minAge" class="block text-sm font-medium mb-1.5">Minimum backup age (days)</label>
+            <Input id="minAge" v-model="minAge" type="number" class="max-w-xs" placeholder="3" />
+            <p class="text-xs text-gray-500 mt-1">Backups are kept for at least this many days before being deleted.</p>
           </div>
 
           <Button :disabled="saving" @click="save">

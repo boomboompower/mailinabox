@@ -122,8 +122,8 @@ function backToEmail(): void {
       <!-- Email step -->
       <form v-if="step === 'email'" class="space-y-4" @submit.prevent="continueFromEmail">
         <div>
-          <label class="block text-sm text-gray-600 dark:text-gray-400 mb-1.5">Email</label>
-          <Input v-model="email" type="email" autocomplete="email" required />
+          <label for="loginEmail" class="block text-sm text-gray-600 dark:text-gray-400 mb-1.5">Email</label>
+          <Input id="loginEmail" v-model="email" type="email" autocomplete="email" required />
         </div>
         <Button type="submit" class="w-full" :disabled="loading">
           {{ loading ? 'Checking...' : 'Continue' }}
@@ -140,15 +140,16 @@ function backToEmail(): void {
         </div>
 
         <div>
-          <label class="block text-sm text-gray-600 dark:text-gray-400 mb-1.5">Password</label>
-          <Input v-model="password" type="password" autocomplete="current-password" required />
+          <label for="loginPassword" class="block text-sm text-gray-600 dark:text-gray-400 mb-1.5">Password</label>
+          <Input id="loginPassword" v-model="password" type="password" autocomplete="current-password" required />
         </div>
 
         <div v-if="step === 'totp'">
-          <label class="block text-sm text-gray-600 dark:text-gray-400 mb-1.5">
+          <label for="loginTotp" class="block text-sm text-gray-600 dark:text-gray-400 mb-1.5">
             Authenticator code
           </label>
           <Input
+            id="loginTotp"
             v-model="totpToken"
             type="text"
             inputmode="numeric"

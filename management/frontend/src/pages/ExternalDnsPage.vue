@@ -71,10 +71,11 @@ onMounted(load)
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-semibold">External DNS</h1>
       <div class="flex items-center gap-2">
-        <Select v-model="selectedZone" class="w-auto">
+        <Select size="sm" v-model="selectedZone" class="w-auto" :disabled="loadError" aria-label="Select zone">
+          <option v-if="loadError" value="" disabled>No zones</option>
           <option v-for="z in dnsZones" :key="z" :value="z">{{ z }}</option>
         </Select>
-        <Button variant="secondary" @click="downloadZonefile">Download zone file</Button>
+        <Button variant="secondary" size="sm" @click="downloadZonefile" :disabled="loadError">Download zone file</Button>
       </div>
     </div>
 

@@ -179,7 +179,7 @@ onMounted(load)
         <TableHead>
           <Th>Domain</Th>
           <Th>Status</Th>
-          <th class="px-4 py-3"></th>
+          <th scope="col" class="px-4 py-3"></th>
         </TableHead>
         <tbody>
           <TableRow v-for="i in 5" :key="i">
@@ -202,7 +202,7 @@ onMounted(load)
         <TableHead>
           <Th>Domain</Th>
           <Th>Status</Th>
-          <th class="px-4 py-3"></th>
+          <th scope="col" class="px-4 py-3"></th>
         </TableHead>
         <tbody>
           <TableRow v-for="d in domains" :key="d.domain">
@@ -244,8 +244,8 @@ onMounted(load)
     <Sheet v-model="installOpen" title="Install TLS Certificate">
       <div class="space-y-5">
         <div>
-          <label class="block text-sm font-medium mb-1.5">Domain</label>
-          <Select v-model="selectedDomain">
+          <label for="installDomain" class="block text-sm font-medium mb-1.5">Domain</label>
+          <Select id="installDomain" v-model="selectedDomain">
             <option
               v-for="d in domains.filter(d => d.status !== 'not-applicable')"
               :key="d.domain"
@@ -255,8 +255,8 @@ onMounted(load)
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1.5">Country code (for CSR)</label>
-          <Select v-model="selectedCc">
+          <label for="installCc" class="block text-sm font-medium mb-1.5">Country code (for CSR)</label>
+          <Select id="installCc" v-model="selectedCc">
             <option
               v-for="[code, name] in config.csrCountryCodes"
               :key="code"
@@ -266,9 +266,10 @@ onMounted(load)
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1.5">Certificate Signing Request (CSR)</label>
-          <p class="text-xs text-gray-400 mb-2">Submit this to your certificate authority.</p>
+          <label for="installCsr" class="block text-sm font-medium mb-1.5">Certificate Signing Request (CSR)</label>
+          <p class="text-xs text-gray-500 mb-2">Submit this to your certificate authority.</p>
           <Textarea
+            id="installCsr"
             :model-value="loadingCsr ? 'Generating...' : csr"
             readonly
             :rows="6"
@@ -278,8 +279,9 @@ onMounted(load)
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1.5">Paste certificate</label>
+          <label for="installCert" class="block text-sm font-medium mb-1.5">Paste certificate</label>
           <Textarea
+            id="installCert"
             v-model="pastedCert"
             :rows="6"
             placeholder="-----BEGIN CERTIFICATE-----"
@@ -288,8 +290,9 @@ onMounted(load)
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1.5">Paste chain (optional)</label>
+          <label for="installChain" class="block text-sm font-medium mb-1.5">Paste chain (optional)</label>
           <Textarea
+            id="installChain"
             v-model="pastedChain"
             :rows="4"
             placeholder="-----BEGIN CERTIFICATE----- (intermediate/chain cert)"

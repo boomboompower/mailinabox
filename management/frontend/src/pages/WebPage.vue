@@ -76,7 +76,7 @@ onMounted(load)
     <Card class="p-5 mb-6">
       <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
         This box serves a static website at
-        <a :href="`https://${config.hostname}`" target="_blank" class="underline font-medium">https://{{ config.hostname }}</a>
+        <a :href="`https://${config.hostname}`" target="_blank" class="underline font-medium">https://{{ config.hostname || 'example.com' }}</a>
         and at every domain you have email users or aliases configured for.
       </p>
 
@@ -103,7 +103,7 @@ onMounted(load)
     <div class="flex items-center justify-between mb-3">
       <h2 class="text-base font-semibold">Hosted Websites</h2>
       <Button variant="secondary" size="sm" :disabled="updating" @click="doUpdate">
-        {{ updating ? 'Updating...' : 'Update Web Settings' }}
+        {{ 'Update Web Settings' }}
       </Button>
     </div>
 
@@ -112,7 +112,7 @@ onMounted(load)
         <TableHead>
           <Th>Site</Th>
           <Th>Directory</Th>
-          <th class="px-4 py-3"></th>
+          <th scope="col" class="px-4 py-3"></th>
         </TableHead>
         <tbody>
           <TableRow v-for="i in 3" :key="i">
@@ -138,7 +138,7 @@ onMounted(load)
         <TableHead>
           <Th>Site</Th>
           <Th>Upload directory</Th>
-          <th class="px-4 py-3"></th>
+          <th scope="col" class="px-4 py-3"></th>
         </TableHead>
         <tbody>
           <TableRow v-for="d in domains" :key="d.domain">

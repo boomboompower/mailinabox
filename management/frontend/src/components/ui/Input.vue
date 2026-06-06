@@ -1,4 +1,6 @@
 <script setup lang="ts">
+defineOptions({ inheritAttrs: false })
+
 const model = defineModel<string>()
 
 defineProps<{
@@ -15,6 +17,7 @@ defineProps<{
 <template>
   <input
     v-model="model"
+    v-bind="$attrs"
     :type="type ?? 'text'"
     :placeholder="placeholder"
     :disabled="disabled"

@@ -150,7 +150,7 @@ onMounted(load)
     </div>
 
     <div class="mb-4 max-w-sm">
-      <Input v-model="search" placeholder="Search users..." />
+      <Input v-model="search" placeholder="Search users..." aria-label="Search users" />
     </div>
 
     <Table>
@@ -158,7 +158,7 @@ onMounted(load)
         <Th class="w-full">Email</Th>
         <Th class="whitespace-nowrap">Privileges</Th>
         <Th class="whitespace-nowrap">Quota</Th>
-        <th class="px-4 py-3"></th>
+        <th scope="col" class="px-4 py-3"></th>
       </TableHead>
       <tbody>
         <template v-if="loading">
@@ -209,9 +209,10 @@ onMounted(load)
       </template>
       <div class="space-y-5">
         <div>
-          <label class="block text-sm font-medium mb-1.5">Email</label>
+          <label for="fEmail" class="block text-sm font-medium mb-1.5">Email</label>
           <Input
             v-if="!editingUser"
+            id="fEmail"
             v-model="fEmail"
             type="email"
             autocomplete="off"
@@ -221,11 +222,12 @@ onMounted(load)
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1.5">
+          <label for="fPassword" class="block text-sm font-medium mb-1.5">
             {{ editingUser ? 'New Password' : 'Password' }}
           </label>
           <div class="flex gap-2">
             <Input
+              id="fPassword"
               v-model="fPassword"
               type="text"
               :placeholder="editingUser ? 'Leave blank to keep current' : ''"
@@ -238,9 +240,9 @@ onMounted(load)
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1.5">Quota</label>
-          <Input v-model="fQuota" placeholder="0 = unlimited (e.g. 10G, 500M)" />
-          <p class="text-xs text-gray-400 mt-1">Use G or M suffix. 0 = unlimited.</p>
+          <label for="fQuota" class="block text-sm font-medium mb-1.5">Quota</label>
+          <Input id="fQuota" v-model="fQuota" placeholder="0 = unlimited (e.g. 10G, 500M)" />
+          <p class="text-xs text-gray-500 mt-1">Use G or M suffix. 0 = unlimited.</p>
         </div>
 
         <div class="flex items-center gap-2">

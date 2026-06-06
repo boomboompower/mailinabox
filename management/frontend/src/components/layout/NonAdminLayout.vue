@@ -16,7 +16,7 @@ async function handleLogout(): Promise<void> {
   <div class="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900 p-4">
     <div class="w-full max-w-lg">
       <div class="flex items-center justify-between mb-6">
-        <span class="text-sm text-gray-500">{{ auth.email }}</span>
+        <span class="text-sm text-gray-500">{{ auth.email || 'Guest' }}</span>
         <button
           class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition"
           @click="handleLogout"

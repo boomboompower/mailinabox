@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ChevronDown } from 'lucide-vue-next'
 
+defineOptions({ inheritAttrs: false })
+
 const model = defineModel<string>()
 defineProps<{ disabled?: boolean }>()
 </script>
@@ -9,6 +11,7 @@ defineProps<{ disabled?: boolean }>()
   <div class="relative">
     <select
       v-model="model"
+      v-bind="$attrs"
       :disabled="disabled"
       class="w-full rounded-lg py-2 px-3 pr-8 text-sm border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-850 dark:text-gray-300 outline-none focus:border-gray-400 dark:focus:border-gray-500 transition-colors appearance-none"
     >

@@ -122,7 +122,7 @@ onMounted(load)
     </div>
 
     <div class="mb-4 max-w-sm">
-      <Input v-model="search" placeholder="Search aliases..." />
+      <Input v-model="search" placeholder="Search aliases..." aria-label="Search aliases" />
     </div>
 
     <Table>
@@ -130,7 +130,7 @@ onMounted(load)
         <Th>Address</Th>
         <Th>Forwards To</Th>
         <Th class="hidden sm:table-cell">Type</Th>
-        <th class="px-4 py-3"></th>
+        <th scope="col" class="px-4 py-3"></th>
       </TableHead>
       <tbody>
         <template v-if="loading">
@@ -180,9 +180,10 @@ onMounted(load)
       </template>
       <div class="space-y-5">
         <div>
-          <label class="block text-sm font-medium mb-1.5">Address</label>
+          <label for="fAddress" class="block text-sm font-medium mb-1.5">Address</label>
           <Input
             v-if="!editingAlias"
+            id="fAddress"
             v-model="fAddress"
             type="email"
             placeholder="alias@yourdomain.com or @yourdomain.com"
@@ -192,8 +193,8 @@ onMounted(load)
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1.5">Forwards To</label>
-          <Textarea v-model="fForwardsTo" placeholder="One address per line or comma-separated" />
+          <label for="fForwardsTo" class="block text-sm font-medium mb-1.5">Forwards To</label>
+          <Textarea id="fForwardsTo" v-model="fForwardsTo" placeholder="One address per line or comma-separated" />
         </div>
 
         <div>
@@ -202,8 +203,8 @@ onMounted(load)
             <label for="fAdvanced" class="text-sm">Restrict permitted senders</label>
           </div>
           <div v-if="fAdvanced">
-            <label class="block text-sm font-medium mb-1.5">Permitted Senders</label>
-            <Textarea v-model="fPermittedSenders" placeholder="One sender per line — only these addresses may send as this alias" />
+            <label for="fPermittedSenders" class="block text-sm font-medium mb-1.5">Permitted Senders</label>
+            <Textarea id="fPermittedSenders" v-model="fPermittedSenders" placeholder="One sender per line — only these addresses may send as this alias" />
           </div>
         </div>
 

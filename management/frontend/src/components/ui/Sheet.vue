@@ -1,8 +1,23 @@
 <script setup lang="ts">
+import { ref, watch, nextTick } from 'vue'
 import { X } from 'lucide-vue-next'
 
 const open = defineModel<boolean>()
 defineProps<{ title?: string }>()
+
+const panelRef = ref<HTMLElement | null>(null)
+let triggerEl: HTMLElement | null = null
+
+watch(open, async (val) => {
+  if (val) {
+    triggerEl = document.activeElement as HTMLElement | null
+    await nextTick()
+    panelRef.value?.focus()
+  } else {
+    triggerEl?.focus()
+    triggerEl = null
+  }
+})
 </script>
 
 <template>
@@ -30,12 +45,18 @@ defineProps<{ title?: string }>()
     >
       <div
         v-if="open"
-        class="fixed inset-y-0 right-0 z-50 flex flex-col w-full sm:w-[480px] lg:w-[560px] bg-white dark:bg-gray-850 shadow-3xl rounded-l-2xl"
+        ref="panelRef"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="title"
+        tabindex="-1"
+        class="fixed inset-y-0 right-0 z-50 flex flex-col w-full sm:w-[480px] lg:w-[560px] bg-white dark:bg-gray-850 shadow-3xl rounded-l-2xl outline-none"
       >
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
           <h2 class="text-base font-semibold">{{ title }}</h2>
           <button
             class="rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 size-8 flex items-center justify-center transition"
+            aria-label="Close"
             @click="open = false"
           >
             <X class="size-4" />

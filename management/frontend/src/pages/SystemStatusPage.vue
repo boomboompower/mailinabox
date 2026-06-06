@@ -204,6 +204,7 @@ onMounted(load)
                   <button
                     v-if="item.extra.some(e => e.text.trim())"
                     class="mt-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                    :aria-expanded="expanded.has(idx)"
                     @click="toggleExpand(idx)"
                   >
                     {{ expanded.has(idx) ? 'show less' : 'show more' }}
@@ -215,7 +216,7 @@ onMounted(load)
         </div>
 
         <!-- Bottom actions -->
-        <Card class="p-5 mt-2">
+        <Card class="p-5 mt-6">
           <h2 class="text-sm font-semibold mb-3">System Tools</h2>
           <div class="flex flex-wrap gap-3">
             <div>

@@ -153,27 +153,27 @@ onMounted(async () => {
       <h2 class="text-base font-semibold mb-4">Add a DNS record</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
-          <label class="block text-sm font-medium mb-1.5">Zone</label>
-          <Select v-model="fZone">
+          <label for="fZone" class="block text-sm font-medium mb-1.5">Zone</label>
+          <Select id="fZone" v-model="fZone">
             <option v-for="z in zones" :key="z" :value="z">{{ z }}</option>
           </Select>
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1.5">Subdomain (optional)</label>
-          <Input v-model="fSubdomain" placeholder="@ or leave blank for zone apex" />
+          <label for="fSubdomain" class="block text-sm font-medium mb-1.5">Subdomain (optional)</label>
+          <Input id="fSubdomain" v-model="fSubdomain" placeholder="@ or leave blank for zone apex" />
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1.5">Type</label>
-          <Select v-model="fRtype">
+          <label for="fRtype" class="block text-sm font-medium mb-1.5">Type</label>
+          <Select id="fRtype" v-model="fRtype">
             <option v-for="o in rtypeOptions" :key="o.value" :value="o.value">{{ o.value }}</option>
           </Select>
         </div>
         <div>
-          <label class="block text-sm font-medium mb-1.5">Value</label>
-          <Input v-model="fValue" :placeholder="fHint" />
+          <label for="fValue" class="block text-sm font-medium mb-1.5">Value</label>
+          <Input id="fValue" v-model="fValue" :placeholder="fHint" />
         </div>
       </div>
-      <p v-if="fHint" class="text-xs text-gray-400 mb-3">{{ fHint }}</p>
+      <p v-if="fHint" class="text-xs text-gray-500 mb-3">{{ fHint }}</p>
       <p v-if="qname" class="text-xs text-gray-500 mb-3">
         Record will be set on: <span class="font-medium">{{ qname }}</span>
       </p>
@@ -189,7 +189,7 @@ onMounted(async () => {
         <Th>Name</Th>
         <Th>Type</Th>
         <Th>Value</Th>
-        <th class="px-4 py-3"></th>
+        <th scope="col" class="px-4 py-3"></th>
       </TableHead>
       <tbody>
         <template v-if="loading">
@@ -228,7 +228,7 @@ onMounted(async () => {
         Space-separated list of secondary nameserver hostnames.
       </p>
       <div class="flex gap-2">
-        <Input v-model="secondaryHostnames" placeholder="ns2.yourdomain.com" class="max-w-sm" />
+        <Input v-model="secondaryHostnames" placeholder="ns2.yourdomain.com" class="max-w-sm" aria-label="Secondary nameserver hostnames" />
         <Button :disabled="savingSecondary" @click="saveSecondary">
           {{ savingSecondary ? 'Saving...' : 'Save' }}
         </Button>

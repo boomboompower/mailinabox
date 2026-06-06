@@ -1,4 +1,6 @@
 <script setup lang="ts">
+defineOptions({ inheritAttrs: false })
+
 const model = defineModel<string>()
 defineProps<{ placeholder?: string; rows?: number; disabled?: boolean }>()
 </script>
@@ -6,6 +8,7 @@ defineProps<{ placeholder?: string; rows?: number; disabled?: boolean }>()
 <template>
   <textarea
     v-model="model"
+    v-bind="$attrs"
     :placeholder="placeholder"
     :rows="rows ?? 3"
     :disabled="disabled"

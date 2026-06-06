@@ -189,8 +189,8 @@ onMounted(load)
             >
               <div>
                 <p class="text-sm font-medium">{{ entry.name || 'Unnamed passkey' }}</p>
-                <p v-if="entry.last_used" class="text-xs text-gray-400 mt-0.5">Last used {{ entry.last_used }}</p>
-                <p v-else class="text-xs text-gray-400 mt-0.5">Never used</p>
+                <p v-if="entry.last_used" class="text-xs text-gray-500 mt-0.5">Last used {{ entry.last_used }}</p>
+                <p v-else class="text-xs text-gray-500 mt-0.5">Never used</p>
               </div>
               <Button variant="ghost" size="sm" @click="openDisable(entry)">Remove</Button>
             </div>
@@ -216,22 +216,22 @@ onMounted(load)
 
           <!-- Add passkey form -->
           <div v-if="showAddPasskey" :class="{ 'mt-4 pt-4 border-t border-gray-100 dark:border-gray-800': passkeyEntries.length > 0 }">
-            <p class="text-sm font-medium mb-2">Name this passkey:</p>
+            <label for="passkeyName" class="block text-sm font-medium mb-2">Name this passkey:</label>
             <div class="flex gap-2 max-w-sm">
-              <Input v-model="passkeyName" placeholder="e.g. My MacBook" />
+              <Input id="passkeyName" v-model="passkeyName" placeholder="e.g. My MacBook" />
               <Button :disabled="!passkeyName.trim() || addingPasskey" @click="addPasskey">
                 {{ addingPasskey ? 'Adding...' : 'Add' }}
               </Button>
               <Button variant="ghost" @click="showAddPasskey = false; passkeyName = ''">Cancel</Button>
             </div>
-            <p class="text-xs text-gray-400 mt-1.5">Your browser will prompt you to create a passkey.</p>
+            <p class="text-xs text-gray-500 mt-1.5">Your browser will prompt you to create a passkey.</p>
           </div>
         </template>
       </Card>
 
       <!-- TOTP Section -->
       <h2 class="text-base font-semibold mb-3">Authenticator App (TOTP)</h2>
-      <Card class="p-5 mb-6">
+      <Card class="p-5">
         <template v-if="loading">
           <Skeleton class="h-4 w-64 mb-3" />
           <Skeleton class="h-9 w-40" />
@@ -267,16 +267,17 @@ onMounted(load)
             </div>
 
             <div>
-              <label class="block text-sm font-medium mb-1.5">
+              <label for="enrollLabel" class="block text-sm font-medium mb-1.5">
                 2. Give this device a label <span class="font-normal text-gray-400">(optional)</span>
               </label>
-              <Input v-model="enrollLabel" placeholder="my phone" class="max-w-xs" />
+              <Input id="enrollLabel" v-model="enrollLabel" placeholder="my phone" class="max-w-xs" />
             </div>
 
             <div>
-              <label class="block text-sm font-medium mb-1.5">3. Enter the 6-digit code from the app:</label>
+              <label for="enrollToken" class="block text-sm font-medium mb-1.5">3. Enter the 6-digit code from the app:</label>
               <div class="flex gap-2 items-start max-w-xs">
                 <Input
+                  id="enrollToken"
                   v-model="enrollToken"
                   inputmode="numeric"
                   :maxlength="6"
@@ -287,7 +288,7 @@ onMounted(load)
                   {{ enrolling ? 'Enabling...' : 'Enable' }}
                 </Button>
               </div>
-              <p class="text-xs text-gray-400 mt-1">You will be logged out after enabling.</p>
+              <p class="text-xs text-gray-500 mt-1">You will be logged out after enabling.</p>
             </div>
           </div>
         </template>
