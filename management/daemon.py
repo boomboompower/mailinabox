@@ -10,7 +10,7 @@
 # DEBUG=1 management/daemon.py
 # service mailinabox start # when done debugging, start it up again
 
-import os, os.path, re, json, time, secrets
+import os, os.path, re, json, time, secrets, threading, datetime
 import multiprocessing.pool
 
 from functools import wraps
@@ -31,6 +31,105 @@ env = utils.load_environment()
 
 auth_service = auth.AuthService()
 
+# ---------------------------------------------------------------------------
+# System status check infrastructure
+# ---------------------------------------------------------------------------
+
+# Shared on-disk cache path - same file the nightly cron writes, so GET /system/status
+# is instant on first visit after the cron has run.
+_STATUS_CACHE_FILE = "/var/cache/mailinabox/status_checks.json"
+
+class _WebOutput:
+    """Converts run_checks() output calls into JSON-serialisable dicts for the API."""
+    def __init__(self):
+        self.items: list = []
+    def add_heading(self, heading: str) -> None:
+        self.items.append({"type": "heading", "text": heading, "extra": []})
+    def print_ok(self, message: str) -> None:
+        self.items.append({"type": "ok", "text": message, "extra": []})
+    def print_error(self, message: str) -> None:
+        self.items.append({"type": "error", "text": message, "extra": []})
+    def print_warning(self, message: str) -> None:
+        self.items.append({"type": "warning", "text": message, "extra": []})
+    def print_line(self, message: str, monospace: bool = False) -> None:
+        if self.items:
+            self.items[-1]["extra"].append({"text": message, "monospace": monospace})
+
+def _load_cache_from_disk():
+    """Read the on-disk BufferedOutput cache and convert to WebOutput items.
+    Returns (items, checked_at_iso) or (None, None) if unavailable."""
+    from status_checks import BufferedOutput
+    if not os.path.exists(_STATUS_CACHE_FILE):
+        return None, None
+    try:
+        mtime = os.path.getmtime(_STATUS_CACHE_FILE)
+        with open(_STATUS_CACHE_FILE, encoding="utf-8") as f:
+            buf = json.load(f)
+        if not isinstance(buf, list):
+            return None, None
+        output = _WebOutput()
+        BufferedOutput(with_lines=buf).playback(output)
+        checked_at = datetime.datetime.fromtimestamp(mtime).astimezone().isoformat()
+        return output.items, checked_at
+    except Exception:
+        return None, None
+
+def _write_cache_to_disk(buffered_buf: list) -> None:
+    """Write BufferedOutput buf to the shared cache file."""
+    try:
+        os.makedirs(os.path.dirname(_STATUS_CACHE_FILE), exist_ok=True)
+        with open(_STATUS_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(buffered_buf, f)
+    except Exception:
+        pass
+
+# In-memory job state shared across all requests.
+_status_job: dict = {
+    "running": False,
+    "lock": threading.Lock(),
+    "items": None,         # list[StatusCheckItem] | None
+    "checked_at": None,    # ISO 8601 string | None
+    "source": None,        # 'cron' | 'manual' | None
+}
+
+def _ensure_disk_cache_loaded() -> None:
+    """Lazy-load the nightly cron's cache on first access so GET is instant."""
+    if _status_job["items"] is not None:
+        return
+    items, checked_at = _load_cache_from_disk()
+    if items is not None:
+        _status_job["items"] = items
+        _status_job["checked_at"] = checked_at
+        _status_job["source"] = "cron"
+
+def _run_status_check_thread() -> None:
+    """Background thread body. Runs checks, updates state, releases lock."""
+    from status_checks import run_checks, BufferedOutput
+    try:
+        buf_output = BufferedOutput()
+        with multiprocessing.pool.Pool(processes=5) as pool:
+            run_checks(True, env, buf_output, pool)
+            pool.close()
+            pool.join()
+
+        # Persist to the shared disk cache (same format as the nightly cron).
+        _write_cache_to_disk(buf_output.buf)
+
+        # Convert to API format.
+        web_output = _WebOutput()
+        buf_output.playback(web_output)
+        checked_at = datetime.datetime.now().astimezone().isoformat()
+
+        _status_job["items"] = web_output.items
+        _status_job["checked_at"] = checked_at
+        _status_job["source"] = "manual"
+    except Exception:
+        pass
+    finally:
+        _status_job["running"] = False
+        _status_job["lock"].release()
+
+# ---------------------------------------------------------------------------
 # We may deploy via a symbolic link, which confuses flask's template finding.
 me = __file__
 with contextlib.suppress(OSError):
@@ -855,30 +954,40 @@ def system_latest_upstream_version():
 	except Exception as e:
 		return (sanitize_error_message(str(e)), 500)
 
+@app.route('/system/status', methods=["GET"])
+@authorized_personnel_only
+def system_status_get():
+	_ensure_disk_cache_loaded()
+	return json_response({
+		"status": "running" if _status_job["running"] else ("done" if _status_job["items"] is not None else "idle"),
+		"items": _status_job["items"],
+		"checked_at": _status_job["checked_at"],
+		"source": _status_job["source"],
+	})
+
 @app.route('/system/status', methods=["POST"])
 @authorized_personnel_only
-def system_status():
-	from status_checks import run_checks
-	class WebOutput:
-		def __init__(self):
-			self.items = []
-		def add_heading(self, heading):
-			self.items.append({ "type": "heading", "text": heading, "extra": [] })
-		def print_ok(self, message):
-			self.items.append({ "type": "ok", "text": message, "extra": [] })
-		def print_error(self, message):
-			self.items.append({ "type": "error", "text": message, "extra": [] })
-		def print_warning(self, message):
-			self.items.append({ "type": "warning", "text": message, "extra": [] })
-		def print_line(self, message, monospace=False):
-			self.items[-1]["extra"].append({ "text": message, "monospace": monospace })
-	output = WebOutput()
-	# Create a temporary pool of processes for the status checks
-	with multiprocessing.pool.Pool(processes=5) as pool:
-		run_checks(False, env, output, pool)
-		pool.close()
-		pool.join()
-	return json_response(output.items)
+def system_status_post():
+	_ensure_disk_cache_loaded()
+	acquired = _status_job["lock"].acquire(blocking=False)
+	if not acquired:
+		# A check is already running - return current state without starting another.
+		return json_response({
+			"status": "running",
+			"items": _status_job["items"],
+			"checked_at": _status_job["checked_at"],
+			"source": _status_job["source"],
+		}), 202
+	# Lock acquired - mark as running and kick off the background thread.
+	_status_job["running"] = True
+	t = threading.Thread(target=_run_status_check_thread, daemon=True)
+	t.start()
+	return json_response({
+		"status": "running",
+		"items": _status_job["items"],
+		"checked_at": _status_job["checked_at"],
+		"source": _status_job["source"],
+	}), 202
 
 @app.route('/system/updates')
 @authorized_personnel_only

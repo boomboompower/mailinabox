@@ -103,7 +103,7 @@ type ExternalDnsEntry = {
 }
 
 // ---------------------------------------------------------------------------
-// System status — POST /admin/system/status
+// System status — GET /admin/system/status (instant) + POST (trigger fresh run)
 // ---------------------------------------------------------------------------
 
 /** A single line in the system status output. */
@@ -111,6 +111,22 @@ type StatusCheckItem = {
   type: 'heading' | 'ok' | 'error' | 'warning'
   text: string
   extra: { text: string; monospace: boolean }[]
+}
+
+/**
+ * Response envelope from GET /admin/system/status and POST /admin/system/status.
+ * GET is always instant (returns cached state). POST triggers a fresh run or
+ * returns the running state if one is already in progress (HTTP 202).
+ */
+type StatusCheckResponse = {
+  /** idle = no cache yet; running = check in progress; done = results available. */
+  status: 'idle' | 'running' | 'done'
+  /** Last known results - present even while running so UI can show stale data. */
+  items: StatusCheckItem[] | null
+  /** ISO 8601 timestamp of when the cached result was produced. */
+  checked_at: string | null
+  /** Whether the cached result came from the nightly cron or a manual refresh. */
+  source: 'cron' | 'manual' | null
 }
 
 // ---------------------------------------------------------------------------
@@ -239,7 +255,7 @@ export type {
   InitData, LoginApiResponse, AuthMethodsResponse, NavItem, NavGroup,
   MailUser, MailUserDomain, MailAlias, MailAliasDomain,
   DnsRecord, ExternalDnsEntry,
-  StatusCheckItem,
+  StatusCheckItem, StatusCheckResponse,
   SslDomainStatus, SslStatus, SslProvisionRequest, SslProvisionResult,
   BackupEntry, BackupStatus, BackupConfig,
   MfaEntry, TotpProvision, MfaStatus,

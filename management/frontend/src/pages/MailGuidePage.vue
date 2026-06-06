@@ -42,7 +42,7 @@ const activeSyncRows: SettingRow[] = [
         rel="noopener"
         class="text-sm font-medium underline underline-offset-2"
       >
-        https://{{ config.hostname }}/mail
+        https://{{ config.hostname || 'example.com' }}/mail
       </a>
       <p class="text-xs text-gray-500 mt-2">Your username is your full email address.</p>
     </Card>
@@ -66,7 +66,7 @@ const activeSyncRows: SettingRow[] = [
         <Table>
           <tbody>
             <TableRow v-for="[label, value] in imapSmtpRows" :key="label">
-              <td class="px-4 py-2.5 text-sm text-gray-500 w-40">{{ label }}</td>
+              <th scope="row" class="px-4 py-2.5 text-sm text-gray-500 font-normal text-left w-40">{{ label }}</th>
               <td class="px-4 py-2.5 text-sm font-medium">{{ value }}</td>
             </TableRow>
           </tbody>
