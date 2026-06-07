@@ -15,7 +15,7 @@ import multiprocessing.pool
 
 from functools import wraps
 
-from flask import Flask, request, render_template, Response, send_from_directory, make_response, abort
+from flask import Flask, request, Response, send_from_directory, make_response, abort
 
 import auth, utils
 from mailconfig import get_mail_users, get_mail_users_ex, get_admins, add_mail_user, set_mail_password, remove_mail_user
@@ -136,14 +136,9 @@ with contextlib.suppress(OSError):
 	me = os.readlink(__file__)
 
 
-template_dir = os.path.abspath(os.path.join(os.path.dirname(me), "templates"))
 static_dir = os.path.abspath(os.path.join(os.path.dirname(me), "static"))
 
-app = Flask(
-    __name__,
-    template_folder=template_dir,
-    static_folder=static_dir
-)
+app = Flask(__name__, static_folder=static_dir)
 
 
 # Super simple CSRF protection: require a custom header on state-changing requests.
@@ -228,6 +223,64 @@ def authorized_personnel_only(viewfunc):
 			# Return plain text output.
 			return Response(error+"\n", status=status, mimetype='text/plain', headers=headers)
 		# Return JSON output.
+		return Response(json.dumps({
+			"status": "error",
+			"reason": error,
+			})+"\n", status=status, mimetype='application/json', headers=headers)
+
+	return newview
+
+# Decorator to protect views that any authenticated mail user may access.
+# Unlike authorized_personnel_only, this does not require admin privileges.
+# Use for routes that operate exclusively on request.user_email (self-service).
+def authorized_user_only(viewfunc):
+	@wraps(viewfunc)
+	def newview(*args, **kwargs):
+		error = None
+		privs = []
+		email = None
+
+		if 'Authorization' in request.headers:
+			try:
+				email, privs = auth_service.authenticate(request, env)
+			except ValueError as e:
+				log_failed_login(request)
+				error = str(e)
+		else:
+			cookie_key = request.cookies.get('admin_session', '')
+			session = auth_service.get_session_by_key_only(cookie_key, env) if cookie_key else None
+			if session:
+				email = session['email']
+				privs = get_mail_user_privileges(email, env)
+				if isinstance(privs, tuple):
+					error = "Account error."
+					privs = []
+			else:
+				error = "No authentication provided."
+
+		if email and not error:
+			if not validate_csrf():
+				error = "Potential CSRF attack detected."
+			else:
+				request.user_email = email
+				request.user_privs = privs
+				return viewfunc(*args, **kwargs)
+
+		if not error:
+			error = "Unauthorized"
+
+		status = 401
+		headers = {
+			'WWW-Authenticate': f'Basic realm="{auth_service.auth_realm}"',
+			'X-Reason': error,
+		}
+
+		if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+			status = 403
+			headers = None
+
+		if request.headers.get('Accept') in {None, "", "*/*"}:
+			return Response((error or "Unauthorized")+"\n", status=status, mimetype='text/plain', headers=headers)
 		return Response(json.dumps({
 			"status": "error",
 			"reason": error,
@@ -356,8 +409,7 @@ def validate_hostname(hostname):
 
 ###################################
 
-# Static file serving for legacy assets (fonts, twemoji, old js/css).
-# The Vue SPA's own assets are under /static/app/ and served by the catch-all below.
+# Static file serving. The Vue SPA's assets live under /static/app/assets/.
 
 @app.route('/static/<path:filename>')
 def static_files(filename):
@@ -795,13 +847,15 @@ def ssl_provision_certs():
 # multi-factor auth
 
 @app.route('/mfa/status', methods=['POST'])
-@authorized_personnel_only
+@authorized_user_only
 def mfa_get_status():
-	# Anyone accessing this route is an admin, and we permit them to
-	# see the MFA status for any user if they submit a 'user' form
-	# field. But we don't include provisioning info since a user can
-	# only provision for themselves.
-	email = request.form.get('user', request.user_email) # user field if given, otherwise the user making the request
+	# Admins may pass a 'user' form field to query another user's MFA status.
+	# Non-admins are always scoped to their own account.
+	is_admin = "admin" in request.user_privs
+	try:
+		email = validate_email(request.form.get('user', request.user_email)) if is_admin else request.user_email
+	except ValueError as e:
+		return (sanitize_error_message(str(e)), 400)
 	try:
 		resp = {
 			"enabled_mfa": get_public_mfa_state(email, env)
@@ -817,7 +871,7 @@ def mfa_get_status():
 	return json_response(resp)
 
 @app.route('/mfa/totp/enable', methods=['POST'])
-@authorized_personnel_only
+@authorized_user_only
 def totp_post_enable():
 	secret = request.form.get('secret')
 	token = request.form.get('token')
@@ -832,19 +886,22 @@ def totp_post_enable():
 	return "OK"
 
 @app.route('/mfa/disable', methods=['POST'])
-@authorized_personnel_only
+@authorized_user_only
 def totp_post_disable():
-	# Anyone accessing this route is an admin, and we permit them to
-	# disable the MFA status for any user if they submit a 'user' form
-	# field. However, admins cannot disable MFA for other admin users.
+	# Admins may pass a 'user' form field to disable MFA for another user,
+	# but cannot disable MFA for other admin accounts. Non-admins are always
+	# scoped to their own account.
+	is_admin = "admin" in request.user_privs
 	try:
-		email = validate_email(request.form.get('user', request.user_email)) # user field if given, otherwise the user making the request
+		email = validate_email(request.form.get('user', request.user_email) if is_admin else request.user_email)
 
-		# Security check: prevent admins from disabling MFA for other admin users
-		# They can only disable their own MFA or MFA for non-admin users
+		# Prevent admins from disabling MFA for other admin accounts.
+		# Fail-closed: if privilege lookup fails, deny rather than proceed.
 		if email != request.user_email:
 			target_privs = get_mail_user_privileges(email, env)
-			if isinstance(target_privs, list) and "admin" in target_privs:
+			if not isinstance(target_privs, list):
+				return ("Unable to verify target account.", 400)
+			if "admin" in target_privs:
 				return ("Cannot disable MFA for other administrator accounts", 403)
 
 		result = disable_mfa(email, request.form.get('mfa-id') or None, env) # convert empty string to None
@@ -856,7 +913,7 @@ def totp_post_disable():
 	return ("Invalid user or MFA id.", 400)
 
 @app.route('/mfa/webauthn/register/begin', methods=['POST'])
-@authorized_personnel_only
+@authorized_user_only
 def webauthn_register_begin_route():
 	try:
 		options, state = webauthn_register_begin(request.user_email, env)
@@ -867,7 +924,7 @@ def webauthn_register_begin_route():
 	return json_response({"options": options, "nonce": nonce})
 
 @app.route('/mfa/webauthn/register/complete', methods=['POST'])
-@authorized_personnel_only
+@authorized_user_only
 def webauthn_register_complete_route():
 	nonce = request.form.get('nonce', '')
 	name = request.form.get('name', 'My Passkey')

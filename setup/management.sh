@@ -58,26 +58,9 @@ if [ ! -f "$STORAGE_ROOT/backup/secret_key.txt" ]; then
 fi
 
 
-# Make sure we have the directory to save to.
-assets_dir=$inst_dir/vendor/assets
-rm -rf $assets_dir
-
-# twemoji CDN URL
-# static assets dir is the current running directory for this script
-static_assets_dir=$PWD/../management/static
-twemoji_version=17.0.2
-twemoji_url=https://github.com/jdecked/twemoji/archive/refs/tags/v$twemoji_version.zip
-
-wget_verify $twemoji_url e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 /tmp/twemoji_source.zip
-unzip -d /tmp/twemoji /tmp/twemoji_source.zip 'twemoji-*/assets/*'
-rm -f /tmp/twemoji_source.zip
-mv /tmp/twemoji/twemoji-*/assets $static_assets_dir/twemoji
-
-
 # Create an init script to start the management daemon and keep it
 # running after a reboot.
-# Set a long timeout since some commands take a while to run, matching
-# the timeout we set for PHP (fastcgi_read_timeout in the nginx confs).
+# Set a long timeout since some commands (status checks, TLS provisioning) take a while.
 # Note: Authentication currently breaks with more than 1 gunicorn worker.
 cat > $inst_dir/start <<EOF;
 #!/bin/bash
@@ -122,7 +105,6 @@ echo "Building admin frontend..."
 (cd "$PWD/management/frontend" && hide_output npm ci --prefer-offline && hide_output npm run build)
 
 echo "Removing Node.js..."
-hide_output npm cache clean --force
 hide_output apt-get remove --purge -y nodejs
 hide_output apt-get autoremove -y
 rm -f /etc/apt/sources.list.d/nodesource.list
