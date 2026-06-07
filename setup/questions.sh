@@ -194,6 +194,14 @@ if [ -z "${STORAGE_ROOT:-}" ]; then
 	STORAGE_ROOT=$([[ -z "${DEFAULT_STORAGE_ROOT:-}" ]] && echo "/home/$STORAGE_USER" || echo "$DEFAULT_STORAGE_ROOT")
 fi
 
+# Ask whether to install FileBrowser on first install only.
+# On re-runs the existing value from mailinabox.conf is preserved.
+if [ -z "${DEFAULT_ENABLE_FILEBROWSER:-}" ] && [ -z "${NONINTERACTIVE:-}" ]; then
+	yesno_box "FileBrowser" \
+		"Would you like to install FileBrowser?\n\nFileBrowser provides a web-based file manager at /files, letting mail users browse and manage their personal file storage.\n\nYou can change this later by editing /etc/mailinabox.conf." \
+		ENABLE_FILEBROWSER
+fi
+
 # Show the configuration, since the user may have not entered it manually.
 echo
 echo "Primary Hostname: $PRIMARY_HOSTNAME"

@@ -90,7 +90,10 @@ def do_web_update(env):
 	template3 = "\trewrite ^(.*) https://$REDIRECT_DOMAIN$1 permanent;\n"
 
 	# Add the PRIMARY_HOST configuration first so it becomes nginx's default server.
-	nginx_conf += make_domain_config(env['PRIMARY_HOSTNAME'], [template0, template1, template2], ssl_certificates, env)
+	primary_templates = [template0, template1, template2]
+	if env.get('ENABLE_FILEBROWSER', 'true') == 'true':
+		primary_templates.append(read_conf("nginx-filebrowser.conf"))
+	nginx_conf += make_domain_config(env['PRIMARY_HOSTNAME'], primary_templates, ssl_certificates, env)
 
 	# Add configuration all other web domains.
 	has_root_proxy_or_redirect = get_web_domains_with_root_overrides(env)

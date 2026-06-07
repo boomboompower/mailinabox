@@ -92,6 +92,9 @@ fi
 # tools know where to look for data. The default MTA_STS_MODE setting
 # is blank unless set by an environment variable, but see web.sh for
 # how that is interpreted.
+# Preserve ENABLE_FILEBROWSER across re-runs; default to true on first install.
+ENABLE_FILEBROWSER=${DEFAULT_ENABLE_FILEBROWSER:-true}
+
 cat > /etc/mailinabox.conf << EOF;
 STORAGE_USER=$STORAGE_USER
 STORAGE_ROOT=$STORAGE_ROOT
@@ -101,6 +104,7 @@ PUBLIC_IPV6=$PUBLIC_IPV6
 PRIVATE_IP=$PRIVATE_IP
 PRIVATE_IPV6=$PRIVATE_IPV6
 MTA_STS_MODE=${DEFAULT_MTA_STS_MODE:-enforce}
+ENABLE_FILEBROWSER=$ENABLE_FILEBROWSER
 EOF
 
 # Start service configuration.
@@ -114,7 +118,13 @@ source setup/dkim.sh
 source setup/spamassassin.sh
 source setup/web.sh
 source setup/webmail.sh
-source setup/filebrowser.sh
+if [ "$ENABLE_FILEBROWSER" = "true" ]; then
+	source setup/filebrowser.sh
+else
+	# Disable FileBrowser if it was previously installed.
+	systemctl stop filebrowser 2>/dev/null || true
+	systemctl disable filebrowser 2>/dev/null || true
+fi
 source setup/zpush.sh
 source setup/management.sh
 source setup/munin.sh

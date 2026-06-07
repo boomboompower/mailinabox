@@ -171,6 +171,16 @@ function message_box {
 	dialog --title "$1" --msgbox "$2" 0 0
 }
 
+function yesno_box {
+	# yesno_box "title" "prompt" VARIABLE
+	# Stores "true" or "false" in VARIABLE based on user selection.
+	declare -n result=$3
+	set +e
+	dialog --title "$1" --yesno "$2" 0 0
+	result=$( [ $? -eq 0 ] && echo true || echo false )
+	set -e
+}
+
 function input_box {
 	# input_box "title" "prompt" "defaultvalue" VARIABLE
 	# The user's input will be stored in the variable VARIABLE.

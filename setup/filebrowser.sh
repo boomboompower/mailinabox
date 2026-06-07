@@ -46,21 +46,22 @@ FB_DB="$STORAGE_ROOT/filebrowser/filebrowser.db"
 # Exit codes: 0=ok, 1=bad credentials, 2=backend unavailable (Dovecot down).
 cat > /usr/local/lib/filebrowser-auth.py << 'EOF'
 #!/usr/bin/env python3
-import sys, json, imaplib, ssl, socket, re
+import sys, os, imaplib, ssl, socket, re
+
+FILES_ROOT = "/home/user-data/files"
 
 socket.setdefaulttimeout(5)
 
 try:
-    data = json.load(sys.stdin)
-    username = data.get('username', '')
-    password = data.get('password', '')
+    # FileBrowser v2 passes credentials via environment variables.
+    username = os.environ.get('USERNAME', '')
+    password = os.environ.get('PASSWORD', '')
 
     if not username or not password:
         sys.exit(1)
 
-    # Reject usernames containing CRLF or characters outside normal email
-    # address syntax to prevent IMAP command injection (imaplib passes the
-    # username raw and unquoted into the LOGIN wire command).
+    # Reject usernames outside normal email address syntax to prevent
+    # IMAP command injection (imaplib passes username raw into LOGIN).
     if not re.fullmatch(r'[A-Za-z0-9._%+\-@]+', username):
         sys.exit(1)
 
@@ -70,33 +71,49 @@ try:
     conn = imaplib.IMAP4_SSL('127.0.0.1', 993, ssl_context=ctx)
     conn.login(username, password)
     conn.logout()
-    print(json.dumps({"username": username, "isAdmin": False}))
+
+    # Ensure the user's personal directory exists under the files root.
+    user_dir = os.path.join(FILES_ROOT, username)
+    os.makedirs(user_dir, mode=0o750, exist_ok=True)
+
+    # Scope the user to their own directory so they cannot see other users' files.
+    print("hook.action=auth")
+    print(f"user.scope={username}")
     sys.exit(0)
 except imaplib.IMAP4.error:
-    # Bad credentials.
+    print("hook.action=block")
     sys.exit(1)
 except Exception:
-    # Dovecot unreachable, malformed input, or other connection error.
+    # Dovecot unreachable or other connection error.
     sys.exit(2)
 EOF
 chmod 755 /usr/local/lib/filebrowser-auth.py
 chown root:root /usr/local/lib/filebrowser-auth.py
 
+# Stop the service before touching the database - it holds a BoltDB lock
+# while running and config init/set will timeout if it's up.
+systemctl stop filebrowser 2>/dev/null || true
+
 # Initialize on first install only.
 if [ ! -f "$FB_DB" ]; then
-	sudo -u www-data filebrowser config init \
+	hide_output sudo -u www-data filebrowser config init \
 		--database "$FB_DB"
 fi
 
 # Apply config on every run so settings are updated when setup re-runs.
-sudo -u www-data filebrowser config set \
+hide_output sudo -u www-data filebrowser config set \
 	--database "$FB_DB" \
 	--address 127.0.0.1 \
 	--port 8080 \
 	--root "$STORAGE_ROOT/files" \
 	--baseURL /files \
 	--auth.method hook \
-	--auth.command "python3 /usr/local/lib/filebrowser-auth.py"
+	--auth.command "python3 /usr/local/lib/filebrowser-auth.py" \
+	--minimumPasswordLength 1 \
+	--createUserDir \
+	--branding.name "$PRIMARY_HOSTNAME"
+# minimumPasswordLength 1: 0 is treated as unset (Go zero value) and reverts to default 12
+# createUserDir: each user gets their own subdirectory under the files root
 
 # Ensure the log file exists before fail2ban starts watching it.
 touch /var/log/filebrowser.log
@@ -122,7 +139,6 @@ NoNewPrivileges=true
 PrivateTmp=true
 PrivateDevices=true
 ProtectSystem=strict
-ProtectHome=true
 ReadWritePaths=$STORAGE_ROOT/files $STORAGE_ROOT/filebrowser /var/log/filebrowser.log
 ProtectKernelTunables=true
 ProtectKernelModules=true
@@ -130,7 +146,6 @@ ProtectControlGroups=true
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 RestrictNamespaces=true
 LockPersonality=true
-SystemCallFilter=@system-service
 CapabilityBoundingSet=
 
 [Install]
