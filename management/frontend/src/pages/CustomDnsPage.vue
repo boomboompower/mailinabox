@@ -6,6 +6,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import Input from '@/components/ui/Input.vue'
 import Card from '@/components/ui/Card.vue'
+import Sheet from '@/components/ui/Sheet.vue'
 import Table from '@/components/ui/Table.vue'
 import TableRow from '@/components/ui/TableRow.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
@@ -23,6 +24,7 @@ const records = ref<DnsRecord[]>([])
 const zones = ref<string[]>([])
 const loading = ref(true)
 const saving = ref(false)
+const sheetOpen = ref(false)
 const deleteOpen = ref(false)
 const pendingDelete = ref<DnsRecord | null>(null)
 
@@ -93,6 +95,7 @@ async function addRecord(): Promise<void> {
     const text = await res.text()
     if (!res.ok) { toast.error(text); return }
     toast.success(text || 'Record added.')
+    sheetOpen.value = false
     fSubdomain.value = ''
     fValue.value = ''
     await loadRecords()
@@ -146,42 +149,10 @@ onMounted(async () => {
 
 <template>
   <AppLayout>
-    <h1 class="text-2xl font-semibold mb-6">Custom DNS</h1>
-
-    <!-- Add record -->
-    <Card class="p-5 mb-6">
-      <h2 class="text-base font-semibold mb-4">Add a DNS record</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label for="fZone" class="block text-sm font-medium mb-1.5">Zone</label>
-          <Select id="fZone" v-model="fZone" aria-placeholder="Select a zone">
-            <option v-if="zones.length === 0" selected disabled value="none">No zones available</option>
-            <option v-for="z in zones" :key="z" :value="z">{{ z }}</option>
-          </Select>
-        </div>
-        <div>
-          <label for="fSubdomain" class="block text-sm font-medium mb-1.5">Subdomain (optional)</label>
-          <Input id="fSubdomain" v-model="fSubdomain" placeholder="@ or leave blank for zone apex" />
-        </div>
-        <div>
-          <label for="fRtype" class="block text-sm font-medium mb-1.5">Type</label>
-          <Select id="fRtype" v-model="fRtype">
-            <option v-for="o in rtypeOptions" :key="o.value" :value="o.value">{{ o.value }}</option>
-          </Select>
-        </div>
-        <div>
-          <label for="fValue" class="block text-sm font-medium mb-1.5">Value</label>
-          <Input id="fValue" v-model="fValue" :placeholder="fHint" />
-        </div>
-      </div>
-      <p v-if="fHint" class="text-xs text-gray-500 mb-3">{{ fHint }}</p>
-      <p v-if="qname" class="text-xs text-gray-500 mb-3">
-        Record will be set on: <span class="font-medium">{{ qname }}</span>
-      </p>
-      <Button :disabled="!qname || !fValue || saving" @click="addRecord">
-        {{ saving ? 'Adding...' : 'Add Record' }}
-      </Button>
-    </Card>
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-semibold">Custom DNS</h1>
+      <Button @click="sheetOpen = true">Add Record</Button>
+    </div>
 
     <!-- Existing records -->
     <h2 class="text-base font-semibold mb-3">Current Records</h2>
@@ -217,9 +188,12 @@ onMounted(async () => {
     <EmptyState
       v-if="!loading && records.length === 0"
       title="No custom DNS records"
-      description="Add records above to override or extend this box's DNS."
+      description="Add a record to override or extend this box's DNS."
     >
       <template #icon><Globe /></template>
+      <template #action>
+        <Button @click="sheetOpen = true">Add Record</Button>
+      </template>
     </EmptyState>
 
     <!-- Secondary nameserver -->
@@ -235,6 +209,40 @@ onMounted(async () => {
         </Button>
       </div>
     </Card>
+
+    <!-- Add record sheet -->
+    <Sheet v-model="sheetOpen" title="Add DNS Record">
+      <div class="space-y-5">
+        <div>
+          <label for="fZone" class="block text-sm font-medium mb-1.5">Zone</label>
+          <Select id="fZone" v-model="fZone" aria-placeholder="Select a zone">
+            <option v-if="zones.length === 0" selected disabled value="none">No zones available</option>
+            <option v-for="z in zones" :key="z" :value="z">{{ z }}</option>
+          </Select>
+        </div>
+        <div>
+          <label for="fSubdomain" class="block text-sm font-medium mb-1.5">Subdomain (optional)</label>
+          <Input id="fSubdomain" v-model="fSubdomain" placeholder="@ or leave blank for zone apex" />
+        </div>
+        <div>
+          <label for="fRtype" class="block text-sm font-medium mb-1.5">Type</label>
+          <Select id="fRtype" v-model="fRtype">
+            <option v-for="o in rtypeOptions" :key="o.value" :value="o.value">{{ o.value }}</option>
+          </Select>
+        </div>
+        <div>
+          <label for="fValue" class="block text-sm font-medium mb-1.5">Value</label>
+          <Input id="fValue" v-model="fValue" :placeholder="fHint" />
+          <p v-if="fHint" class="text-xs text-gray-500 mt-1.5">{{ fHint }}</p>
+        </div>
+        <p v-if="qname" class="text-xs text-gray-500">
+          Record will be set on: <span class="font-medium">{{ qname }}</span>
+        </p>
+        <Button class="w-full" :disabled="!qname || !fValue || saving" @click="addRecord">
+          {{ saving ? 'Adding...' : 'Add Record' }}
+        </Button>
+      </div>
+    </Sheet>
 
     <!-- Delete confirm -->
     <Dialog
