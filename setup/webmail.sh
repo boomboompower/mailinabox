@@ -40,9 +40,19 @@ fi
 git -C "$OXI_DIR" fetch --all
 git -C "$OXI_DIR" checkout "$OXI_COMMIT"
 
-# Skip the build if the installed binary was already built from this commit.
+# Apply MIAB-specific patches (custom server lockdown, etc.).
+# Reset any previously applied patch first so git apply is idempotent.
+OXI_PATCH="$PWD/management/oxi/1_miab_oxi_auth_patch.patch"
+if [ -f "$OXI_PATCH" ]; then
+	git -C "$OXI_DIR" apply --reverse --check "$OXI_PATCH" 2>/dev/null && \
+		git -C "$OXI_DIR" apply --reverse "$OXI_PATCH"
+	git -C "$OXI_DIR" apply "$OXI_PATCH"
+fi
+
+# Skip the build if the installed binary was already built from this commit + patch.
+OXI_PATCH_HASH=$(sha256sum "$OXI_PATCH" 2>/dev/null | cut -d' ' -f1)
 OXI_BUILD_STAMP=/usr/local/share/oxi-email/built-commit
-if [ ! -f "$OXI_BUILD_STAMP" ] || [ "$(cat "$OXI_BUILD_STAMP")" != "$OXI_COMMIT" ]; then
+if [ ! -f "$OXI_BUILD_STAMP" ] || [ "$(cat "$OXI_BUILD_STAMP")" != "$OXI_COMMIT:$OXI_PATCH_HASH" ]; then
 
 	# Build frontend and backend in a subshell so the cd calls do not change
 	# the working directory for the rest of start.sh (which sources this script).
@@ -68,7 +78,7 @@ if [ ! -f "$OXI_BUILD_STAMP" ] || [ "$(cat "$OXI_BUILD_STAMP")" != "$OXI_COMMIT"
 	chmod -R 755 /usr/local/share/oxi-email
 
 	# Record the built commit so re-runs skip the build when nothing changed.
-	echo "$OXI_COMMIT" > "$OXI_BUILD_STAMP"
+	echo "$OXI_COMMIT:$OXI_PATCH_HASH" > "$OXI_BUILD_STAMP"
 fi
 
 # Data directory for per-user SQLite + search indexes - www-data needs write.
@@ -89,6 +99,7 @@ IMAP_PORT=143
 TLS_ENABLED=false
 SMTP_HOST=127.0.0.1
 SMTP_PORT=587
+ALLOW_CUSTOM_MAIL_SERVERS=false
 DATA_DIR=$STORAGE_ROOT/oxi
 STATIC_DIR=/usr/local/share/oxi-email/static
 RUST_LOG=info,tantivy=warn,async_imap=warn
