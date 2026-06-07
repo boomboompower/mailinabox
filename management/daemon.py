@@ -192,7 +192,10 @@ def authorized_personnel_only(viewfunc):
 
 		# Authorized to access an API view?
 		if "admin" in privs:
-			if not validate_csrf():
+			# CSRF protection only applies to cookie-authenticated requests.
+			# Basic Auth callers (curl, API clients) cannot be targeted by CSRF
+			# because the attacker cannot inject the credentials cross-origin.
+			if 'Authorization' not in request.headers and not validate_csrf():
 				error = "Potential CSRF attack detected."
 			else:
 				# Store the email address of the logged in user so it can be accessed
@@ -259,7 +262,7 @@ def authorized_user_only(viewfunc):
 				error = "No authentication provided."
 
 		if email and not error:
-			if not validate_csrf():
+			if 'Authorization' not in request.headers and not validate_csrf():
 				error = "Potential CSRF attack detected."
 			else:
 				request.user_email = email
@@ -484,7 +487,7 @@ def auth_methods():
 
 @app.route('/logout', methods=["POST"])
 def logout():
-	if not validate_csrf():
+	if 'Authorization' not in request.headers and not validate_csrf():
 		return Response("Forbidden\n", status=403, mimetype='text/plain')
 
 	if 'Authorization' in request.headers:
