@@ -7,5 +7,6 @@ externals/
 .vagrant
 api/docs/api-docs.html
 *.code-workspace
+.idea/
 management/frontend/node_modules/
 management/static/app/

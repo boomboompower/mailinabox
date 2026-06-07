@@ -43,7 +43,9 @@ FB_DB="$STORAGE_ROOT/filebrowser/filebrowser.db"
 # Install IMAP hook auth script. Connects on port 993 with cert verification
 # disabled (Python ssl allows this; oxi does not). Lets users log in with
 # their mail credentials.
-# Exit codes: 0=ok, 1=bad credentials, 2=backend unavailable (Dovecot down).
+# Exit codes: 0=auth or block (FileBrowser reads hook.action), 1=server error.
+# Bad credentials must exit 0 with hook.action=block - a non-zero exit makes
+# FileBrowser return 500 instead of 403, which breaks fail2ban targeting.
 cat > /usr/local/lib/filebrowser-auth.py << 'EOF'
 #!/usr/bin/env python3
 import sys, os, imaplib, ssl, socket, re
@@ -52,19 +54,20 @@ FILES_ROOT = "/home/user-data/files"
 
 socket.setdefaulttimeout(5)
 
+username = os.environ.get('USERNAME', '')
+password = os.environ.get('PASSWORD', '')
+
+if not username or not password:
+    print("hook.action=block")
+    sys.exit(0)
+
+# Reject usernames outside normal email address syntax to prevent
+# IMAP command injection (imaplib passes username raw into LOGIN).
+if not re.fullmatch(r'[A-Za-z0-9._%+\-@]+', username):
+    print("hook.action=block")
+    sys.exit(0)
+
 try:
-    # FileBrowser v2 passes credentials via environment variables.
-    username = os.environ.get('USERNAME', '')
-    password = os.environ.get('PASSWORD', '')
-
-    if not username or not password:
-        sys.exit(1)
-
-    # Reject usernames outside normal email address syntax to prevent
-    # IMAP command injection (imaplib passes username raw into LOGIN).
-    if not re.fullmatch(r'[A-Za-z0-9._%+\-@]+', username):
-        sys.exit(1)
-
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
@@ -82,10 +85,10 @@ try:
     sys.exit(0)
 except imaplib.IMAP4.error:
     print("hook.action=block")
-    sys.exit(1)
+    sys.exit(0)
 except Exception:
-    # Dovecot unreachable or other connection error.
-    sys.exit(2)
+    # Dovecot unreachable or other connection error - let FileBrowser return 500.
+    sys.exit(1)
 EOF
 chmod 755 /usr/local/lib/filebrowser-auth.py
 chown root:root /usr/local/lib/filebrowser-auth.py

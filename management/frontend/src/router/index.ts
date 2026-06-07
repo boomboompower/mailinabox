@@ -7,8 +7,7 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.DEV ? '/' : '/admin/'),
   routes: [
     { path: '/login', component: () => import('@/pages/LoginPage.vue'), meta: { public: true } },
-    { path: '/', redirect: '/welcome' },
-    { path: '/welcome', component: () => import('@/pages/WelcomePage.vue') },
+    { path: '/', redirect: '/system-status' },
     { path: '/mfa', component: () => import('@/pages/MfaPage.vue') },
     { path: '/users', component: () => import('@/pages/UsersPage.vue'), meta: { adminOnly: true } },
     { path: '/aliases', component: () => import('@/pages/AliasesPage.vue'), meta: { adminOnly: true } },
@@ -38,7 +37,7 @@ const legacyHashMap: Record<string, string> = {
   '#munin': '/munin',
   '#mail-guide': '/mail-guide',
   '#sync-guide': '/sync-guide',
-  '#welcome': '/welcome',
+  '#welcome': '/system-status',
 }
 
 router.beforeEach((to) => {
@@ -49,13 +48,13 @@ router.beforeEach((to) => {
 
   const auth = useAuthStore()
   if (to.path === '/login' && auth.isLoggedIn) {
-    return '/welcome'
+    return auth.isAdmin ? '/system-status' : '/mfa'
   }
   if (!to.meta.public && !auth.isLoggedIn) {
     return '/login'
   }
   if (to.meta.adminOnly && !auth.isAdmin) {
-    return '/welcome'
+    return '/mfa'
   }
 })
 
