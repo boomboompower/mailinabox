@@ -14,9 +14,13 @@ echo "Installing Radicale (CardDAV/CalDAV)..."
 # Install Radicale into a dedicated venv.
 RADICALE_VENV=/usr/local/lib/radicale
 
+apt_install_cached "radicale" python3-venv python3-pip
+
 if [ ! -d "$RADICALE_VENV" ]; then
-	python3 -m venv "$RADICALE_VENV"
+	hide_output python3 -m venv "$RADICALE_VENV"
 fi
+# Ensure pip is present in the venv regardless of how the system Python was installed.
+hide_output "$RADICALE_VENV/bin/python3" -m ensurepip --upgrade
 hide_output "$RADICALE_VENV/bin/pip" install --upgrade pip
 hide_output "$RADICALE_VENV/bin/pip" install "radicale>=3.1,<4" "passlib[bcrypt]"
 
@@ -41,7 +45,7 @@ logger = logging.getLogger(__name__)
 
 
 class Auth(BaseAuth):
-    def login(self, login: str, password: str) -> str:
+    def _login(self, login: str, password: str) -> str:
         try:
             conn = imaplib.IMAP4("127.0.0.1", 143)
             conn.login(login, password)
@@ -57,17 +61,16 @@ PYEOF
 # Storage plugin: bridges oxi.email per-user SQLite to CardDAV/CalDAV.
 cat > "$PLUGIN_DIR/radicale_miab/storage.py" << 'PYEOF'
 """
-Radicale storage backend for Mail-in-a-Box.
+Radicale 3.7+ storage backend for Mail-in-a-Box.
 
 Bridges oxi.email per-user SQLite databases to CardDAV/CalDAV:
-  /<email>/contacts/  → VADDRESSBOOK (contacts + contact_groups tables)
-  /<email>/calendar/  → VCALENDAR (calendar_events table)
+  /<email>/contacts/  -> VADDRESSBOOK (contacts table)
+  /<email>/calendar/  -> VCALENDAR (calendar_events table)
 
 Database path: $OXI_DATA_DIR/<sha256(email)>/db.sqlite
 
 Adds vcard_data/ical_data columns on first access so full vCard/iCal payloads
-round-trip without data loss. oxi's structured columns (name, email, company,
-notes, title, etc.) are also kept in sync so the oxi UI continues to work.
+round-trip without data loss. oxi's structured columns stay in sync for the UI.
 """
 
 import hashlib
@@ -76,7 +79,7 @@ import os
 import sqlite3
 from contextlib import contextmanager
 from datetime import datetime, timezone
-from typing import Iterator, Mapping, Optional
+from typing import Dict, Iterable, Iterator, List, Mapping, Optional, Tuple
 
 from radicale import storage
 from radicale.item import Item
@@ -120,7 +123,7 @@ def _ensure_columns(conn: sqlite3.Connection) -> None:
             conn.execute("ALTER TABLE contacts ADD COLUMN vcard_data TEXT")
             conn.commit()
     except sqlite3.OperationalError:
-        pass  # Table may not exist yet (user never logged into oxi)
+        pass
     try:
         existing = {r[1] for r in conn.execute("PRAGMA table_info(calendar_events)")}
         if "ical_data" not in existing:
@@ -139,7 +142,6 @@ def _ical_escape(s: str) -> str:
 
 
 def _fold(line: str) -> str:
-    """Fold a vCard/iCal line at 75 characters per RFC 5545/6350."""
     if len(line) <= 75:
         return line
     parts = [line[:75]]
@@ -250,7 +252,6 @@ def _event_to_ical(row: sqlite3.Row) -> str:
 
 def _parse_vcard(text: str) -> dict:
     fields = {"name": "", "email": "", "company": "", "notes": ""}
-    # Unfold continuation lines
     unfolded = text.replace("\r\n ", "").replace("\r\n\t", "")
     for line in unfolded.splitlines():
         key, _, value = line.partition(":")
@@ -313,12 +314,64 @@ def _parse_ical(text: str) -> dict:
 # Collections
 # ---------------------------------------------------------------------------
 
+class _RootCollection(storage.BaseCollection):
+    """Synthetic root collection returned for path '/' to allow client discovery."""
+
+    @property
+    def path(self) -> str:
+        return ""
+
+    @property
+    def tag(self) -> str:
+        return ""
+
+    @property
+    def etag(self) -> str:
+        return '"root"'
+
+    @property
+    def last_modified(self) -> str:
+        return datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
+
+    def get_meta(self, key=None):
+        meta: dict = {"D:displayname": "Radicale"}
+        return meta.get(key) if key else meta
+
+    def set_meta(self, props) -> None:
+        pass
+
+    def get_all(self) -> Iterator[Item]:
+        return iter([])
+
+    def get_multi(self, hrefs) -> Iterable[Tuple[str, Optional[Item]]]:
+        return iter([])
+
+    def get_filtered(self, filters) -> Iterable[Tuple[Item, bool]]:
+        return iter([])
+
+    def has_uid(self, uid: str) -> bool:
+        return False
+
+    def serialize(self, vcf_to_ics: bool = False, **kwargs) -> str:
+        return ""
+
+    def sync(self, old_token: str = "") -> Tuple[str, Iterable[str]]:
+        return '"root"', []
+
+    def upload(self, href: str, item: Item) -> Tuple[Item, Optional[Item]]:
+        raise NotImplementedError
+
+    def delete(self, href: Optional[str] = None) -> None:
+        pass
+
+
 class _OxiCollection(storage.BaseCollection):
     def __init__(self, path: str, data_dir: str, email: str, coll_type: str):
+        # path must be stripped (no leading/trailing slashes), e.g. "user@domain/contacts"
         self._path = path
         self._data_dir = data_dir
         self._email = email
-        self._type = coll_type  # _CONTACTS or _CALENDAR
+        self._type = coll_type
 
     @property
     def path(self) -> str:
@@ -333,6 +386,14 @@ class _OxiCollection(storage.BaseCollection):
         return ""
 
     @property
+    def is_principal(self) -> bool:
+        return False
+
+    @property
+    def owner(self) -> str:
+        return self._email
+
+    @property
     def etag(self) -> str:
         conn = _open_db(self._data_dir, self._email)
         if conn is None:
@@ -343,6 +404,8 @@ class _OxiCollection(storage.BaseCollection):
             row = conn.execute(f"SELECT MAX(updated_at) as ts FROM {table}").fetchone()
             ts = row["ts"] or "empty"
             return f'"{hashlib.md5(ts.encode()).hexdigest()}"'
+        except sqlite3.OperationalError:
+            return '"empty"'
         finally:
             conn.close()
 
@@ -365,14 +428,14 @@ class _OxiCollection(storage.BaseCollection):
         if self._type == _CONTACTS:
             meta = {
                 "tag": "VADDRESSBOOK",
-                "{DAV:}displayname": "Contacts",
-                "{urn:ietf:params:xml:ns:carddav}addressbook-description": "oxi.email contacts",
+                "D:displayname": "Contacts",
+                "CR:addressbook-description": "oxi.email contacts",
             }
         else:
             meta = {
                 "tag": "VCALENDAR",
-                "{DAV:}displayname": "Calendar",
-                "{urn:ietf:params:xml:ns:caldav}calendar-description": "oxi.email calendar",
+                "D:displayname": "Calendar",
+                "C:calendar-description": "oxi.email calendar",
             }
         return meta.get(key) if key else meta
 
@@ -420,7 +483,8 @@ class _OxiCollection(storage.BaseCollection):
             _ensure_columns(conn)
             if self._type == _CONTACTS:
                 rows = conn.execute(
-                    "SELECT id, email, name, company, notes, vcard_data, updated_at FROM contacts"
+                    "SELECT id, email, name, company, notes, vcard_data, updated_at"
+                    " FROM contacts"
                 ).fetchall()
                 for row in rows:
                     yield Item(collection=self, collection_path=self._path,
@@ -443,13 +507,54 @@ class _OxiCollection(storage.BaseCollection):
         finally:
             conn.close()
 
-    def upload(self, href: str, item: Item) -> Item:
+    def get_multi(self, hrefs: Iterable[str]) -> Iterable[Tuple[str, Optional[Item]]]:
+        for href in hrefs:
+            yield href, self.get(href)
+
+    def get_filtered(self, filters) -> Iterable[Tuple[Item, bool]]:
+        for item in self.get_all():
+            yield item, True  # Return all items; Radicale filters client-side
+
+    def has_uid(self, uid: str) -> bool:
+        conn = _open_db(self._data_dir, self._email)
+        if conn is None:
+            return False
+        try:
+            table = "contacts" if self._type == _CONTACTS else "calendar_events"
+            row = conn.execute(f"SELECT id FROM {table} WHERE id=?", (uid,)).fetchone()
+            return row is not None
+        except sqlite3.OperationalError:
+            return False
+        finally:
+            conn.close()
+
+    def serialize(self, vcf_to_ics: bool = False, **kwargs) -> str:
+        return "".join(item.serialize() for item in self.get_all())
+
+    def sync(self, old_token: str = "") -> Tuple[str, Iterable[str]]:
+        token = self.etag
+        conn = _open_db(self._data_dir, self._email)
+        if conn is None:
+            return token, []
+        try:
+            table = "contacts" if self._type == _CONTACTS else "calendar_events"
+            ext = ".vcf" if self._type == _CONTACTS else ".ics"
+            rows = conn.execute(f"SELECT id FROM {table}").fetchall()
+            hrefs = [f"{row['id']}{ext}" for row in rows]
+            return token, hrefs
+        except sqlite3.OperationalError:
+            return token, []
+        finally:
+            conn.close()
+
+    def upload(self, href: str, item: Item) -> Tuple[Item, Optional[Item]]:
+        old_item = self.get(href)
         uid = href.rsplit(".", 1)[0]
         text = item.serialize()
         now = _now_sql()
         conn = _open_db(self._data_dir, self._email)
         if conn is None:
-            raise RuntimeError(f"No oxi database found for user - log into oxi first")
+            raise RuntimeError("No oxi database found for user - log into oxi first")
         try:
             _ensure_columns(conn)
             if self._type == _CONTACTS:
@@ -466,7 +571,6 @@ class _OxiCollection(storage.BaseCollection):
                     """, (uid, f["email"], f["name"], f["company"], f["notes"], text, now, now))
                     conn.commit()
                 except sqlite3.IntegrityError:
-                    # Email unique constraint conflict - update the existing row by email
                     conn.execute("""
                         UPDATE contacts SET name=?, company=?, notes=?, vcard_data=?, updated_at=?
                         WHERE email=?
@@ -491,14 +595,14 @@ class _OxiCollection(storage.BaseCollection):
                 conn.commit()
         finally:
             conn.close()
-        # Return a fresh Item with current timestamp
         lm = _last_modified_rfc1123(now)
-        return Item(collection=self, collection_path=self._path,
-                    href=href, last_modified=lm, text=text)
+        new_item = Item(collection=self, collection_path=self._path,
+                        href=href, last_modified=lm, text=text)
+        return new_item, old_item
 
     def delete(self, href: Optional[str] = None) -> None:
         if href is None:
-            return  # Never delete the collection itself
+            return
         uid = href.rsplit(".", 1)[0]
         conn = _open_db(self._data_dir, self._email)
         if conn is None:
@@ -514,9 +618,10 @@ class _OxiCollection(storage.BaseCollection):
 
 
 class _PrincipalCollection(storage.BaseCollection):
-    """Per-user principal collection (/<email>/)."""
+    """Per-user principal collection. path must be stripped, e.g. 'user@domain'."""
 
     def __init__(self, path: str, email: str):
+        # path must be stripped (no leading/trailing slashes), e.g. "user@domain"
         self._path = path
         self._email = email
 
@@ -529,6 +634,14 @@ class _PrincipalCollection(storage.BaseCollection):
         return ""
 
     @property
+    def is_principal(self) -> bool:
+        return True
+
+    @property
+    def owner(self) -> str:
+        return self._email
+
+    @property
     def etag(self) -> str:
         return f'"{hashlib.md5(self._email.encode()).hexdigest()}"'
 
@@ -536,23 +649,39 @@ class _PrincipalCollection(storage.BaseCollection):
     def last_modified(self) -> str:
         return datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")
 
-    def get_meta(self, key=None):
-        meta = {"{DAV:}displayname": self._email}
+    def get_meta(self, key: Optional[str] = None):
+        meta = {"D:displayname": self._email}
         return meta.get(key) if key else meta
 
-    def set_meta(self, props):
+    def set_meta(self, props: Mapping) -> None:
         pass
 
-    def get(self, href):
+    def get(self, href: str) -> Optional[Item]:
         return None
 
-    def get_all(self):
+    def get_all(self) -> Iterator[Item]:
         return iter([])
 
-    def upload(self, href, item):
+    def get_multi(self, hrefs: Iterable[str]) -> Iterable[Tuple[str, Optional[Item]]]:
+        for href in hrefs:
+            yield href, None
+
+    def get_filtered(self, filters) -> Iterable[Tuple[Item, bool]]:
+        return iter([])
+
+    def has_uid(self, uid: str) -> bool:
+        return False
+
+    def serialize(self, vcf_to_ics: bool = False, **kwargs) -> str:
+        return ""
+
+    def sync(self, old_token: str = "") -> Tuple[str, Iterable[str]]:
+        return self.etag, []
+
+    def upload(self, href: str, item: Item) -> Tuple[Item, Optional[Item]]:
         raise NotImplementedError
 
-    def delete(self, href=None):
+    def delete(self, href: Optional[str] = None) -> None:
         pass
 
 
@@ -568,11 +697,10 @@ class Storage(storage.BaseStorage):
             raise RuntimeError("OXI_DATA_DIR environment variable is not set")
 
     @contextmanager
-    def acquire_lock(self, mode, user=None):
-        yield  # SQLite handles its own locking
+    def acquire_lock(self, mode: str, user: str = "", *args, **kwargs):
+        yield
 
     def _parse_path(self, path: str):
-        """Return (email, collection_type, href) for a normalised Radicale path."""
         parts = [p for p in path.strip("/").split("/") if p]
         if not parts:
             return None, None, None
@@ -588,16 +716,18 @@ class Storage(storage.BaseStorage):
         return email, None, None
 
     def _collection(self, email: str, coll_type: str) -> _OxiCollection:
-        return _OxiCollection(f"/{email}/{coll_type}/", self._data_dir, email, coll_type)
+        return _OxiCollection(f"{email}/{coll_type}", self._data_dir, email, coll_type)
 
-    def discover(self, path: str, depth: str = "0") -> Iterator:
+    def discover(self, path: str, depth: str = "0",
+                 child_context_manager=None, user_groups=None) -> Iterable:
         email, coll_type, href = self._parse_path(path)
         if email is None:
+            # Root path: return synthetic root so clients can do service discovery
+            yield _RootCollection()
             return
 
         if coll_type is None:
-            # Principal level
-            yield _PrincipalCollection(f"/{email}/", email)
+            yield _PrincipalCollection(email, email)
             if depth != "0":
                 yield self._collection(email, _CONTACTS)
                 yield self._collection(email, _CALENDAR)
@@ -609,24 +739,29 @@ class Storage(storage.BaseStorage):
             yield from coll.get_all()
 
     def move(self, item: Item, to_collection, to_href: str) -> None:
-        text = item.serialize()
         to_collection.upload(to_href, item)
         item.collection.delete(item.href)
 
-    def create_collection(self, path: str, collection=None, props=None):
-        email, coll_type, _ = self._parse_path(path)
-        norm = path if path.endswith("/") else path + "/"
+    def create_collection(self, href: str, items=None,
+                          props=None) -> Tuple[storage.BaseCollection, Dict, List]:
+        email, coll_type, _ = self._parse_path(href)
+        sane = href.strip("/")
         if coll_type:
-            return _OxiCollection(norm, self._data_dir, email, coll_type)
-        return _PrincipalCollection(norm, email)
+            coll = _OxiCollection(sane, self._data_dir, email, coll_type)
+        else:
+            coll = _PrincipalCollection(sane, email)
+        return coll, {}, []
 
     def get_collection(self, path: str) -> Optional[storage.BaseCollection]:
         email, coll_type, _ = self._parse_path(path)
         if email is None:
             return None
         if coll_type is None:
-            return _PrincipalCollection(f"/{email}/", email)
+            return _PrincipalCollection(email, email)
         return self._collection(email, coll_type)
+
+    def verify(self) -> bool:
+        return True
 PYEOF
 
 chmod 644 "$PLUGIN_DIR/radicale_miab/auth.py"
@@ -645,9 +780,20 @@ timeout = 30
 [auth]
 type = radicale_miab.auth
 delay = 1
+cache_logins = True
+cache_successful_logins_expiry = 300
+cache_failed_logins_expiry = 90
+urldecode_username = True
+
+[rights]
+permit_delete_collection = False
+permit_overwrite_collection = False
 
 [storage]
 type = radicale_miab.storage
+
+[web]
+type = none
 
 [logging]
 level = warning
@@ -699,6 +845,7 @@ CapabilityBoundingSet=
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
+BindPaths=$STORAGE_ROOT/oxi
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
@@ -713,6 +860,6 @@ ReadWritePaths=$STORAGE_ROOT/oxi /var/log/radicale.log
 WantedBy=multi-user.target
 EOF
 
-systemctl daemon-reload
-systemctl enable radicale
+hide_output systemctl daemon-reload
+hide_output systemctl enable radicale
 restart_service radicale
