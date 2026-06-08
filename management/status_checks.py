@@ -219,7 +219,7 @@ def run_system_checks(rounded_values, env, output):
 	# Use BufferedOutput to collect results from each check
 	check_outputs = []
 
-	with ThreadPoolExecutor(max_workers=10) as executor:
+	with ThreadPoolExecutor(max_workers=12) as executor:
 		futures = []
 
 		# Submit all independent checks
@@ -457,10 +457,10 @@ def check_webmail(env, output):
 	try:
 		with urllib.request.urlopen("http://127.0.0.1:3001/api/health", timeout=5) as resp:
 			data = json.loads(resp.read())
-		if resp.status == 200 and data.get("status") == "ok":
-			output.print_ok("oxi.email webmail is running and healthy.")
-		else:
-			output.print_error(f"oxi.email webmail returned an unexpected health response (HTTP {resp.status}).")
+			if resp.status == 200 and data.get("status") == "ok":
+				output.print_ok("oxi.email webmail is running and healthy.")
+			else:
+				output.print_error(f"oxi.email webmail returned an unexpected health response (HTTP {resp.status}).")
 	except urllib.error.URLError as e:
 		output.print_error(f"oxi.email webmail is not responding to requests: {e.reason}. Run: systemctl restart oxi-email")
 		return
@@ -496,10 +496,10 @@ def check_filebrowser(env, output):
 	try:
 		with urllib.request.urlopen("http://127.0.0.1:8080/files/health", timeout=5) as resp:
 			data = json.loads(resp.read())
-		if resp.status == 200 and data.get("status") == "OK":
-			output.print_ok("FileBrowser file manager is running and healthy.")
-		else:
-			output.print_error(f"FileBrowser returned an unexpected health response (HTTP {resp.status}). Run: journalctl -u filebrowser")
+			if resp.status == 200 and data.get("status") == "OK":
+				output.print_ok("FileBrowser file manager is running and healthy.")
+			else:
+				output.print_error(f"FileBrowser returned an unexpected health response (HTTP {resp.status}). Run: journalctl -u filebrowser")
 	except urllib.error.URLError as e:
 		output.print_error(f"FileBrowser is not responding to requests: {e.reason}. Run: systemctl restart filebrowser")
 		return

@@ -50,12 +50,13 @@ git -C "$OXI_DIR" checkout -q "$OXI_COMMIT"
 # reverse order first so the operation is idempotent across re-runs.
 OXI_PATCH1="$PWD/management/oxi/1_miab_oxi_auth_patch.patch"
 OXI_PATCH2="$PWD/management/oxi/2_miab_oxi_ui_patch.patch"
-for _p in "$OXI_PATCH2" "$OXI_PATCH1"; do
+OXI_PATCH3="$PWD/management/oxi/3_miab_oxi_subfolder_patch.patch"
+for _p in "$OXI_PATCH3" "$OXI_PATCH2" "$OXI_PATCH1"; do
 	[ -f "$_p" ] || continue
 	git -C "$OXI_DIR" apply --reverse --check "$_p" 2>/dev/null && \
 		git -C "$OXI_DIR" apply --reverse "$_p"
 done
-for _p in "$OXI_PATCH1" "$OXI_PATCH2"; do
+for _p in "$OXI_PATCH1" "$OXI_PATCH2" "$OXI_PATCH3"; do
 	[ -f "$_p" ] && git -C "$OXI_DIR" apply "$_p"
 done
 
@@ -64,8 +65,8 @@ done
 # left off on the next run. Each stamp is written only after its deploy step
 # succeeds, so a partial failure leaves the stamp invalid for retry.
 
-# Frontend stamp: commit + lockfile hash + UI patch hash.
-_fe_want="$OXI_COMMIT:$(hash_files "$OXI_DIR/frontend/bun.lock" "$OXI_PATCH2")"
+# Frontend stamp: commit + lockfile hash + UI patch hash + subfolder patch hash.
+_fe_want="$OXI_COMMIT:$(hash_files "$OXI_DIR/frontend/bun.lock" "$OXI_PATCH2" "$OXI_PATCH3")"
 
 # Backend stamp: commit + backend patch hash.
 _be_want="$OXI_COMMIT:$(hash_files "$OXI_PATCH1")"
