@@ -110,15 +110,11 @@ hide_output add-apt-repository -y universe
 # Install the duplicity PPA.
 hide_output add-apt-repository -y ppa:duplicity-team/duplicity-release-git
 
-# Stock PHP is 8.1+, but Z-Push requires 8.0, so we pin it via the ondrej PPA.
-hide_output add-apt-repository --y ppa:ondrej/php
-
 # ### Update Packages
 
 # Update system packages to make sure we have the latest upstream versions
-# of things from Ubuntu, as well as the directory of packages provide by the
+# of things from Ubuntu, as well as the directory of packages provided by the
 # PPAs so we can install those packages later.
-# --allow-releaseinfo-change is added because ppa:ondrej/php changed its Label.
 
 echo "Updating system packages..."
 hide_output apt-get update --allow-releaseinfo-change
@@ -161,8 +157,7 @@ fi
 
 # ### Set the system timezone
 #
-# Some systems are missing /etc/timezone, which we cat into the configs for
-# Z-Push, so we need to set it to something. Daily cron tasks
+# Some systems are missing /etc/timezone. Daily cron tasks
 # like the system backup are run at a time tied to the system timezone, so
 # letting the user choose will help us identify the right time to do those
 # things (i.e. late at night in whatever timezone the user actually lives

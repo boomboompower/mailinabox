@@ -299,7 +299,7 @@ chmod +x /etc/cron.daily/mailinabox-postgrey-whitelist
 /etc/cron.daily/mailinabox-postgrey-whitelist
 
 # Increase the message size limit from 10MB to 128MB.
-# The same limit is specified in nginx.conf for mail submitted via webmail and Z-Push.
+# The same limit is specified in nginx.conf for mail submitted via webmail.
 tools/editconf.py /etc/postfix/main.cf \
 	message_size_limit=134217728
 

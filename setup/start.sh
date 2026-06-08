@@ -125,7 +125,7 @@ else
 	systemctl stop filebrowser 2>/dev/null || true
 	systemctl disable filebrowser 2>/dev/null || true
 fi
-source setup/zpush.sh
+source setup/radicale.sh
 source setup/management.sh
 source setup/munin.sh
 

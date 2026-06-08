@@ -39,7 +39,7 @@ These services are protected by [TLS](https://en.wikipedia.org/wiki/Transport_La
 
 * SMTP Submission (ports 465/587). Mail users submit outbound mail through SMTP with TLS (port 465) or STARTTLS (port 587).
 * IMAP/POP (ports 993, 995). Mail users check for incoming mail through IMAP or POP over TLS.
-* HTTPS (port 443). Webmail, the Exchange/ActiveSync protocol, the administrative control panel, and any static hosted websites are accessed over HTTPS.
+* HTTPS (port 443). Webmail, CardDAV/CalDAV sync, the administrative control panel, and any static hosted websites are accessed over HTTPS.
 
 The services all follow these rules:
 

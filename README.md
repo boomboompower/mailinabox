@@ -33,8 +33,8 @@ It is a one-click email appliance. There are no user-configurable setup options.
 
 The components installed are:
 
-* SMTP ([postfix](http://www.postfix.org/)), IMAP ([Dovecot](http://dovecot.org/)), and Exchange ActiveSync email push ([z-push](http://z-push.org/)) servers
-* Webmail ([oxi.email](https://github.com/c0h1b4/oxi)), file storage ([FileBrowser](https://filebrowser.org/)), mail filter rules (Dovecot), and email client autoconfig settings (served by [nginx](http://nginx.org/))
+* SMTP ([postfix](http://www.postfix.org/)) and IMAP ([Dovecot](http://dovecot.org/)) servers
+* Webmail ([oxi.email](https://github.com/c0h1b4/oxi)), contacts and calendar sync ([Radicale](https://radicale.org/) CardDAV/CalDAV), file storage ([FileBrowser](https://filebrowser.org/)), mail filter rules (Dovecot), and email client autoconfig settings (served by [nginx](http://nginx.org/))
 * Spam filtering ([spamassassin](https://spamassassin.apache.org/)) and greylisting ([postgrey](http://postgrey.schweikert.ch/))
 * DNS ([nsd4](https://www.nlnetlabs.nl/projects/nsd/)) with [SPF](https://en.wikipedia.org/wiki/Sender_Policy_Framework), DKIM ([OpenDKIM](http://www.opendkim.org/)), [DMARC](https://en.wikipedia.org/wiki/DMARC), [DNSSEC](https://en.wikipedia.org/wiki/DNSSEC), [DANE TLSA](https://en.wikipedia.org/wiki/DNS-based_Authentication_of_Named_Entities), [MTA-STS](https://tools.ietf.org/html/rfc8461), and [SSHFP](https://tools.ietf.org/html/rfc4255) policy records automatically set
 * TLS certificates are automatically provisioned using [Let's Encrypt](https://letsencrypt.org/) for protecting https and all of the other services on the box
@@ -92,8 +92,6 @@ The Acknowledgements
 This project was inspired in part by the ["NSA-proof your email in 2 hours"](http://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/) blog post by Drew Crawford, [Sovereign](https://github.com/sovereign/sovereign) by Alex Payne, and conversations with <a href="https://twitter.com/shevski" target="_blank">@shevski</a>, <a href="https://github.com/konklone" target="_blank">@konklone</a>, and <a href="https://github.com/gregelin" target="_blank">@GregElin</a>.
 
 Mail-in-a-Box is similar to [iRedMail](http://www.iredmail.org/) and [Modoboa](https://github.com/tonioo/modoboa).
-
-The new rework of the Mail-in-a-Box control panel makes use of [twemoji](https://github.com/jdecked/twemoji) - this feature is optional, and can be disabled by deleting the relevant files in `./management/static/twemoji`. Twemoji is licensed under the [Creative Commons Attribution 4.0 International License (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
 
 The History
 -----------
