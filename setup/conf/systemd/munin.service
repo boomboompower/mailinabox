@@ -1,0 +1,11 @@
+[Unit]
+Description=Munin System Monitoring Startup Script
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c "mkdir -p /var/run/munin && chown munin /var/run/munin"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

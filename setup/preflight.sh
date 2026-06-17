@@ -8,18 +8,40 @@ if [[ $EUID -ne 0 ]]; then
 	exit 1
 fi
 
-# Check that we are running on Ubuntu 22.04 LTS (or 22.04.xx).
+# Check that we are running on a supported Ubuntu LTS release.
 # Pull in the variables defined in /etc/os-release but in a
 # namespace to avoid polluting our variables.
 source <(cat /etc/os-release | sed s/^/OS_RELEASE_/)
-if [ "${OS_RELEASE_ID:-}" != "ubuntu" ] || [ "${OS_RELEASE_VERSION_ID:-}" != "22.04" ]; then
-	echo "Mail-in-a-Box only supports being installed on Ubuntu 22.04, sorry. You are running:"
+if [ "${OS_RELEASE_ID:-}" != "ubuntu" ]; then
+	echo "Mail-in-a-Box only supports Ubuntu. You are running:"
 	echo
 	echo "${OS_RELEASE_ID:-"Unknown linux distribution"} ${OS_RELEASE_VERSION_ID:-}"
 	echo
-	echo "We can't write scripts that run on every possible setup, sorry."
 	exit 1
 fi
+case "${OS_RELEASE_VERSION_ID:-}" in
+	24.04)
+		# Ubuntu 24.04 LTS - fully supported, recommended.
+		;;
+	26.04)
+		# Ubuntu 26.04 LTS - newly released, should work but less tested.
+		echo "WARNING: Ubuntu 26.04 support is new and less tested than 24.04."
+		echo "         Consider using 24.04 for production deployments."
+		echo
+		;;
+	22.04)
+		# Ubuntu 22.04 LTS - still works but approaching end of life (April 2027).
+		echo "WARNING: Ubuntu 22.04 reaches end of life in April 2027."
+		echo "         Consider upgrading to 24.04."
+		echo
+		;;
+	*)
+		echo "Mail-in-a-Box supports Ubuntu 24.04 (recommended), 26.04, and 22.04."
+		echo "You are running: Ubuntu ${OS_RELEASE_VERSION_ID:-unknown}"
+		echo
+		exit 1
+		;;
+esac
 
 # Check that we have enough memory.
 #
@@ -29,7 +51,7 @@ fi
 # We will display a warning if the memory is below 768 MB which is 750000 kibibytes
 #
 # Skip the check if we appear to be running inside of Vagrant, because that's really just for testing.
-TOTAL_PHYSICAL_MEM=$(head -n 1 /proc/meminfo | awk '{print $2}')
+TOTAL_PHYSICAL_MEM=$(awk 'NR==1{print $2}' /proc/meminfo)
 if [ "$TOTAL_PHYSICAL_MEM" -lt 490000 ]; then
 if [ ! -d /vagrant ]; then
 	TOTAL_PHYSICAL_MEM=$(( TOTAL_PHYSICAL_MEM * 1024 / 1000 / 1000 ))

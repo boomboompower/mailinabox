@@ -8,8 +8,6 @@ preview = true
 
 output-format = "concise"
 
-extend-exclude = ["tools/mail.py"]
-
 [tool.ruff.lint]
 select = [
 	"F",

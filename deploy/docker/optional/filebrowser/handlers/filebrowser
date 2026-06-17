@@ -1,0 +1,21 @@
+#!/bin/bash
+# Handler for the filebrowser service inside the filebrowser container.
+# Called by control-socket-server in response to management container requests.
+set -euo pipefail
+
+case "$1" in
+    stop)
+        supervisorctl stop filebrowser
+        ;;
+    restart)
+        supervisorctl restart filebrowser
+        ;;
+    reload)
+        # FileBrowser has no reload signal; restart is equivalent.
+        supervisorctl restart filebrowser
+        ;;
+    *)
+        echo "Unknown action: $1" >&2
+        exit 1
+        ;;
+esac

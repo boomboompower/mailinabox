@@ -8,7 +8,7 @@
 import sys, os, os.path, glob, re, shutil
 
 sys.path.insert(0, 'management')
-from utils import load_environment, save_environment, shell
+from core.utils import load_environment, save_environment, shell
 import contextlib
 
 def migration_1(env):

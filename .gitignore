@@ -1,12 +1,10 @@
 *~
-tests/__pycache__/
-management/__pycache__/
-tools/__pycache__/
+__pycache__/
 externals/
 .env
 .vagrant
-api/docs/api-docs.html
+management/api/docs/api-docs.html
 *.code-workspace
 .idea/
-management/frontend/node_modules/
-management/static/app/
+frontend/node_modules/
+frontend/dist/

@@ -5,6 +5,12 @@
 # -o pipefail: don't ignore errors in the non-last command in a pipeline
 set -euo pipefail
 
+# RUNTIME controls environment-specific behaviour.
+# "baremetal" (default): normal apt/systemctl usage.
+# "docker": skip package installs (pre-installed in Dockerfile) and ufw calls;
+#           systemctl calls are handled by the stub at /usr/local/bin/systemctl.
+RUNTIME=${RUNTIME:-baremetal}
+
 function hide_output {
 	# This function hides the output of a command unless the command fails
 	# and returns a non-zero exit code.
@@ -45,7 +51,7 @@ function apt_get_quiet {
 	# Although we could pass -qq to apt-get to make output quieter, many packages write to stdout
 	# and stderr things that aren't really important. Use our hide_output function to capture
 	# all of that and only show it if there is a problem (i.e. if apt_get returns a failure exit status).
-	DEBIAN_FRONTEND=noninteractive hide_output apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" "$@"
+	DEBIAN_FRONTEND=noninteractive hide_output apt-get -y --no-install-recommends -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" -o DPkg::Lock::Timeout=300 "$@"
 }
 
 function apt_install {
@@ -54,12 +60,18 @@ function apt_install {
 	# install' for all of the packages.  Calling `dpkg` on each package is slow,
 	# and doesn't affect what we actually do, except in the messages, so let's
 	# not do that anymore.
+	#
+	# In Docker, packages are pre-installed via the Dockerfile; skip apt entirely.
+	if [ "${RUNTIME:-baremetal}" = "docker" ]; then return 0; fi
 	apt_get_quiet install "$@"
 }
 
 function apt_install_cached {
 	# Like apt_install but skips if this exact package list was already installed.
 	# First argument is a step name for the stamp; remaining arguments are packages.
+	#
+	# In Docker, packages are pre-installed via the Dockerfile; skip apt entirely.
+	if [ "${RUNTIME:-baremetal}" = "docker" ]; then return 0; fi
 	local step="$1"
 	shift
 	local pkg_hash
@@ -147,6 +159,8 @@ function get_default_privateip {
 }
 
 function ufw_allow {
+	# In Docker, firewall rules are managed at the host level; skip ufw.
+	if [ "${RUNTIME:-baremetal}" = "docker" ]; then return 0; fi
 	if [ -z "${DISABLE_FIREWALL:-}" ]; then
 		# ufw has completely unhelpful output
 		ufw allow "$1" > /dev/null;
@@ -154,6 +168,8 @@ function ufw_allow {
 }
 
 function ufw_limit {
+	# In Docker, firewall rules are managed at the host level; skip ufw.
+	if [ "${RUNTIME:-baremetal}" = "docker" ]; then return 0; fi
 	if [ -z "${DISABLE_FIREWALL:-}" ]; then
 		# ufw has completely unhelpful output
 		ufw limit "$1" > /dev/null;
@@ -161,6 +177,11 @@ function ufw_limit {
 }
 
 function restart_service {
+	if [ "${RUNTIME:-baremetal}" = "docker" ]; then
+		# The systemctl stub forwards start/restart to supervisorctl.
+		systemctl restart "$1"
+		return 0
+	fi
 	hide_output service "$1" restart
 }
 
@@ -227,6 +248,38 @@ function wget_verify {
 	fi
 }
 
+function wget_verify_sha256 {
+	# Same as wget_verify, but for sources (like GitHub release checksums.txt
+	# files) that publish sha256 instead of sha1.
+	URL=$1
+	HASH=$2
+	DEST=$3
+	CHECKSUM="$HASH  $DEST"
+	rm -f "$DEST"
+	hide_output wget -O "$DEST" "$URL"
+	if ! echo "$CHECKSUM" | sha256sum --check --strict > /dev/null; then
+		echo "------------------------------------------------------------"
+		echo "Download of $URL did not match expected checksum."
+		echo "Found:"
+		sha256sum "$DEST"
+		echo
+		echo "Expected:"
+		echo "$CHECKSUM"
+		rm -f "$DEST"
+		exit 1
+	fi
+}
+
+function php_fpm_service {
+	# Returns the actual php-fpm systemd unit name for whatever PHP version
+	# apt resolved on this box (e.g. "php8.3-fpm"), instead of a hardcoded
+	# version that silently breaks the moment Ubuntu's default PHP version
+	# changes. Debian/Ubuntu's php-fpm packages always name their unit
+	# php{MAJOR}.{MINOR}-fpm, so deriving it from the php-cli binary that's
+	# already a required dependency is reliable and needs no separate lookup.
+	php -r 'echo PHP_MAJOR_VERSION, ".", PHP_MINOR_VERSION;' | sed 's/^/php/;s/$/-fpm/'
+}
+
 function git_clone {
 	# Clones a git repository, checks out a particular commit or tag,
 	# and moves the repository (or a subdirectory in it) to some path.
@@ -249,6 +302,9 @@ function git_clone {
 
 # Central directory where per-step build stamps are stored.
 MIAB_STAMP_DIR=/usr/local/lib/mailinabox/stamps
+
+# Bootstrap venv used by the setup boxctl (questions.sh) for email_validator.
+BOOT_VENV=/usr/local/lib/mailinabox/boot-venv
 
 function hash_files {
 	# Produces a single sha256 hex string over all given files/directories.

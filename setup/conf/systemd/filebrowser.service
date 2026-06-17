@@ -1,0 +1,30 @@
+[Unit]
+Description=FileBrowser web file manager
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/filebrowser \
+    --database ${STORAGE_ROOT}/filebrowser/filebrowser.db
+User=www-data
+Group=www-data
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/var/log/filebrowser.log
+StandardError=append:/var/log/filebrowser.log
+
+# Sandboxing
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ReadWritePaths=${STORAGE_ROOT}/files ${STORAGE_ROOT}/filebrowser /var/log/filebrowser.log
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+LockPersonality=true
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target

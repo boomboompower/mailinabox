@@ -1,0 +1,79 @@
+name: Build and publish admin frontend
+
+# Publishes a prebuilt frontend/dist build, tagged by a content hash of
+# frontend/ itself (not the commit SHA or a version number) - so
+# setup/management.sh can fetch "the build matching my current source"
+# without anyone ever bumping a pin. Only runs when frontend/ actually
+# changed, since that's the only time the hash (and therefore the build)
+# can differ from what's already published.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute frontend content hash
+        id: hash
+        run: |
+          source setup/functions.sh
+          echo "hash=$(hash_files "$PWD/frontend")" >> "$GITHUB_OUTPUT"
+
+      - name: Check if this hash was already published
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "frontend-${{ steps.hash.outputs.hash }}" >/dev/null 2>&1; then
+            echo "exists=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.check.outputs.exists == '0'
+        with:
+          node-version: 24
+
+      - name: Cache node_modules
+        if: steps.check.outputs.exists == '0'
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: frontend-deps-${{ hashFiles('frontend/package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.check.outputs.exists == '0'
+        working-directory: frontend
+        run: npm ci --prefer-offline
+
+      - name: Build frontend
+        if: steps.check.outputs.exists == '0'
+        working-directory: frontend
+        run: npm run build
+
+      - name: Package dist
+        if: steps.check.outputs.exists == '0'
+        run: |
+          tar -czf frontend-dist.tar.gz -C frontend/dist .
+          sha256sum frontend-dist.tar.gz | cut -d' ' -f1 > frontend-dist.tar.gz.sha256
+
+      - name: Publish release
+        if: steps.check.outputs.exists == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "frontend-${{ steps.hash.outputs.hash }}" \
+            frontend-dist.tar.gz frontend-dist.tar.gz.sha256 \
+            --title "Admin frontend (${{ steps.hash.outputs.hash }})" \
+            --notes "Automated build of frontend/ at this content hash. Fetched by setup/management.sh when the local hash matches."

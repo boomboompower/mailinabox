@@ -1,0 +1,5 @@
+#!/bin/bash
+case "$1" in
+    reload)  doveadm reload ;;
+    restart) supervisorctl restart dovecot ;;
+esac

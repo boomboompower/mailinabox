@@ -1,0 +1,5 @@
+#!/bin/bash
+case "$1" in
+    reload)  /usr/sbin/nsd-control reconfig; /usr/sbin/nsd-control reload ;;
+    restart) supervisorctl restart nsd ;;
+esac

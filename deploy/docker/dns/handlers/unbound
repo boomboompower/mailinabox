@@ -1,0 +1,5 @@
+#!/bin/bash
+case "$1" in
+    reload)  /usr/sbin/unbound-control -c /etc/unbound/unbound.conf flush_zone . ;;
+    restart) supervisorctl restart unbound ;;
+esac

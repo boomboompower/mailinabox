@@ -1,0 +1,5 @@
+#!/bin/bash
+case "$1" in
+    reload)  postfix reload ;;
+    restart) supervisorctl restart postfix ;;
+esac

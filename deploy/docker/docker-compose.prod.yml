@@ -1,0 +1,23 @@
+# Production port overrides.
+# Apply this when deploying to a real server with standard ports available.
+#
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  dns:
+    ports:
+      - "53:5353/tcp"
+      - "53:5353/udp"
+
+  mail:
+    ports:
+      - "25:25"
+      - "465:465"
+      - "587:587"
+      - "993:993"
+      - "4190:4190"
+
+  nginx:
+    ports:
+      - "80:80"
+      - "443:443"

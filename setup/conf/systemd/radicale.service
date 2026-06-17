@@ -1,0 +1,33 @@
+[Unit]
+Description=Radicale CardDAV/CalDAV server
+After=network.target dovecot.service
+
+[Service]
+ExecStart=${RADICALE_VENV}/bin/python -m radicale --config /etc/radicale/config
+User=www-data
+Group=www-data
+Environment=PYTHONPATH=/usr/local/lib/radicale-miab
+Environment=OXI_DATA_DIR=${STORAGE_ROOT}/oxi
+StandardOutput=append:/var/log/radicale.log
+StandardError=append:/var/log/radicale.log
+Restart=on-failure
+RestartSec=5
+
+# Sandboxing
+CapabilityBoundingSet=
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+BindPaths=${STORAGE_ROOT}/oxi
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictNamespaces=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+NoNewPrivileges=true
+ReadWritePaths=${STORAGE_ROOT}/oxi /var/lib/radicale /var/log/radicale.log
+
+[Install]
+WantedBy=multi-user.target
