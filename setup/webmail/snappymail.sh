@@ -105,7 +105,7 @@ fi
 # wildcard-domain patch landing in $SNAPPYMAIL_DIR but never reaching
 # $SNAPPYMAIL_TARGET.
 _sm_deploy_key="${SNAPPYMAIL_VERSION}:$(hash_files "$PWD/setup/webmail/snappymail.sh")"
-if needs_build "snappymail-webmail" "$_sm_deploy_key"; then
+if needs_build "snappymail-webmail" "$_sm_deploy_key" || [ ! -d "$SNAPPYMAIL_TARGET" ]; then
     echo "Deploying SnappyMail..."
     mkdir -p "$SNAPPYMAIL_TARGET"
     hide_output rsync -a --delete "$SNAPPYMAIL_DIR/" "$SNAPPYMAIL_TARGET/"

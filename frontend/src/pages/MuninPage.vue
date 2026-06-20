@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { toast } from 'vue-sonner'
-import { BarChart2 } from 'lucide-vue-next'
+import { ExternalLink, Cpu, HardDrive, Mail, Network } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
-import EmptyState from '@/components/ui/EmptyState.vue'
+import Card from '@/components/ui/Card.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
 import { useApi } from '@/composables/useApi'
 
 const api = useApi()
@@ -28,23 +29,55 @@ async function openMunin(): Promise<void> {
   }
 }
 
-onMounted(openMunin)
+type MuninCategory = {
+  icon: typeof Cpu
+  label: string
+  description: string
+}
+
+const CATEGORIES: MuninCategory[] = [
+  { icon: Cpu,       label: 'System',  description: 'CPU usage, load average, memory, swap, and process counts over time.' },
+  { icon: HardDrive, label: 'Disk',    description: 'Disk I/O throughput, latency, and filesystem usage trends.' },
+  { icon: Network,   label: 'Network', description: 'Bandwidth in/out per interface, connection states, and error rates.' },
+  { icon: Mail,      label: 'Mail',    description: 'Postfix queue depth, delivery rates, spam/virus filter hits, and Dovecot connections.' },
+]
 </script>
 
 <template>
   <AppLayout>
-    <h1 class="text-2xl font-semibold mb-6">Munin Monitoring</h1>
-
-    <EmptyState
-      title="Opening Munin..."
-      description="Munin opens in a new tab. Allow pop-ups for this site if it does not open automatically."
-    >
-      <template #icon><BarChart2 /></template>
-      <template #action>
-        <Button :disabled="opening" @click="openMunin">
-          {{ opening ? 'Opening...' : 'Open Munin' }}
+    <PageHeader title="Munin Monitoring">
+      <template #actions>
+        <Button size="sm" :disabled="opening" @click="openMunin">
+          <ExternalLink class="size-3.5" />{{ opening ? 'Opening...' : 'Open Munin' }}
         </Button>
       </template>
-    </EmptyState>
+    </PageHeader>
+
+    <p class="text-sm text-muted mb-6">
+      Munin collects system and service metrics every 5 minutes and renders them as historical graphs.
+      Use it to spot trends, diagnose performance issues, or verify that services are behaving normally.
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+      <Card v-for="cat in CATEGORIES" :key="cat.label" class="flex items-start gap-3 p-4">
+        <div class="mt-0.5 rounded-lg bg-accent/10 p-2 shrink-0">
+          <component :is="cat.icon" class="size-4 text-accent" />
+        </div>
+        <div>
+          <p class="text-sm font-medium mb-0.5">{{ cat.label }}</p>
+          <p class="text-xs text-muted">{{ cat.description }}</p>
+        </div>
+      </Card>
+    </div>
+
+    <Card class="p-4 flex items-center justify-between gap-4">
+      <div>
+        <p class="text-sm font-medium mb-0.5">Open monitoring dashboard</p>
+        <p class="text-xs text-muted">Opens in a new tab. Graphs are updated every 5 minutes.</p>
+      </div>
+      <Button size="sm" :disabled="opening" @click="openMunin">
+        <ExternalLink class="size-3.5" />{{ opening ? 'Opening...' : 'Open Munin' }}
+      </Button>
+    </Card>
   </AppLayout>
 </template>

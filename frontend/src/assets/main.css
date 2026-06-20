@@ -11,20 +11,396 @@
   animation: fade-in 120ms ease-in both;
 }
 
+/*
+ * Design token system
+ *
+ * Two layers of CSS variables:
+ *
+ * 1. --p-* (palette scale) - the raw tinted neutral ramp, mapped to the
+ *    Tailwind gray scale in tailwind.config.ts. Not used directly in
+ *    components - prefer the semantic tokens below.
+ *
+ * 2. --color-* (semantic tokens) - named by role, not by shade. These are
+ *    what components reference. Mapped to Tailwind utilities in
+ *    tailwind.config.ts under the `colors` key.
+ *
+ * 3. --accent-* - interactive accent color: primary buttons, active nav,
+ *    focus rings, checkbox. Each palette defines its own.
+ *
+ * Semantic token reference:
+ *   --color-bg             page background
+ *   --color-sidebar        sidebar color
+ *   --color-surface        card / panel / sheet background
+ *   --color-surface-raised popover / dialog (slightly elevated)
+ *   --color-subtle         input bg, table header fill, Well bg
+ *   --color-border         default dividers and card outlines
+ *   --color-border-input   border on form inputs and selects
+ *   --color-border-strong  checkbox border, stronger separators
+ *   --color-text           primary body text
+ *   --color-muted          secondary / helper / description text
+ *   --color-faint          placeholder, disabled, very secondary labels
+ *   --color-hover          hover background for nav items, icon buttons
+ *   --color-hover-subtle   softer hover for list rows, popover items
+ *   --color-skeleton       skeleton loader fill
+ *
+ *   --accent               interactive color (button, active nav)
+ *   --accent-hover         darker accent for :hover on accent elements
+ *   --accent-fg            text/icon rendered on top of --accent bg
+ *   --accent-ring          translucent accent for focus rings
+ */
+
+/* ─── Zinc (default) ─────────────────────────────────────────────────────── */
+:root {
+  /* Palette scale */
+  --p-50:  #f8f8f8;
+  --p-100: #ebebeb;
+  --p-200: #e4e4e4;
+  --p-300: #cecece;
+  --p-400: #b4b4b4;
+  --p-500: #9b9b9b;
+  --p-600: #666666;
+  --p-700: #4d4d4d;
+  --p-800: #333333;
+  --p-850: #262626;
+  --p-900: #161616;
+  --p-950: #0d0d0d;
+
+  /* Semantic tokens - light mode */
+  --color-bg:             #f8f8f8;
+  --color-sidebar:        #f2f2f2;
+  --color-surface:        #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-subtle:         #f8f8f8;
+  --color-border:         #ebebeb;
+  --color-border-input:   #e4e4e4;
+  --color-border-strong:  #cecece;
+  --color-text:           #4d4d4d;
+  --color-muted:          #9b9b9b;
+  --color-faint:          #b4b4b4;
+  --color-hover:          #ebebeb;
+  --color-hover-subtle:   #f8f8f8;
+  --color-skeleton:       #e4e4e4;
+
+  /* Accent - light: black */
+  --accent:       #000000;
+  --accent-hover: #1c1c1c;
+  --accent-fg:    #ffffff;
+  --accent-ring:  rgb(0 0 0 / 0.12);
+}
+
+/* Zinc dark mode overrides */
+.dark {
+  --color-bg:             #171717;
+  --color-sidebar:        #202020;
+  --color-surface:        #262626;
+  --color-surface-raised: #0d0d0d;
+  --color-subtle:         #262626;
+  --color-border:         #333333;
+  --color-border-input:   #4d4d4d;
+  --color-border-strong:  #666666;
+  --color-text:           #ebebeb;
+  --color-muted:          #b4b4b4;
+  --color-faint:          #9b9b9b;
+  --color-hover:          #262626;
+  --color-hover-subtle:   #333333;
+  --color-skeleton:       #333333;
+
+  /* Accent - dark: white */
+  --accent:       #ffffff;
+  --accent-hover: #e0e0e0;
+  --accent-fg:    #000000;
+  --accent-ring:  rgb(255 255 255 / 0.12);
+}
+
+/* ─── Oxi - Warm Industrial Copper ──────────────────────────────────────── */
+[data-palette='oxi'] {
+  --p-50:  hsl(30 20% 97%);
+  --p-100: hsl(30 15% 92%);
+  --p-200: hsl(30 12% 86%);
+  --p-300: hsl(25 10% 75%);
+  --p-400: hsl(22  8% 62%);
+  --p-500: hsl(20  6% 50%);
+  --p-600: hsl(20  8% 38%);
+  --p-700: hsl(20 10% 28%);
+  --p-800: hsl(20 12% 18%);
+  --p-850: hsl(20 10% 14%);
+  --p-900: hsl(20 10%  9%);
+  --p-950: hsl(20 10%  5%);
+
+  --color-bg:             hsl(30 20% 97%);
+  --color-sidebar:        hsl(30 16% 94%);
+  --color-surface:        #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-subtle:         hsl(30 20% 97%);
+  --color-border:         hsl(30 15% 92%);
+  --color-border-input:   hsl(30 12% 86%);
+  --color-border-strong:  hsl(25 10% 75%);
+  --color-text:           hsl(20 10% 28%);
+  --color-muted:          hsl(20  6% 50%);
+  --color-faint:          hsl(22  8% 62%);
+  --color-hover:          hsl(30 15% 92%);
+  --color-hover-subtle:   hsl(30 20% 97%);
+  --color-skeleton:       hsl(30 12% 86%);
+
+  --accent:       hsl(20 70% 50%);
+  --accent-hover: hsl(20 70% 43%);
+  --accent-fg:    #ffffff;
+  --accent-ring:  hsl(20 70% 50% / 0.22);
+}
+
+.dark[data-palette='oxi'] {
+  --color-bg:             hsl(20 10%  9%);
+  --color-sidebar:        hsl(20 10% 12%);
+  --color-surface:        hsl(20 10% 14%);
+  --color-surface-raised: hsl(20 10%  5%);
+  --color-subtle:         hsl(20 10% 14%);
+  --color-border:         hsl(20 12% 18%);
+  --color-border-input:   hsl(20 10% 28%);
+  --color-border-strong:  hsl(20  8% 38%);
+  --color-text:           hsl(30 15% 92%);
+  --color-muted:          hsl(22  8% 62%);
+  --color-faint:          hsl(20  6% 50%);
+  --color-hover:          hsl(20 10% 14%);
+  --color-hover-subtle:   hsl(20 12% 18%);
+  --color-skeleton:       hsl(20 12% 18%);
+}
+
+/* ─── Indigo - Cool Blue-Violet ──────────────────────────────────────────── */
+[data-palette='indigo'] {
+  --p-50:  hsl(240 20% 98%);
+  --p-100: hsl(240 15% 94%);
+  --p-200: hsl(240 12% 88%);
+  --p-300: hsl(240 10% 76%);
+  --p-400: hsl(240  8% 62%);
+  --p-500: hsl(240  6% 50%);
+  --p-600: hsl(240  8% 38%);
+  --p-700: hsl(240 10% 28%);
+  --p-800: hsl(240 12% 18%);
+  --p-850: hsl(240 10% 13%);
+  --p-900: hsl(240 10%  9%);
+  --p-950: hsl(240 10%  5%);
+
+  --color-bg:             hsl(240 20% 98%);
+  --color-sidebar:        hsl(240 16% 95%);
+  --color-surface:        #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-subtle:         hsl(240 20% 98%);
+  --color-border:         hsl(240 15% 94%);
+  --color-border-input:   hsl(240 12% 88%);
+  --color-border-strong:  hsl(240 10% 76%);
+  --color-text:           hsl(240 10% 28%);
+  --color-muted:          hsl(240  6% 50%);
+  --color-faint:          hsl(240  8% 62%);
+  --color-hover:          hsl(240 15% 94%);
+  --color-hover-subtle:   hsl(240 20% 98%);
+  --color-skeleton:       hsl(240 12% 88%);
+
+  --accent:       #6366f1;
+  --accent-hover: #4f52d6;
+  --accent-fg:    #ffffff;
+  --accent-ring:  rgb(99 102 241 / 0.22);
+}
+
+.dark[data-palette='indigo'] {
+  --color-bg:             hsl(240 10%  9%);
+  --color-sidebar:        hsl(240 10% 11%);
+  --color-surface:        hsl(240 10% 13%);
+  --color-surface-raised: hsl(240 10%  5%);
+  --color-subtle:         hsl(240 10% 13%);
+  --color-border:         hsl(240 12% 18%);
+  --color-border-input:   hsl(240 10% 28%);
+  --color-border-strong:  hsl(240  8% 38%);
+  --color-text:           hsl(240 15% 94%);
+  --color-muted:          hsl(240  8% 62%);
+  --color-faint:          hsl(240  6% 50%);
+  --color-hover:          hsl(240 10% 13%);
+  --color-hover-subtle:   hsl(240 12% 18%);
+  --color-skeleton:       hsl(240 12% 18%);
+}
+
+/* ─── Nord - Arctic Steel Blue ───────────────────────────────────────────── */
+[data-palette='nord'] {
+  --p-50:  hsl(218 27% 97%);
+  --p-100: hsl(218 22% 92%);
+  --p-200: hsl(218 18% 85%);
+  --p-300: hsl(218 14% 74%);
+  --p-400: hsl(218 12% 60%);
+  --p-500: hsl(218 10% 48%);
+  --p-600: hsl(218 12% 37%);
+  --p-700: hsl(218 16% 27%);
+  --p-800: hsl(220 18% 20%);
+  --p-850: hsl(220 17% 16%);
+  --p-900: hsl(220 16% 12%);
+  --p-950: hsl(220 16%  7%);
+
+  --color-bg:             hsl(218 27% 97%);
+  --color-sidebar:        hsl(218 22% 94%);
+  --color-surface:        #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-subtle:         hsl(218 27% 97%);
+  --color-border:         hsl(218 22% 92%);
+  --color-border-input:   hsl(218 18% 85%);
+  --color-border-strong:  hsl(218 14% 74%);
+  --color-text:           hsl(218 16% 27%);
+  --color-muted:          hsl(218 10% 48%);
+  --color-faint:          hsl(218 12% 60%);
+  --color-hover:          hsl(218 22% 92%);
+  --color-hover-subtle:   hsl(218 27% 97%);
+  --color-skeleton:       hsl(218 18% 85%);
+
+  /* Nord8 frost cyan */
+  --accent:       #88C0D0;
+  --accent-hover: #6aabbe;
+  --accent-fg:    #2E3440;
+  --accent-ring:  rgb(136 192 208 / 0.25);
+}
+
+.dark[data-palette='nord'] {
+  --color-bg:             hsl(220 16% 12%);
+  --color-sidebar:        hsl(220 17% 14%);
+  --color-surface:        hsl(220 17% 16%);
+  --color-surface-raised: hsl(220 16%  7%);
+  --color-subtle:         hsl(220 17% 16%);
+  --color-border:         hsl(220 18% 20%);
+  --color-border-input:   hsl(218 16% 27%);
+  --color-border-strong:  hsl(218 12% 37%);
+  --color-text:           hsl(218 22% 92%);
+  --color-muted:          hsl(218 12% 60%);
+  --color-faint:          hsl(218 10% 48%);
+  --color-hover:          hsl(220 17% 16%);
+  --color-hover-subtle:   hsl(220 18% 20%);
+  --color-skeleton:       hsl(220 18% 20%);
+}
+
+/* ─── Emerald - Deep Forest Green ───────────────────────────────────────── */
+[data-palette='emerald'] {
+  --p-50:  hsl(150 25% 97%);
+  --p-100: hsl(150 18% 92%);
+  --p-200: hsl(150 14% 85%);
+  --p-300: hsl(150 10% 74%);
+  --p-400: hsl(150  7% 60%);
+  --p-500: hsl(150  5% 48%);
+  --p-600: hsl(150  7% 37%);
+  --p-700: hsl(152 10% 26%);
+  --p-800: hsl(152 12% 17%);
+  --p-850: hsl(152 11% 13%);
+  --p-900: hsl(152 11%  8%);
+  --p-950: hsl(152 11%  5%);
+
+  --color-bg:             hsl(150 25% 97%);
+  --color-sidebar:        hsl(150 20% 94%);
+  --color-surface:        #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-subtle:         hsl(150 25% 97%);
+  --color-border:         hsl(150 18% 92%);
+  --color-border-input:   hsl(150 14% 85%);
+  --color-border-strong:  hsl(150 10% 74%);
+  --color-text:           hsl(152 10% 26%);
+  --color-muted:          hsl(150  5% 48%);
+  --color-faint:          hsl(150  7% 60%);
+  --color-hover:          hsl(150 18% 92%);
+  --color-hover-subtle:   hsl(150 25% 97%);
+  --color-skeleton:       hsl(150 14% 85%);
+
+  --accent:       hsl(152 42% 36%);
+  --accent-hover: hsl(152 42% 29%);
+  --accent-fg:    #ffffff;
+  --accent-ring:  hsl(152 42% 36% / 0.22);
+}
+
+.dark[data-palette='emerald'] {
+  --color-bg:             hsl(152 11%  8%);
+  --color-sidebar:        hsl(152 11% 11%);
+  --color-surface:        hsl(152 11% 13%);
+  --color-surface-raised: hsl(152 11%  5%);
+  --color-subtle:         hsl(152 11% 13%);
+  --color-border:         hsl(152 12% 17%);
+  --color-border-input:   hsl(152 10% 26%);
+  --color-border-strong:  hsl(150  7% 37%);
+  --color-text:           hsl(150 18% 92%);
+  --color-muted:          hsl(150  7% 60%);
+  --color-faint:          hsl(150  5% 48%);
+  --color-hover:          hsl(152 11% 13%);
+  --color-hover-subtle:   hsl(152 12% 17%);
+  --color-skeleton:       hsl(152 12% 17%);
+}
+
+/* ─── Catppuccin - Warm Lavender ─────────────────────────────────────────── */
+[data-palette='catppuccin'] {
+  --p-50:  hsl(220 23% 97%);
+  --p-100: hsl(220 18% 92%);
+  --p-200: hsl(220 14% 85%);
+  --p-300: hsl(228 10% 74%);
+  --p-400: hsl(228  8% 60%);
+  --p-500: hsl(228  6% 48%);
+  --p-600: hsl(228  8% 37%);
+  --p-700: hsl(232 12% 26%);
+  --p-800: hsl(232 16% 18%);
+  --p-850: hsl(232 14% 14%);
+  --p-900: hsl(234 14% 10%);
+  --p-950: hsl(234 14%  6%);
+
+  --color-bg:             hsl(220 23% 97%);
+  --color-sidebar:        hsl(220 18% 94%);
+  --color-surface:        #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-subtle:         hsl(220 23% 97%);
+  --color-border:         hsl(220 18% 92%);
+  --color-border-input:   hsl(220 14% 85%);
+  --color-border-strong:  hsl(228 10% 74%);
+  --color-text:           hsl(232 12% 26%);
+  --color-muted:          hsl(228  6% 48%);
+  --color-faint:          hsl(228  8% 60%);
+  --color-hover:          hsl(220 18% 92%);
+  --color-hover-subtle:   hsl(220 23% 97%);
+  --color-skeleton:       hsl(220 14% 85%);
+
+  /* Catppuccin Mocha mauve */
+  --accent:       #CBA6F7;
+  --accent-hover: #b389f0;
+  --accent-fg:    #1e1e2e;
+  --accent-ring:  rgb(203 166 247 / 0.25);
+}
+
+.dark[data-palette='catppuccin'] {
+  --color-bg:             hsl(234 14% 10%);
+  --color-sidebar:        hsl(233 14% 12%);
+  --color-surface:        hsl(232 14% 14%);
+  --color-surface-raised: hsl(234 14%  6%);
+  --color-subtle:         hsl(232 14% 14%);
+  --color-border:         hsl(232 16% 18%);
+  --color-border-input:   hsl(232 12% 26%);
+  --color-border-strong:  hsl(228  8% 37%);
+  --color-text:           hsl(220 18% 92%);
+  --color-muted:          hsl(228  8% 60%);
+  --color-faint:          hsl(228  6% 48%);
+  --color-hover:          hsl(232 14% 14%);
+  --color-hover-subtle:   hsl(232 16% 18%);
+  --color-skeleton:       hsl(232 16% 18%);
+}
+
 @layer base {
-  body {
-    background: #fff;
+  :root {
+    --font-sans: 'Inter', sans-serif;
   }
-  .dark body {
-    background: #171717;
-    color: #ebebeb;
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans), sans-serif;
+  }
+  code, pre, kbd, samp, [class*="language-"] {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   }
   [type='checkbox'],
   [type='radio'] {
-    accent-color: #000;
+    accent-color: var(--accent);
   }
-  .dark [type='checkbox'],
-  .dark [type='radio'] {
-    accent-color: #fff;
+  .page a {
+    text-decoration-color: var(--accent);
+    text-underline-offset: 2px;
+    transition: text-decoration-color 120ms ease-in;
+  }
+  .page a:hover {
+    text-decoration-color: transparent;
   }
 }

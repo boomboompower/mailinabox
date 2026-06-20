@@ -51,6 +51,8 @@ setup/tools/editconf.py /etc/nginx/nginx.conf -s \
 # nginx configuration at /mailinabox-mobileconfig.
 mkdir -p /var/lib/mailinabox
 chmod a+rx /var/lib/mailinabox
+cp --remove-destination setup/conf/web/admin-down.html /var/lib/mailinabox/admin-down.html
+cp --remove-destination setup/conf/web/500.html /var/lib/mailinabox/500.html
 UUID1=$(cat /proc/sys/kernel/random/uuid)
 UUID2=$(cat /proc/sys/kernel/random/uuid)
 UUID3=$(cat /proc/sys/kernel/random/uuid)

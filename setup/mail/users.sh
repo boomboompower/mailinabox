@@ -17,11 +17,14 @@ DOVECOT_VERSION=$(dovecot --version 2>/dev/null | awk '{print $1}')
 # The database of mail users (i.e. authenticated users, who have mailboxes)
 # and aliases (forwarders).
 
-db_path=$STORAGE_ROOT/mail/users.sqlite
+db_path=$STORAGE_ROOT/mail/db/users.sqlite
 
-# Ensure the database directory exists. Schema is created on first connection
-# by open_database() in management/mail/mailconfig.py (CREATE TABLE IF NOT EXISTS).
+# Ensure the database directory exists and is owned by root:postfix so that
+# Postfix processes can write the WAL -shm/-wal sidecar files without needing
+# access to the broader mail directory.
 mkdir -p "$(dirname "$db_path")"
+chown root:postfix "$(dirname "$db_path")"
+chmod 770 "$(dirname "$db_path")"
 
 # ### User Authentication
 
@@ -41,7 +44,7 @@ sqlite_path = $db_path
 
 passdb sql {
   passdb_driver = sql
-  passdb_default_password_scheme = SHA512-CRYPT
+  passdb_default_password_scheme = BLF-CRYPT
   passdb_sql_query = SELECT email as user, password FROM users WHERE email='%{user}'
 }
 
@@ -67,7 +70,7 @@ EOF
   cat > /etc/dovecot/dovecot-sql.conf.ext << EOF;
 driver = sqlite
 connect = $db_path
-default_pass_scheme = SHA512-CRYPT
+default_pass_scheme = BLF-CRYPT
 password_query = SELECT email as user, password FROM users WHERE email='%u';
 user_query = SELECT email AS user, "mail" as uid, "mail" as gid, "$STORAGE_ROOT/mail/mailboxes/%d/%n" as home, '*:bytes=' || quota AS quota_rule FROM users WHERE email='%u';
 iterate_query = SELECT email AS user FROM users;

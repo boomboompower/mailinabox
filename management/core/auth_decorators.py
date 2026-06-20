@@ -1,6 +1,6 @@
 # Access control for views. Two ways to apply it:
 #
-# 1. Per-route decorator (@authorized_personnel_only / @authorized_user_only) -
+# 1. Per-route decorator (@require_admin_route / @require_user_route) -
 #    used by auth_views.py and mfa_views.py, which deliberately mix public and
 #    protected routes in the same blueprint and need per-route control.
 #
@@ -10,87 +10,124 @@
 #    added to those blueprints are protected automatically; there's no
 #    per-route step to forget.
 #
-# Both forms call the exact same _authenticate_admin/_authenticate_user
-# functions below, so there is only one place where the actual auth logic
-# lives - the decorator and the blueprint guard cannot drift apart.
+# All forms call resolve_caller(), the single credential-resolution function.
+# Auth logic lives in one place; decorators and blueprint guards cannot drift apart.
+#
+# API token scope enforcement:
+# @read_scope marks a route as accessible to read-only tokens. Unannotated routes
+# implicitly require write scope - read-only tokens are rejected at the auth layer.
 
 import json
 from functools import wraps
 
-from flask import Response, request
+from flask import Response, current_app, request
 
 from core.app_context import env, auth_service
 from core.web_helpers import validate_csrf, log_failed_login
 from mail.mailconfig import get_mail_user_privileges
 
-def _authenticate_admin(req):
-	"""Returns (email, privs, error). error is None only on success."""
-	error = None
-	privs = []
-	email = None
 
-	if 'Authorization' in req.headers:
-		# HTTP Basic Auth - for API clients and backward compatibility.
+def read_scope(viewfunc):
+	"""Marks a route as accessible to read-only API tokens. Apply before the auth decorator."""
+	viewfunc._read_scope = True
+	return viewfunc
+
+
+def _is_read_scope(endpoint: str) -> bool:
+	"""Check whether the current endpoint is marked as read-safe."""
+	view_func = current_app.view_functions.get(endpoint)
+	return getattr(view_func, '_read_scope', False)
+
+
+def resolve_caller(req):
+	"""
+	Resolve credentials from the request. Tries in order:
+	  1. Bearer token (miab_ prefix) - user API token
+	  2. Basic Auth - master API key or legacy basic auth
+	  3. HttpOnly admin_session cookie
+
+	Returns (email, privs, scope, error, token_id).
+	  scope is 'read', 'write', or 'full' (session/basic auth = full).
+	  token_id is the db id of the token when caller authenticated via API token, else None.
+	  error is None on success.
+	"""
+	auth_header = req.headers.get('Authorization', '')
+
+	if auth_header.startswith('Bearer '):
+		token = auth_header[7:].strip()
+		if token.startswith('miab_'):
+			from auth.api_tokens import verify_token
+			result = verify_token(token, env)
+			if result is None:
+				log_failed_login(req)
+				return None, [], 'full', 'Invalid API token.', None
+			email, scope, token_id = result
+			privs = get_mail_user_privileges(email, env)
+			if isinstance(privs, tuple):
+				return None, [], 'full', 'Account error.', None
+			if 'admin' not in privs:
+				return None, [], 'full', 'You are not an administrator.', None
+			return email, privs, scope, None, token_id
+
+	if auth_header.startswith('Basic '):
 		try:
 			email, privs = auth_service.authenticate(req, env)
 		except ValueError as e:
 			log_failed_login(req)
-			error = str(e)
-	else:
-		# No Authorization header - try the HttpOnly admin session cookie.
-		cookie_key = req.cookies.get('admin_session', '')
-		session = auth_service.get_session_by_key_only(cookie_key, env) if cookie_key else None
-		if session:
-			email = session['email']
-			privs = get_mail_user_privileges(email, env)
-			if isinstance(privs, tuple):
-				error = "Account error."
-				privs = []
-		else:
-			error = "No authentication provided."
+			return None, [], 'full', str(e), None
+		if 'admin' not in privs:
+			return None, [], 'full', 'You are not an administrator.', None
+		return email, privs, 'full', None, None
 
-	if "admin" in privs:
-		# CSRF protection only applies to cookie-authenticated requests.
-		# Basic Auth callers (curl, API clients) cannot be targeted by CSRF
-		# because the attacker cannot inject the credentials cross-origin.
-		if 'Authorization' not in req.headers and not validate_csrf():
-			return None, [], "Potential CSRF attack detected."
-		return email, privs, None
+	# Cookie-based session.
+	cookie_key = req.cookies.get('admin_session', '')
+	session = auth_service.get_session_by_key_only(cookie_key, env) if cookie_key else None
+	if not session:
+		return None, [], 'full', 'No authentication provided.', None
+	email = session['email']
+	privs = get_mail_user_privileges(email, env)
+	if isinstance(privs, tuple):
+		return None, [], 'full', 'Account error.', None
+	if 'admin' not in privs:
+		return None, [], 'full', 'You are not an administrator.', None
+	# CSRF check only applies to cookie auth - Bearer/Basic callers cannot be
+	# targeted by CSRF because the attacker cannot inject those credentials cross-origin.
+	if not validate_csrf():
+		return None, [], 'full', 'Potential CSRF attack detected.', None
+	return email, privs, 'full', None, None
 
-	return email, privs, error or "You are not an administrator."
 
-def _authenticate_user(req):
-	"""Like _authenticate_admin but does not require admin privileges - any
-	authenticated user passes. Used for self-service routes that operate
-	exclusively on request.user_email."""
-	error = None
-	privs = []
-	email = None
+def _resolve_any_user(req):
+	"""Like resolve_caller but accepts any authenticated user, not just admins."""
+	auth_header = req.headers.get('Authorization', '')
 
-	if 'Authorization' in req.headers:
+	if auth_header.startswith('Basic '):
 		try:
 			email, privs = auth_service.authenticate(req, env)
 		except ValueError as e:
 			log_failed_login(req)
-			error = str(e)
-	else:
-		cookie_key = req.cookies.get('admin_session', '')
-		session = auth_service.get_session_by_key_only(cookie_key, env) if cookie_key else None
-		if session:
-			email = session['email']
-			privs = get_mail_user_privileges(email, env)
-			if isinstance(privs, tuple):
-				error = "Account error."
-				privs = []
-		else:
-			error = "No authentication provided."
-
-	if email and not error:
-		if 'Authorization' not in req.headers and not validate_csrf():
-			return None, [], "Potential CSRF attack detected."
+			return None, [], str(e)
 		return email, privs, None
 
-	return email, privs, error or "Unauthorized"
+	cookie_key = req.cookies.get('admin_session', '')
+	session = auth_service.get_session_by_key_only(cookie_key, env) if cookie_key else None
+	if not session:
+		return None, [], 'No authentication provided.'
+	email = session['email']
+	privs = get_mail_user_privileges(email, env)
+	if isinstance(privs, tuple):
+		return None, [], 'Account error.'
+	if not validate_csrf():
+		return None, [], 'Potential CSRF attack detected.'
+	return email, privs, None
+
+
+def _scope_error(scope: str, endpoint: str):
+	"""Return a 403 response if a read-only token is hitting a write-only endpoint."""
+	if scope == 'read' and not _is_read_scope(endpoint):
+		return _unauthorized_response('This endpoint requires write access.')
+	return None
+
 
 def _unauthorized_response(error):
 	status = 401
@@ -112,41 +149,53 @@ def _unauthorized_response(error):
 		"reason": error,
 		}) + "\n", status=status, mimetype='application/json', headers=headers)
 
-def authorized_personnel_only(viewfunc):
-	"""Decorator form - use only in blueprints that mix public and protected
-	routes (auth, mfa). Blueprints that are uniformly admin-only should use
-	require_admin as a blueprint-wide before_request guard instead."""
+
+def require_admin_route(viewfunc):
+	"""Per-route decorator for blueprints that mix public and admin-only routes."""
 	@wraps(viewfunc)
 	def newview(*args, **kwargs):
-		email, privs, error = _authenticate_admin(request)
+		email, privs, scope, error, token_id = resolve_caller(request)
 		if error:
 			return _unauthorized_response(error)
+		err = _scope_error(scope, request.endpoint)
+		if err:
+			return err
 		request.user_email = email
 		request.user_privs = privs
+		request.token_scope = scope
+		request.caller_token_id = token_id
 		return viewfunc(*args, **kwargs)
 	return newview
 
-def authorized_user_only(viewfunc):
-	"""Decorator form requiring any authenticated user (not necessarily admin)."""
+
+def require_user_route(viewfunc):
+	"""Per-route decorator requiring any authenticated user (not necessarily admin)."""
 	@wraps(viewfunc)
 	def newview(*args, **kwargs):
-		email, privs, error = _authenticate_user(request)
+		email, privs, error = _resolve_any_user(request)
 		if error:
 			return _unauthorized_response(error)
 		request.user_email = email
 		request.user_privs = privs
+		request.token_scope = 'full'
+		request.caller_token_id = None
 		return viewfunc(*args, **kwargs)
 	return newview
+
 
 def require_admin():
 	"""Blueprint-wide before_request guard - register with bp.before_request(require_admin)
 	on blueprints where every route needs admin privileges. Returning a Response here
 	short-circuits the request before the view function runs; returning None lets it
-	continue. Same check as authorized_personnel_only, just applied to the whole
-	blueprint instead of one route at a time."""
-	email, privs, error = _authenticate_admin(request)
+	continue."""
+	email, privs, scope, error, token_id = resolve_caller(request)
 	if error:
 		return _unauthorized_response(error)
+	err = _scope_error(scope, request.endpoint)
+	if err:
+		return err
 	request.user_email = email
 	request.user_privs = privs
+	request.token_scope = scope
+	request.caller_token_id = token_id
 	return None

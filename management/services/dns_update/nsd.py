@@ -121,6 +121,9 @@ $TTL 86400          ; default time to live
 def get_dns_zonefile(zone, env):
 	from services.dns_update.zones import get_dns_zones
 
+	# zone is validated against the managed-zone list here; fn (not zone) is used
+	# in the path, so there is no path traversal even though the caller passes zone
+	# directly from a URL parameter.
 	for domain, fn in get_dns_zones(env):
 		if zone == domain:
 			break

@@ -1,19 +1,38 @@
+"""
+MFA (TOTP and WebAuthn/passkey) management for the admin control panel.
+
+TOTP replay protection: each 30-second time-step is consumed atomically via a
+conditional UPDATE. Once a step is consumed, the same code cannot be reused
+within that window even under concurrent login attempts.
+
+WebAuthn (passkeys) follow the FIDO2 spec: registration and authentication are
+split into begin/complete round-trips, and the sign_count is updated on each
+successful assertion to detect cloned authenticators.
+"""
+
 import base64
 import io
 import json as _json
 import os
+import time
 import pyotp
 import qrcode
 
 from mail.mailconfig import open_database
 
+
 def get_user_id(email, c):
+	"""Look up the integer user id for an email address using an open cursor.
+	Raises ValueError if the user does not exist."""
 	c.execute('SELECT id FROM users WHERE email=?', (email,))
 	r = c.fetchone()
 	if not r: raise ValueError("User does not exist.")
 	return r[0]
 
+
 def get_mfa_state(email, env):
+	"""Return all MFA rows for a user including secrets and replay state.
+	Only used internally - never expose this to the frontend."""
 	conn, c = open_database(env, with_connection=True)
 	c.execute('SELECT id, type, secret, mru_token, label FROM mfa WHERE user_id=?', (get_user_id(email, c),))
 	rows = c.fetchall()
@@ -23,7 +42,10 @@ def get_mfa_state(email, env):
 		for r in rows
 	]
 
+
 def get_public_mfa_state(email, env):
+	"""Return MFA state safe to send to the frontend - no secrets, no replay tokens.
+	Combines TOTP entries and passkeys into a single list."""
 	totp = [
 		{ "id": s["id"], "type": s["type"], "label": s["label"] }
 		for s in get_mfa_state(email, env)
@@ -34,17 +56,22 @@ def get_public_mfa_state(email, env):
 	]
 	return totp + passkeys
 
+
 def get_hash_mfa_state(email, env):
+	"""Return only the fields needed to verify a TOTP code - id, type, and secret.
+	Used by the auth pipeline; strips label and replay state."""
 	mfa_state = get_mfa_state(email, env)
 	return [
 		{ "id": s["id"], "type": s["type"], "secret": s["secret"] }
 		for s in mfa_state
 	]
 
+
 def enable_mfa(email, type, secret, token, label, env):
 	if type == "totp":
 		validate_totp_secret(secret)
-		# Sanity check with the provide current token.
+		# Verify the user's current code before saving so we don't lock them
+		# out with a secret their app can't actually produce.
 		totp = pyotp.TOTP(secret)
 		if not totp.verify(token, valid_window=1):
 			msg = "Invalid token."
@@ -58,11 +85,26 @@ def enable_mfa(email, type, secret, token, label, env):
 	conn.commit()
 	conn.close()
 
-def set_mru_token(email, mfa_id, token, env):
+
+def consume_totp_step(email, mfa_id, env) -> bool:
+	"""Atomically mark the current 30-second TOTP time-step as used.
+
+	Stores the step counter (unix_time // 30) rather than the code itself.
+	The conditional UPDATE only succeeds if the stored step is older than the
+	current one, making it safe against concurrent login attempts - only one
+	request can win the UPDATE for a given step.
+
+	Returns False if the step was already consumed (replay attempt)."""
+	step = str(int(time.time()) // 30)
 	conn, c = open_database(env, with_connection=True)
-	c.execute('UPDATE mfa SET mru_token=? WHERE user_id=? AND id=?', (token, get_user_id(email, c), mfa_id))
+	c.execute(
+		'UPDATE mfa SET mru_token=? WHERE id=? AND user_id=? AND (mru_token IS NULL OR CAST(mru_token AS INTEGER) < ?)',
+		(step, mfa_id, get_user_id(email, c), step)
+	)
+	consumed = c.rowcount > 0
 	conn.commit()
 	conn.close()
+	return consumed
 
 def disable_mfa(email, mfa_id, env):
 	conn, c = open_database(env, with_connection=True)
@@ -214,14 +256,15 @@ def webauthn_authenticate_complete(email, state, client_response, env):
 ###################################
 
 def validate_auth_mfa(email, request, env):
-	# Validates that a login request satisfies any MFA modes
-	# that have been enabled for the user's account. Returns
-	# a tuple (status, [hints]). status is True for a successful
-	# MFA login, False for a missing token. If status is False,
-	# hints is an array of codes that indicate what the user
-	# can try. Possible codes are:
-	# "missing-totp-token"
-	# "invalid-totp-token"
+	"""Validate that a login request satisfies the user's enabled MFA methods.
+
+	Returns (True, []) on success. Returns (False, hints) if MFA is required but
+	not satisfied, where hints is a list of strings indicating what the caller
+	can supply. Possible hint values:
+	  'missing-totp-token'   - X-Auth-Token header not present
+	  'invalid-totp-token'   - code present but wrong or already used
+	  'missing-webauthn-assertion' - account has passkeys; use the passkey flow instead
+	"""
 
 	mfa_state = get_mfa_state(email, env)
 
@@ -240,10 +283,12 @@ def validate_auth_mfa(email, request, env):
 				hints.add("missing-totp-token")
 				continue
 
-			# TOTP is intentionally stateless per RFC 6238 implementations;
-			# replay protection is enforced at the session layer, not OTP level.
 			totp = pyotp.TOTP(mfa_mode["secret"])
 			if not totp.verify(token, valid_window=1):
+				hints.add("invalid-totp-token")
+				continue
+
+			if not consume_totp_step(email, mfa_mode["id"], env):
 				hints.add("invalid-totp-token")
 				continue
 

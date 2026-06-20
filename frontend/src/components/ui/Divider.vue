@@ -1,3 +1,3 @@
 <template>
-  <hr class="border-t border-gray-100 dark:border-gray-800" />
+  <hr class="border-t border-border" />
 </template>

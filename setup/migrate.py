@@ -52,7 +52,7 @@ def migration_3(env):
 
 def migration_4(env):
 	# Add a new column to the mail users table where we can store administrative privileges.
-	db = os.path.join(env["STORAGE_ROOT"], 'mail/users.sqlite')
+	db = os.path.join(env["STORAGE_ROOT"], 'mail/db/users.sqlite')
 	shell("check_call", ["sqlite3", db, "ALTER TABLE users ADD privileges TEXT NOT NULL DEFAULT ''"])
 
 def migration_5(env):
@@ -70,7 +70,7 @@ def migration_7(env):
 	# I previously wanted domain names to be stored in Unicode in the database. Now I want them
 	# to be in IDNA. Affects aliases only.
 	import sqlite3
-	conn = sqlite3.connect(os.path.join(env["STORAGE_ROOT"], "mail/users.sqlite"))
+	conn = sqlite3.connect(os.path.join(env["STORAGE_ROOT"], "mail/db/users.sqlite"))
 
 	# Get existing alias source addresses.
 	c = conn.cursor()
@@ -107,7 +107,7 @@ def migration_9(env):
 	# address. This was motivated by the addition of #427 ("Reject
 	# outgoing mail if FROM does not match Login") - which introduced
 	# the notion of outbound permitted-senders.
-	db = os.path.join(env["STORAGE_ROOT"], 'mail/users.sqlite')
+	db = os.path.join(env["STORAGE_ROOT"], 'mail/db/users.sqlite')
 	shell("check_call", ["sqlite3", db, "ALTER TABLE aliases ADD permitted_senders TEXT"])
 
 def migration_10(env):
@@ -182,22 +182,35 @@ def migration_12(env):
 
 def migration_13(env):
 	# Add the "mfa" table for configuring MFA for login to the control panel.
-	db = os.path.join(env["STORAGE_ROOT"], 'mail/users.sqlite')
+	db = os.path.join(env["STORAGE_ROOT"], 'mail/db/users.sqlite')
 	shell("check_call", ["sqlite3", db, "CREATE TABLE mfa (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, type TEXT NOT NULL, secret TEXT NOT NULL, mru_token TEXT, label TEXT, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE);"])
 
 def migration_14(env):
 	# Add the "auto_aliases" table.
-	db = os.path.join(env["STORAGE_ROOT"], 'mail/users.sqlite')
+	db = os.path.join(env["STORAGE_ROOT"], 'mail/db/users.sqlite')
 	shell("check_call", ["sqlite3", db, "CREATE TABLE auto_aliases (id INTEGER PRIMARY KEY AUTOINCREMENT, source TEXT NOT NULL UNIQUE, destination TEXT NOT NULL, permitted_senders TEXT);"])
 
 def migration_15(env):
 	# Add a column to the users table to store their quota limit.  Default to '0' for unlimited.
-	db = os.path.join(env["STORAGE_ROOT"], 'mail/users.sqlite')
+	db = os.path.join(env["STORAGE_ROOT"], 'mail/db/users.sqlite')
 	shell("check_call", ["sqlite3", db, "ALTER TABLE users ADD COLUMN quota TEXT NOT NULL DEFAULT '0';"])
 
 def migration_16(env):
-	# Add the "webauthn_credentials" table for passkey / WebAuthn support.
-	db = os.path.join(env["STORAGE_ROOT"], 'mail/users.sqlite')
+	# Move the database from mail/users.sqlite to mail/db/users.sqlite (subdirectory
+	# added to keep all DB-related files together), then add the webauthn_credentials table.
+	old_db = os.path.join(env["STORAGE_ROOT"], 'mail/users.sqlite')
+	new_db_dir = os.path.join(env["STORAGE_ROOT"], 'mail/db')
+	new_db = os.path.join(new_db_dir, 'users.sqlite')
+	if os.path.exists(old_db) and not os.path.exists(new_db):
+		os.makedirs(new_db_dir, exist_ok=True)
+		shutil.move(old_db, new_db)
+		# Move WAL sidecar files if present.
+		for suffix in ('-wal', '-shm'):
+			old_sidecar = old_db + suffix
+			if os.path.exists(old_sidecar):
+				shutil.move(old_sidecar, new_db + suffix)
+
+	db = os.path.join(env["STORAGE_ROOT"], 'mail/db/users.sqlite')
 	shell("check_call", ["sqlite3", db, """CREATE TABLE webauthn_credentials (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
@@ -206,6 +219,19 @@ def migration_16(env):
     sign_count INTEGER NOT NULL DEFAULT 0,
     aaguid TEXT,
     name TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    last_used TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);"""])
+def migration_17(env):
+	# Add the "api_tokens" table for programmatic API access with scoped tokens.
+	db = os.path.join(env["STORAGE_ROOT"], 'mail/db/users.sqlite')
+	shell("check_call", ["sqlite3", db, """CREATE TABLE api_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    token_hash TEXT NOT NULL UNIQUE,
+    scope TEXT NOT NULL DEFAULT 'read',
     created_at TEXT NOT NULL DEFAULT (datetime('now')),
     last_used TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

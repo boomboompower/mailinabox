@@ -7,7 +7,7 @@ from flask import Blueprint, request
 
 from core import utils
 from core.app_context import env
-from core.auth_decorators import require_admin
+from core.auth_decorators import require_admin, read_scope
 from core.web_helpers import json_response, sanitize_error_message
 
 bp = Blueprint("system", __name__, url_prefix="/system")
@@ -96,6 +96,7 @@ def _run_status_check_thread() -> None:
 		_status_job["lock"].release()
 
 @bp.route('/version', methods=["GET"])
+@read_scope
 def system_version():
 	from services.status_checks import what_version_is_this
 	try:
@@ -112,6 +113,7 @@ def system_latest_upstream_version():
 		return (sanitize_error_message(str(e)), 500)
 
 @bp.route('/status', methods=["GET"])
+@read_scope
 def system_status_get():
 	_ensure_disk_cache_loaded()
 	return json_response({
@@ -145,6 +147,7 @@ def system_status_post():
 	}), 202
 
 @bp.route('/updates')
+@read_scope
 def show_updates():
 	from services.status_checks import list_apt_updates
 	return "".join(
@@ -162,6 +165,7 @@ def do_updates():
 	})
 
 @bp.route('/reboot', methods=["GET"])
+@read_scope
 def needs_reboot():
 	from services.status_checks import is_reboot_needed_due_to_package_installation
 	if is_reboot_needed_due_to_package_installation():
@@ -180,14 +184,16 @@ def do_reboot():
 	return "No reboot is required, so it is not allowed."
 
 @bp.route('/backup/status')
+@read_scope
 def backup_status():
 	from services.backup import backup_status as get_backup_status
 	try:
 		return json_response(get_backup_status(env))
 	except Exception as e:
-		return json_response({ "error": str(e) })
+		return json_response({ "error": sanitize_error_message(str(e)) })
 
 @bp.route('/backup/config', methods=["GET"])
+@read_scope
 def backup_get_custom():
 	from services.backup import get_backup_config
 	return json_response(get_backup_config(env, for_ui=True))
@@ -195,14 +201,18 @@ def backup_get_custom():
 @bp.route('/backup/config', methods=["POST"])
 def backup_set_custom():
 	from services.backup import backup_set_custom
+	_cab_raw = request.form.get('check_after_backup')
+	check_after_backup = _cab_raw.lower() in ('true', '1', 'on', 'yes') if _cab_raw is not None else True
 	return json_response(backup_set_custom(env,
 		request.form.get('target', ''),
 		request.form.get('target_user', ''),
 		request.form.get('target_pass', ''),
-		request.form.get('min_age', '')
+		request.form.get('min_age', ''),
+		check_after_backup,
 	))
 
 @bp.route('/privacy', methods=["GET"])
+@read_scope
 def privacy_status_get():
 	config = utils.load_settings(env)
 	return json_response(config.get("privacy", True))

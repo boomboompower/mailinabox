@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
-import { Globe } from 'lucide-vue-next'
+import { Globe, Plus } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
+import SectionHeader from '@/components/ui/SectionHeader.vue'
+import Field from '@/components/ui/Field.vue'
 import Input from '@/components/ui/Input.vue'
 import Card from '@/components/ui/Card.vue'
 import Sheet from '@/components/ui/Sheet.vue'
@@ -149,13 +152,14 @@ onMounted(async () => {
 
 <template>
   <AppLayout>
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-semibold">Custom DNS</h1>
-      <Button @click="sheetOpen = true">Add Record</Button>
-    </div>
+    <PageHeader title="Custom DNS">
+      <template #actions>
+        <Button size="sm" @click="sheetOpen = true"><Plus class="size-3.5" />Add Record</Button>
+      </template>
+    </PageHeader>
 
     <!-- Existing records -->
-    <h2 class="text-base font-semibold mb-3">Current Records</h2>
+    <SectionHeader title="Current Records" />
     <Table>
       <TableHead>
         <Th>Name</Th>
@@ -176,7 +180,7 @@ onMounted(async () => {
           <TableRow v-for="record in records" :key="`${record.qname}/${record.rtype}/${record.value}`">
             <td class="px-4 py-3 font-mono text-sm">{{ record.qname }}</td>
             <td class="px-4 py-3 text-sm font-medium">{{ record.rtype }}</td>
-            <td class="px-4 py-3 font-mono text-sm text-gray-500 max-w-xs truncate">{{ record.value }}</td>
+            <td class="px-4 py-3 font-mono text-sm text-muted max-w-xs truncate">{{ record.value }}</td>
             <td class="px-4 py-3 text-right">
               <Button variant="ghost" size="sm" @click="confirmDelete(record)">Delete</Button>
             </td>
@@ -198,8 +202,8 @@ onMounted(async () => {
 
     <!-- Secondary nameserver -->
     <Card class="p-5 mt-6">
-      <h2 class="text-base font-semibold mb-3">Secondary Nameserver</h2>
-      <p class="text-sm text-gray-500 mb-3">
+      <SectionHeader title="Secondary Nameserver" />
+      <p class="text-sm text-muted mb-3">
         Space-separated list of secondary nameserver hostnames.
       </p>
       <div class="flex gap-2">
@@ -213,29 +217,25 @@ onMounted(async () => {
     <!-- Add record sheet -->
     <Sheet v-model="sheetOpen" title="Add DNS Record">
       <div class="space-y-5">
-        <div>
-          <label for="fZone" class="block text-sm font-medium mb-1.5">Zone</label>
+        <Field label="Zone" for="fZone">
           <Select id="fZone" v-model="fZone" aria-placeholder="Select a zone">
             <option v-if="zones.length === 0" selected disabled value="none">No zones available</option>
             <option v-for="z in zones" :key="z" :value="z">{{ z }}</option>
           </Select>
-        </div>
-        <div>
-          <label for="fSubdomain" class="block text-sm font-medium mb-1.5">Subdomain (optional)</label>
+        </Field>
+        <Field label="Subdomain (optional)" for="fSubdomain">
           <Input id="fSubdomain" v-model="fSubdomain" placeholder="@ or leave blank for zone apex" />
-        </div>
-        <div>
-          <label for="fRtype" class="block text-sm font-medium mb-1.5">Type</label>
+        </Field>
+        <Field label="Type" for="fRtype">
           <Select id="fRtype" v-model="fRtype">
             <option v-for="o in rtypeOptions" :key="o.value" :value="o.value">{{ o.value }}</option>
           </Select>
-        </div>
-        <div>
-          <label for="fValue" class="block text-sm font-medium mb-1.5">Value</label>
+        </Field>
+        <Field label="Value" for="fValue">
           <Input id="fValue" v-model="fValue" :placeholder="fHint" />
-          <p v-if="fHint" class="text-xs text-gray-500 mt-1.5">{{ fHint }}</p>
-        </div>
-        <p v-if="qname" class="text-xs text-gray-500">
+          <p v-if="fHint" class="text-xs text-muted mt-1.5">{{ fHint }}</p>
+        </Field>
+        <p v-if="qname" class="text-xs text-muted">
           Record will be set on: <span class="font-medium">{{ qname }}</span>
         </p>
         <Button class="w-full" :disabled="!qname || !fValue || saving" @click="addRecord">

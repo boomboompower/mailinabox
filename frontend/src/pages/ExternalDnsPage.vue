@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
-import { WifiOff } from 'lucide-vue-next'
+import { WifiOff, Download } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
+import Badge from '@/components/ui/Badge.vue'
 import Select from '@/components/ui/Select.vue'
 import Table from '@/components/ui/Table.vue'
 import TableRow from '@/components/ui/TableRow.vue'
@@ -57,32 +59,28 @@ async function downloadZonefile(): Promise<void> {
   URL.revokeObjectURL(url)
 }
 
-function explanationBadgeClass(explanation: string): string {
-  if (explanation.startsWith('Required.')) return 'text-red-600 dark:text-red-400 font-medium'
-  if (explanation.startsWith('Recommended.')) return 'text-amber-600 dark:text-amber-400 font-medium'
-  return 'text-gray-400'
-}
 
 onMounted(load)
 </script>
 
 <template>
   <AppLayout>
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-semibold">External DNS</h1>
-      <div class="flex items-center gap-2">
-        <Select size="sm" v-model="selectedZone" class="w-auto" :disabled="loadError" aria-label="Select zone">
-          <option v-if="loadError" value="" disabled>No zones</option>
-          <option v-for="z in dnsZones" :key="z" :value="z">{{ z }}</option>
-        </Select>
-        <Button variant="secondary" size="sm" @click="downloadZonefile" :disabled="loadError">Download zone file</Button>
-      </div>
-    </div>
+    <PageHeader title="External DNS">
+      <template #actions>
+        <div class="flex items-center gap-2">
+          <Select v-model="selectedZone" size="sm" class="w-auto" :disabled="loadError" aria-label="Select zone">
+            <option v-if="loadError" value="" disabled>No zones</option>
+            <option v-for="z in dnsZones" :key="z" :value="z">{{ z }}</option>
+          </Select>
+          <Button variant="secondary" size="sm" @click="downloadZonefile" :disabled="loadError"><Download class="size-3.5" />Download zone file</Button>
+        </div>
+      </template>
+    </PageHeader>
 
-    <p class="text-sm text-gray-500 mb-6">
+    <p class="text-sm text-muted mb-6">
       If this box's DNS is managed by an external provider, set the following records.
-      Records marked <span class="text-red-600 dark:text-red-400 font-medium">Required</span> must be set.
-      <span class="text-amber-600 dark:text-amber-400 font-medium">Recommended</span> records improve deliverability.
+      Records marked <Badge variant="error">Required</Badge> must be set.
+      <Badge variant="warning">Recommended</Badge> records improve deliverability.
     </p>
 
     <template v-if="loading">
@@ -125,8 +123,10 @@ onMounted(load)
               <td class="px-4 py-3 font-mono text-sm">{{ record.qname }}</td>
               <td class="px-4 py-3 text-sm font-medium">{{ record.rtype }}</td>
               <td class="px-4 py-3 font-mono text-xs max-w-xs break-all">{{ record.value }}</td>
-              <td class="px-4 py-3 text-xs hidden lg:table-cell" :class="explanationBadgeClass(record.explanation)">
-                {{ record.explanation }}
+              <td class="px-4 py-3 text-xs hidden lg:table-cell">
+                <Badge v-if="record.explanation.startsWith('Required.')" variant="error">{{ record.explanation }}</Badge>
+                <Badge v-else-if="record.explanation.startsWith('Recommended.')" variant="warning">{{ record.explanation }}</Badge>
+                <span v-else class="text-faint">{{ record.explanation }}</span>
               </td>
             </TableRow>
           </tbody>

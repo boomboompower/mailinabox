@@ -105,16 +105,11 @@ setup/tools/editconf.py /etc/opendkim.conf -s \
 # headers. The order possibly/probably matters: OpenDMARC relies on the
 # OpenDKIM Authentication-Results header already being present.
 #
-# Be careful. If we add other milters later, this needs to be concatenated
-# on the smtpd_milters line.
-#
 # The OpenDMARC milter is skipped in the SMTP submission listener by
 # configuring smtpd_milters there to only list the OpenDKIM milter
-# (see mail-postfix.sh).
-setup/tools/editconf.py /etc/postfix/main.cf \
-	"smtpd_milters=inet:127.0.0.1:8891 inet:127.0.0.1:8893"\
-	non_smtpd_milters=\$smtpd_milters \
-	milter_default_action=accept
+# (see postfix.sh).
+append_milter "inet:127.0.0.1:8891"
+append_milter "inet:127.0.0.1:8893"
 
 # We need to explicitly enable the opendmarc service, or it will not start
 hide_output systemctl enable opendmarc

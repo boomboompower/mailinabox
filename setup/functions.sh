@@ -341,3 +341,52 @@ function mark_built {
 	mkdir -p "$MIAB_STAMP_DIR"
 	printf '%s' "$2" > "$MIAB_STAMP_DIR/$1"
 }
+
+## Milter helpers ##
+
+function clear_milters {
+	# Clear smtpd_milters to empty. Call this before spam filter scripts run
+	# so switching filters produces a clean, deterministic list.
+	# Also sets milter_default_action=accept so Postfix keeps accepting mail
+	# if a milter is temporarily unavailable.
+	python3 setup/tools/editconf.py /etc/postfix/main.cf \
+		"smtpd_milters=" \
+		"non_smtpd_milters=" \
+		milter_default_action=accept
+}
+
+function append_milter {
+	# Append a milter socket to smtpd_milters if not already present.
+	# Usage: append_milter "inet:127.0.0.1:11332"
+	local socket="$1"
+	local current already
+	current=$(postconf -h smtpd_milters 2>/dev/null | sed 's/[[:space:]]*$//')
+	# postconf may return a Postfix variable reference on a fresh install; treat as empty.
+	[[ "$current" == \$* ]] && current=""
+	already=false
+	for m in $current; do
+		[[ "$m" == "$socket" ]] && already=true && break
+	done
+	if ! $already; then
+		python3 setup/tools/editconf.py /etc/postfix/main.cf \
+			"smtpd_milters=${current:+$current }$socket"
+		python3 setup/tools/editconf.py /etc/postfix/main.cf \
+			"non_smtpd_milters=\$smtpd_milters"
+	fi
+}
+
+function remove_milter {
+	# Remove a milter socket from smtpd_milters.
+	# Usage: remove_milter "unix:/run/clamav/clamav-milter.sock"
+	local socket="$1"
+	local current new
+	current=$(postconf -h smtpd_milters 2>/dev/null)
+	[[ "$current" == \$* ]] && current=""
+	new=$(echo "$current" | sed "s|[[:space:]]*$(echo "$socket" | sed 's|[/.]|\\&|g')||g" | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
+	if [[ "$current" != "$new" ]]; then
+		python3 setup/tools/editconf.py /etc/postfix/main.cf \
+			"smtpd_milters=$new"
+		python3 setup/tools/editconf.py /etc/postfix/main.cf \
+			"non_smtpd_milters=\$smtpd_milters"
+	fi
+}

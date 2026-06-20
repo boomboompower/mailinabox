@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
 import { Toaster } from 'vue-sonner'
+import { useUiStore } from '@/stores/ui'
 
-// Apply dark class to <html> based on OS preference. No manual toggle needed.
-onMounted(() => {
-  const mq = window.matchMedia('(prefers-color-scheme: dark)')
-  document.documentElement.classList.toggle('dark', mq.matches)
-  mq.addEventListener('change', (e) => document.documentElement.classList.toggle('dark', e.matches))
-})
+// Initialize the UI store at the root so theme + palette are applied
+// immediately on every route, including the login page.
+useUiStore()
 </script>
 
 <template>

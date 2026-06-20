@@ -1,17 +1,55 @@
 # This blueprint deliberately mixes public and protected routes - you can't
 # require a login to use the login route. Routes with no decorator below are
-# intentionally public; everything else uses authorized_personnel_only.
+# intentionally public; everything else uses require_admin_route.
 #
 # PUBLIC: /login, /auth/methods, /logout, /auth/verify
 # PROTECTED (admin): /whoami
 
+import collections
+import threading
+import time
+
 from flask import Blueprint, Response, current_app, make_response, request
 
 from core.app_context import env, auth_service
-from core.auth_decorators import authorized_personnel_only
+from core.auth_decorators import require_admin_route, read_scope
 from core.web_helpers import json_response, validate_csrf, validate_email, log_failed_login
+from mail.mailconfig import get_mail_password, get_mail_user_privileges
+from mail.mailconfig.users import verify_password
+from auth.auth import _get_dummy_hash
 
 bp = Blueprint("auth", __name__)
+
+# In-memory rate limiter for /auth/verify. This endpoint is not proxied by nginx
+# (so fail2ban cannot see it) but is reachable from the Docker internal network,
+# where a compromised container could otherwise brute-force mail passwords.
+# remote_addr is used as the key rather than X-Forwarded-For because this endpoint
+# is never behind a proxy - remote_addr is always the actual TCP peer.
+_VERIFY_WINDOW_SECONDS = 60
+_VERIFY_MAX_FAILURES = 5
+_VERIFY_MAX_IPS = 1000
+_verify_failures: collections.OrderedDict[str, list[float]] = collections.OrderedDict()
+_verify_lock = threading.Lock()
+
+def _verify_rate_limited(ip: str) -> bool:
+	now = time.monotonic()
+	cutoff = now - _VERIFY_WINDOW_SECONDS
+	with _verify_lock:
+		attempts = [t for t in _verify_failures.get(ip, []) if t > cutoff]
+		_verify_failures[ip] = attempts
+		_verify_failures.move_to_end(ip)
+		return len(attempts) >= _VERIFY_MAX_FAILURES
+
+def _verify_record_failure(ip: str) -> None:
+	now = time.monotonic()
+	cutoff = now - _VERIFY_WINDOW_SECONDS
+	with _verify_lock:
+		attempts = [t for t in _verify_failures.get(ip, []) if t > cutoff]
+		attempts.append(now)
+		_verify_failures[ip] = attempts
+		_verify_failures.move_to_end(ip)
+		if len(_verify_failures) > _VERIFY_MAX_IPS:
+			_verify_failures.popitem(last=False)
 
 # Create a session key by checking the username/password in the Authorization header.
 @bp.route('/login', methods=["POST"])
@@ -109,13 +147,17 @@ def auth_verify():
 	# through Dovecot. Not proxied by nginx - only reachable on the internal
 	# network (Docker) or localhost (bare metal). No admin session is involved
 	# here, by design - that's the whole point of this endpoint.
-	from passlib.hash import sha512_crypt
-	from mail.mailconfig import get_mail_password, get_mail_user_privileges
+	client_ip = request.remote_addr or "unknown"
+	if _verify_rate_limited(client_ip):
+		resp = Response("Too many failed attempts. Try again later.\n", status=429, mimetype='text/plain')
+		resp.headers["Retry-After"] = str(_VERIFY_WINDOW_SECONDS)
+		return resp
 
 	email = request.form.get('email', '').strip()
 	password = request.form.get('password', '')
 
 	if not email or not password:
+		_verify_record_failure(client_ip)
 		return Response("Missing credentials.\n", status=400, mimetype='text/plain')
 
 	# Constant-time: always run verify even for unknown users.
@@ -123,16 +165,13 @@ def auth_verify():
 		pw_hash = get_mail_password(email, env)
 		user_exists = True
 	except ValueError:
-		pw_hash = "{SHA512-CRYPT}$6$rounds=5000$invalidsaltvalue$" + "x" * 86
+		pw_hash = _get_dummy_hash()
 		user_exists = False
 
-	raw_hash = pw_hash.split("}", 1)[-1] if pw_hash.startswith("{") else pw_hash
-	try:
-		pw_ok = sha512_crypt.verify(password, raw_hash)
-	except Exception:
-		pw_ok = False
+	pw_ok = verify_password(pw_hash, password)
 
 	if not pw_ok or not user_exists:
+		_verify_record_failure(client_ip)
 		current_app.logger.warning("auth/verify failed for %s", email)
 		return Response("Invalid credentials.\n", status=401, mimetype='text/plain')
 
@@ -143,9 +182,49 @@ def auth_verify():
 	})
 
 @bp.route('/whoami')
-@authorized_personnel_only
+@read_scope
+@require_admin_route
 def whoami():
 	return json_response({
         "email": request.user_email,
         "privileges": request.user_privs,
     })
+
+@bp.route('/tokens', methods=['GET'])
+@read_scope
+@require_admin_route
+def list_tokens():
+	from auth.api_tokens import list_tokens as _list_tokens
+	return json_response(_list_tokens(request.user_email, env))
+
+@bp.route('/tokens', methods=['POST'])
+@require_admin_route
+def create_token():
+	# API tokens may not create other API tokens - only session/basic auth callers can.
+	if request.token_scope != 'full':
+		return ('API tokens cannot create other API tokens.', 403)
+	from auth.api_tokens import create_token as _create_token
+	name = request.form.get('name', '').strip()
+	scope = request.form.get('scope', 'write').strip()
+	if not name:
+		return ('Token name is required.', 400)
+	if len(name) > 100:
+		return ('Token name must be 100 characters or fewer.', 400)
+	if scope not in ('read', 'write'):
+		return ('scope must be read or write.', 400)
+	try:
+		plaintext = _create_token(request.user_email, name, scope, env)
+	except ValueError as e:
+		return (str(e), 400)
+	return json_response({'token': plaintext})
+
+@bp.route('/tokens/<int:token_id>', methods=['DELETE'])
+@require_admin_route
+def revoke_token(token_id: int):
+	# API tokens can only revoke themselves, not other tokens.
+	if request.token_scope != 'full' and request.caller_token_id != token_id:
+		return ('API tokens can only revoke themselves.', 403)
+	from auth.api_tokens import revoke_token as _revoke_token
+	if not _revoke_token(request.user_email, token_id, env):
+		return ('Token not found.', 404)
+	return ('OK', 200)

@@ -1,0 +1,3 @@
+duplicity>=1.0
+b2sdk
+boto3

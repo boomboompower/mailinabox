@@ -60,7 +60,7 @@ def validate_hostname(name):
 
 def step_email(args, answers):
     domain  = args.default_hostname[4:] if args.default_hostname.startswith("box.") else ""
-    default = answers.get("EMAIL_ADDR") or (f"me@{domain}" if domain else "")
+    default = answers.get("__EMAIL_ADDR") or (f"me@{domain}" if domain else "")
     return text_prompt(
         "What email address should this server manage?",
         "The domain part (after @) will be used to suggest a hostname.",
@@ -69,7 +69,7 @@ def step_email(args, answers):
 
 
 def step_hostname(args, answers):
-    email     = answers.get("EMAIL_ADDR", "")
+    email     = answers.get("__EMAIL_ADDR", "")
     suggested = f"box.{email.split('@')[-1]}" if email else (args.default_hostname or "")
     current   = answers.get("PRIMARY_HOSTNAME")
     options   = []
@@ -247,7 +247,7 @@ def step_timezone(args, answers):
 
 # Each entry: (argparse_flag, conf_key, nav_label, step_fn)
 STEPS = [
-    ("ask_email",        "EMAIL_ADDR",        "Email",       step_email),
+    ("ask_email",        "__EMAIL_ADDR",       "Email",       step_email),
     ("ask_hostname",     "PRIMARY_HOSTNAME",  "Hostname",    step_hostname),
     ("ask_ipv4",         "PUBLIC_IP",         "IPv4",        step_ipv4),
     ("ask_ipv6",         "PUBLIC_IPV6",       "IPv6",        step_ipv6),

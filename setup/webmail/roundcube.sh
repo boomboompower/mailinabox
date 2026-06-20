@@ -49,7 +49,7 @@ if [ "$needs_download" = "1" ]; then
     echo "$ROUNDCUBE_VERSION" > "$_RC_STAMP"
 fi
 
-if needs_build "roundcube-webmail" "$ROUNDCUBE_VERSION"; then
+if needs_build "roundcube-webmail" "$ROUNDCUBE_VERSION" || [ ! -d "$ROUNDCUBE_TARGET" ]; then
     echo "Deploying Roundcube..."
     mkdir -p "$ROUNDCUBE_TARGET"
     hide_output rsync -a --delete "$ROUNDCUBE_DIR/" "$ROUNDCUBE_TARGET/"

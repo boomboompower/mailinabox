@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
-import { AtSign } from 'lucide-vue-next'
+import { AtSign, Plus } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
+import Field from '@/components/ui/Field.vue'
+import Checkbox from '@/components/ui/Checkbox.vue'
 import Input from '@/components/ui/Input.vue'
 import Table from '@/components/ui/Table.vue'
 import TableRow from '@/components/ui/TableRow.vue'
@@ -116,10 +119,11 @@ onMounted(load)
 
 <template>
   <AppLayout>
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-semibold">Aliases</h1>
-      <Button @click="openAdd">Add Alias</Button>
-    </div>
+    <PageHeader title="Aliases">
+      <template #actions>
+        <Button size="sm" @click="openAdd"><Plus class="size-3.5" />Add Alias</Button>
+      </template>
+    </PageHeader>
 
     <div class="mb-4 max-w-sm">
       <Input v-model="search" placeholder="Search aliases..." aria-label="Search aliases" />
@@ -149,7 +153,7 @@ onMounted(load)
             @click="openEdit(alias)"
           >
             <td class="px-4 py-3 font-medium">{{ alias.address_display }}</td>
-            <td class="px-4 py-3 text-sm text-gray-500">
+            <td class="px-4 py-3 text-sm text-muted">
               {{ alias.forwards_to.join(', ') }}
             </td>
             <td class="px-4 py-3 hidden sm:table-cell">
@@ -179,8 +183,7 @@ onMounted(load)
         <Button variant="destructive" class="w-full" @click="deleteOpen = true">Remove Alias</Button>
       </template>
       <div class="space-y-5">
-        <div>
-          <label for="fAddress" class="block text-sm font-medium mb-1.5">Address</label>
+        <Field label="Address" for="fAddress">
           <Input
             v-if="!editingAlias"
             id="fAddress"
@@ -189,23 +192,21 @@ onMounted(load)
             placeholder="alias@yourdomain.com or @yourdomain.com"
             autocomplete="off"
           />
-          <p v-else class="text-sm text-gray-500 py-2">{{ editingAlias.address_display }}</p>
-        </div>
+          <p v-else class="text-sm text-muted py-2">{{ editingAlias.address_display }}</p>
+        </Field>
 
-        <div>
-          <label for="fForwardsTo" class="block text-sm font-medium mb-1.5">Forwards To</label>
+        <Field label="Forwards To" for="fForwardsTo">
           <Textarea id="fForwardsTo" v-model="fForwardsTo" placeholder="One address per line or comma-separated" />
-        </div>
+        </Field>
 
         <div>
           <div class="flex items-center gap-2 mb-3">
-            <input id="fAdvanced" v-model="fAdvanced" type="checkbox" class="size-4 rounded" />
+            <Checkbox id="fAdvanced" v-model="fAdvanced" />
             <label for="fAdvanced" class="text-sm">Restrict permitted senders</label>
           </div>
-          <div v-if="fAdvanced">
-            <label for="fPermittedSenders" class="block text-sm font-medium mb-1.5">Permitted Senders</label>
+          <Field v-if="fAdvanced" label="Permitted Senders" for="fPermittedSenders">
             <Textarea id="fPermittedSenders" v-model="fPermittedSenders" placeholder="One sender per line - only these addresses may send as this alias" />
-          </div>
+          </Field>
         </div>
 
         <Button class="w-full" :disabled="saving" @click="save">

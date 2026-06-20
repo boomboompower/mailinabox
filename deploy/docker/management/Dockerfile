@@ -3,7 +3,9 @@ FROM ubuntu:24.04 AS frontend-builder
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install Node.js only in the builder stage - not needed at runtime.
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
     curl ca-certificates \
     && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
@@ -15,7 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # copy management/ into this stage at all.
 COPY frontend/ /frontend/
 
-RUN cd /frontend && npm ci --prefer-offline && npm run build
+RUN --mount=type=cache,target=/root/.npm \
+    cd /frontend && npm ci --prefer-offline && npm run build
 
 # ---------------------------------------------------------------------------
 
@@ -23,15 +26,16 @@ FROM ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+ARG BACKUP_TOOL=restic
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
     # Python runtime and pip for management daemon dependencies
     python3 python3-pip virtualenv \
     # certbot for TLS certificate provisioning
     certbot \
     # rsync used by backup tasks
     rsync \
-    # gnupg required by duplicity for backup encryption
-    gnupg \
     # ncat used by start.sh to wait for the daemon
     ncat \
     # cron runs daily_tasks.sh for backup, cert renewal, status checks
@@ -46,6 +50,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     restic \
     locales \
     curl git ca-certificates \
+    # gnupg is only needed by duplicity for backup encryption
+    $([ "$BACKUP_TOOL" = "duplicity" ] && echo gnupg) \
     && locale-gen en_US.UTF-8 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -55,15 +61,14 @@ ENV LC_ALL=en_US.UTF-8
 # Pre-install Python packages BEFORE copying source so this layer is cached
 # across source-file changes and only reruns when the package list changes.
 # Keep this list in sync with the pip install block in setup/management.sh.
-RUN mkdir -p /usr/local/lib/mailinabox/stamps && \
+COPY deploy/docker/management/requirements.txt deploy/docker/management/requirements-duplicity.txt /tmp/
+
+RUN --mount=type=cache,target=/root/.cache/pip \
+    mkdir -p /usr/local/lib/mailinabox/stamps && \
     virtualenv /usr/local/lib/mailinabox/env && \
     /usr/local/lib/mailinabox/env/bin/pip install --upgrade --quiet --no-compile --prefer-binary \
-        rtyaml "email_validator>=1.0.0" "exclusiveprocess" \
-        flask dnspython python-dateutil expiringdict gunicorn \
-        "qrcode[pil]" pyotp "fido2>=1.0" \
-        "idna>=2.0.0" "cryptography>=41.0.0" psutil postfix-mta-sts-resolver \
-        "duplicity>=1.0" b2sdk boto3 \
-        "passlib[bcrypt]"
+        -r /tmp/requirements.txt \
+        $([ "$BACKUP_TOOL" = "duplicity" ] && echo "-r /tmp/requirements-duplicity.txt")
 
 # Pre-write the gunicorn start script so the entrypoint can exec it immediately
 # without waiting for setup/management.sh to run. Bound to 0.0.0.0 so nginx

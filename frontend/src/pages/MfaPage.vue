@@ -5,6 +5,8 @@ import { KeyRound, WifiOff } from 'lucide-vue-next'
 import { startRegistration } from '@simplewebauthn/browser'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
+import SectionHeader from '@/components/ui/SectionHeader.vue'
+import Field from '@/components/ui/Field.vue'
 import Input from '@/components/ui/Input.vue'
 import Card from '@/components/ui/Card.vue'
 import Badge from '@/components/ui/Badge.vue'
@@ -166,7 +168,7 @@ onMounted(load)
   <AppLayout>
     <h1 class="text-2xl font-semibold mb-6">Two-Factor Authentication</h1>
 
-    <p class="text-sm text-gray-500 mb-6">
+    <p class="text-sm text-muted mb-6">
       Two-factor authentication adds an extra layer of security to this control panel.
       It does not protect email access - use a strong password for that.
     </p>
@@ -187,7 +189,7 @@ onMounted(load)
 
     <template v-else>
       <!-- Passkeys Section -->
-      <h2 class="text-base font-semibold mb-3">Passkeys</h2>
+      <SectionHeader title="Passkeys" />
       <Card class="p-5 mb-6">
         <template v-if="loading">
           <Skeleton class="h-4 w-48 mb-3"/>
@@ -196,7 +198,7 @@ onMounted(load)
 
         <template v-else>
           <!-- Existing passkeys -->
-          <div v-if="passkeyEntries.length > 0" class="mb-4 divide-y divide-gray-100 dark:divide-gray-800">
+          <div v-if="passkeyEntries.length > 0" class="mb-4 divide-y divide-border">
             <div
               v-for="entry in passkeyEntries"
               :key="entry.id"
@@ -204,8 +206,8 @@ onMounted(load)
             >
               <div>
                 <p class="text-sm font-medium">{{ entry.name || 'Unnamed passkey' }}</p>
-                <p v-if="entry.last_used" class="text-xs text-gray-500 mt-0.5">Last used {{ entry.last_used }}</p>
-                <p v-else class="text-xs text-gray-500 mt-0.5">Never used</p>
+                <p v-if="entry.last_used" class="text-xs text-muted mt-0.5">Last used {{ entry.last_used }}</p>
+                <p v-else class="text-xs text-muted mt-0.5">Never used</p>
               </div>
               <Button variant="ghost" size="sm" @click="openDisable(entry)">Remove</Button>
             </div>
@@ -246,14 +248,14 @@ onMounted(load)
                 </Button>
                 <Button variant="ghost" @click="showAddPasskey = false; passkeyName = ''">Cancel</Button>
               </div>
-              <p class="text-xs text-gray-500 mt-1.5">Your browser will prompt you to create a passkey.</p>
+              <p class="text-xs text-muted mt-1.5">Your browser will prompt you to create a passkey.</p>
             </div>
           </template>
         </template>
       </Card>
 
       <!-- TOTP Section -->
-      <h2 class="text-base font-semibold mb-3">Authenticator App (TOTP)</h2>
+      <SectionHeader title="Authenticator App (TOTP)" />
       <Card class="p-5">
         <template v-if="loading">
           <Skeleton class="h-4 w-64 mb-3"/>
@@ -264,19 +266,24 @@ onMounted(load)
         <template v-else-if="totpEntries.length > 0">
           <div v-for="entry in totpEntries" :key="entry.id" class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <span class="flex size-2 rounded-full bg-green-500"/>
+              <Badge variant="success">Active</Badge>
               <div>
-                <p class="text-sm font-medium">Active{{ entry.label ? ` - ${entry.label}` : '' }}</p>
-                <p class="text-xs text-gray-500 mt-0.5">A 6-digit code is required at login.</p>
+                <p class="text-sm font-medium">{{ entry.label || 'Authenticator app' }}</p>
+                <p class="text-xs text-muted mt-0.5">A 6-digit code is required at login.</p>
               </div>
             </div>
             <Button variant="destructive" size="sm" @click="openDisable(entry)">Disable</Button>
           </div>
         </template>
 
+        <!-- TOTP empty state -->
+        <template v-else-if="!totpSetup">
+          <p class="text-sm text-muted">No TOTP configured. Refresh the page if this persists.</p>
+        </template>
+
         <!-- TOTP setup form -->
-        <template v-else-if="totpSetup">
-          <p class="text-sm text-gray-500 mb-5">
+        <template v-else>
+          <p class="text-sm text-muted mb-5">
             Use <a href="https://freeotp.github.io/" target="_blank" rel="noopener"
                    class="underline underline-offset-2">FreeOTP</a>,
             Google Authenticator, or any TOTP app.
@@ -295,7 +302,7 @@ onMounted(load)
                     class="w-40 h-40"
                   />
                 </Card>
-                <p class="text-xs text-gray-500 mb-1">Or enter the secret manually:</p>
+                <p class="text-xs text-muted mb-1">Or enter the secret manually:</p>
                 <Code block class="max-w-xs">{{ totpSetup.secret }}</Code>
               </div>
             </div>
@@ -303,20 +310,16 @@ onMounted(load)
             <!-- Step 2: Label -->
             <div class="flex gap-5 items-start">
               <Badge class="flex-none mt-0.5 size-6 justify-center rounded-full px-0">2</Badge>
-              <div class="w-full max-w-xs">
-                <label for="enrollLabel" class="block text-sm font-medium mb-1.5">
-                  Label this device <span class="font-normal text-gray-400">(optional)</span>
-                </label>
+              <Field for="enrollLabel" class="w-full max-w-xs">
+                <template #label>Label this device <span class="font-normal text-faint">(optional)</span></template>
                 <Input id="enrollLabel" v-model="enrollLabel" placeholder="e.g. my phone"/>
-              </div>
+              </Field>
             </div>
 
             <!-- Step 3: Verify -->
             <div class="flex gap-5 items-start">
               <Badge class="flex-none mt-0.5 size-6 justify-center rounded-full px-0">3</Badge>
-              <div class="w-full">
-                <label for="enrollToken" class="block text-sm font-medium mb-1.5">Enter the 6-digit code from your
-                  app</label>
+              <Field label="Enter the 6-digit code from your app" for="enrollToken" class="w-full">
                 <div class="flex gap-2 items-center max-w-xs">
                   <Input
                     id="enrollToken"
@@ -330,8 +333,8 @@ onMounted(load)
                     {{ enrolling ? 'Enabling...' : 'Enable' }}
                   </Button>
                 </div>
-                <p class="text-xs text-gray-500 mt-1.5">You will be logged out after enabling.</p>
-              </div>
+                <p class="text-xs text-muted mt-1.5">You will be logged out after enabling.</p>
+              </Field>
             </div>
           </div>
         </template>

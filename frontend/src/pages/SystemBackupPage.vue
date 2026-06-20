@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
-import { HardDrive } from 'lucide-vue-next'
+import { HardDrive, Settings2 } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
+import SectionHeader from '@/components/ui/SectionHeader.vue'
+import Field from '@/components/ui/Field.vue'
+import Checkbox from '@/components/ui/Checkbox.vue'
 import Input from '@/components/ui/Input.vue'
 import Select from '@/components/ui/Select.vue'
 import Card from '@/components/ui/Card.vue'
@@ -17,7 +21,7 @@ import EmptyState from '@/components/ui/EmptyState.vue'
 import Well from '@/components/ui/Well.vue'
 import { useApi } from '@/composables/useApi'
 import { useConfigStore } from '@/stores/config'
-import type { BackupEntry, BackupStatus, BackupConfig } from '@/types'
+import type { BackupEntry, BackupStatus, BackupConfig, BackupCheckResult } from '@/types'
 
 const api = useApi()
 const config = useConfigStore()
@@ -35,6 +39,7 @@ const unmatchedSize = ref(0)
 const statusError = ref<string | null>(null)
 const backupsOff = ref(false)
 const backupBackend = ref<'restic' | 'duplicity' | null>(null)
+const lastCheck = ref<BackupCheckResult | null>(null)
 
 // Config read-only info
 const fileTargetDir = ref('')
@@ -44,6 +49,7 @@ const sshPubKey = ref('')
 // Config form state
 const targetType = ref<BackupTargetType>('local')
 const minAge = ref('3')
+const checkAfterBackup = ref(true)
 // rsync
 const rsyncUser = ref('')
 const rsyncHost = ref('')
@@ -88,6 +94,7 @@ function parseConfig(cfg: BackupConfig): void {
   encPwFile.value = cfg.enc_pw_file ?? ''
   sshPubKey.value = cfg.ssh_pub_key ?? ''
   minAge.value = String(cfg.min_age_in_days ?? 3)
+  checkAfterBackup.value = cfg.check_after_backup ?? true
 
   const target = cfg.target ?? 'off'
   if (target === 'off') {
@@ -159,6 +166,7 @@ async function loadStatus(): Promise<void> {
       backups.value = data.backups
       unmatchedSize.value = data.unmatched_file_size ?? 0
       backupBackend.value = data.backend ?? null
+      lastCheck.value = data.last_check ?? null
     }
   } catch {
     toast.error('Failed to load backup status.')
@@ -190,6 +198,7 @@ async function save(): Promise<void> {
       target_user,
       target_pass,
       min_age: minAge.value,
+      check_after_backup: String(checkAfterBackup.value),
     })
     const text = await res.text()
     if (!res.ok) {
@@ -223,13 +232,21 @@ onMounted(() => Promise.all([loadStatus(), loadConfig()]))
 
 <template>
   <AppLayout>
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-semibold">System Backup</h1>
-      <Button variant="secondary" @click="configSheetOpen = true">Configure</Button>
-    </div>
+    <PageHeader title="System Backup">
+      <template #actions>
+        <Button variant="secondary" size="sm" @click="configSheetOpen = true"><Settings2 class="size-3.5" />Configure</Button>
+      </template>
+    </PageHeader>
+
+    <!-- Integrity check warning -->
+    <Card v-if="lastCheck && !lastCheck.passed" class="p-5 mb-6 border-red-200 dark:border-red-800">
+      <p class="text-sm font-medium text-red-600 dark:text-red-400 mb-1">Backup integrity check failed</p>
+      <p class="text-xs text-muted mb-3">Last checked {{ new Date(lastCheck.timestamp).toLocaleString() }}. An email has been sent to the administrator.</p>
+      <pre v-if="lastCheck.output" class="text-xs font-mono whitespace-pre-wrap break-all text-text">{{ lastCheck.output }}</pre>
+    </Card>
 
     <!-- Backup history -->
-    <h2 class="text-base font-semibold mb-3">Backup History</h2>
+    <SectionHeader title="Backup History" />
 
     <template v-if="loadingStatus">
       <Table>
@@ -272,21 +289,38 @@ onMounted(() => Promise.all([loadStatus(), loadConfig()]))
         <TableHead>
           <Th>Date</Th>
           <Th>Age</Th>
-          <Th>Type</Th>
+          <Th>{{ backupBackend === 'restic' ? 'Snapshot' : 'Type' }}</Th>
           <Th class="text-right">Size</Th>
           <Th>Expires</Th>
         </TableHead>
         <tbody>
           <TableRow v-for="b in backups" :key="b.date">
             <td class="px-4 py-3 text-sm font-mono">{{ b.date_str }}</td>
-            <td class="px-4 py-3 text-sm text-gray-500">{{ b.date_delta }} ago</td>
-            <td class="px-4 py-3 text-sm">{{ b.full ? 'full' : 'increment' }}</td>
-            <td class="px-4 py-3 text-sm text-right tabular-nums text-gray-500">{{ backupBackend === 'restic' ? '—' : niceSize(b.size) }}</td>
-            <td class="px-4 py-3 text-sm text-gray-500">{{ b.deleted_in ?? '—' }}</td>
+            <td class="px-4 py-3 text-sm text-muted">{{ b.date_delta }} ago</td>
+            <td class="px-4 py-3 text-sm">
+              <template v-if="backupBackend === 'restic'">
+                <span class="font-mono text-muted">{{ b.id ?? '—' }}</span>
+              </template>
+              <template v-else>{{ b.full ? 'full' : 'increment' }}</template>
+            </td>
+            <td class="px-4 py-3 text-sm text-right tabular-nums">
+              <template v-if="backupBackend === 'restic'">
+                <span v-if="b.size" class="text-text">{{ niceSize(b.size) }}</span>
+                <span v-else class="text-faint">—</span>
+                <div v-if="b.data_added || b.file_count" class="text-xs text-faint mt-0.5 space-x-2">
+                  <span v-if="b.data_added">+{{ niceSize(b.data_added) }} new</span>
+                  <span v-if="b.file_count">{{ b.file_count.toLocaleString() }} files</span>
+                </div>
+              </template>
+              <template v-else>
+                <span class="text-muted">{{ niceSize(b.size) }}</span>
+              </template>
+            </td>
+            <td class="px-4 py-3 text-sm text-muted">{{ b.deleted_in ?? '—' }}</td>
           </TableRow>
         </tbody>
       </Table>
-      <p v-if="totalSize" class="text-xs text-gray-500 mt-2 text-right px-1">
+      <p v-if="totalSize" class="text-xs text-muted mt-2 text-right px-1">
         Total storage: {{ totalSize }}
       </p>
     </template>
@@ -301,8 +335,7 @@ onMounted(() => Promise.all([loadStatus(), loadConfig()]))
         </div>
       </template>
       <div v-else class="space-y-5">
-        <div>
-          <label for="targetType" class="block text-sm font-medium mb-1.5">Backup target</label>
+        <Field label="Backup target" for="targetType">
           <Select id="targetType" v-model="targetType">
             <option value="off">Disabled</option>
             <option value="local">Local storage (on this machine)</option>
@@ -310,91 +343,88 @@ onMounted(() => Promise.all([loadStatus(), loadConfig()]))
             <option value="s3">Amazon S3 (or compatible)</option>
             <option value="b2">Backblaze B2</option>
           </Select>
-        </div>
+        </Field>
 
         <!-- Local info -->
         <template v-if="targetType === 'local'">
           <Well class="text-sm space-y-1">
-            <p class="text-gray-500">Storage location: <span class="font-mono text-gray-700 dark:text-gray-300">{{ fileTargetDir }}</span></p>
-            <p class="text-gray-500">Encryption key: <span class="font-mono text-gray-700 dark:text-gray-300">{{ encPwFile }}</span></p>
+            <p class="text-muted">Storage location: <span class="font-mono text-text">{{ fileTargetDir }}</span></p>
+            <p class="text-muted">Encryption key: <span class="font-mono text-text">{{ encPwFile }}</span></p>
           </Well>
         </template>
 
         <!-- Rsync fields -->
         <template v-if="targetType === 'rsync'">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label for="rsyncUser" class="block text-sm font-medium mb-1.5">Remote user</label>
+            <Field label="Remote user" for="rsyncUser">
               <Input id="rsyncUser" v-model="rsyncUser" placeholder="backup-user" />
-            </div>
-            <div>
-              <label for="rsyncHost" class="block text-sm font-medium mb-1.5">Remote host</label>
+            </Field>
+            <Field label="Remote host" for="rsyncHost">
               <Input id="rsyncHost" v-model="rsyncHost" placeholder="backup.example.com" />
-            </div>
-            <div class="sm:col-span-2">
-              <label for="rsyncPath" class="block text-sm font-medium mb-1.5">Remote path</label>
+            </Field>
+            <Field label="Remote path" for="rsyncPath" class="sm:col-span-2">
               <Input id="rsyncPath" v-model="rsyncPath" placeholder="backups/mailinabox" />
-            </div>
+            </Field>
           </div>
           <Well v-if="sshPubKey">
-            <p class="text-xs font-medium text-gray-500 mb-1.5">SSH public key (add to remote authorized_keys)</p>
-            <pre class="text-xs font-mono text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-all select-all">{{ sshPubKey }}</pre>
+            <p class="text-xs font-medium text-muted mb-1.5">SSH public key (add to remote authorized_keys)</p>
+            <pre class="text-xs font-mono text-text whitespace-pre-wrap break-all select-all">{{ sshPubKey }}</pre>
           </Well>
         </template>
 
         <!-- S3 fields -->
         <template v-if="targetType === 's3'">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label for="s3Host" class="block text-sm font-medium mb-1.5">S3 endpoint / host</label>
+            <Field label="S3 endpoint / host" for="s3Host">
               <Select v-if="s3HostOptions.length" id="s3Host" v-model="s3Host">
                 <option v-for="o in s3HostOptions" :key="o.host" :value="o.host">{{ o.host }}</option>
                 <option value="">Other...</option>
               </Select>
-              <Input v-else id="s3Host" v-model="s3Host" placeholder="s3.amazonaws.com" />
-            </div>
-            <div>
-              <label for="s3Region" class="block text-sm font-medium mb-1.5">Region name</label>
+              <Input v-if="s3HostOptions.length && s3Host === ''" v-model="s3Host" class="mt-2" placeholder="s3.amazonaws.com" />
+              <Input v-else-if="!s3HostOptions.length" id="s3Host" v-model="s3Host" placeholder="s3.amazonaws.com" />
+            </Field>
+            <Field label="Region name" for="s3Region">
               <Input id="s3Region" v-model="s3Region" placeholder="us-east-1" />
-            </div>
-            <div>
-              <label for="s3Path" class="block text-sm font-medium mb-1.5">Bucket path</label>
+            </Field>
+            <Field label="Bucket path" for="s3Path">
               <Input id="s3Path" v-model="s3Path" placeholder="my-bucket/mailinabox" />
-            </div>
-            <div>
-              <label for="s3AccessKey" class="block text-sm font-medium mb-1.5">Access key ID</label>
+            </Field>
+            <Field label="Access key ID" for="s3AccessKey">
               <Input id="s3AccessKey" v-model="s3AccessKey" autocomplete="off" placeholder="AKIA..." />
-            </div>
-            <div class="sm:col-span-2">
-              <label for="s3SecretKey" class="block text-sm font-medium mb-1.5">Secret access key</label>
+            </Field>
+            <Field label="Secret access key" for="s3SecretKey" class="sm:col-span-2">
               <Input id="s3SecretKey" v-model="s3SecretKey" type="password" autocomplete="off" placeholder="wJalEXAMPLExFE..." />
-            </div>
+            </Field>
           </div>
         </template>
 
         <!-- B2 fields -->
         <template v-if="targetType === 'b2'">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label for="b2AppKeyId" class="block text-sm font-medium mb-1.5">Application key ID</label>
+            <Field label="Application key ID" for="b2AppKeyId">
               <Input id="b2AppKeyId" v-model="b2AppKeyId" autocomplete="off" placeholder="4a1b2c3d4e5f6g7h8i9j0k" />
-            </div>
-            <div>
-              <label for="b2AppKey" class="block text-sm font-medium mb-1.5">Application key</label>
+            </Field>
+            <Field label="Application key" for="b2AppKey">
               <Input id="b2AppKey" v-model="b2AppKey" type="password" autocomplete="off" placeholder="b2_app_key_..." />
-            </div>
-            <div>
-              <label for="b2Bucket" class="block text-sm font-medium mb-1.5">Bucket name</label>
+            </Field>
+            <Field label="Bucket name" for="b2Bucket">
               <Input id="b2Bucket" v-model="b2Bucket" placeholder="my-mailinabox-bucket" />
-            </div>
+            </Field>
           </div>
         </template>
 
         <!-- Min age (shown for all enabled targets) -->
-        <div v-if="targetType !== 'off'">
-          <label for="minAge" class="block text-sm font-medium mb-1.5">Minimum backup age (days)</label>
+        <Field v-if="targetType !== 'off'" label="Minimum backup age (days)" for="minAge">
           <Input id="minAge" v-model="minAge" type="number" class="max-w-xs" placeholder="3" />
-          <p class="text-xs text-gray-500 mt-1">Backups are kept for at least this many days before being deleted.</p>
+          <p class="text-xs text-muted mt-1">Backups are kept for at least this many days before being deleted.</p>
+        </Field>
+
+        <div v-if="targetType !== 'off'" class="flex items-start gap-3">
+          <Checkbox id="checkAfterBackup" v-model="checkAfterBackup" class="mt-0.5" />
+          <div>
+            <label for="checkAfterBackup" class="text-sm font-medium cursor-pointer">Verify backup integrity after each run</label>
+            <p class="text-xs text-muted mt-0.5">Checks the backup chain for errors after each backup. Email is sent to the administrator if a problem is found.</p>
+          </div>
         </div>
 
         <Button class="w-full" :disabled="saving" @click="save">

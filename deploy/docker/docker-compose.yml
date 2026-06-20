@@ -13,6 +13,7 @@
 #   --profile filebrowser  FileBrowser file manager
 #   --profile radicale     Radicale CardDAV/CalDAV
 #   --profile monitoring   Munin system monitoring
+#   --profile clamav       ClamAV antivirus milter
 
 networks:
   # Fixed subnet so the dns container can have a stable IP that other
@@ -22,6 +23,7 @@ networks:
     ipam:
       config:
         - subnet: 172.28.0.0/24
+          ip_range: 172.28.0.128/25
 
 volumes:
   storage:
@@ -101,7 +103,7 @@ services:
       redis:
         condition: service_healthy
       dns:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD", "bash", "-c", "echo '' > /dev/tcp/127.0.0.1/11332"]
       interval: 5s
@@ -132,12 +134,14 @@ services:
     environment:
       RUNTIME: docker
       RSPAMD_HOST: rspamd
+      CLAMAV_HOST: ${CLAMAV_HOST:-clamav}
+      ENABLE_CLAMAV: ${ENABLE_CLAMAV:-false}
       # Added to self-signed cert SANs so webmail can verify Dovecot's cert
       # when connecting via IMAPS using the container service name.
       SSL_EXTRA_SANS: mail
     depends_on:
       dns:
-        condition: service_healthy
+        condition: service_started
       rspamd:
         condition: service_healthy
     healthcheck:
@@ -151,6 +155,8 @@ services:
     build:
       context: ../..
       dockerfile: deploy/docker/management/Dockerfile
+      args:
+        BACKUP_TOOL: ${BACKUP_TOOL:-restic}
     container_name: miab-management
     restart: unless-stopped
     networks:
@@ -176,7 +182,7 @@ services:
       mail:
         condition: service_healthy
       dns:
-        condition: service_healthy
+        condition: service_started
     healthcheck:
       test: ["CMD", "bash", "-c", "echo '' > /dev/tcp/127.0.0.1/10222"]
       interval: 3s
@@ -358,3 +364,26 @@ services:
       timeout: 3s
       retries: 6
       start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # Optional: ClamAV antivirus milter  (--profile clamav)
+  # ---------------------------------------------------------------------------
+
+  clamav:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/optional/clamav/Dockerfile
+    container_name: miab-clamav
+    restart: unless-stopped
+    profiles:
+      - clamav
+    networks:
+      - miab-internal
+    expose:
+      - "7357"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo '' > /dev/tcp/127.0.0.1/7357"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 120s

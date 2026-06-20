@@ -1,21 +1,21 @@
 # The first route (starting a munin session) uses the normal admin check.
 # The other two routes use a *different*, munin-specific cookie (not the
-# admin_session cookie) - they can't use require_admin or the normal
-# authorized_personnel_only, so this file defines its own decorator for them.
+# admin_session cookie) - they can't use require_admin or require_admin_route,
+# so this file defines its own decorator for them.
 
 from functools import wraps
 
 from flask import Blueprint, Response, current_app, make_response, request, send_from_directory
 
 from core.app_context import env, auth_service
-from core.auth_decorators import authorized_personnel_only
+from core.auth_decorators import require_admin_route
 from core import utils
 from mail.mailconfig import get_mail_user_privileges
 
 bp = Blueprint("munin", __name__, url_prefix="/munin")
 
 @bp.route('/')
-@authorized_personnel_only
+@require_admin_route
 def munin_start():
 	# Munin pages, static images, and dynamically generated images are served
 	# outside of the AJAX API. We'll start with a 'start' API that sets a cookie

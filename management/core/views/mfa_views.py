@@ -9,7 +9,7 @@ import secrets
 from flask import Blueprint, current_app, make_response, request
 
 from core.app_context import env, auth_service
-from core.auth_decorators import authorized_user_only
+from core.auth_decorators import require_user_route
 from core.web_helpers import json_response, sanitize_error_message, validate_email, log_failed_login
 from mail.mailconfig import get_mail_user_privileges
 from auth.mfa import (
@@ -21,7 +21,7 @@ from auth.mfa import (
 bp = Blueprint("mfa", __name__, url_prefix="/mfa")
 
 @bp.route('/status', methods=['POST'])
-@authorized_user_only
+@require_user_route
 def mfa_get_status():
 	# Admins may pass a 'user' form field to query another user's MFA status.
 	# Non-admins are always scoped to their own account.
@@ -45,7 +45,7 @@ def mfa_get_status():
 	return json_response(resp)
 
 @bp.route('/totp/enable', methods=['POST'])
-@authorized_user_only
+@require_user_route
 def totp_post_enable():
 	secret = request.form.get('secret')
 	token = request.form.get('token')
@@ -60,7 +60,7 @@ def totp_post_enable():
 	return "OK"
 
 @bp.route('/disable', methods=['POST'])
-@authorized_user_only
+@require_user_route
 def totp_post_disable():
 	# Admins may pass a 'user' form field to disable MFA for another user,
 	# but cannot disable MFA for other admin accounts. Non-admins are always
@@ -87,7 +87,7 @@ def totp_post_disable():
 	return ("Invalid user or MFA id.", 400)
 
 @bp.route('/webauthn/register/begin', methods=['POST'])
-@authorized_user_only
+@require_user_route
 def webauthn_register_begin_route():
 	try:
 		options, state = webauthn_register_begin(request.user_email, env)
@@ -98,7 +98,7 @@ def webauthn_register_begin_route():
 	return json_response({"options": options, "nonce": nonce})
 
 @bp.route('/webauthn/register/complete', methods=['POST'])
-@authorized_user_only
+@require_user_route
 def webauthn_register_complete_route():
 	nonce = request.form.get('nonce', '')
 	name = request.form.get('name', 'My Passkey')

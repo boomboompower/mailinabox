@@ -65,11 +65,13 @@ sign_authenticated = true;
 sign_local = true;
 EOF
 
-# Greylisting via Redis - replaces Postgrey. 180s delay matches what Postgrey used.
+# Greylisting via Redis. Short timeout (60s) is enough to deter non-retrying bots;
+# DKIM_ALLOW skips greylisting entirely for mail with a valid DKIM signature.
 cat > /etc/rspamd/local.d/greylisting.conf << 'EOF'
 enabled = true;
-timeout = 180;
+timeout = 60;
 expire = 86400;
+whitelist_symbols = ["DKIM_ALLOW"];
 EOF
 
 # DMARC verification. No outbound reports - not a reporting MTA.
@@ -100,10 +102,7 @@ setup/tools/editconf.py /etc/postfix/main.cf \
 setup/tools/editconf.py /etc/postfix/main.cf -e \
     lmtp_destination_recipient_limit=
 
-setup/tools/editconf.py /etc/postfix/main.cf \
-    "smtpd_milters=inet:127.0.0.1:11332" \
-    "non_smtpd_milters=inet:127.0.0.1:11332" \
-    milter_default_action=accept
+append_milter "inet:127.0.0.1:11332"
 
 # Rspamd handles greylisting internally via Redis - drop the Postgrey policy check.
 # Dovecot quota policy (12340) stays.

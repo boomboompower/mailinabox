@@ -1,13 +1,18 @@
 import type { Component } from 'vue'
 
+/** The 6 available color palettes for the admin panel. */
+export type Palette = 'zinc' | 'oxi' | 'indigo' | 'nord' | 'emerald' | 'catppuccin'
+
 /**
  * Bootstrap data injected by Flask into the __INIT__ script tag on page load.
  * Auth-sensitive fields are only present when the admin_session cookie is valid.
- * hostname is always present (it is already public knowledge).
+ * hostname and needsBootstrap are always present.
  */
 type InitData = {
   hostname: string
   authenticated: boolean
+  /** True when no admin users exist. Always present. Triggers onboarding redirect. */
+  needsBootstrap?: boolean
   /** Present when authenticated. */
   email?: string
   /** Present when authenticated. */
@@ -18,6 +23,18 @@ type InitData = {
   noAdminsExist?: boolean
   /** Present when authenticated. */
   backupS3Hosts?: [string, string][]
+}
+
+/** Response from POST /admin/bootstrap/setup. */
+type BootstrapSetupResponse = {
+  status: 'ok'
+}
+
+/** Error response from POST /admin/bootstrap/setup when the code is wrong. */
+type BootstrapCodeError = {
+  error: 'invalid_code' | 'expired' | 'locked' | 'not_found'
+  /** Present when error is invalid_code. */
+  attempts_remaining?: number
 }
 
 /** JSON response from POST /admin/login. */
@@ -173,16 +190,20 @@ type BackupEntry = {
   date_str: string
   /** Human-readable age (e.g. "3 days, 2 hours"). */
   date_delta: string
-  /** True for a full backup, false for an incremental. Always true for restic, since every snapshot is independently restorable. */
+  /** True for a full backup, false for an incremental. Always true for restic. */
   full: boolean
-  /** Size in bytes. Always 0 for restic entries - per-snapshot size isn't meaningful in a deduplicated model; see unmatched_file_size on BackupStatus for the real total. */
+  /** Restore size in bytes. For restic: total bytes that would be restored from this snapshot (from backup summary cache). For duplicity: archive file size. */
   size: number
-  /** Number of archive volumes (duplicity only - always 0 when the restic backend is active). */
+  /** Number of archive volumes (duplicity only - always 0 for restic). */
   volumes: number
-  /** Human-readable time until deletion (absent if unknown; never present for restic entries). */
+  /** Human-readable time until deletion. */
   deleted_in?: string
-  /** Snapshot ID (restic only - absent for duplicity entries). Pass this, not the date, when restoring a restic-backed snapshot. */
+  /** Snapshot ID (restic only). Use this when restoring, not the date. */
   id?: string
+  /** Bytes of new data added to the repository by this snapshot (restic only - from backup summary cache). */
+  data_added?: number
+  /** Number of files in this snapshot (restic only - from backup summary cache). */
+  file_count?: number
 }
 
 /**
@@ -190,12 +211,23 @@ type BackupEntry = {
  * Returns {} when backups are off, {"error": ...} on failure,
  * or {"backend": ..., "backups": [...], "unmatched_file_size": N} when enabled.
  */
+/** Result of the post-backup integrity check (restic only). */
+type BackupCheckResult = {
+  passed: boolean
+  /** ISO 8601 timestamp of when the check ran. */
+  timestamp: string
+  /** restic check output - only populated when passed is false. */
+  output: string
+}
+
 type BackupStatus = {
   /** Which backup backend produced this response. */
   backend?: 'restic' | 'duplicity'
   backups?: BackupEntry[]
   unmatched_file_size?: number
   error?: string
+  /** Result of the most recent post-backup integrity check (restic only). */
+  last_check?: BackupCheckResult
 }
 
 /**
@@ -213,6 +245,8 @@ type BackupConfig = {
   enc_pw_file: string
   /** SSH public key used for rsync access (present if key exists on disk). */
   ssh_pub_key?: string
+  /** Whether to run an integrity check after each backup and email admin on failure. */
+  check_after_backup: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -270,13 +304,57 @@ type WebDomain = {
   static_enabled: boolean
 }
 
+// ---------------------------------------------------------------------------
+// API tokens - GET /admin/tokens, POST /admin/tokens, DELETE /admin/tokens/:id
+// ---------------------------------------------------------------------------
+
+/** A single API token entry returned by GET /admin/tokens. The plaintext is never returned. */
+type ApiToken = {
+  /** Database id used to revoke the token. */
+  id: number
+  /** Human-readable label set at creation time. */
+  name: string
+  /** 'read' tokens can only call read-scope endpoints; 'write' tokens can call any endpoint. */
+  scope: 'read' | 'write'
+  /** ISO 8601 creation timestamp. */
+  created_at: string
+  /** ISO 8601 timestamp of last use, or null if never used. */
+  last_used: string | null
+}
+
+/** Response from POST /admin/tokens. The plaintext is shown once and never stored. */
+type ApiTokenCreateResponse = {
+  token: string
+}
+
+// ---------------------------------------------------------------------------
+// SMTP relay - GET /admin/system/relay
+// ---------------------------------------------------------------------------
+
+/** Response from GET /admin/system/relay. */
+type SmtpRelayConfig = {
+  /** SMTP relay hostname, or empty string when relay is disabled. */
+  host: string
+  /** SMTP port (typically 587). */
+  port: number
+  /** SMTP username. */
+  user: string
+  /** True if a password is stored on the server. The password itself is never returned. */
+  password_set: boolean
+  /** SPF include domain appended to the auto-generated SPF record (e.g. "sendgrid.net"). */
+  spf_include: string
+}
+
 export type {
-  InitData, LoginApiResponse, AuthMethodsResponse, NavItem, NavGroup,
+  InitData, LoginApiResponse, AuthMethodsResponse, BootstrapSetupResponse, BootstrapCodeError,
+  NavItem, NavGroup,
   MailUser, MailUserDomain, MailAlias, MailAliasDomain,
   DnsRecord, ExternalDnsEntry,
   StatusCheckItem, StatusCheckResponse,
   SslDomainStatus, SslStatus, SslProvisionRequest, SslProvisionResult,
-  BackupEntry, BackupStatus, BackupConfig,
+  BackupEntry, BackupStatus, BackupConfig, BackupCheckResult,
   MfaEntry, TotpProvision, MfaStatus,
   WebDomain,
+  ApiToken, ApiTokenCreateResponse,
+  SmtpRelayConfig,
 }

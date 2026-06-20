@@ -54,8 +54,11 @@ Our goals:
 | Ubuntu target  | 22.04 LTS          | 22.04 LTS / 24.04 LTS / 26.04 LTS                                       |
 | Deployment     | Bare metal only    | Bare metal + Docker                                                     |
 | PHP            | Required           | Not installed                                                           |
+| Backups        | Duplicity          | [Restic](https://github.com/restic/restic) / Duplicity                  |
+| Relay support  | No                 | Yes (configurable in admin panel)                                       |
 
-Upstream divergence: 150+ commits, 290+ files changed. Manual cherry-picks only going forward.
+This is a hard-fork, and has diverged significantly from the original codebase. Given it has diverged
+signicantly from upstream, fixes from upstream will be ported manually on a case-by-case basis.
 
 ## What is in the box
 
@@ -98,7 +101,7 @@ Internationalized domain names are supported. Static website hosting is included
 ## Requirements
 
 - **Ubuntu LTS** (64-bit) - 22.04, 24.04, and 26.04 are all supported
-- A fresh machine - the installer expects to own the system
+- A fresh machine - the installer prefers to own the system and _may_ overwrite existing configurations.
 - A domain name with glue records pointing to the box's IP
 
 For Docker development, any Linux host with Docker and Docker Compose installed is sufficient.
@@ -118,8 +121,9 @@ python3 setup/boxctl
 Running with no arguments shows a landing screen: **Docker**, **Bare metal**, or **Manage services**. Skip it with a subcommand:
 
 ```bash
-python3 setup/boxctl docker      # Docker setup wizard
 python3 setup/boxctl baremetal   # bare metal guided install
+python3 setup/boxctl docker      # Docker setup wizard
+python3 setup/boxctl update      # For updating an existing installation
 python3 setup/boxctl doctor      # check service health on a running box
 ```
 

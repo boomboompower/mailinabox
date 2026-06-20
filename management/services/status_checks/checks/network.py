@@ -4,14 +4,31 @@ from .. import utils
 
 @check("outbound-smtp", category="network")
 def check_outbound_smtp(env, report):
-	with report.step("Outbound mail (SMTP port 25) is not blocked"):
-		# Many residential networks block outbound port 25 to prevent hijacked
-		# machines from sending spam. See if we can reach one of Google's MTAs.
-		_code, ret = utils.shell("check_call", ["/bin/nc", "-z", "-w5", "aspmx.l.google.com", "25"], trap=True)
-		if ret != 0:
-			raise CheckFailed("""Outbound mail (SMTP port 25) seems to be blocked by your network. You
-				will not be able to send any mail. Many residential networks block port 25 to prevent hijacked
-				machines from sending spam. A quick connection test to Google's mail server on port 25 failed.""")
+	from core.utils import load_settings
+	relay = load_settings(env).get("smtp_relay", {})
+	relay_host = (relay.get("host") or "").strip()
+
+	if relay_host:
+		relay_port = relay.get("port", 587)
+		with report.step(f"Outbound relay ({relay_host}:{relay_port}) is reachable"):
+			_code, ret = utils.shell("check_call",
+				["/bin/nc", "-z", "-w5", relay_host, str(relay_port)], trap=True)
+			if ret != 0:
+				raise CheckFailed(
+					f"Cannot reach the configured SMTP relay {relay_host}:{relay_port}. "
+					f"Outbound mail will fail until the relay is reachable or reconfigured "
+					f"in System -> Outbound Mail Relay.")
+	else:
+		with report.step("Outbound mail (SMTP port 25) is not blocked"):
+			# Many residential networks block outbound port 25 to prevent hijacked
+			# machines from sending spam. See if we can reach one of Google's MTAs.
+			_code, ret = utils.shell("check_call",
+				["/bin/nc", "-z", "-w5", "aspmx.l.google.com", "25"], trap=True)
+			if ret != 0:
+				raise CheckFailed(
+					"Outbound mail (SMTP port 25) seems to be blocked by your network. "
+					"Configure an outbound SMTP relay in System -> Outbound Mail Relay "
+					"to send mail through an external provider.")
 
 # Each RBL is an independent lookup - one being listed (or timing out) must
 # not prevent the others from being checked, so each gets its own check

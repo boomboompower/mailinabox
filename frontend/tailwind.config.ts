@@ -9,23 +9,40 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Pure neutral gray scale - no blue cast.
-        // Tailwind v3 default grays carry chroma at hue 264, making dark
-        // surfaces appear blue-tinted. These hex values are exact conversions
-        // of the equivalent achromatic OKLCH values (C=0).
+        // Semantic design tokens - all components reference these, never
+        // raw gray-* values. Each palette defines these variables in main.css.
+        bg:      'var(--color-bg)',
+        sidebar: 'var(--color-sidebar)',
+        surface: 'var(--color-surface)',
+        'surface-raised': 'var(--color-surface-raised)',
+        subtle:  'var(--color-subtle)',
+        border:  { DEFAULT: 'var(--color-border)', input: 'var(--color-border-input)', strong: 'var(--color-border-strong)' },
+        text:    'var(--color-text)',
+        muted:   'var(--color-muted)',
+        faint:   'var(--color-faint)',
+        hover:   { DEFAULT: 'var(--color-hover)', subtle: 'var(--color-hover-subtle)' },
+        skeleton: 'var(--color-skeleton)',
+        // Accent scale: per-palette interactive color (buttons, focus rings, active states).
+        accent: {
+          DEFAULT: 'var(--accent)',
+          hover:   'var(--accent-hover)',
+          fg:      'var(--accent-fg)',
+          ring:    'var(--accent-ring)',
+        },
+        // Gray scale kept for backwards compat and internal palette scale reference.
         gray: {
-          50:  '#f8f8f8',
-          100: '#ebebeb',
-          200: '#e4e4e4',
-          300: '#cecece',
-          400: '#b4b4b4',
-          500: '#9b9b9b',
-          600: '#666666',
-          700: '#4d4d4d',
-          800: '#333333',
-          850: '#262626',
-          900: '#161616',
-          950: '#0d0d0d',
+          50:  'var(--p-50)',
+          100: 'var(--p-100)',
+          200: 'var(--p-200)',
+          300: 'var(--p-300)',
+          400: 'var(--p-400)',
+          500: 'var(--p-500)',
+          600: 'var(--p-600)',
+          700: 'var(--p-700)',
+          800: 'var(--p-800)',
+          850: 'var(--p-850)',
+          900: 'var(--p-900)',
+          950: 'var(--p-950)',
         },
       },
       borderRadius: {
@@ -44,7 +61,7 @@ export default {
         slow: '250ms',
       },
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'ui-sans-serif', 'system-ui'],
+        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },

@@ -7,12 +7,15 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.DEV ? '/' : '/admin/'),
   routes: [
     { path: '/login', component: () => import('@/pages/LoginPage.vue'), meta: { public: true } },
+    { path: '/setup', component: () => import('@/pages/OnboardingPage.vue'), meta: { public: true } },
     { path: '/', redirect: '/system-status' },
     { path: '/mfa', component: () => import('@/pages/MfaPage.vue') },
+    { path: '/api-tokens', component: () => import('@/pages/ApiTokensPage.vue'), meta: { adminOnly: true } },
     { path: '/users', component: () => import('@/pages/UsersPage.vue'), meta: { adminOnly: true } },
     { path: '/aliases', component: () => import('@/pages/AliasesPage.vue'), meta: { adminOnly: true } },
     { path: '/system-status', component: () => import('@/pages/SystemStatusPage.vue'), meta: { adminOnly: true } },
     { path: '/system-backup', component: () => import('@/pages/SystemBackupPage.vue'), meta: { adminOnly: true } },
+    { path: '/smtp-relay', component: () => import('@/pages/SmtpRelayPage.vue'), meta: { adminOnly: true } },
     { path: '/ssl', component: () => import('@/pages/SslPage.vue'), meta: { adminOnly: true } },
     { path: '/custom-dns', component: () => import('@/pages/CustomDnsPage.vue'), meta: { adminOnly: true } },
     { path: '/external-dns', component: () => import('@/pages/ExternalDnsPage.vue'), meta: { adminOnly: true } },
@@ -47,6 +50,16 @@ router.beforeEach((to) => {
   }
 
   const auth = useAuthStore()
+
+  // Bootstrap takes priority: no admins exist, send everyone to /setup.
+  if (auth.needsBootstrap && to.path !== '/setup') {
+    return '/setup'
+  }
+  // Once bootstrap is done, /setup should not be accessible.
+  if (!auth.needsBootstrap && to.path === '/setup') {
+    return '/login'
+  }
+
   if (to.path === '/login' && auth.isLoggedIn) {
     return auth.isAdmin ? '/system-status' : '/mfa'
   }

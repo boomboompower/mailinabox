@@ -1,0 +1,21 @@
+# Exclude large dev-only directories from the Docker build context.
+# Without this, docs/node_modules (~635MB), docs/.next (~184MB), and
+# frontend/node_modules (~139MB) get transferred on every build.
+
+.git
+
+# docs is a Next.js dev site, never needed inside containers
+docs/
+
+# frontend/node_modules is only needed in the management frontend-builder stage,
+# which runs `npm ci` itself - sending node_modules would just waste bandwidth
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+
+# Common dev artifacts
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+.pytest_cache/
+*.egg-info/

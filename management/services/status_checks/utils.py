@@ -194,10 +194,16 @@ def list_apt_updates(apt_update=True):
 def is_reboot_needed_due_to_package_installation():
 	return os.path.exists("/var/run/reboot-required")
 
+_VERSION_FILE = "/usr/local/share/mailinabox/version"
+
 def what_version_is_this(env):
-	# This function runs `git describe --always --abbrev=0` on the Mail-in-a-Box installation directory.
-	# Git may not be installed and Mail-in-a-Box may not have been cloned from github,
-	# so this function may raise all sorts of exceptions.
+	# Prefer the version written by the installer so this works even if the
+	# source repo is no longer present. Fall back to git for local dev.
+	if os.path.exists(_VERSION_FILE):
+		with open(_VERSION_FILE, encoding="utf-8") as f:
+			v = f.read().strip()
+		if v:
+			return v
 	miab_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 	return shell("check_output", ["/usr/bin/git", "describe", "--always", "--abbrev=0"], env={"GIT_DIR": os.path.join(miab_dir, '.git')}).strip()
 

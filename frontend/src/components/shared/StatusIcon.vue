@@ -15,7 +15,7 @@ const colorClass = computed(() =>
     ok: 'text-emerald-500',
     error: 'text-red-500',
     warning: 'text-yellow-500',
-    'not-applicable': 'text-gray-400',
+    'not-applicable': 'text-faint',
   }[props.status]),
 )
 </script>

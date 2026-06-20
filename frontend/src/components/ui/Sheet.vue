@@ -50,12 +50,12 @@ watch(open, async (val) => {
         aria-modal="true"
         :aria-label="title"
         tabindex="-1"
-        class="fixed inset-y-0 right-0 z-50 flex flex-col w-full sm:w-[480px] lg:w-[560px] bg-white dark:bg-gray-850 shadow-3xl rounded-l-2xl outline-none"
+        class="fixed inset-y-0 right-0 z-50 flex flex-col w-full sm:w-[480px] lg:w-[560px] bg-surface shadow-3xl rounded-l-2xl outline-none"
       >
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 shrink-0">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
           <h2 class="text-base font-semibold">{{ title }}</h2>
           <button
-            class="rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 size-8 flex items-center justify-center transition"
+            class="rounded-xl hover:bg-hover size-8 flex items-center justify-center transition"
             aria-label="Close"
             @click="open = false"
           >
@@ -66,10 +66,10 @@ watch(open, async (val) => {
           <slot />
         </div>
         <!-- danger slot: adds a top border divider before destructive actions -->
-        <div v-if="$slots.danger" class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 shrink-0">
+        <div v-if="$slots.danger" class="px-6 py-4 border-t border-border shrink-0">
           <slot name="danger" />
         </div>
-        <div v-if="$slots.footer" class="px-6 py-4 border-t border-gray-100 dark:border-gray-800 shrink-0">
+        <div v-if="$slots.footer" class="px-6 py-4 border-t border-border shrink-0">
           <slot name="footer" />
         </div>
       </div>

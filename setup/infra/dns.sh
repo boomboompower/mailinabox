@@ -136,6 +136,11 @@ fi
 	# And loop to do the next algorithm...
 done
 
+# Install the dns_update helper to a fixed path so the cron doesn't depend
+# on the source repo surviving after setup.
+cp --remove-destination setup/tools/dns_update /usr/local/lib/mailinabox/dns_update
+chmod +x /usr/local/lib/mailinabox/dns_update
+
 # Force the dns_update script to be run every day to re-sign zones for DNSSEC
 # before they expire. When we sign zones (in `dns_update.py`) we specify a
 # 30-day validation window, so we had better re-sign before then.
@@ -143,7 +148,7 @@ cat > /etc/cron.daily/mailinabox-dnssec << EOF;
 #!/bin/bash
 # Mail-in-a-Box
 # Re-sign any DNS zones with DNSSEC because the signatures expire periodically.
-$PWD/setup/tools/dns_update
+/usr/local/lib/mailinabox/dns_update
 EOF
 chmod +x /etc/cron.daily/mailinabox-dnssec
 

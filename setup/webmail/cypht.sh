@@ -42,7 +42,7 @@ fi
 # Keyed on script content hash so a script change (e.g. module list update)
 # forces a redeploy even when the version string hasn't changed.
 _cypht_deploy_key="${CYPHT_VERSION}:$(hash_files "$PWD/setup/webmail/cypht.sh")"
-if needs_build "cypht-webmail" "$_cypht_deploy_key"; then
+if needs_build "cypht-webmail" "$_cypht_deploy_key" || [ ! -d "$CYPHT_TARGET" ]; then
     echo "Installing Cypht vendor dependencies..."
     COMPOSER_ALLOW_SUPERUSER=1 hide_output composer install --no-dev --working-dir="$CYPHT_DIR"
     echo "Deploying Cypht..."

@@ -59,5 +59,17 @@ python3 setup/tools/editconf.py /etc/postfix/main.cf \
 python3 setup/tools/editconf.py /etc/postfix/main.cf \
     smtpd_recipient_restrictions="permit_sasl_authenticated,permit_mynetworks,reject_rbl_client zen.spamhaus.org=127.0.0.[2..11],reject_unlisted_recipient,check_policy_service inet:127.0.0.1:12340"
 
+if [ "${ENABLE_CLAMAV:-false}" = "true" ]; then
+    CLAMAV_HOST="${CLAMAV_HOST:-clamav}"
+    echo "Wiring Postfix milter to clamav-milter at ${CLAMAV_HOST}:7357..."
+    CURRENT_MILTERS=$(postconf -h smtpd_milters 2>/dev/null | sed 's/[[:space:]]*$//')
+    if [[ "$CURRENT_MILTERS" != *"${CLAMAV_HOST}:7357"* ]]; then
+        python3 setup/tools/editconf.py /etc/postfix/main.cf \
+            "smtpd_milters=${CURRENT_MILTERS:+$CURRENT_MILTERS }inet:${CLAMAV_HOST}:7357"
+        python3 setup/tools/editconf.py /etc/postfix/main.cf \
+            "non_smtpd_milters=\$smtpd_milters"
+    fi
+fi
+
 echo "Mail setup complete. Starting supervisord..."
 exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf

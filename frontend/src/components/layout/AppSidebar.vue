@@ -6,10 +6,10 @@ import { useAuthStore } from '@/stores/auth'
 import { useConfigStore } from '@/stores/config'
 import {
   Users, AtSign, Globe, ExternalLink, Activity, Database, Shield,
-  Lock, Layout, BookOpen, RefreshCw, BarChart2,
+  Lock, Key, Layout, BookOpen, RefreshCw, BarChart2, Send,
   ChevronLeft, ChevronRight, LogOut, Settings, Info, Sun, Moon, Monitor,
 } from 'lucide-vue-next'
-import type { NavGroup } from '@/types'
+import type { NavGroup, Palette } from '@/types'
 
 const props = defineProps<{ forceExpanded?: boolean }>()
 
@@ -33,6 +33,7 @@ const navGroups: NavGroup[] = [
       { label: 'Status', path: '/system-status', icon: Activity, adminOnly: true },
       { label: 'Backup', path: '/system-backup', icon: Database, adminOnly: true },
       { label: 'TLS', path: '/ssl', icon: Shield, adminOnly: true },
+      { label: 'Relay', path: '/smtp-relay', icon: Send, adminOnly: true },
     ],
   },
   {
@@ -46,6 +47,7 @@ const navGroups: NavGroup[] = [
     label: 'Settings',
     items: [
       { label: 'Two-Factor Auth', path: '/mfa', icon: Lock },
+      { label: 'API Tokens', path: '/api-tokens', icon: Key, adminOnly: true },
       { label: 'Web', path: '/web', icon: Layout, adminOnly: true },
     ],
   },
@@ -87,6 +89,21 @@ async function handleLogout(): Promise<void> {
   await auth.logout()
   await router.push('/login')
 }
+
+// Each entry: [palette id, display color, tooltip label]
+// Colors are sourced from each theme's canonical accent/primary values:
+// Oxi: primary from oxi globals.css; Indigo: from docs tailwind config;
+// Nord: Nord8 frost cyan (#88C0D0) from nordtheme.com palette;
+// Emerald: mid forest green representative of the muted green surface hue;
+// Catppuccin: Mocha mauve (#CBA6F7), the signature Catppuccin accent.
+const PALETTES: [Palette, string, string][] = [
+  ['zinc',       '#9b9b9b',  'Zinc'],
+  ['oxi',        'hsl(20 70% 50%)', 'Oxi'],
+  ['indigo',     '#6366f1',  'Indigo'],
+  ['nord',       '#88C0D0',  'Nord'],
+  ['emerald',    'hsl(152 42% 36%)', 'Emerald'],
+  ['catppuccin', '#CBA6F7',  'Catppuccin'],
+]
 </script>
 
 <template>
@@ -94,9 +111,9 @@ async function handleLogout(): Promise<void> {
     :class="[
       'fixed top-0 left-0 h-screen flex flex-col z-50 transition-all duration-300',
       forceExpanded
-        ? 'bg-gray-50 dark:bg-gray-950'
-        : 'bg-gray-50/70 dark:bg-gray-950/70 backdrop-blur-md',
-      collapsed ? 'w-14 px-[5px] border-e-[0.5px] border-gray-50 dark:border-gray-850/30' : 'w-[260px] px-3',
+        ? 'bg-sidebar'
+        : 'bg-sidebar backdrop-blur-md',
+      collapsed ? 'w-14 px-[5px] border-e-[0.5px] border-border' : 'w-[260px] px-3',
     ]"
   >
     <!--
@@ -112,7 +129,7 @@ async function handleLogout(): Promise<void> {
           v-if="!forceExpanded"
           :class="[
             'flex items-center justify-center transition rounded-xl',
-            collapsed ? 'size-9 hover:bg-gray-100 dark:hover:bg-gray-850' : 'size-7 hover:bg-gray-100 dark:hover:bg-gray-900',
+            collapsed ? 'size-9 hover:bg-hover' : 'size-7 hover:bg-hover',
           ]"
           :title="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
           @click="ui.toggleSidebar()"
@@ -125,8 +142,8 @@ async function handleLogout(): Promise<void> {
       <nav class="flex-1 overflow-y-auto space-y-4">
         <div v-for="group in visibleNavGroups" :key="group.label">
           <!-- Divider replaces section label in collapsed mode -->
-          <div v-if="collapsed" class="border-t border-gray-100 dark:border-gray-850/30 mx-1 mb-1" />
-          <p class="text-[10px] font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-400 px-2.5 overflow-hidden transition-[max-height,opacity] duration-300"
+          <div v-if="collapsed" class="border-t border-border mx-1 mb-1" />
+          <p class="text-[10px] font-semibold uppercase tracking-wider text-muted px-2.5 overflow-hidden transition-[max-height,opacity] duration-300"
              :class="collapsed ? 'max-h-0 opacity-0' : 'max-h-8 opacity-100 mb-1'">
             {{ group.label }}
           </p>
@@ -138,9 +155,9 @@ async function handleLogout(): Promise<void> {
               :class="[
                 'flex items-center transition',
                 collapsed
-                  ? 'mx-auto justify-center rounded-xl size-9 hover:bg-gray-100 dark:hover:bg-gray-850'
-                  : 'space-x-3 h-9 items-center rounded-2xl px-2.5 hover:bg-gray-100 dark:hover:bg-gray-900',
-                isActive(item.path) && 'bg-gray-100 dark:bg-gray-900',
+                  ? 'mx-auto justify-center rounded-xl size-9 hover:bg-hover'
+                  : 'space-x-3 h-9 items-center rounded-2xl px-2.5 hover:bg-hover',
+                isActive(item.path) ? 'bg-accent/10 text-accent font-medium' : '',
               ]"
               :title="collapsed ? item.label : undefined"
             >
@@ -159,25 +176,44 @@ async function handleLogout(): Promise<void> {
           :class="[
             'flex items-center transition',
             collapsed
-              ? 'mx-auto justify-center rounded-xl size-9 hover:bg-gray-100 dark:hover:bg-gray-850'
-              : 'w-full space-x-3 h-9 items-center rounded-2xl px-2.5 hover:bg-gray-100 dark:hover:bg-gray-900',
+              ? 'mx-auto justify-center rounded-xl size-9 hover:bg-hover'
+              : 'w-full space-x-3 h-9 items-center rounded-2xl px-2.5 hover:bg-hover',
           ]"
-          :title="collapsed ? 'Settings' : undefined"
+          :title="collapsed ? (auth.email || 'Account') : undefined"
           @click="settingsOpen = !settingsOpen"
         >
           <Settings class="size-4 shrink-0" />
-          <span class="text-sm whitespace-nowrap overflow-hidden transition-[max-width] duration-300" :class="collapsed ? 'max-w-0' : 'max-w-[200px]'">Settings</span>
+          <span class="text-sm whitespace-nowrap overflow-hidden transition-[max-width] duration-300" :class="collapsed ? 'max-w-0' : 'max-w-[200px]'">{{ auth.email || 'Account' }}</span>
         </button>
 
         <div
           v-if="settingsOpen"
-          class="absolute bottom-full mb-1 left-0 z-10 w-[240px] rounded-2xl px-1 py-1 border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-850 shadow-lg"
+          class="absolute bottom-full mb-1 left-0 z-10 w-[240px] rounded-2xl px-1 py-1 border border-border bg-surface shadow-lg"
         >
-          <div class="flex items-center gap-2 px-3 py-2 border-b border-gray-100 dark:border-gray-800 mb-1">
-            <Info class="size-4 text-gray-400 shrink-0" />
-            <div class="text-xs text-gray-500 truncate">{{ auth.email || 'Guest' }}</div>
+          <div class="flex items-center gap-2 px-3 py-2 border-b border-border mb-1">
+            <Info class="size-4 text-faint shrink-0" />
+            <div class="text-xs text-muted truncate">{{ auth.email || 'Guest' }}</div>
           </div>
-          <div class="flex items-center gap-1 px-2 py-1.5 border-b border-gray-100 dark:border-gray-800 mb-1">
+          <!-- Palette picker - 2 rows of 3 color dots -->
+          <div class="grid grid-cols-3 gap-1 px-2 py-1.5 border-b border-border mb-1">
+            <button
+              v-for="[p, color, label] in PALETTES"
+              :key="p"
+              :title="label"
+              class="flex items-center justify-center py-1.5 rounded-lg transition hover:bg-hover"
+              :class="ui.palette === p ? 'bg-hover' : ''"
+              @click="ui.setPalette(p)"
+            >
+              <span
+                class="size-4 rounded-full transition"
+                :style="ui.palette === p
+                  ? { background: color, outline: `2px solid ${color}`, outlineOffset: '2px' }
+                  : { background: color }"
+              />
+            </button>
+          </div>
+          <!-- Mode toggle -->
+          <div class="flex items-center gap-1 px-2 py-1.5 border-b border-border mb-1">
             <button
               v-for="[t, icon] in ([['light', Sun], ['system', Monitor], ['dark', Moon]] as const)"
               :key="t"
@@ -185,8 +221,8 @@ async function handleLogout(): Promise<void> {
               :class="[
                 'flex-1 flex items-center justify-center py-1 rounded-lg transition',
                 ui.theme === t
-                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
-                  : 'text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800/50',
+                  ? 'bg-hover text-text'
+                  : 'text-faint hover:bg-hover-subtle',
               ]"
               @click="ui.setTheme(t)"
             >
@@ -194,7 +230,7 @@ async function handleLogout(): Promise<void> {
             </button>
           </div>
           <button
-            class="flex w-full items-center gap-2 rounded-xl py-1.5 px-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition text-gray-700 dark:text-gray-300"
+            class="flex w-full items-center gap-2 rounded-xl py-1.5 px-3 text-sm hover:bg-hover-subtle transition text-text"
             @click="handleLogout"
           >
             <LogOut class="size-4 shrink-0" />

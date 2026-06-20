@@ -62,7 +62,7 @@ if needs_build "management-pip" "$_pip_hash"; then
 			flask dnspython python-dateutil expiringdict gunicorn \
 			qrcode[pil] pyotp "fido2>=1.0" \
 			"idna>=2.0.0" "cryptography>=41.0.0" psutil postfix-mta-sts-resolver \
-			"passlib[bcrypt]"
+			"passlib[bcrypt]" "bcrypt<4"
 
 		if [ "$BACKUP_TOOL" = "duplicity" ]; then
 			# duplicity lives in the venv so system pip is never touched
@@ -153,7 +153,7 @@ tr -cd '[:xdigit:]' < /dev/urandom | head -c 32 > /var/lib/mailinabox/api.key
 chmod 640 /var/lib/mailinabox/api.key
 
 source $venv/bin/activate
-export PYTHONPATH=$PWD/management
+export PYTHONPATH=$inst_dir/management
 exec gunicorn -b 127.0.0.1:10222 -w 1 --timeout 630 core.wsgi:app
 EOF
 chmod +x $inst_dir/start
@@ -170,7 +170,7 @@ if [ "${RUNTIME:-baremetal}" = "baremetal" ]; then
 	cat > /etc/cron.d/mailinabox-nightly << EOF;
 # Mail-in-a-Box --- Do not edit / will be overwritten on update.
 # Run nightly tasks: backup, status checks.
-$minute 1 * * *	root	(cd $PWD && management/scripts/daily_tasks.sh)
+$minute 1 * * *	root	(cd $inst_dir && management/scripts/daily_tasks.sh)
 EOF
 fi
 
@@ -182,8 +182,8 @@ fi
 # commit it's on, only whether frontend/'s contents match something CI has
 # already built.
 _fe_hash=$(hash_files "$PWD/frontend")
-if needs_build "management-frontend" "$_fe_hash"; then
-	FE_DIST_DIR="$PWD/frontend/dist"
+FE_DIST_DIR="$PWD/frontend/dist"
+if needs_build "management-frontend" "$_fe_hash" || [ ! -d "$FE_DIST_DIR" ]; then
 	FE_TAG="frontend-$_fe_hash"
 	FE_URL="https://github.com/boomboompower/mailinabox/releases/download/$FE_TAG/frontend-dist.tar.gz"
 	_fe_fetched=0
@@ -236,6 +236,32 @@ if needs_build "management-frontend" "$_fe_hash"; then
 	fi
 
 	mark_built "management-frontend" "$_fe_hash"
+fi
+
+# Install read-only data files to the FHS-correct share directory so the
+# daemon and web_update don't depend on the repo surviving after setup.
+share_dir=/usr/local/share/mailinabox
+mkdir -p $share_dir/frontend/dist $share_dir/nginx-templates
+rsync -a --delete frontend/dist/ $share_dir/frontend/dist/
+rsync -a --delete setup/conf/nginx/ $share_dir/nginx-templates/
+rsync -a --delete management/ $inst_dir/management/
+rsync -a --delete setup/boxctl/ $inst_dir/boxctl/
+
+# Install boxctl as a standalone command so `sudo boxctl` and `sudo mailinabox` both work
+# after setup, even if the repo directory is deleted.
+cat > /usr/local/bin/boxctl << EOF
+#!/bin/bash
+export PYTHONPATH=$inst_dir
+exec $venv/bin/python3 -m boxctl "\$@"
+EOF
+chmod +x /usr/local/bin/boxctl
+# VERSION file is written by the release workflow into the tarball root (git
+# archive strips history so git describe returns nothing when run from there).
+# Fall back to git describe for local dev runs where the file won't exist.
+if [ -f VERSION ]; then
+	cp VERSION $share_dir/version
+else
+	git describe --always --abbrev=0 2>/dev/null > $share_dir/version || true
 fi
 
 # Join the background pip install before starting the daemon.

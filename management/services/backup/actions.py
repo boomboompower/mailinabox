@@ -3,6 +3,24 @@ import sys
 
 from core.utils import load_environment, shell
 
+def _atomic_json_write(path, data):
+	"""Write data as JSON to path atomically (temp-file + os.replace) with 0o600 permissions."""
+	import json, tempfile
+	dir_ = os.path.dirname(path)
+	os.makedirs(dir_, exist_ok=True)
+	fd, tmp = tempfile.mkstemp(dir=dir_, suffix=".tmp")
+	try:
+		with os.fdopen(fd, "w", encoding="utf-8") as f:
+			json.dump(data, f)
+		os.chmod(tmp, 0o600)
+		os.replace(tmp, path)
+	except Exception:
+		try:
+			os.unlink(tmp)
+		except OSError:
+			pass
+		raise
+
 def _email_administrator(subject, body):
 	# email_administrator.py is a script, not an importable module - it reads
 	# sys.argv/stdin and runs top-level code unconditionally, so it must be
@@ -42,25 +60,27 @@ def _checkpoint_sqlite_databases(storage_root):
 			conn = sqlite3.connect(str(db_path), timeout=10)
 			conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
 			conn.close()
-		except Exception:
-			pass
+		except Exception as e:
+			print(f"WARNING: WAL checkpoint failed for {db_path}: {e}", file=sys.stderr)
 
 def _run_pre_script(env, backup_root, config):
 	# Execute a pre-backup script that copies files outside the homedir.
 	# Run as the STORAGE_USER user, not as root. Pass our settings in
 	# environment variables so the script has access to STORAGE_ROOT.
+	# The backup target URL is available to the script as $BACKUP_TARGET.
+	# (Passing it as a positional arg via 'su -c cmd arg' makes it $0, not $1.)
 	pre_script = os.path.join(backup_root, 'before-backup')
 	if os.path.exists(pre_script):
 		shell('check_call',
-			['su', env['STORAGE_USER'], '-c', pre_script, config["target"]],
-			env=env)
+			['su', env['STORAGE_USER'], '-c', pre_script],
+			env={**env, 'BACKUP_TARGET': config["target"]})
 
 def _run_post_script(env, backup_root, config):
 	post_script = os.path.join(backup_root, 'after-backup')
 	if os.path.exists(post_script):
 		shell('check_call',
-			['su', env['STORAGE_USER'], '-c', post_script, config["target"]],
-			env=env)
+			['su', env['STORAGE_USER'], '-c', post_script],
+			env={**env, 'BACKUP_TARGET': config["target"]})
 
 def _perform_backup_duplicity(env, config, full_backup):
 	from .duplicity_args import DUPLICITY, get_duplicity_additional_args, get_duplicity_env_vars, get_duplicity_target_url
@@ -142,6 +162,9 @@ def _perform_backup_duplicity(env, config, full_backup):
 	if get_target_type(config) == 'file':
 		shell('check_call', ["/bin/chown", "-R", env["STORAGE_USER"], backup_dir])
 
+	if config.get("check_after_backup", True):
+		_verify_duplicity(env, config, backup_cache_dir)
+
 	_run_post_script(env, backup_root, config)
 
 def _restic_repo_exists(repo, extra_args, restic_env):
@@ -176,13 +199,20 @@ def _perform_backup_restic(env, config):
 	_run_pre_script(env, backup_root, config)
 
 	# Back up STORAGE_ROOT, excluding the backup directories themselves.
-	shell('check_call', [
+	# --json emits a final summary line with snapshot_id, data_added,
+	# total_bytes_processed, and total_files_processed - captured for the
+	# stats cache so the status page never needs extra restic calls.
+	code, backup_output = shell('check_output', [
 		RESTIC, "-r", repo, "backup",
+		"--json",
 		"--exclude", backup_root,
 		"--exclude", os.path.join(env["STORAGE_ROOT"], "owncloud-backup"),
 		*extra_args,
 		env["STORAGE_ROOT"],
-		], restic_env)
+		], restic_env, trap=True, capture_stderr=False)
+	if code != 0:
+		raise Exception("restic backup failed:\n" + backup_output)
+	_cache_restic_snapshot_stats(env, backup_output)
 
 	# Pruning lifecycle guarantee: forget --keep-within {N}d --prune always
 	# runs immediately after a successful backup. It is never skipped. If it
@@ -192,8 +222,132 @@ def _perform_backup_restic(env, config):
 	# taken - but the failure must surface as a non-fatal operational error
 	# through both logging and email_administrator.py, never silently swallowed.
 	_prune_restic(repo, extra_args, restic_env, config)
+	if config.get("check_after_backup", True):
+		_verify_restic(repo, extra_args, restic_env, env)
 
 	_run_post_script(env, backup_root, config)
+
+def _cache_restic_snapshot_stats(env, backup_output):
+	import json
+	# The backup --json output is multiple JSON lines. The last line with
+	# message_type "summary" has everything we need.
+	summary = None
+	for line in backup_output.splitlines():
+		line = line.strip()
+		if not line:
+			continue
+		try:
+			obj = json.loads(line)
+			if obj.get("message_type") == "summary":
+				summary = obj
+		except (ValueError, KeyError):
+			pass
+	if not summary or not summary.get("snapshot_id"):
+		print("WARNING: restic backup produced no summary line - snapshot stats will not be cached", file=sys.stderr)
+		return
+
+	cache_path = _restic_stats_cache_path(env)
+	try:
+		with open(cache_path, encoding="utf-8") as f:
+			cache = json.load(f)
+	except (FileNotFoundError, ValueError):
+		cache = {}
+	if "snapshots" not in cache:
+		# Migrate old format where snapshot IDs were top-level keys
+		cache = {"snapshots": {k: v for k, v in cache.items() if k != "last_check"}}
+
+	cache["snapshots"][summary["snapshot_id"]] = {
+		"restore_size": summary.get("total_bytes_processed", 0),
+		"data_added": summary.get("data_added", 0),
+		"file_count": summary.get("total_files_processed", 0),
+	}
+
+	_atomic_json_write(cache_path, cache)
+
+def _restic_stats_cache_path(env):
+	return os.path.join(env["STORAGE_ROOT"], "backup", "cache", "restic-snapshot-stats.json")
+
+def _restic_check_cache_path(env):
+	return os.path.join(env["STORAGE_ROOT"], "backup", "cache", "restic-check.json")
+
+def _duplicity_check_cache_path(env):
+	return os.path.join(env["STORAGE_ROOT"], "backup", "cache", "duplicity-check.json")
+
+def _verify_duplicity(env, config, backup_cache_dir):
+	import datetime, subprocess
+	from .duplicity_args import DUPLICITY, get_duplicity_additional_args, get_duplicity_env_vars, get_duplicity_target_url
+	# collection-status verifies the backup chain is intact without downloading data.
+	# Timeout prevents a hung check from blocking future backups. Default 10 min; override
+	# with check_timeout_seconds in custom.yaml.
+	timeout = int(config.get("check_timeout_seconds", 600))
+	dup_env = {**get_duplicity_env_vars(env), "PATH": "/sbin:/bin:/usr/sbin:/usr/bin"}
+	try:
+		result = subprocess.run(
+			[
+				DUPLICITY, "collection-status",
+				"--archive-dir", backup_cache_dir,
+				"--gpg-options", "'--cipher-algo=AES256'",
+				"--log-fd", "1",
+				*get_duplicity_additional_args(env),
+				get_duplicity_target_url(config),
+			],
+			env=dup_env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+			timeout=1800,
+		)
+		passed = result.returncode == 0
+		output = result.stdout.decode(errors="replace").strip()
+	except subprocess.TimeoutExpired:
+		passed = False
+		output = f"duplicity collection-status timed out after {timeout // 60} minutes"
+
+	_atomic_json_write(_duplicity_check_cache_path(env), {
+		"passed": passed,
+		"timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+		"output": output if not passed else "",
+	})
+
+	if not passed:
+		warning = f"duplicity collection-status failed after backup - your backup chain may have integrity issues:\n\n{output}"
+		print(f"WARNING: {warning}", file=sys.stderr)
+		try:
+			_email_administrator("Backup Integrity Check Failed", warning)
+		except Exception as e:
+			print(f"WARNING: could not send admin email: {e}", file=sys.stderr)
+
+def _verify_restic(repo, extra_args, restic_env, env):
+	import datetime, subprocess
+	from .restic_args import RESTIC
+	from .config import get_backup_config as _get_cfg
+	# Timeout prevents a hung check from holding the process lock and blocking future backups.
+	# Default is 10 minutes; override with check_timeout_seconds in custom.yaml.
+	cfg = _get_cfg(env)
+	timeout = int(cfg.get("check_timeout_seconds", 600))
+	try:
+		result = subprocess.run(
+			[RESTIC, "-r", repo, "check", *extra_args],
+			env={**restic_env, "PATH": "/sbin:/bin:/usr/sbin:/usr/bin"},
+			stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+			timeout=timeout,
+		)
+		passed = result.returncode == 0
+		output = result.stdout.decode(errors="replace").strip()
+	except subprocess.TimeoutExpired:
+		passed = False
+		output = f"restic check timed out after {timeout // 60} minutes"
+
+	_atomic_json_write(_restic_check_cache_path(env), {
+		"passed": passed,
+		"timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+		"output": output if not passed else "",
+	})
+
+	if not passed:
+		warning = f"restic check failed after backup - your repository may have integrity issues:\n\n{output}"
+		print(f"WARNING: {warning}", file=sys.stderr)
+		try:
+			_email_administrator("Backup Integrity Check Failed", warning)
+		except Exception as e:
+			print(f"WARNING: could not send admin email: {e}", file=sys.stderr)
 
 def _prune_restic(repo, extra_args, restic_env, config):
 	from .restic_args import RESTIC
@@ -216,8 +370,8 @@ def _prune_restic(repo, extra_args, restic_env, config):
 	print(f"WARNING: {warning}", file=sys.stderr)
 	try:
 		_email_administrator("Backup Retention Warning", warning)
-	except Exception:
-		pass
+	except Exception as e:
+		print(f"WARNING: could not send admin email: {e}", file=sys.stderr)
 
 def run_duplicity_verification():
 	from .config import get_backup_config
@@ -271,7 +425,9 @@ def verify_backup():
 		repo = get_restic_repository(env, config)
 		extra_args = get_restic_extra_args(env, config)
 		restic_env = get_restic_env_vars(env, config)
-		shell('check_call', [RESTIC, "-r", repo, "check", *extra_args], restic_env)
+		# --read-data downloads and verifies every data blob - this is the full check,
+		# distinct from the lightweight post-backup check which omits this flag.
+		shell('check_call', [RESTIC, "-r", repo, "check", "--read-data", *extra_args], restic_env)
 	else:
 		run_duplicity_verification()
 
