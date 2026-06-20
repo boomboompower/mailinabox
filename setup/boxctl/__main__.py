@@ -1,4 +1,4 @@
-"""Entry point: python3 setup/boxctl [docker|questions|firstuser|doctor]"""
+"""Entry point: python3 setup/boxctl [docker|questions|bootstrap|doctor]"""
 
 import argparse, os, signal, sys, termios
 
@@ -7,11 +7,11 @@ import argparse, os, signal, sys, termios
 if __package__ in (None, ''):
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     from boxctl.questions import STEPS, VALUE_DISPLAY
-    from boxctl.runner import run_questions, run_firstuser, write_output, load_conf
+    from boxctl.runner import run_questions, write_output, load_conf
     from boxctl.ui import select_prompt, clear, bold, gray_desc, green, red, _term_width
 else:
     from .questions import STEPS, VALUE_DISPLAY
-    from .runner import run_questions, run_firstuser, write_output, load_conf
+    from .runner import run_questions, write_output, load_conf
     from .ui import select_prompt, clear, bold, gray_desc, green, red, _term_width
 
 BARE_METAL_CONF = "/etc/mailinabox.conf"
@@ -90,7 +90,93 @@ def _preflight():
     return True
 
 
+def _run_update():
+    import os, subprocess, sys, tarfile, tempfile, urllib.request
+
+    # Docker users update by pulling a new image, not by running setup.
+    if os.path.exists("/.dockerenv") or os.environ.get("container") == "docker":
+        print("boxctl update is only available on bare metal installs.")
+        print("To update a Docker deployment, pull a new image and restart your containers.")
+        sys.exit(1)
+
+    if os.geteuid() != 0:
+        print("boxctl update must be run as root (sudo boxctl update).")
+        sys.exit(1)
+
+    # /releases/latest excludes prereleases, so frontend hash builds never appear here.
+    api_url = "https://api.github.com/repos/boomboompower/mailinabox/releases/latest"
+    print("Fetching latest release info...")
+    try:
+        with urllib.request.urlopen(api_url, timeout=15) as r:
+            import json
+            release = json.loads(r.read())
+    except Exception as e:
+        print(f"Failed to fetch release info: {e}")
+        sys.exit(1)
+
+    version = release.get("tag_name", "unknown")
+    tarball_url = release.get("tarball_url")
+    if not tarball_url:
+        print("No versioned release found. Check https://github.com/boomboompower/mailinabox/releases")
+        sys.exit(1)
+
+    current_version = ""
+    version_file = "/usr/local/share/mailinabox/version"
+    if os.path.exists(version_file):
+        with open(version_file) as f:
+            current_version = f.read().strip()
+
+    if current_version == version:
+        print(f"Already on the latest version ({version}).")
+        answer = input("Re-run setup anyway? [y/N] ").strip().lower()
+        if answer != "y":
+            sys.exit(0)
+    else:
+        print(f"Updating from {current_version or 'unknown'} to {version}...")
+
+    with tempfile.TemporaryDirectory(prefix="miab-update-") as tmp:
+        tarball = os.path.join(tmp, "release.tar.gz")
+        print("Downloading...")
+        try:
+            urllib.request.urlretrieve(tarball_url, tarball)
+        except Exception as e:
+            print(f"Download failed: {e}")
+            sys.exit(1)
+
+        print("Extracting...")
+        with tarfile.open(tarball, "r:gz") as tf:
+            tf.extractall(tmp)
+
+        # GitHub tarballs extract to a single top-level directory.
+        subdirs = [d for d in os.listdir(tmp) if os.path.isdir(os.path.join(tmp, d)) and d != "__MACOSX"]
+        if len(subdirs) != 1:
+            print("Unexpected tarball structure.")
+            sys.exit(1)
+        repo_dir = os.path.join(tmp, subdirs[0])
+
+        print(f"Running setup from {version}...")
+        result = subprocess.run(["bash", "setup/start.sh"], cwd=repo_dir)
+        sys.exit(result.returncode)
+
+
 def main():
+    # bootstrap and update don't need an interactive terminal - exempt them
+    # before the TTY check so they work when called from setup scripts.
+    if len(sys.argv) > 1 and sys.argv[1] in ('bootstrap', 'update'):
+        p = argparse.ArgumentParser(add_help=False)
+        p.add_argument('command')
+        p.add_argument('--show-cert', action='store_true')
+        _quick, _ = p.parse_known_args()
+        if _quick.command == 'bootstrap':
+            if __package__ in (None, ''):
+                from boxctl.bootstrap import run as run_bootstrap
+            else:
+                from .bootstrap import run as run_bootstrap
+            run_bootstrap(show_cert=_quick.show_cert)
+        elif _quick.command == 'update':
+            _run_update()
+        return
+
     if not sys.stdin.isatty():
         sys.exit("Interactive terminal required")
 
@@ -135,12 +221,6 @@ def main():
     pq.add_argument("--ask-backup-tool",  action="store_true", help="ask which backup tool to use (restic or duplicity)")
     pq.add_argument("--ask-timezone",     action="store_true", help="ask for the server timezone")
 
-    # ── bare metal: firstuser ──────────────────────────────────────────────────
-    pf = sub.add_parser("firstuser",
-                        help="create the first admin mail account (called by setup/firstuser.sh)")
-    pf.add_argument("--output",           required=True, help="file to write answers to")
-    pf.add_argument("--default-hostname", default="",   help="used to suggest a default email address")
-
     # ── docker wizard ──────────────────────────────────────────────────────────
     pd = sub.add_parser("docker",
                         help="interactive Docker Compose setup - writes .env and prints the compose command")
@@ -152,6 +232,16 @@ def main():
                          help="check service health and swap services on a running box")
     pd2.add_argument("--check", action="store_true",
                      help="non-interactive: print service status and exit (non-zero if any degraded)")
+
+    # ── bootstrap ──────────────────────────────────────────────────────────────
+    pb = sub.add_parser("bootstrap",
+                   help="generate a one-time setup code to create the first admin account via the web UI")
+    pb.add_argument("--show-cert", action="store_true",
+                    help="also print the TLS certificate fingerprint (useful when DNS is not yet resolving)")
+
+    # ── update (bare metal only) ───────────────────────────────────────────────
+    sub.add_parser("update",
+                   help="fetch the latest release from GitHub and re-run setup (bare metal only)")
 
     args = p.parse_args()
 
@@ -193,12 +283,6 @@ def main():
             results = run_questions(active, args, VALUE_DISPLAY, initial=initial, all_steps=all_steps)
             write_output(args.output, results)
 
-        elif args.command == "firstuser":
-            conf = load_conf(BARE_METAL_CONF)
-            args.existing_email = conf.get("EMAIL_ADDR", "")
-            results = run_firstuser(args)
-            write_output(args.output, results)
-
         elif args.command == "docker":
             if __package__ in (None, ''):
                 from boxctl.docker import run as run_docker
@@ -212,6 +296,16 @@ def main():
             else:
                 from .doctor import run as run_doctor
             run_doctor(check=getattr(args, "check", False))
+
+        elif args.command == "bootstrap":
+            if __package__ in (None, ''):
+                from boxctl.bootstrap import run as run_bootstrap
+            else:
+                from .bootstrap import run as run_bootstrap
+            run_bootstrap(show_cert=getattr(args, 'show_cert', False))
+
+        elif args.command == "update":
+            _run_update()
 
     except KeyboardInterrupt:
         print("\n\n  Setup cancelled.\n")

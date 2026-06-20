@@ -16,14 +16,14 @@ const props = withDefaults(
 
 const classes = computed(() => {
   const base =
-    'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 dark:focus-visible:ring-gray-600 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
+    'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'
 
   const variants: Record<ButtonVariant, string> = {
     primary:
-      'bg-black text-white hover:bg-gray-900 dark:bg-white dark:text-black dark:hover:bg-gray-100',
+      'bg-accent text-accent-fg hover:bg-accent-hover',
     secondary:
-      'bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-gray-850 dark:text-gray-100 dark:hover:bg-gray-800',
-    ghost: 'hover:bg-gray-100 dark:hover:bg-gray-900 text-gray-700 dark:text-gray-300',
+      'bg-surface text-text hover:bg-hover',
+    ghost: 'hover:bg-hover text-text',
     destructive: 'bg-red-600 text-white hover:bg-red-700',
   }
 

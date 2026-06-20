@@ -6,6 +6,7 @@ import { toast } from 'vue-sonner'
 import { useAuthStore } from '@/stores/auth'
 import { useConfigStore } from '@/stores/config'
 import Button from '@/components/ui/Button.vue'
+import Checkbox from '@/components/ui/Checkbox.vue'
 import Input from '@/components/ui/Input.vue'
 import Card from '@/components/ui/Card.vue'
 import PageBackground from '@/components/ui/PageBackground.vue'
@@ -146,7 +147,7 @@ function backToEmail(): void {
       <h1 class="text-2xl font-semibold text-center mb-1">
         {{ config.hostname || 'Mail-in-a-Box' }}
       </h1>
-      <p class="text-sm text-gray-500 text-center mb-7">Control panel</p>
+      <p class="text-sm text-muted text-center mb-7">Control panel</p>
 
       <!-- Email step -->
       <form v-if="step === 'email'" class="space-y-4" @submit.prevent="continueFromEmail">
@@ -155,8 +156,8 @@ function backToEmail(): void {
           <Input id="loginEmail" v-model="email" type="email" autocomplete="email" required />
         </div>
         <div class="flex items-center gap-2">
-          <input id="rememberEmail" v-model="rememberEmail" type="checkbox" class="size-4 rounded" />
-          <label for="rememberEmail" class="text-sm text-gray-500">Remember email</label>
+          <Checkbox id="rememberEmail" v-model="rememberEmail" />
+          <label for="rememberEmail" class="text-sm text-muted">Remember email</label>
         </div>
         <Button type="submit" class="w-full" :disabled="loading">
           {{ loading ? 'Checking...' : 'Continue' }}
@@ -166,8 +167,8 @@ function backToEmail(): void {
       <!-- Password / TOTP step -->
       <form v-else-if="step === 'password' || step === 'totp'" class="space-y-4" @submit.prevent="submitPassword">
         <div class="flex items-center justify-between text-sm mb-1">
-          <span class="text-gray-500">{{ email }}</span>
-          <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" @click="backToEmail">
+          <span class="text-muted">{{ email }}</span>
+          <button type="button" class="text-faint hover:text-text transition-colors" @click="backToEmail">
             Change
           </button>
         </div>
@@ -198,8 +199,8 @@ function backToEmail(): void {
       <!-- Passkey step -->
       <div v-else-if="step === 'passkey'" class="space-y-4">
         <div class="flex items-center justify-between text-sm mb-1">
-          <span class="text-gray-500">{{ email }}</span>
-          <button type="button" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" @click="backToEmail">
+          <span class="text-muted">{{ email }}</span>
+          <button type="button" class="text-faint hover:text-text transition-colors" @click="backToEmail">
             Change
           </button>
         </div>
@@ -211,7 +212,7 @@ function backToEmail(): void {
         <button
           v-if="availablePaths.includes('password') || availablePaths.includes('password+totp')"
           type="button"
-          class="w-full text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors py-2"
+          class="w-full text-sm text-muted hover:text-text transition-colors py-2"
           @click="step = 'password'"
         >
           Use password instead

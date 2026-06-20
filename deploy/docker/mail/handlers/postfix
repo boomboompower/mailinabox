@@ -1,5 +1,67 @@
 #!/bin/bash
+set -euo pipefail
+source /etc/mailinabox.conf
+
 case "$1" in
-    reload)  postfix reload ;;
-    restart) supervisorctl restart postfix ;;
+    reload)
+        postfix reload
+        ;;
+    restart)
+        supervisorctl restart postfix
+        ;;
+    configure-relay)
+        # Apply relay credentials and main.cf directives. Called by the management
+        # container when relay config changes - this container has the Postfix tools.
+        RELAY_DIR="$STORAGE_ROOT/mail/relay"
+        SASL_PASSWD="$RELAY_DIR/sasl_passwd"
+        SASL_PASSWD_DB="$RELAY_DIR/sasl_passwd.db"
+
+        # Read relay config from settings.yaml (host/port/user - no password there).
+        eval "$(python3 - <<'PYEOF'
+import os, sys
+storage = os.environ.get('STORAGE_ROOT', '/home/user-data')
+try:
+    import rtyaml
+    with open(f'{storage}/settings.yaml', encoding='utf-8') as f:
+        cfg = rtyaml.load(f) or {}
+    r = cfg.get('smtp_relay', {})
+    host = r.get('host', '') or ''
+    port = str(r.get('port', 587))
+except Exception:
+    host = ''
+    port = '587'
+import shlex
+print(f"RELAY_HOST={shlex.quote(host)}")
+print(f"RELAY_PORT={shlex.quote(port)}")
+PYEOF
+        )"
+
+        # If a staged plaintext credential file exists, build the .db from it and delete it.
+        if [ -f "$SASL_PASSWD" ]; then
+            mkdir -p "$RELAY_DIR"
+            chmod 700 "$RELAY_DIR"
+            postmap "$SASL_PASSWD"
+            chmod 600 "$SASL_PASSWD_DB"
+            rm -f "$SASL_PASSWD"
+        fi
+
+        if [ -n "$RELAY_HOST" ]; then
+            postconf -e \
+                "relayhost=[$RELAY_HOST]:$RELAY_PORT" \
+                "smtp_sasl_auth_enable=yes" \
+                "smtp_sasl_password_maps=hash:$STORAGE_ROOT/mail/relay/sasl_passwd" \
+                "smtp_sasl_security_options=noanonymous" \
+                "smtp_tls_security_level=verify"
+        else
+            postconf -e \
+                "relayhost=" \
+                "smtp_sasl_auth_enable=no" \
+                "smtp_sasl_password_maps=" \
+                "smtp_sasl_security_options=" \
+                "smtp_tls_security_level=dane"
+            rm -f "$SASL_PASSWD" "$SASL_PASSWD_DB"
+        fi
+
+        postfix reload
+        ;;
 esac

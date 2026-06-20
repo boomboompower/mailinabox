@@ -3,5 +3,5 @@ defineProps<{ class?: string }>()
 </script>
 
 <template>
-  <div class="animate-pulse rounded bg-gray-200 dark:bg-gray-800" :class="$props.class" />
+  <div class="animate-pulse rounded bg-skeleton" :class="$props.class" />
 </template>

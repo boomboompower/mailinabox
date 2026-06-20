@@ -19,40 +19,32 @@ if host "$PRIMARY_HOSTNAME.dbl.spamhaus.org" > /dev/null; then
 	exit 1
 fi
 
-# Stop if the IPv4 address is listed in the ZEN Spamhouse Block List.
-# The user might have ended up on an IP address that was previously in use
-# by a spammer, or the user may be deploying on a residential network. We
-# will not be able to reliably send mail in these cases.
+# Warn if the IPv4 address is listed in the ZEN Spamhaus Block List.
+# A listed IP affects outbound mail reputation, but can be mitigated by
+# configuring an outbound SMTP relay in the admin panel after setup.
 REVERSED_IPV4=$(echo "$PUBLIC_IP" | sed "s/\([0-9]*\).\([0-9]*\).\([0-9]*\).\([0-9]*\)/\4.\3.\2.\1/")
 if host "$REVERSED_IPV4.zen.spamhaus.org" > /dev/null; then
 	echo
-	echo "The IP address $PUBLIC_IP is listed in the Spamhaus Block List."
+	echo "WARNING: The IP address $PUBLIC_IP is listed in the Spamhaus Block List."
 	echo "See http://www.spamhaus.org/query/ip/$PUBLIC_IP."
 	echo
-	echo "You will not be able to send mail using this machine, so setup"
-	echo "cannot continue."
+	echo "Direct mail delivery may be unreliable from this IP. After setup"
+	echo "completes, configure an outbound SMTP relay in the admin panel"
+	echo "under System -> Outbound Mail Relay to route mail through a"
+	echo "reputable provider instead."
 	echo
-	echo "Associate a different IP address with this machine if possible."
-	echo "Many residential network IP addresses are listed, so Mail-in-a-Box"
-	echo "typically cannot be used on a residential Internet connection."
-	echo
-	exit 1
 fi
 
-# Stop if we cannot make an outbound connection on port 25. Many residential
-# networks block outbound port 25 to prevent their network from sending spam.
-# See if we can reach one of Google's MTAs with a 5-second timeout.
+# Warn if we cannot make an outbound connection on port 25. Many residential
+# networks and some cloud providers block outbound port 25. This is recoverable
+# by configuring an outbound relay after setup.
 if ! nc -z -w5 aspmx.l.google.com 25; then
 	echo
-	echo "Outbound mail (port 25) seems to be blocked by your network."
+	echo "WARNING: Outbound port 25 appears to be blocked on this machine."
 	echo
-	echo "You will not be able to send mail using this machine, so setup"
-	echo "cannot continue."
+	echo "Direct mail delivery will not work. After setup completes,"
+	echo "configure an outbound SMTP relay in the admin panel under"
+	echo "System -> Outbound Mail Relay to send mail through an external"
+	echo "provider (SendGrid, Mailgun, Amazon SES, etc.)."
 	echo
-	echo "Many residential networks block port 25 to prevent hijacked"
-	echo "machines from being able to send spam. I just tried to connect"
-	echo "to Google's mail server on port 25 but the connection did not"
-	echo "succeed."
-	echo
-	exit 1
 fi

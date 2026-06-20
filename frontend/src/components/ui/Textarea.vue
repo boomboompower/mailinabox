@@ -12,6 +12,6 @@ defineProps<{ placeholder?: string; rows?: number; disabled?: boolean }>()
     :placeholder="placeholder"
     :rows="rows ?? 3"
     :disabled="disabled"
-    class="w-full rounded-lg py-2 px-4 text-sm bg-gray-50 dark:bg-gray-850 dark:text-gray-300 outline-none border border-gray-200 dark:border-gray-700 focus:border-gray-400 dark:focus:border-gray-500 transition-colors resize-none"
+    class="w-full rounded-lg py-2 px-4 text-sm bg-subtle text-text outline-none border border-border-input focus:border-accent ring-2 ring-transparent focus:ring-accent-ring transition-colors resize-none"
   />
 </template>

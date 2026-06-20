@@ -93,8 +93,11 @@ def do_web_update(env):
 	ssl_certificates = get_ssl_certificates(env)
 
 	# Helper for reading config files and templates
+	_NGINX_TEMPLATES = "/usr/local/share/mailinabox/nginx-templates"
+	_NGINX_TEMPLATES_FALLBACK = os.path.join(os.path.dirname(__file__), "../../setup/conf/nginx")
 	def read_conf(conf_fn):
-		with open(os.path.join(os.path.dirname(__file__), "../../setup/conf/nginx", conf_fn), encoding='utf-8') as f:
+		base = _NGINX_TEMPLATES if os.path.isdir(_NGINX_TEMPLATES) else _NGINX_TEMPLATES_FALLBACK
+		with open(os.path.join(base, conf_fn), encoding='utf-8') as f:
 			return f.read()
 
 	# Build an nginx configuration file.

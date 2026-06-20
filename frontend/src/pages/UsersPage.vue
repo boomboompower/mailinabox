@@ -4,6 +4,9 @@ import { toast } from 'vue-sonner'
 import { UserPlus } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
+import Field from '@/components/ui/Field.vue'
+import Checkbox from '@/components/ui/Checkbox.vue'
 import Input from '@/components/ui/Input.vue'
 import Table from '@/components/ui/Table.vue'
 import TableRow from '@/components/ui/TableRow.vue'
@@ -144,10 +147,11 @@ onMounted(load)
 
 <template>
   <AppLayout>
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-semibold">Users</h1>
-      <Button @click="openAdd">Add User</Button>
-    </div>
+    <PageHeader title="Users">
+      <template #actions>
+        <Button size="sm" @click="openAdd"><UserPlus class="size-3.5" />Add User</Button>
+      </template>
+    </PageHeader>
 
     <div class="mb-4 max-w-sm">
       <Input v-model="search" placeholder="Search users..." aria-label="Search users" />
@@ -180,7 +184,7 @@ onMounted(load)
             <td class="px-4 py-3">
               <Badge v-if="user.privileges.includes('admin')">admin</Badge>
             </td>
-            <td class="px-4 py-3 text-sm text-gray-500">
+            <td class="px-4 py-3 text-sm text-muted">
               {{ user.quota === '0' ? 'unlimited' : user.quota }}
               <span v-if="user.percent?.trim()" class="ml-1 text-xs">({{ user.percent.trim() }})</span>
             </td>
@@ -208,8 +212,7 @@ onMounted(load)
         <Button variant="destructive" class="w-full" @click="deleteOpen = true">Archive User</Button>
       </template>
       <div class="space-y-5">
-        <div>
-          <label for="fEmail" class="block text-sm font-medium mb-1.5">Email</label>
+        <Field label="Email" for="fEmail">
           <Input
             v-if="!editingUser"
             id="fEmail"
@@ -218,13 +221,10 @@ onMounted(load)
             autocomplete="off"
             placeholder="user@example.com"
           />
-          <p v-else class="text-sm text-gray-500 py-2">{{ editingUser.email }}</p>
-        </div>
+          <p v-else class="text-sm text-muted py-2">{{ editingUser.email }}</p>
+        </Field>
 
-        <div>
-          <label for="fPassword" class="block text-sm font-medium mb-1.5">
-            {{ editingUser ? 'New Password' : 'Password' }}
-          </label>
+        <Field :label="editingUser ? 'New Password' : 'Password'" for="fPassword">
           <div class="flex gap-2">
             <Input
               id="fPassword"
@@ -237,16 +237,15 @@ onMounted(load)
               Generate
             </Button>
           </div>
-        </div>
+        </Field>
 
-        <div>
-          <label for="fQuota" class="block text-sm font-medium mb-1.5">Quota</label>
+        <Field label="Quota" for="fQuota">
           <Input id="fQuota" v-model="fQuota" placeholder="0 = unlimited (e.g. 10G, 500M)" />
-          <p class="text-xs text-gray-500 mt-1">Use G or M suffix. 0 = unlimited.</p>
-        </div>
+          <p class="text-xs text-muted mt-1">Use G or M suffix. 0 = unlimited.</p>
+        </Field>
 
         <div class="flex items-center gap-2">
-          <input id="fAdmin" v-model="fAdmin" type="checkbox" class="size-4 rounded" />
+          <Checkbox id="fAdmin" v-model="fAdmin" />
           <label for="fAdmin" class="text-sm">Administrator</label>
         </div>
 

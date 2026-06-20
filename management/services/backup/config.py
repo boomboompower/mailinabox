@@ -9,20 +9,33 @@ def get_backup_config(env, for_save=False, for_ui=False):
 	config = {
 		"min_age_in_days": 3,
 		"target": "local",
+		"check_after_backup": True,
 	}
 
 	# Merge in anything written to custom.yaml.
 	try:
 		with open(os.path.join(backup_root, 'custom.yaml'), encoding="utf-8") as f:
 			custom_config = rtyaml.load(f)
-		if not isinstance(custom_config, dict): raise ValueError # caught below
+		if not isinstance(custom_config, dict):
+			raise ValueError("custom.yaml did not parse as a mapping")
 		config.update(custom_config)
-	except:
-		pass
+	except FileNotFoundError:
+		pass  # first run - no custom config yet
+	except Exception as e:
+		import sys
+		print(f"WARNING: backup config could not be read ({e}), using defaults", file=sys.stderr)
 
 	# When updating config.yaml, don't do any further processing on what we find.
 	if for_save:
 		return config
+
+	# Coerce typed fields so callers always get the right types regardless of
+	# whether the value came from the API (already validated) or hand-edited YAML.
+	try:
+		config["min_age_in_days"] = max(1, int(config["min_age_in_days"]))
+	except (TypeError, ValueError):
+		config["min_age_in_days"] = 3
+	config["check_after_backup"] = bool(config.get("check_after_backup", True))
 
 	# When passing this back to the admin to show the current settings, do not include
 	# authentication details. The user will have to re-enter it.
@@ -44,29 +57,44 @@ def get_backup_config(env, for_save=False, for_ui=False):
 	return config
 
 def write_backup_config(env, newconfig):
+	import tempfile
 	backup_root = os.path.join(env["STORAGE_ROOT"], 'backup')
-	with open(os.path.join(backup_root, 'custom.yaml'), "w", encoding="utf-8") as f:
-		f.write(rtyaml.dump(newconfig))
+	target = os.path.join(backup_root, 'custom.yaml')
+	# Atomic write: truncate only happens on os.replace, so a crash mid-write
+	# leaves the previous config intact. 0o600 because the file holds credentials.
+	fd, tmp = tempfile.mkstemp(dir=backup_root, suffix=".tmp")
+	try:
+		with os.fdopen(fd, "w", encoding="utf-8") as f:
+			f.write(rtyaml.dump(newconfig))
+		os.chmod(tmp, 0o600)
+		os.replace(tmp, target)
+	except Exception:
+		try:
+			os.unlink(tmp)
+		except OSError:
+			pass
+		raise
 
-def backup_set_custom(env, target, target_user, target_pass, min_age):
+def backup_set_custom(env, target, target_user, target_pass, min_age, check_after_backup=True):
 	from .status import list_target_files
 
 	config = get_backup_config(env, for_save=True)
 
-	# min_age must be an int
-	if isinstance(min_age, str):
-		min_age = int(min_age)
+	try:
+		min_age = max(1, int(min_age))
+	except (TypeError, ValueError):
+		return "Minimum backup age must be a positive integer."
 
 	config["target"] = target
 	config["target_user"] = target_user
 	config["target_pass"] = target_pass
 	config["min_age_in_days"] = min_age
+	config["check_after_backup"] = bool(check_after_backup)
 
-	# Validate.
+	# Validate connectivity. list_target_files is duplicity-only; restic validates
+	# connectivity itself on first backup/init, so skip the probe for restic targets.
 	try:
-		if config["target"] not in {"off", "local"}:
-			# these aren't supported by the following function, which expects a full url in the target key,
-			# which is what is there except when loading the config prior to saving
+		if config["target"] not in {"off", "local"} and env.get("BACKUP_TOOL", "duplicity") != "restic":
 			list_target_files(config)
 	except ValueError as e:
 		return str(e)

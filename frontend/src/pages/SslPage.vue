@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
-import { ShieldCheck } from 'lucide-vue-next'
+import { ShieldCheck, Upload } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
+import SectionHeader from '@/components/ui/SectionHeader.vue'
+import Field from '@/components/ui/Field.vue'
 import Select from '@/components/ui/Select.vue'
 import Card from '@/components/ui/Card.vue'
 import Table from '@/components/ui/Table.vue'
@@ -148,15 +151,19 @@ onMounted(load)
 
 <template>
   <AppLayout>
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-semibold">TLS Certificates</h1>
-      <Button variant="secondary" size="sm" @click="openInstall()">Install Certificate</Button>
-    </div>
+    <PageHeader title="TLS Certificates">
+      <template #actions>
+        <Button variant="secondary" size="sm" @click="openInstall()"><Upload class="size-3.5" />Install Certificate</Button>
+      </template>
+    </PageHeader>
+
+    <!-- Status explanation -->
+    <SectionHeader title="Certificate Status" />
 
     <!-- Provision card -->
     <Card v-if="!loading && canProvision.length > 0" class="p-5 mb-6">
       <h2 class="text-base font-semibold mb-1">Provision certificates</h2>
-      <p class="text-sm text-gray-500 mb-3">
+      <p class="text-sm text-muted mb-3">
         {{ canProvision.join(', ') }}
         {{ canProvision.length === 1 ? 'is' : 'are' }} eligible for a free Let's Encrypt certificate.
       </p>
@@ -221,9 +228,9 @@ onMounted(load)
                 target="_blank"
                 class="hover:underline"
               >{{ d.domain }}</a>
-              <span v-else class="text-gray-400">{{ d.domain }}</span>
+              <span v-else class="text-faint">{{ d.domain }}</span>
             </td>
-            <td class="px-4 py-3 text-sm text-gray-500">
+            <td class="px-4 py-3 text-sm text-muted">
               <div class="flex items-start gap-2">
                 <StatusIcon
                   v-if="d.status !== 'not-applicable'"
@@ -251,8 +258,7 @@ onMounted(load)
     <!-- Install cert sheet -->
     <Sheet v-model="installOpen" title="Install TLS Certificate">
       <div class="space-y-5">
-        <div>
-          <label for="installDomain" class="block text-sm font-medium mb-1.5">Domain</label>
+        <Field label="Domain" for="installDomain">
           <Select id="installDomain" v-model="selectedDomain">
             <option
               v-for="d in domains.filter(d => d.status !== 'not-applicable')"
@@ -260,10 +266,9 @@ onMounted(load)
               :value="d.domain"
             >{{ d.domain }}</option>
           </Select>
-        </div>
+        </Field>
 
-        <div>
-          <label for="installCc" class="block text-sm font-medium mb-1.5">Country code (for CSR)</label>
+        <Field label="Country code (for CSR)" for="installCc">
           <Select id="installCc" v-model="selectedCc">
             <option
               v-for="[code, name] in countryCodes"
@@ -271,11 +276,10 @@ onMounted(load)
               :value="code"
             >{{ code }} - {{ name }}</option>
           </Select>
-        </div>
+        </Field>
 
-        <div>
-          <label for="installCsr" class="block text-sm font-medium mb-1.5">Certificate Signing Request (CSR)</label>
-          <p class="text-xs text-gray-500 mb-2">Submit this to your certificate authority.</p>
+        <Field label="Certificate Signing Request (CSR)" for="installCsr">
+          <p class="text-xs text-muted mb-2">Submit this to your certificate authority.</p>
           <Textarea
             id="installCsr"
             :model-value="loadingCsr ? 'Generating...' : csr"
@@ -284,10 +288,9 @@ onMounted(load)
             class="font-mono text-xs"
             placeholder="Select a domain and country code above."
           />
-        </div>
+        </Field>
 
-        <div>
-          <label for="installCert" class="block text-sm font-medium mb-1.5">Paste certificate</label>
+        <Field label="Paste certificate" for="installCert">
           <Textarea
             id="installCert"
             v-model="pastedCert"
@@ -295,10 +298,9 @@ onMounted(load)
             placeholder="-----BEGIN CERTIFICATE-----"
             class="font-mono text-xs"
           />
-        </div>
+        </Field>
 
-        <div>
-          <label for="installChain" class="block text-sm font-medium mb-1.5">Paste chain (optional)</label>
+        <Field label="Paste chain (optional)" for="installChain">
           <Textarea
             id="installChain"
             v-model="pastedChain"
@@ -306,7 +308,7 @@ onMounted(load)
             placeholder="-----BEGIN CERTIFICATE----- (intermediate/chain cert)"
             class="font-mono text-xs"
           />
-        </div>
+        </Field>
 
         <Button
           class="w-full"

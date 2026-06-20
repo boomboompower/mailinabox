@@ -56,10 +56,10 @@ watch(open, async (val) => {
           aria-modal="true"
           aria-labelledby="dialog-title"
           tabindex="-1"
-          class="bg-white/95 dark:bg-gray-950/95 backdrop-blur-sm rounded-4xl w-full max-w-[32rem] p-6 shadow-3xl outline-none"
+          class="bg-surface-raised/95 backdrop-blur-sm rounded-4xl w-full max-w-[32rem] p-6 shadow-3xl outline-none"
         >
           <h3 id="dialog-title" class="text-base font-semibold mb-1">{{ title }}</h3>
-          <p v-if="description" class="text-sm text-gray-500 mb-5">{{ description }}</p>
+          <p v-if="description" class="text-sm text-muted mb-5">{{ description }}</p>
           <div v-if="$slots.default" class="mb-5"><slot /></div>
           <div class="flex justify-end gap-2">
             <slot name="actions" />

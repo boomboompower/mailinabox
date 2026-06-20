@@ -149,10 +149,20 @@ def _duplicity_backup_status(env, config):
 			deleted_in = reldate(now, dateutil.parser.parse(bak["date"]) + datetime.timedelta(days=config["min_age_in_days"]), "on next daily backup")
 			bak["deleted_in"] = deleted_in
 
+	from .actions import _duplicity_check_cache_path
+	import json as _json
+	last_check = None
+	try:
+		with open(_duplicity_check_cache_path(env), encoding="utf-8") as f:
+			last_check = _json.load(f)
+	except (FileNotFoundError, ValueError):
+		pass
+
 	return {
 		"backend": "duplicity",
 		"backups": backups,
 		"unmatched_file_size": unmatched_file_size,
+		"last_check": last_check,
 	}
 
 def _restic_backup_status(env, config):
@@ -174,28 +184,62 @@ def _restic_backup_status(env, config):
 
 	snapshots = json.loads(snapshots_json) if snapshots_json.strip() else []
 
+	min_age = config.get("min_age_in_days", 3)
+
+	# Load per-snapshot stats cache written by the backup run itself.
+	# Prune entries for snapshots that no longer exist and rewrite the cache
+	# so it never grows beyond the current snapshot count.
+	from .actions import _restic_stats_cache_path, _restic_check_cache_path, _atomic_json_write
+	import json as _json
+	cache_path = _restic_stats_cache_path(env)
+	try:
+		with open(cache_path, encoding="utf-8") as f:
+			cache = _json.load(f)
+	except (FileNotFoundError, ValueError):
+		cache = {}
+	if "snapshots" not in cache:
+		# Migrate old format where snapshot IDs were top-level keys
+		cache = {"snapshots": {k: v for k, v in cache.items() if k != "last_check"}}
+	live_ids = {s.get("short_id", s.get("id")) for s in snapshots}
+	pruned_snapshots = {k: v for k, v in cache["snapshots"].items() if k in live_ids}
+	if pruned_snapshots != cache["snapshots"]:
+		try:
+			cache["snapshots"] = pruned_snapshots
+			_atomic_json_write(cache_path, cache)
+		except Exception as e:
+			import sys
+			print(f"WARNING: could not prune backup stats cache: {e}", file=sys.stderr)
+	stats_cache = pruned_snapshots
+
+	# Load the integrity check result from its own file (written by _verify_restic).
+	last_check = None
+	try:
+		with open(_restic_check_cache_path(env), encoding="utf-8") as f:
+			last_check = _json.load(f)
+	except (FileNotFoundError, ValueError):
+		pass
+
 	backups = []
 	for snap in snapshots:
 		date = dateutil.parser.parse(snap["time"]).astimezone(dateutil.tz.tzlocal())
+		expires_on = date + datetime.timedelta(days=min_age)
+		if expires_on <= now:
+			deleted_in = "on next backup run"
+		else:
+			deleted_in = reldate(now, expires_on, "on next backup run")
+		snap_id = snap.get("short_id", snap.get("id"))
+		cached = stats_cache.get(snap_id, {})
 		backups.append({
 			"date": snap["time"],
 			"date_str": date.strftime("%Y-%m-%d %X") + " " + now.tzname(),
 			"date_delta": reldate(date, now, "the future?"),
-			# Every restic snapshot is independently, fully restorable regardless
-			# of how much data changed since the last one - that's what dedup means.
-			# "full" is genuinely true for every entry, not a simplification.
 			"full": True,
-			# Per-snapshot size is not a meaningful number in a deduplicated model
-			# and must never be approximated or backfilled - see status.py's
-			# total-size handling below for where the real number goes instead.
-			"size": 0,
-			# "volumes" (number of archive volumes) is a duplicity-specific concept -
-			# restic snapshots aren't split into numbered volumes at all. 0 means "not
-			# applicable," same convention as size: 0 above - keeps this a required,
-			# always-numeric field so the frontend type contract never has to special-case
-			# which backend produced a given entry.
+			"size": cached.get("restore_size", 0),
 			"volumes": 0,
-			"id": snap.get("short_id", snap.get("id")),
+			"id": snap_id,
+			"deleted_in": deleted_in,
+			"data_added": cached.get("data_added", 0),
+			"file_count": cached.get("file_count", 0),
 		})
 	backups.sort(key=operator.itemgetter("date"), reverse=True)
 
@@ -215,6 +259,7 @@ def _restic_backup_status(env, config):
 		"backend": "restic",
 		"backups": backups,
 		"unmatched_file_size": unmatched_file_size,
+		"last_check": last_check,
 	}
 
 def should_force_full(config, env):

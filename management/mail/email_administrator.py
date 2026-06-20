@@ -93,7 +93,7 @@ msg.attach(MIMEText(content_html, 'html'))
 #msg.add_alternative(content_html, "html")
 
 # send
-smtpclient = smtplib.SMTP('127.0.0.1', 25)
+smtpclient = smtplib.SMTP(os.environ.get('MAIL_HOST', '127.0.0.1'), 25)
 smtpclient.ehlo()
 smtpclient.sendmail(
         admin_addr, # MAIL FROM

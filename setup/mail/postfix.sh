@@ -214,6 +214,58 @@ setup/tools/editconf.py /etc/postfix/main.cf \
 	smtp_tls_CAfile=/etc/ssl/certs/ca-certificates.crt \
 	smtp_tls_loglevel=2
 
+# ### Outbound SMTP Relay (Smarthost)
+#
+# If a relay is configured via the admin panel, route outbound mail through it
+# instead of delivering directly on port 25. Required on networks that block
+# port 25 outbound (residential ISPs, some cloud providers).
+#
+# Relay config is stored in STORAGE_ROOT/settings.yaml by the management daemon.
+# When relay is active, smtp_tls_security_level is set to 'verify' (certificate
+# verification against the system CA store) rather than 'dane', since DANE TLSA
+# records are published for destination MX hosts, not relay endpoints.
+
+eval "$(python3 - <<'PYEOF'
+import os
+storage = os.environ.get('STORAGE_ROOT', '/home/user-data')
+try:
+    import rtyaml
+    with open(f'{storage}/settings.yaml', encoding='utf-8') as f:
+        cfg = rtyaml.load(f) or {}
+    r = cfg.get('smtp_relay', {})
+    host = r.get('host', '') or ''
+    port = str(r.get('port', 587))
+    user = r.get('user', '') or ''
+except Exception:
+    host = ''
+    port = '587'
+    user = ''
+import shlex
+print(f"RELAY_HOST={shlex.quote(host)}")
+print(f"RELAY_PORT={shlex.quote(port)}")
+PYEOF
+)"
+
+if [ -n "$RELAY_HOST" ]; then
+	# Relay is configured. Set main.cf directives only - sasl_passwd credentials
+	# are managed exclusively by the admin API and are never written here.
+	# The .db lives on the shared storage volume so it survives Docker restarts.
+	setup/tools/editconf.py /etc/postfix/main.cf \
+		"relayhost=[$RELAY_HOST]:$RELAY_PORT" \
+		smtp_sasl_auth_enable=yes \
+		"smtp_sasl_password_maps=hash:$STORAGE_ROOT/mail/relay/sasl_passwd" \
+		smtp_sasl_security_options=noanonymous \
+		smtp_tls_security_level=verify
+else
+	# No relay - clear any leftover relay settings and restore direct DANE delivery.
+	setup/tools/editconf.py /etc/postfix/main.cf -e \
+		relayhost= \
+		smtp_sasl_auth_enable= \
+		smtp_sasl_password_maps= \
+		smtp_sasl_security_options= \
+		smtp_tls_security_level=dane
+fi
+
 # ### Incoming Mail
 
 # ### Postscreen

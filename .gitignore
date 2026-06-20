@@ -1,3 +1,6 @@
+# Local tooling configuration (uppercase root-level markdown)
+/[A-Z]*.md
+!/README.md
 *~
 __pycache__/
 externals/
@@ -8,3 +11,7 @@ management/api/docs/api-docs.html
 .idea/
 frontend/node_modules/
 frontend/dist/
+docs/node_modules/
+docs/.next/
+docs/out/
+.*/

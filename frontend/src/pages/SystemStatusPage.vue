@@ -196,9 +196,9 @@ onUnmounted(stopPolling)
     <div class="flex items-center justify-between mb-6">
       <div>
         <h1 class="text-2xl font-semibold">System Status</h1>
-        <p v-if="checkedAtLabel" class="text-xs text-gray-500 mt-0.5">
+        <p v-if="checkedAtLabel" class="text-xs text-muted mt-0.5">
           Last checked {{ checkedAtLabel }}
-          <span v-if="source === 'cron'" class="ml-1 text-gray-400">(nightly)</span>
+          <span v-if="source === 'cron'" class="ml-1 text-faint">(nightly)</span>
         </p>
       </div>
       <Button
@@ -253,7 +253,7 @@ onUnmounted(stopPolling)
 
       <!-- Results (shown even while running if we have prior cached data) -->
       <template v-else-if="items.length > 0">
-        <p v-if="jobStatus === 'running'" class="text-xs text-gray-400 mb-4">
+        <p v-if="jobStatus === 'running'" class="text-xs text-faint mb-4">
           Showing previous results while the new check runs...
         </p>
 
@@ -278,7 +278,7 @@ onUnmounted(stopPolling)
 
         <!-- Sections -->
         <div v-for="section in sections" :key="section.heading" class="mb-6">
-          <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2 px-1">
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-muted dark:text-faint mb-2 px-1">
             {{ section.heading }}
           </h2>
           <Card>
@@ -292,12 +292,12 @@ onUnmounted(stopPolling)
                 <StatusIcon :status="item.type as 'ok' | 'error' | 'warning'" class="mt-0.5 shrink-0" />
                 <div class="flex-1 min-w-0 break-words">
                   <p class="text-sm font-medium">{{ item.text }}</p>
-                  <p v-if="item.detail" class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ item.detail }}</p>
+                  <p v-if="item.detail" class="text-sm text-muted dark:text-faint mt-0.5">{{ item.detail }}</p>
                   <div v-if="expanded.has(idx) && item.extra.length" class="mt-2 space-y-1">
                     <p
                       v-for="(ex, ei) in item.extra.filter(e => e.text.trim())"
                       :key="ei"
-                      class="text-xs text-gray-500 dark:text-gray-400"
+                      class="text-xs text-muted dark:text-faint"
                       :class="{ 'font-mono whitespace-pre-wrap': ex.monospace }"
                     >
                       {{ ex.text }}
@@ -306,7 +306,7 @@ onUnmounted(stopPolling)
                   <button
                     v-if="item.extra.some(e => e.text.trim())"
                     :aria-expanded="expanded.has(idx)"
-                    class="mt-1 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                    class="mt-1 text-xs text-faint hover:text-text transition-colors"
                     @click="toggleExpand(idx)"
                   >
                     {{ expanded.has(idx) ? 'show less' : 'show more' }}
@@ -323,7 +323,7 @@ onUnmounted(stopPolling)
           <h2 class="text-sm font-semibold mb-3">System Tools</h2>
           <div class="flex flex-wrap gap-3">
             <div>
-              <p class="text-xs text-gray-500 mb-1.5">
+              <p class="text-xs text-muted mb-1.5">
                 Version check: {{ privacy === true ? 'enabled' : privacy === false ? 'disabled' : '...' }}
               </p>
               <Button variant="secondary" size="sm" :disabled="privacy === null" @click="togglePrivacy">
@@ -331,11 +331,11 @@ onUnmounted(stopPolling)
               </Button>
             </div>
             <div v-if="rebootNeeded === false">
-              <p class="text-xs text-gray-500 mb-1.5">No reboot required.</p>
+              <p class="text-xs text-muted mb-1.5">No reboot required.</p>
               <Button variant="secondary" size="sm" disabled>Reboot</Button>
             </div>
             <div v-else-if="rebootNeeded">
-              <p class="text-xs text-gray-500 mb-1.5">Reboot pending.</p>
+              <p class="text-xs text-muted mb-1.5">Reboot pending.</p>
               <Button variant="secondary" size="sm" @click="rebootOpen = true">Reboot Now</Button>
             </div>
           </div>

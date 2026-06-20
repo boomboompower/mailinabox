@@ -6,7 +6,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 # install via apt.  We pre-install them here so the setup scripts run
 # quickly at container start time (they will find the packages already
 # present and skip apt).
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
     # Supervisor manages multiple processes inside the container
     supervisor \
     # Core mail stack

@@ -1,5 +1,9 @@
+import logging
 import os
+import re
 import sqlite3
+
+from passlib.hash import bcrypt, sha512_crypt
 
 from core import utils
 from .database import open_database
@@ -7,6 +11,13 @@ from .validation import (
 	validate_email, validate_password, validate_quota, validate_privilege,
 	parse_privs, is_dcv_address, get_domain,
 )
+
+log = logging.getLogger(__name__)
+
+# Archived mailbox directory names become email addresses in the admin UI, so
+# reject any entry containing characters outside a basic email-safe charset.
+_ARCHIVED_LOCAL_RE = re.compile(r'^[a-zA-Z0-9._%+-]+$')
+_ARCHIVED_DOMAIN_RE = re.compile(r'^[a-zA-Z0-9.-]+$')
 
 def get_mail_users(env):
 	# Returns a flat, sorted list of all user accounts.
@@ -97,7 +108,13 @@ def get_mail_users_ex(env, with_archived=False):
 		root = os.path.join(env['STORAGE_ROOT'], 'mail/mailboxes')
 		for domain in os.listdir(root):
 			if os.path.isdir(os.path.join(root, domain)):
+				if not _ARCHIVED_DOMAIN_RE.match(domain):
+					log.warning("Skipping archived mailbox domain with invalid name: %r", domain)
+					continue
 				for user in os.listdir(os.path.join(root, domain)):
+					if not _ARCHIVED_LOCAL_RE.match(user):
+						log.warning("Skipping archived mailbox with invalid name: %r in %r", user, domain)
+						continue
 					email = user + "@" + domain
 					mbox = os.path.join(root, domain, user)
 					if email in active_accounts: continue
@@ -220,10 +237,29 @@ def hash_password(pw):
 	# Turn the plain password into a Dovecot-format hashed password.
 	# Dovecot stores passwords as "{SCHEME}hashedpassworddata".
 	# http://wiki2.dovecot.org/Authentication/PasswordSchemes
-	# passlib generates the same SHA512-CRYPT format as doveadm pw, so existing
-	# hashes from stock MIAB databases continue to verify without rehashing.
-	from passlib.hash import sha512_crypt
-	return "{SHA512-CRYPT}" + sha512_crypt.hash(pw)
+	return "{BLF-CRYPT}" + bcrypt.hash(pw)
+
+
+def verify_password(pw_hash: str, pw: str) -> bool:
+	"""Verify a password against a Dovecot-format hash.
+	Handles both BLF-CRYPT (current) and SHA512-CRYPT (legacy) so existing
+	hashes keep working until users change their passwords."""
+	if pw_hash.startswith("{BLF-CRYPT}"):
+		try:
+			return bcrypt.verify(pw, pw_hash[len("{BLF-CRYPT}"):])
+		except Exception:
+			return False
+	if pw_hash.startswith("{SHA512-CRYPT}"):
+		try:
+			return sha512_crypt.verify(pw, pw_hash[len("{SHA512-CRYPT}"):])
+		except Exception:
+			return False
+	# Unknown scheme - strip any prefix and fall back to sha512_crypt for legacy hashes.
+	raw = pw_hash.split("}", 1)[-1] if pw_hash.startswith("{") else pw_hash
+	try:
+		return sha512_crypt.verify(pw, raw)
+	except Exception:
+		return False
 
 
 def get_mail_quota(email, env):
@@ -281,7 +317,11 @@ def get_mail_password(email, env):
 	return rows[0][0]
 
 def remove_mail_user(email, env):
-	# remove
+	# Revoke tokens before deleting the user row so nothing is left dangling
+	# even if the FK cascade somehow doesn't fire.
+	from auth.api_tokens import revoke_all_tokens
+	revoke_all_tokens(email, env)
+
 	conn, c = open_database(env, with_connection=True)
 	c.execute("DELETE FROM users WHERE email=?", (email,))
 	if c.rowcount != 1:
@@ -331,5 +371,11 @@ def add_remove_mail_user_privilege(email, priv, action, env):
 		return ("Something went wrong.", 400)
 	conn.commit()
 	conn.close()
+
+	# Revoke all API tokens when admin privilege is removed - a demoted user
+	# should have zero access immediately, not just inert tokens sitting in the DB.
+	if action == "remove" and priv == "admin":
+		from auth.api_tokens import revoke_all_tokens
+		revoke_all_tokens(email, env)
 
 	return "OK"

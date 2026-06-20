@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Card from '@/components/ui/Card.vue'
+import SectionHeader from '@/components/ui/SectionHeader.vue'
 import Code from '@/components/ui/Code.vue'
 import Table from '@/components/ui/Table.vue'
 import TableRow from '@/components/ui/TableRow.vue'
@@ -31,16 +32,16 @@ const caldavRows: SettingRow[] = [
     <h1 class="text-2xl font-semibold mb-6">Sync to Devices</h1>
 
     <!-- IMAP / SMTP -->
-    <h2 class="text-base font-semibold mb-3">Email (IMAP / SMTP)</h2>
+    <SectionHeader title="Email (IMAP / SMTP)" />
     <Card class="p-5 mb-6">
-      <p class="text-sm text-gray-500 mb-3">
+      <p class="text-sm text-muted mb-3">
         Configure any mail client using these settings. Autoconfig and autodiscover are
         supported - most clients can configure themselves with just your email address and password.
       </p>
       <Table>
         <tbody>
           <TableRow v-for="[label, value] in imapRows" :key="label">
-            <th scope="row" class="px-4 py-2.5 text-sm text-gray-500 font-normal text-left w-48">{{ label }}</th>
+            <th scope="row" class="px-4 py-2.5 text-sm text-muted font-normal text-left w-48">{{ label }}</th>
             <td class="px-4 py-2.5 text-sm font-medium font-mono">{{ value }}</td>
           </TableRow>
         </tbody>
@@ -48,9 +49,9 @@ const caldavRows: SettingRow[] = [
     </Card>
 
     <!-- CalDAV / CardDAV -->
-    <h2 class="text-base font-semibold mb-3">Contacts &amp; Calendar (CalDAV / CardDAV)</h2>
+    <SectionHeader title="Contacts &amp; Calendar (CalDAV / CardDAV)" />
     <Card class="p-5 mb-6">
-      <p class="text-sm text-gray-500 mb-3">
+      <p class="text-sm text-muted mb-3">
         Contacts and calendars are served by <a href="https://radicale.org/" target="_blank" rel="noopener" class="underline underline-offset-2">Radicale</a>.
         Use these settings in iOS, Android, Thunderbird, or any CalDAV/CardDAV client.
         Clients that support <Code>.well-known</Code> autodiscovery
@@ -59,12 +60,12 @@ const caldavRows: SettingRow[] = [
       <Table>
         <tbody>
           <TableRow v-for="[label, value] in caldavRows" :key="label">
-            <th scope="row" class="px-4 py-2.5 text-sm text-gray-500 font-normal text-left w-48">{{ label }}</th>
+            <th scope="row" class="px-4 py-2.5 text-sm text-muted font-normal text-left w-48">{{ label }}</th>
             <td class="px-4 py-2.5 text-sm font-medium font-mono">{{ value }}</td>
           </TableRow>
         </tbody>
       </Table>
-      <p class="text-xs text-gray-500 mt-3 px-1">
+      <p class="text-xs text-muted mt-3 px-1">
         CalDAV and CardDAV autodiscovery is configured via
         <Code>/.well-known/caldav</Code> and
         <Code>/.well-known/carddav</Code>.
@@ -73,15 +74,15 @@ const caldavRows: SettingRow[] = [
     </Card>
 
     <!-- Autodiscover -->
-    <h2 class="text-base font-semibold mb-3">Autodiscover</h2>
+    <SectionHeader title="Autodiscover" />
     <Card class="p-5 mb-6">
-      <p class="text-sm text-gray-500 mb-3">
+      <p class="text-sm text-muted mb-3">
         Outlook, iOS, and most modern mail clients can configure themselves automatically.
         Enter your email address and password - no manual server settings needed.
       </p>
       <div class="space-y-1">
         <div>
-          <span class="text-xs text-gray-400 uppercase tracking-wide">Outlook (autodiscover)</span>
+          <span class="text-xs text-faint uppercase tracking-wide">Outlook (autodiscover)</span>
           <div>
             <a
               :href="`https://${config.hostname}/autodiscover/autodiscover.xml`"
@@ -92,7 +93,7 @@ const caldavRows: SettingRow[] = [
           </div>
         </div>
         <div class="pt-1">
-          <span class="text-xs text-gray-400 uppercase tracking-wide">Thunderbird (autoconfig)</span>
+          <span class="text-xs text-faint uppercase tracking-wide">Thunderbird (autoconfig)</span>
           <div>
             <a
               :href="`https://${config.hostname}/.well-known/autoconfig/mail/config-v1.1.xml`"
@@ -106,9 +107,9 @@ const caldavRows: SettingRow[] = [
     </Card>
 
     <!-- Webmail -->
-    <h2 class="text-base font-semibold mb-3">Webmail</h2>
+    <SectionHeader title="Webmail" />
     <Card class="p-5">
-      <p class="text-sm text-gray-500 mb-3">
+      <p class="text-sm text-muted mb-3">
         Access your email from a browser without installing a client.
       </p>
       <a

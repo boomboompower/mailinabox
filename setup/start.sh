@@ -2,7 +2,21 @@
 # This is the entry point for configuring the system.
 #####################################################
 
+# Change to the repo root regardless of how this script was invoked.
+cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/.."
+
 source setup/functions.sh # load our functions
+
+# Parse flags.
+# --force          bypasses all stamp checks and re-runs every build step.
+# --no-upgrade     skips apt update/upgrade/autoremove (safe on re-runs, not first installs).
+for _arg in "$@"; do
+	case "$_arg" in
+		--force) export MIAB_FORCE=1 ;;
+		--no-upgrade) export MIAB_SKIP_UPDATES=1 ;;
+	esac
+done
+unset _arg
 
 # Tee all output (stdout + stderr) to a log file so crashes leave a trace.
 exec > >(tee -a /tmp/mailinabox-setup.log) 2>&1
@@ -48,10 +62,9 @@ fi
 
 # Put a start script in a global location. We tell the user to run 'mailinabox'
 # in the first dialog prompt, so we should do this before that starts.
-cat > /usr/local/bin/mailinabox << EOF;
+cat > /usr/local/bin/mailinabox << 'EOF'
 #!/bin/bash
-cd $PWD
-source setup/start.sh
+exec boxctl "$@"
 EOF
 chmod +x /usr/local/bin/mailinabox
 
@@ -139,6 +152,12 @@ source setup/infra/system.sh
 source setup/infra/ssl.sh
 source setup/infra/dns.sh
 source setup/mail/postfix.sh
+
+# Clear any previously configured milters so that spam filter scripts start
+# from a clean slate. Prevents stale entries from a prior filter path (e.g.
+# opendkim/opendmarc) persisting when the active filter changes.
+clear_milters
+
 source setup/mail/dovecot.sh
 source setup/mail/users.sh
 if [ "$SPAM_FILTER" = "spamassassin" ]; then
@@ -198,48 +217,23 @@ setup/tools/web_update
 # fail2ban was first configured, but they should exist now.
 restart_service fail2ban
 
-# If there aren't any mail users yet, create one.
-source setup/firstuser.sh
-
 # Register with Let's Encrypt, including agreeing to the Terms of Service.
 # We'd let certbot ask the user interactively, but when this script is
 # run in the recommended curl-pipe-to-bash method there is no TTY and
 # certbot will fail if it tries to ask.
 if [ ! -d "$STORAGE_ROOT/ssl/lets_encrypt/accounts/acme-v02.api.letsencrypt.org/" ]; then
-echo
-echo "-----------------------------------------------"
-echo "Mail-in-a-Box uses Let's Encrypt to provision free SSL/TLS certificates"
-echo "to enable HTTPS connections to your box. We're automatically"
-echo "agreeing you to their subscriber agreement. See https://letsencrypt.org."
-echo
-certbot register --register-unsafely-without-email --agree-tos --config-dir "$STORAGE_ROOT/ssl/lets_encrypt"
+	echo "Registering with Let's Encrypt (auto-accepting subscriber agreement)..."
+	hide_output certbot register --register-unsafely-without-email --agree-tos --config-dir "$STORAGE_ROOT/ssl/lets_encrypt"
 fi
 
-# Done.
-echo
-echo "-----------------------------------------------"
-echo
-echo "Your Mail-in-a-Box is running."
-echo
-echo "Please log in to the control panel for further instructions at:"
-echo
-if /usr/local/lib/mailinabox/env/bin/python3 management/services/status_checks --check-primary-hostname; then
-	# Show the nice URL if it appears to be resolving and has a valid certificate.
-	echo "https://$PRIMARY_HOSTNAME/admin"
-	echo
-	echo "If you have a DNS problem put the box's IP address in the URL"
-	echo "(https://$PUBLIC_IP/admin) but then check the TLS fingerprint:"
-	openssl x509 -in "$STORAGE_ROOT/ssl/ssl_certificate.pem" -noout -fingerprint -sha256\
-        	| sed "s/SHA256 Fingerprint=//i"
-else
-	echo "https://$PUBLIC_IP/admin"
-	echo
-	echo "You will be alerted that the website has an invalid certificate. Check that"
-	echo "the certificate fingerprint matches:"
-	echo
-	openssl x509 -in "$STORAGE_ROOT/ssl/ssl_certificate.pem" -noout -fingerprint -sha256\
-        	| sed "s/SHA256 Fingerprint=//i"
-	echo
-	echo "Then you can confirm the security exception and continue."
-	echo
+if [ -n "${FIRST_TIME_SETUP:-}" ]; then
+    # Done - generate bootstrap code and print the final summary.
+    if [ -z "${NONINTERACTIVE:-}" ]; then
+    	boxctl bootstrap --show-cert
+    else
+    	echo
+    	echo "Mail-in-a-Box is running."
+    	echo "Set MAILINABOX_BOOTSTRAP_EMAIL and MAILINABOX_BOOTSTRAP_PASSWORD to create the first admin account."
+    	echo
+    fi
 fi

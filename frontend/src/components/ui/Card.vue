@@ -4,7 +4,7 @@ defineProps<{ class?: string }>()
 
 <template>
   <div
-    class="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-850"
+    class="rounded-2xl border border-border bg-surface"
     :class="$props.class"
   >
     <slot />

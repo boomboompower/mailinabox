@@ -6,8 +6,8 @@ defineEmits<{ click: [] }>()
 <template>
   <tr
     :class="[
-      'border-b border-gray-100 dark:border-gray-800 last:border-0',
-      clickable && 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors',
+      'border-b border-border last:border-0',
+      clickable && 'cursor-pointer hover:bg-hover-subtle transition-colors',
     ]"
     @click="clickable && $emit('click')"
   >

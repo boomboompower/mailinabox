@@ -1,8 +1,10 @@
 import sqlite3
 
+_DB_SUBPATH = "/mail/db/users.sqlite"
+
 def initialize_database(env):
 	# Create tables if they don't exist. Called once at daemon startup.
-	conn = sqlite3.connect(env["STORAGE_ROOT"] + "/mail/users.sqlite")
+	conn = sqlite3.connect(env["STORAGE_ROOT"] + _DB_SUBPATH)
 	conn.executescript("""
 		PRAGMA journal_mode=WAL;
 		CREATE TABLE IF NOT EXISTS users (
@@ -46,12 +48,23 @@ def initialize_database(env):
 			last_used TEXT,
 			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 		);
+		CREATE TABLE IF NOT EXISTS api_tokens (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			name TEXT NOT NULL,
+			token_hash TEXT NOT NULL UNIQUE,
+			scope TEXT NOT NULL DEFAULT 'read',
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			last_used TEXT,
+			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+		);
 	""")
 	conn.commit()
 	conn.close()
 
 def open_database(env, with_connection=False):
-	conn = sqlite3.connect(env["STORAGE_ROOT"] + "/mail/users.sqlite")
+	conn = sqlite3.connect(env["STORAGE_ROOT"] + _DB_SUBPATH)
+	conn.execute("PRAGMA foreign_keys = ON")
 	if not with_connection:
 		return conn.cursor()
 	return conn, conn.cursor()

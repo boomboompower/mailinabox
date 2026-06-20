@@ -120,10 +120,33 @@ echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99no-translations
 
 # Update system packages to make sure we have the latest upstream versions.
 
-echo "Updating system packages..."
-hide_output apt-get update --allow-releaseinfo-change
-apt_get_quiet upgrade
-apt_get_quiet autoremove
+if [ "${MIAB_SKIP_UPDATES:-0}" = "1" ]; then
+	if [ ! -f /etc/mailinabox.conf ]; then
+		echo "WARNING: --no-upgrade was passed but this looks like a first install."
+		echo "         Package index may be stale - installation could fail or install outdated packages."
+	fi
+	echo "Skipping system package upgrade (--no-upgrade)."
+else
+	echo "Updating system packages..."
+	hide_output apt-get update --allow-releaseinfo-change
+
+	# Apply security patches only - general updates are handled by unattended-upgrades.
+	# Install unattended-upgrades first in case this is a minimal image without it.
+	# Fall back to a full upgrade if either step fails.
+	_security_upgrade_ok=false
+	if command -v unattended-upgrade &>/dev/null \
+	   || apt_get_quiet install unattended-upgrades 2>/dev/null; then
+		if hide_output unattended-upgrade; then
+			_security_upgrade_ok=true
+		fi
+	fi
+	if ! $_security_upgrade_ok; then
+		apt_get_quiet upgrade
+	fi
+	unset _security_upgrade_ok
+
+	apt_get_quiet autoremove
+fi
 
 # ### Install System Packages
 

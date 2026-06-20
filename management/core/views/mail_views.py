@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 
 from core.app_context import env
-from core.auth_decorators import require_admin
+from core.auth_decorators import require_admin, read_scope
 from core.web_helpers import json_response, sanitize_error_message, validate_email
 from mail.mailconfig import (
 	get_mail_users, get_mail_users_ex, add_mail_user, set_mail_password, remove_mail_user,
@@ -14,6 +14,7 @@ bp = Blueprint("mail", __name__, url_prefix="/mail")
 bp.before_request(require_admin)
 
 @bp.route('/users')
+@read_scope
 def mail_users():
 	if request.args.get("format", "") == "json":
 		return json_response(get_mail_users_ex(env, with_archived=True))
@@ -29,6 +30,7 @@ def mail_users_add():
 		return (sanitize_error_message(str(e)), 400)
 
 @bp.route('/users/quota', methods=['GET'])
+@read_scope
 def get_mail_users_quota():
 	try:
 		email = validate_email(request.values.get('email', ''))
@@ -69,6 +71,7 @@ def mail_users_remove():
 		return (sanitize_error_message(str(e)), 400)
 
 @bp.route('/users/privileges')
+@read_scope
 def mail_user_privs():
 	try:
 		email = validate_email(request.args.get('email', ''))
@@ -80,6 +83,9 @@ def mail_user_privs():
 
 @bp.route('/users/privileges/add', methods=['POST'])
 def mail_user_privs_add():
+	# API tokens may not grant admin - only session/basic auth callers can.
+	if request.form.get('privilege', '') == 'admin' and request.token_scope != 'full':
+		return ('API tokens cannot grant admin privileges.', 403)
 	try:
 		email = validate_email(request.form.get('email', ''))
 		return add_remove_mail_user_privilege(email, request.form.get('privilege', ''), "add", env)
@@ -95,6 +101,7 @@ def mail_user_privs_remove():
 		return (sanitize_error_message(str(e)), 400)
 
 @bp.route('/aliases')
+@read_scope
 def mail_aliases():
 	if request.args.get("format", "") == "json":
 		return json_response(get_mail_aliases_ex(env))
@@ -115,5 +122,6 @@ def mail_aliases_remove():
 	return remove_mail_alias(request.form.get('address', ''), env)
 
 @bp.route('/domains')
+@read_scope
 def mail_domains():
 	return "".join(x + "\n" for x in get_mail_domains(env))

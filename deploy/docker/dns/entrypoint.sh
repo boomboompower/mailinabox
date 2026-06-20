@@ -89,7 +89,9 @@ fi
 if [ ! -f /var/lib/unbound/root.key ]; then
     echo "Initializing Unbound DNSSEC trust anchor..."
     mkdir -p /var/lib/unbound
-    unbound-anchor -a /var/lib/unbound/root.key
+    # unbound-anchor exits 1 when it updates the anchor (success), 0 if unchanged.
+    # Both are fine - suppress the exit code so set -e doesn't kill the script.
+    unbound-anchor -a /var/lib/unbound/root.key || true
 
     chown unbound:unbound /var/lib/unbound/root.key
     chmod 644 /var/lib/unbound/root.key

@@ -1,15 +1,21 @@
 #!/bin/bash
 # ClamAV - antivirus scanning for email attachments
 # --------------------------------------------------
-# ClamAV scans mail passing through the spam filter.
-# With Rspamd: the antivirus module connects to clamd via socket.
-# With SpamAssassin: the ClamAV plugin scores infected mail.
+# On bare metal: installs clamav-milter so Postfix scans mail directly as a milter.
+# Rspamd also connects to clamd via socket for in-process scanning.
+# In Docker: the miab-clamav container provides clamav-milter over TCP.
 
 source setup/functions.sh
 source /etc/mailinabox.conf
 
 echo "Installing ClamAV (antivirus)..."
-apt_install_cached "clamav" clamav clamav-daemon
+if [ "${RUNTIME:-baremetal}" = "docker" ]; then
+    # In Docker, only the base ClamAV packages are needed - the miab-clamav
+    # container provides clamav-milter, and entrypoint.sh wires the milter.
+    apt_install_cached "clamav" clamav clamav-daemon
+else
+    apt_install_cached "clamav" clamav clamav-daemon clamav-milter
+fi
 
 # freshclam downloads the signature database on first run. This can take
 # a minute. Run it once now so the daemon starts with an up-to-date DB.
@@ -41,6 +47,24 @@ clamav {
 }
 EOF
     restart_service rspamd
+fi
+
+# On bare metal, configure clamav-milter so Postfix can scan mail as a milter.
+# In Docker this is handled by the miab-clamav container and entrypoint.sh.
+if [ "${RUNTIME:-baremetal}" != "docker" ]; then
+    cat > /etc/clamav/clamav-milter.conf << 'EOF'
+MilterSocket unix:/run/clamav/clamav-milter.sock
+MilterSocketMode 660
+ClamdSocket unix:/run/clamav/clamd.ctl
+OnInfected Reject
+RejectMsg "Message rejected: virus detected"
+AddHeader Replace
+LogSyslog true
+LogFacility LOG_MAIL
+EOF
+
+    append_milter "unix:/run/clamav/clamav-milter.sock"
+    restart_service clamav-milter
 fi
 
 restart_service clamav-daemon

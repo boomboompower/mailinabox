@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { InitData, LoginApiResponse } from '@/types'
 
@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const email = ref<string | null>(init.email ?? null)
   const privileges = ref<string[]>(init.privileges ?? [])
+  const needsBootstrap = ref<boolean>(init.needsBootstrap ?? false)
 
   const isLoggedIn = computed(() => !!email.value)
   const isAdmin = computed(() => privileges.value.includes('admin'))
@@ -22,6 +23,10 @@ export const useAuthStore = defineStore('auth', () => {
   function handleAuthSuccess(emailAddr: string, privs: string[]): void {
     email.value = emailAddr
     privileges.value = privs
+  }
+
+  function clearBootstrap(): void {
+    needsBootstrap.value = false
   }
 
   function clearSession(): void {
@@ -63,5 +68,5 @@ export const useAuthStore = defineStore('auth', () => {
     }).catch(() => {})
   }
 
-  return { email, privileges, isLoggedIn, isAdmin, handleAuthSuccess, clearSession, login, logout }
+  return { email, privileges, needsBootstrap, isLoggedIn, isAdmin, handleAuthSuccess, clearBootstrap, clearSession, login, logout }
 })

@@ -4,13 +4,14 @@ from flask import Blueprint, Response, request
 
 from core import utils
 from core.app_context import env
-from core.auth_decorators import require_admin
+from core.auth_decorators import require_admin, read_scope
 from core.web_helpers import json_response, sanitize_error_message, validate_hostname
 
 bp = Blueprint("dns", __name__, url_prefix="/dns")
 bp.before_request(require_admin)
 
 @bp.route('/zones')
+@read_scope
 def dns_zones():
 	from services.dns_update import get_dns_zones
 	return json_response([z[0] for z in get_dns_zones(env)])
@@ -24,6 +25,7 @@ def dns_update():
 		return (sanitize_error_message(str(e)), 500)
 
 @bp.route('/secondary-nameserver')
+@read_scope
 def dns_get_secondary_nameserver():
 	from services.dns_update import get_custom_dns_config, get_secondary_dns
 	return json_response({ "hostnames": get_secondary_dns(get_custom_dns_config(env), mode=None) })
@@ -42,6 +44,7 @@ def dns_set_secondary_nameserver():
 		return (sanitize_error_message(str(e)), 400)
 
 @bp.route('/custom')
+@read_scope
 def dns_get_records(qname=None, rtype=None):
 	# Get the current set of custom DNS records.
 	from services.dns_update import get_custom_dns_config, get_dns_zones
@@ -140,11 +143,13 @@ def dns_set_record(qname, rtype="A"):
 		return (sanitize_error_message(str(e)), 400)
 
 @bp.route('/dump')
+@read_scope
 def dns_get_dump():
 	from services.dns_update import build_recommended_dns
 	return json_response(build_recommended_dns(env))
 
 @bp.route('/zonefile/<zone>')
+@read_scope
 def dns_get_zonefile(zone):
 	from services.dns_update import get_dns_zonefile
 	return Response(get_dns_zonefile(zone, env), status=200, mimetype='text/plain')

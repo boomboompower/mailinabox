@@ -4,6 +4,8 @@ import { toast } from 'vue-sonner'
 import { Globe } from 'lucide-vue-next'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
+import SectionHeader from '@/components/ui/SectionHeader.vue'
 import Card from '@/components/ui/Card.vue'
 import Code from '@/components/ui/Code.vue'
 import Table from '@/components/ui/Table.vue'
@@ -72,17 +74,17 @@ onMounted(load)
 
 <template>
   <AppLayout>
-    <h1 class="text-2xl font-semibold mb-6">Static Web Hosting</h1>
+    <PageHeader title="Static Web Hosting" />
 
     <Card class="p-5 mb-6">
-      <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+      <p class="text-sm text-muted mb-3">
         This box serves a static website at
         <a :href="`https://${config.hostname}`" target="_blank" class="underline font-medium">https://{{ config.hostname || 'example.com' }}</a>
         and at every domain you have email users or aliases configured for.
       </p>
 
       <h2 class="text-sm font-semibold mb-2">Uploading web files</h2>
-      <ol class="text-sm text-gray-600 dark:text-gray-400 space-y-2 list-decimal list-inside">
+      <ol class="text-sm text-muted space-y-2 list-decimal list-inside">
         <li>
           Ensure your domains have no problems on the
           <router-link to="/system-status" class="underline">Status Checks</router-link> page.
@@ -101,12 +103,13 @@ onMounted(load)
     </Card>
 
     <!-- Domains table -->
-    <div class="flex items-center justify-between mb-3">
-      <h2 class="text-base font-semibold">Hosted Websites</h2>
-      <Button variant="secondary" size="sm" :disabled="updating" @click="doUpdate">
-        {{ 'Update Web Settings' }}
-      </Button>
-    </div>
+    <SectionHeader title="Hosted Websites">
+      <template #actions>
+        <Button variant="secondary" size="sm" :disabled="updating" @click="doUpdate">
+          Update Web Settings
+        </Button>
+      </template>
+    </SectionHeader>
 
     <template v-if="loading">
       <Table>
@@ -148,7 +151,7 @@ onMounted(load)
                 https://{{ d.domain }}
               </a>
             </td>
-            <td class="px-4 py-3 font-mono text-xs text-gray-500">{{ d.root }}</td>
+            <td class="px-4 py-3 font-mono text-xs text-muted">{{ d.root }}</td>
             <td class="px-4 py-3 text-right">
               <Button
                 v-if="d.root !== d.custom_root"
@@ -163,7 +166,7 @@ onMounted(load)
         </tbody>
       </Table>
 
-      <p class="text-xs text-gray-400 mt-2">
+      <p class="text-xs text-faint mt-2">
         To add a site, create a mail user or alias for that domain.
         See the <a href="https://mailinabox.email/guide.html#domain-name-configuration" target="_blank" class="underline">setup guide</a>
         for nameserver configuration.
@@ -172,8 +175,8 @@ onMounted(load)
 
     <!-- Update result -->
     <Card v-if="updateResult" class="p-4 mt-4">
-      <p class="text-xs font-medium text-gray-500 mb-1">Update result</p>
-      <pre class="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{{ updateResult }}</pre>
+      <p class="text-xs font-medium text-muted mb-1">Update result</p>
+      <pre class="text-xs text-text whitespace-pre-wrap">{{ updateResult }}</pre>
     </Card>
 
     <!-- Change root confirm dialog -->

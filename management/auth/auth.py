@@ -1,10 +1,13 @@
 import base64, hmac, json, secrets
+from passlib.hash import bcrypt
 from datetime import timedelta
 
 from expiringdict import ExpiringDict
 
 from core import utils
 from mail.mailconfig import get_mail_password, get_mail_user_privileges
+from mail.mailconfig.users import verify_password, hash_password
+from mail.mailconfig.database import open_database
 from auth.mfa import get_hash_mfa_state, validate_auth_mfa
 
 DEFAULT_KEY_PATH   = '/var/lib/mailinabox/api.key'
@@ -12,7 +15,14 @@ DEFAULT_AUTH_REALM = 'Mail-in-a-Box Management Server'
 
 # Placeholder hash used when an email address is not found, so that passlib
 # still runs and response time is consistent regardless of whether the user exists.
-_DUMMY_HASH = "{SHA512-CRYPT}$6$rounds=5000$invalidsaltvalue$" + "x" * 86
+# Generated lazily on first use so startup cost is paid only when needed.
+_dummy_hash_cache: "str | None" = None
+
+def _get_dummy_hash() -> str:
+	global _dummy_hash_cache
+	if _dummy_hash_cache is None:
+		_dummy_hash_cache = "{BLF-CRYPT}" + bcrypt.hash("mailinabox-timing-dummy")
+	return _dummy_hash_cache
 
 class AuthService:
 	def __init__(self):
@@ -129,25 +139,24 @@ class AuthService:
 			pw_hash = get_mail_password(email, env)
 			user_exists = True
 		except ValueError:
-			# Unknown user. Use a dummy hash so doveadm still runs below and
+			# Unknown user. Use a dummy hash so verify_password still runs and
 			# response time is consistent - prevents email enumeration via timing.
-			pw_hash = _DUMMY_HASH
+			pw_hash = _get_dummy_hash()
 			user_exists = False
 
-		# Verify the password against the stored hash using passlib.
-		# Strips the Dovecot scheme prefix (e.g. "{SHA512-CRYPT}") before verifying
-		# so existing stock MIAB hashes work without any rehashing.
-		from passlib.hash import sha512_crypt
-		raw_hash = pw_hash.split("}", 1)[-1] if pw_hash.startswith("{") else pw_hash
-		pw_ok = False
-		try:
-			pw_ok = sha512_crypt.verify(pw, raw_hash)
-		except Exception:
-			pass
+		pw_ok = verify_password(pw_hash, pw)
 
 		if not pw_ok or not user_exists:
 			# Login failed.
 			raise ValueError("Incorrect email address or password.")
+
+		# Upgrade legacy SHA512-CRYPT hashes to BLF-CRYPT on successful login.
+		if pw_hash.startswith("{SHA512-CRYPT}"):
+			new_hash = hash_password(pw)
+			conn, c = open_database(env, with_connection=True)
+			c.execute("UPDATE users SET password=? WHERE email=?", (new_hash, email))
+			conn.commit()
+			conn.close()
 
 		# If MFA is enabled, check that MFA passes.
 		status, hints = validate_auth_mfa(email, request, env)
@@ -204,5 +213,10 @@ class AuthService:
 		session = store[session_key]
 		if session_type == "login" and not hmac.compare_digest(session["email"], user_email): return None
 		if session["type"] != session_type: return None
-		if not hmac.compare_digest(session["password_token"], self.create_user_password_state_token(session["email"], env)): return None
+		try:
+			current_token = self.create_user_password_state_token(session["email"], env)
+		except ValueError:
+			# User no longer exists - invalidate the session.
+			return None
+		if not hmac.compare_digest(session["password_token"], current_token): return None
 		return session
