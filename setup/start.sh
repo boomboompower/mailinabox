@@ -226,14 +226,11 @@ if [ ! -d "$STORAGE_ROOT/ssl/lets_encrypt/accounts/acme-v02.api.letsencrypt.org/
 	hide_output certbot register --register-unsafely-without-email --agree-tos --config-dir "$STORAGE_ROOT/ssl/lets_encrypt"
 fi
 
-if [ -n "${FIRST_TIME_SETUP:-}" ]; then
-    # Done - generate bootstrap code and print the final summary.
-    if [ -z "${NONINTERACTIVE:-}" ]; then
-    	boxctl bootstrap --show-cert
-    else
-    	echo
-    	echo "Mail-in-a-Box is running."
-    	echo "Set MAILINABOX_BOOTSTRAP_EMAIL and MAILINABOX_BOOTSTRAP_PASSWORD to create the first admin account."
-    	echo
-    fi
+if [ -z "${NONINTERACTIVE:-}" ]; then
+    boxctl bootstrap --show-cert --install
+else
+    echo
+    echo "Mail-in-a-Box setup complete."
+    echo "Set MAILINABOX_BOOTSTRAP_EMAIL and MAILINABOX_BOOTSTRAP_PASSWORD to create the first admin account."
+    echo
 fi

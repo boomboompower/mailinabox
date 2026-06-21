@@ -6,14 +6,14 @@ Navigate with ↑↓, Enter to open a service, Esc to quit.
 Exits non-zero if any service is degraded.
 """
 
-import os, sys, subprocess, datetime, tarfile, socket, re
+import os, sys, subprocess, datetime, tarfile, socket, re, threading, time
 from .ui import (
     bold, gray_desc, lavender, white_b, red, green,
     Raw, read_key, clear, _term_width,
 )
 
 BARE_METAL_CONF = "/etc/mailinabox.conf"
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 OK   = "ok"
 WARN = "warn"
@@ -99,10 +99,12 @@ def check_webmail(conf):
         if not _port_open("127.0.0.1", 3001):
             return WARN, "oxi-email running but not responding on port 3001"
         return OK, "oxi.email running"
-    # php-fpm service name varies by version; use shell glob
-    r = subprocess.run("systemctl is-active php*-fpm 2>/dev/null",
-                       capture_output=True, text=True, shell=True)
-    fpm_ok = r.stdout.strip() == "active"
+    # php-fpm service name varies by version; find any active unit matching the pattern
+    r = subprocess.run(
+        ["systemctl", "list-units", "--state=active", "--no-legend", "--plain", "php*-fpm.service"],
+        capture_output=True, text=True,
+    )
+    fpm_ok = bool(r.stdout.strip())
     label = {"roundcube": "Roundcube", "snappymail": "SnappyMail", "cypht": "Cypht"}.get(client, client)
     if not fpm_ok:
         return ERR, f"{label} installed but PHP-FPM not running"
@@ -259,21 +261,59 @@ def _stop(conf_key):
         subprocess.run(["systemctl", "stop",    svc], capture_output=True)
         subprocess.run(["systemctl", "disable", svc], capture_output=True)
 
-def _run_scripts(conf_key, conf):
+def _redraw_log(buf, log_lines):
+    """Redraw the rolling log panel in place (must have reserved log_lines blank lines first)."""
+    width = _term_width() - 6
+    visible = buf[-log_lines:]
+    sys.stdout.write(f"\033[{log_lines}A")
+    for i in range(log_lines):
+        if i < len(visible):
+            sys.stdout.write(f"  {gray_desc(visible[i][:width])}\033[K\n")
+        else:
+            sys.stdout.write(f"\033[K\n")
+    sys.stdout.flush()
+
+def _run_script(script, log_buf=None, log_lines=10):
+    """Run a single setup script with a 5-minute timeout. Returns True on success.
+    If log_buf is given, output is captured and displayed as a rolling panel."""
+    proc = subprocess.Popen(
+        ["bash", "-c", f"set -e; source setup/functions.sh; source {BARE_METAL_CONF}; source {script}"],
+        cwd=PROJECT_ROOT,
+        env={**os.environ, "VERBOSE": "1", "MIAB_FORCE": "1"},
+        stdout=subprocess.PIPE if log_buf is not None else None,
+        stderr=subprocess.STDOUT if log_buf is not None else None,
+        text=log_buf is not None,
+        bufsize=1,
+    )
+    if log_buf is not None:
+        def _reader():
+            for line in proc.stdout:
+                log_buf.append(line.rstrip())
+                _redraw_log(log_buf, log_lines)
+        t = threading.Thread(target=_reader, daemon=True)
+        t.start()
+    try:
+        proc.wait(timeout=300)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        proc.wait()
+        if log_buf is not None:
+            log_buf.append("[timed out after 5 minutes]")
+            _redraw_log(log_buf, log_lines)
+        else:
+            print(f"\n  Script timed out after 5 minutes: {script}")
+        return False
+    if log_buf is not None:
+        t.join()
+    return proc.returncode == 0
+
+def _run_scripts(conf_key, conf, log_buf=None, log_lines=10):
     scripts = _SETUP_SEQUENCES.get(conf_key, [])
     for script in scripts:
-        result = subprocess.run(
-            ["bash", "-c", f"set -e; source setup/functions.sh; source {BARE_METAL_CONF}; source {script}"],
-            cwd=PROJECT_ROOT,
-        )
-        if result.returncode != 0:
+        if not _run_script(script, log_buf, log_lines):
             return False
     if _NEEDS_POSTFIX.intersection(conf_key.split(":")):
-        result = subprocess.run(
-            ["bash", "-c", f"set -e; source setup/functions.sh; source {BARE_METAL_CONF}; source setup/mail/postfix.sh"],
-            cwd=PROJECT_ROOT,
-        )
-        if result.returncode != 0:
+        if not _run_script("setup/mail/postfix.sh", log_buf, log_lines):
             return False
     return True
 
@@ -292,24 +332,16 @@ def _write_conf_key(key, value):
     with open(BARE_METAL_CONF, "w") as f:
         f.writelines(lines)
 
-def _regenerate(conf):
-    try:
-        api_key_file = os.path.join(conf.get("STORAGE_ROOT", "/home/user-data"), "api.key")
-        if not os.path.exists(api_key_file):
-            return False
-        import urllib.request, urllib.error
-        with open(api_key_file) as f:
-            api_key = f.read().strip()
-        for endpoint in ["/dns/update", "/web/update"]:
-            req = urllib.request.Request(
-                f"http://127.0.0.1:10222{endpoint}",
-                data=b"", method="POST",
-                headers={"X-Api-Key": api_key},
-            )
-            urllib.request.urlopen(req, timeout=30)
-        return True
-    except Exception:
-        return False
+def _regenerate(conf, reload_daemon=False):
+    if reload_daemon:
+        subprocess.run(["systemctl", "restart", "mailinabox"], capture_output=True)
+        for _ in range(30):
+            if _port_open("127.0.0.1", 10222, timeout=1):
+                break
+            time.sleep(1)
+    r1 = subprocess.run([f"{PROJECT_ROOT}/dns_update"], capture_output=True)
+    r2 = subprocess.run([f"{PROJECT_ROOT}/web_update"], capture_output=True)
+    return r1.returncode == 0 and r2.returncode == 0
 
 # ── UI rendering ───────────────────────────────────────────────────────────────
 
@@ -350,7 +382,7 @@ def _render_list(services, results, sel, first=False):
         out.append(f"  {arrow} {icon}  {lbl}{pad}{gray_desc(msg)}")
 
     out.append("")
-    out.append(f"  {gray_desc('↑↓ navigate  ·  Enter to manage  ·  Esc to quit')}")
+    out.append(f"  {gray_desc('↑↓ navigate  ·  Enter to manage  ·  r recheck all  ·  q quit')}")
 
     text = "\n".join(out)
     print(text, end="\n", flush=True)
@@ -372,7 +404,7 @@ def _render_detail(label, status, msg, actions, sel, first=False):
         out.append(f"  {arrow} {lbl}")
 
     out.append("")
-    out.append(f"  {gray_desc('↑↓ navigate  ·  Enter to select  ·  Esc to go back')}")
+    out.append(f"  {gray_desc('↑↓ navigate  ·  Enter to select  ·  r recheck  ·  Esc to go back')}")
 
     text = "\n".join(out)
     print(text, end="\n", flush=True)
@@ -424,31 +456,84 @@ def _warn_screen(lines, confirm_label="Yes, proceed", cancel_label="Cancel"):
         print("\033[?25h", end="", flush=True)
 
 
+def _page_header(subtitle=None):
+    """Print the standard boxctl doctor page header."""
+    clear()
+    print(f"\n  {bold('boxctl doctor')}")
+    print(f"  {gray_desc('─' * (_term_width() - 4))}")
+    print()
+    if subtitle:
+        print(f"  {white_b(subtitle)}")
+        print()
+
+def _run_logged_screen(title, run_fn):
+    """TUI page: header, title, 10-line rolling log, result footer.
+    run_fn(log_buf, log_lines) -> bool."""
+    LOG_LINES = 10
+    _page_header(title)
+    print()
+    for _ in range(LOG_LINES):
+        print()
+    log_buf = []
+    ok = run_fn(log_buf, LOG_LINES)
+    print()
+    if ok:
+        print(f"  {green('✓')} {bold('Done.')}")
+    else:
+        print(f"  {red('✗')} {bold('Failed.')}  {gray_desc('Run sudo setup/start.sh to restore a known-good state.')}")
+    _press_enter_to_return()
+    return ok
+
 def _run_with_output(conf_key, conf, storage_root, action_verb="Installing"):
     """Back up, stop old services, run scripts, regenerate. Prints progress."""
+    LOG_LINES = 10
+    _page_header(f"{action_verb}...")
 
-
-    print(f"\n  → Backing up existing data...")
+    sys.stdout.write(f"  → Backing up...  ")
+    sys.stdout.flush()
     archive = _backup(storage_root, conf_key.replace("new:", "old:"))
-    if archive:
-        print(f"    {green('✓')} Saved to {archive}")
-    else:
-        print(f"    {gray_desc('(no data to back up)')}")
+    bname = os.path.basename(archive) if archive else None
+    print(f"{green('✓')}  {gray_desc(bname) if bname else gray_desc('nothing to back up')}")
 
-    print(f"  → Stopping old services...")
+    sys.stdout.write(f"  → Stopping old services...  ")
+    sys.stdout.flush()
     _stop(conf_key.replace("new:", "old:"))
+    print(green('✓'))
 
     print(f"  → {action_verb}...")
-    ok = _run_scripts(conf_key, conf)
+    print()
+    for _ in range(LOG_LINES):
+        print()
+
+    log_buf = []
+    ok = _run_scripts(conf_key, conf, log_buf, LOG_LINES)
+    print()
+
     if not ok:
-        print(f"\n  {red('✗')} Script failed - check output above.")
+        print(f"  {red('✗')} Script failed - check output above.")
         print(f"  {gray_desc('Run sudo setup/start.sh to restore a known-good state.')}\n")
         return False
 
-    print(f"  → Regenerating nginx + DNS...")
-    regen_ok = _regenerate(conf)
-    if not regen_ok:
-        print(f"    {gray_desc('Management daemon unreachable - run sudo setup/start.sh')}")
+    sys.stdout.write(f"  → Reloading daemon...  ")
+    sys.stdout.flush()
+    subprocess.run(["systemctl", "restart", "mailinabox"], capture_output=True)
+    for _ in range(30):
+        if _port_open("127.0.0.1", 10222, timeout=1):
+            break
+        time.sleep(1)
+    if _port_open("127.0.0.1", 10222, timeout=1):
+        print(green('✓'))
+    else:
+        print(f"{red('✗')}  {gray_desc('daemon unreachable - run sudo setup/start.sh')}")
+
+    sys.stdout.write(f"  → Regenerating nginx + DNS...  ")
+    sys.stdout.flush()
+    r1 = subprocess.run([f"{PROJECT_ROOT}/dns_update"], capture_output=True)
+    r2 = subprocess.run([f"{PROJECT_ROOT}/web_update"], capture_output=True)
+    if r1.returncode == 0 and r2.returncode == 0:
+        print(green('✓'))
+    else:
+        print(f"{red('✗')}  {gray_desc('check: journalctl -u mailinabox')}")
 
     print(f"\n  {green('✓')} {bold('Done.')}\n")
     return True
@@ -457,26 +542,17 @@ def _run_with_output(conf_key, conf, storage_root, action_verb="Installing"):
 
 def _actions_for(key, label, status, msg, conf):
     """Return list of (action_label, handler) for a service."""
-
-
     storage_root = conf.get("STORAGE_ROOT", "/home/user-data")
     actions = []
 
-    # Recheck is always available
-    def recheck():
-        pass  # sentinel - handled in run_detail loop
     actions.append(("Recheck status", "recheck"))
 
     if key == "mail":
         def reinstall_mail():
-            clear()
-            print("\n  Reinstalling mail services...\n")
-            for script in ["setup/mail/postfix.sh", "setup/mail/dovecot.sh"]:
-                subprocess.run(
-                    ["bash", "-c", f"set -e; source setup/functions.sh; source {BARE_METAL_CONF}; source {script}"],
-                    cwd=PROJECT_ROOT,
-                )
-            _press_enter_to_return()
+            def run(log_buf, log_lines):
+                return all(_run_script(s, log_buf, log_lines)
+                           for s in ["setup/mail/postfix.sh", "setup/mail/dovecot.sh"])
+            _run_logged_screen("Reinstalling mail services", run)
         actions.append(("Reinstall / repair", reinstall_mail))
 
     elif key == "spam":
@@ -496,7 +572,6 @@ def _actions_for(key, label, status, msg, conf):
             ], confirm_label=f"Switch to {other_label}", cancel_label="Cancel")
             if not confirmed:
                 return
-            clear()
             _write_conf_key("SPAM_FILTER", other)
             conf["SPAM_FILTER"] = other
             _run_with_output(f"SPAM_FILTER:{other}", conf, storage_root, f"Installing {other_label}")
@@ -504,10 +579,9 @@ def _actions_for(key, label, status, msg, conf):
         actions.append((f"Switch to {other_label}", switch_spam))
 
         def reinstall_spam():
-            clear()
-            print(f"\n  Reinstalling {current}...\n")
-            _run_scripts(f"SPAM_FILTER:{current}", conf)
-            _press_enter_to_return()
+            def run(log_buf, log_lines):
+                return _run_scripts(f"SPAM_FILTER:{current}", conf, log_buf, log_lines)
+            _run_logged_screen(f"Reinstalling {current}", run)
         actions.append(("Reinstall / repair", reinstall_spam))
 
     elif key == "webmail":
@@ -524,35 +598,24 @@ def _actions_for(key, label, status, msg, conf):
         def switch_webmail():
             from .questions import step_webmail
             clear()
-
             class _FakeArgs: pass
             new_client = step_webmail(_FakeArgs(), dict(conf))
             if not new_client or new_client == current:
                 return
             new_label = next((l for l, v in _CLIENTS if v == new_client), new_client)
-
             clear()
-            warn_lines = [
-                f"Switching webmail from {current_label} to {new_label}.",
-                "",
-            ]
+            warn_lines = [f"Switching webmail from {current_label} to {new_label}.", ""]
             backup_paths = _BACKUP_PATHS.get(f"WEBMAIL_CLIENT:{current}", [])
             if backup_paths:
-                warn_lines += [
-                    "The following will be backed up but NOT migrated:",
-                ]
+                warn_lines += ["The following will be backed up but NOT migrated:"]
                 for p in backup_paths:
                     warn_lines.append(f"  · {storage_root}/{p}")
-                warn_lines += [
-                    "",
-                    "Contacts synced via Radicale (CardDAV) are unaffected.",
-                ]
+                warn_lines += ["", "Contacts synced via Radicale (CardDAV) are unaffected."]
             confirmed = _warn_screen(warn_lines,
                                      confirm_label=f"Switch to {new_label}",
                                      cancel_label="Cancel")
             if not confirmed:
                 return
-            clear()
             _backup(storage_root, f"WEBMAIL_CLIENT:{current}")
             _stop(f"WEBMAIL_CLIENT:{current}")
             _write_conf_key("WEBMAIL_CLIENT", new_client)
@@ -563,11 +626,12 @@ def _actions_for(key, label, status, msg, conf):
 
         if status != OFF:
             def reinstall_webmail():
-                clear()
-                print(f"\n  Reinstalling {current_label}...\n")
-                _run_scripts(f"WEBMAIL_CLIENT:{current}", conf)
-                _regenerate(conf)
-                _press_enter_to_return()
+                def run(log_buf, log_lines):
+                    ok = _run_scripts(f"WEBMAIL_CLIENT:{current}", conf, log_buf, log_lines)
+                    if ok:
+                        _regenerate(conf)
+                    return ok
+                _run_logged_screen(f"Reinstalling {current_label}", run)
             actions.append(("Reinstall / repair", reinstall_webmail))
 
     elif key in ("radicale", "filebrowser", "clamav"):
@@ -581,7 +645,7 @@ def _actions_for(key, label, status, msg, conf):
 
         if key == "radicale" and "226/NAMESPACE" in msg:
             def fix_namespace():
-                clear()
+                _page_header("Fix Radicale sandbox")
                 dropin_dir = "/etc/systemd/system/radicale.service.d"
                 dropin = os.path.join(dropin_dir, "no-namespace.conf")
                 os.makedirs(dropin_dir, exist_ok=True)
@@ -589,17 +653,18 @@ def _actions_for(key, label, status, msg, conf):
                     f.write("[Service]\nPrivateTmp=false\nProtectSystem=false\nBindPaths=\nReadWritePaths=\n")
                 subprocess.run(["systemctl", "daemon-reload"], capture_output=True)
                 subprocess.run(["systemctl", "restart", "radicale"], capture_output=True)
-                print(f"\n  {green('✓')} Drop-in written, Radicale restarted.\n")
+                print(f"\n  {green('✓')} Drop-in written, Radicale restarted.")
                 _press_enter_to_return()
             actions.append(("Fix sandbox (no namespace support)", fix_namespace))
 
         if enabled:
             def reinstall_svc(k=key, ck=ck):
-                clear()
-                print(f"\n  Reinstalling {label}...\n")
-                _run_scripts(f"{ck}:true", conf)
-                _regenerate(conf)
-                _press_enter_to_return()
+                def run(log_buf, log_lines):
+                    ok = _run_scripts(f"{ck}:true", conf, log_buf, log_lines)
+                    if ok:
+                        _regenerate(conf)
+                    return ok
+                _run_logged_screen(f"Reinstalling {label}", run)
             actions.append(("Reinstall / repair", reinstall_svc))
 
             def disable_svc(k=key, ck=ck):
@@ -621,20 +686,20 @@ def _actions_for(key, label, status, msg, conf):
                 _stop(f"{ck}:true")
                 _write_conf_key(ck, "false")
                 conf[ck] = "false"
-                _regenerate(conf)
-
-                print(f"\n  {green('✓')} {label} disabled.\n")
+                _regenerate(conf, reload_daemon=True)
+                print(f"\n  {green('✓')} {label} disabled.")
                 _press_enter_to_return()
             actions.append((f"Disable {label}", disable_svc))
         else:
             def enable_svc(k=key, ck=ck):
-                clear()
-                print(f"\n  Installing {label}...\n")
                 _write_conf_key(ck, "true")
                 conf[ck] = "true"
-                _run_scripts(f"{ck}:true", conf)
-                _regenerate(conf)
-                _press_enter_to_return()
+                def run(log_buf, log_lines):
+                    ok = _run_scripts(f"{ck}:true", conf, log_buf, log_lines)
+                    if ok:
+                        _regenerate(conf, reload_daemon=True)
+                    return ok
+                _run_logged_screen(f"Installing {label}", run)
             actions.append((f"Enable {label}", enable_svc))
 
     elif key in ("dns", "certs"):
@@ -643,13 +708,9 @@ def _actions_for(key, label, status, msg, conf):
             "certs": "setup/infra/ssl.sh",
         }
         def reinstall_infra(s=script_map[key]):
-            clear()
-            print(f"\n  Reinstalling {label}...\n")
-            subprocess.run(
-                ["bash", "-c", f"set -e; source setup/functions.sh; source {BARE_METAL_CONF}; source {s}"],
-                cwd=PROJECT_ROOT,
-            )
-            _press_enter_to_return()
+            def run(log_buf, log_lines):
+                return _run_script(s, log_buf, log_lines)
+            _run_logged_screen(f"Reinstalling {label}", run)
         actions.append(("Reinstall / repair", reinstall_infra))
 
     return actions
@@ -669,6 +730,17 @@ def run_detail(key, label, conf, results):
         print(f"  {gray_desc('─' * (_term_width() - 4))}")
         print()
         _render_detail(label, status, msg, actions, sel, first=True)
+        def _do_recheck():
+            nonlocal status, msg, actions, sel
+            sys.stdout.write("\033[u\033[J  ↻  Checking...\n")
+            sys.stdout.flush()
+            service_check = next(fn for sk, sl, fn in SERVICES if sk == key)
+            new_status, new_msg = service_check(conf)
+            results[key] = (new_status, new_msg)
+            status, msg = new_status, new_msg
+            actions = _actions_for(key, label, status, msg, conf)
+            sel = min(sel, len(actions) - 1)
+
         with Raw():
             while True:
                 k = read_key()
@@ -676,16 +748,12 @@ def run_detail(key, label, conf, results):
                     sel = (sel - 1) % len(actions)
                 elif k in ("down", "tab"):
                     sel = (sel + 1) % len(actions)
+                elif k == "r":
+                    _do_recheck()
                 elif k == "enter":
                     action_label, handler = actions[sel]
                     if handler == "recheck":
-
-                        service_check = next(fn for sk, sl, fn in SERVICES if sk == key)
-                        new_status, new_msg = service_check(conf)
-                        results[key] = (new_status, new_msg)
-                        status, msg = new_status, new_msg
-                        actions = _actions_for(key, label, status, msg, conf)
-                        sel = min(sel, len(actions) - 1)
+                        _do_recheck()
                     else:
                         print("\033[?25h", end="", flush=True)
                         clear()
@@ -704,7 +772,7 @@ def run_detail(key, label, conf, results):
                         print()
                         _render_detail(label, status, msg, actions, sel, first=True)
                         continue
-                elif k in ("esc", "ctrl_c"):
+                elif k in ("esc", "ctrl_c", "q"):
                     return
                 _render_detail(label, status, msg, actions, sel)
     finally:
@@ -802,6 +870,18 @@ def run(check=False):
                     sel = (sel - 1) % len(SERVICES)
                 elif k in ("down", "tab"):
                     sel = (sel + 1) % len(SERVICES)
+                elif k == "r":
+                    sys.stdout.write("\033[u\033[J")
+                    sys.stdout.flush()
+                    print(f"\n  {bold('boxctl doctor')}  {gray_desc('rechecking...')}", flush=True)
+                    for skey, _, check_fn in SERVICES:
+                        results[skey] = check_fn(conf)
+                    clear()
+                    print(f"\n  {bold('boxctl doctor')}")
+                    print(f"  {gray_desc('─' * (_term_width() - 4))}")
+                    print()
+                    _render_list(SERVICES, results, sel, first=True)
+                    continue
                 elif k == "enter":
                     key, label, check_fn = SERVICES[sel]
                     print("\033[?25h", end="", flush=True)
@@ -815,7 +895,7 @@ def run(check=False):
                     print()
                     _render_list(SERVICES, results, sel, first=True)
                     continue
-                elif k in ("esc", "ctrl_c"):
+                elif k in ("esc", "ctrl_c", "q"):
                     break
                 _render_list(SERVICES, results, sel)
     finally:

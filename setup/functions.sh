@@ -13,7 +13,11 @@ RUNTIME=${RUNTIME:-baremetal}
 
 function hide_output {
 	# This function hides the output of a command unless the command fails
-	# and returns a non-zero exit code.
+	# and returns a non-zero exit code. If VERBOSE=1, output is always shown.
+	if [ "${VERBOSE:-0}" = "1" ]; then
+		"$@"
+		return
+	fi
 
 	# Get a temporary file.
 	OUTPUT=$(mktemp)
@@ -48,10 +52,15 @@ function apt_get_quiet {
 	# and c) what to do about files changed locally (we don't cause that to happen but
 	# some VM providers muck with their images; -o).
 	#
+	# In recent versions, NEEDRESTART_MODE=a is also needed to suppress the "pending kernel upgrade"
+	# interactive dialog that needrestart shows on Ubuntu 26.04+ even with DEBIAN_FRONTEND=noninteractive.
+	# NEEDRESTART_SUSPEND=1 is needed to prevent it from trying to restart services in the middle of setup,
+	# which causes problems with our systemd stub in Docker and also just isn't a good idea in the middle of setup on bare metal.
+	#
 	# Although we could pass -qq to apt-get to make output quieter, many packages write to stdout
 	# and stderr things that aren't really important. Use our hide_output function to capture
 	# all of that and only show it if there is a problem (i.e. if apt_get returns a failure exit status).
-	DEBIAN_FRONTEND=noninteractive hide_output apt-get -y --no-install-recommends -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" -o DPkg::Lock::Timeout=300 "$@"
+	DEBIAN_FRONTEND=noninteractive NEEDRESTART_SUSPEND=1 NEEDRESTART_MODE=a hide_output apt-get -y --no-install-recommends -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" -o DPkg::Lock::Timeout=300 "$@"
 }
 
 function apt_install {

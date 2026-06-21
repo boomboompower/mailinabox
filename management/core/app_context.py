@@ -4,6 +4,11 @@
 
 from core import utils
 import auth.auth as auth
+from mail.mailconfig import initialize_database
 
 env = utils.load_environment()
+
+# Ensure DB tables exist and database file is 660 (so -shm inherits correctly).
+initialize_database(env)
+
 auth_service = auth.AuthService()

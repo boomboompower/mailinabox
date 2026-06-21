@@ -246,6 +246,7 @@ rsync -a --delete frontend/dist/ $share_dir/frontend/dist/
 rsync -a --delete setup/conf/nginx/ $share_dir/nginx-templates/
 rsync -a --delete management/ $inst_dir/management/
 rsync -a --delete setup/boxctl/ $inst_dir/boxctl/
+rsync -a --delete setup/ $inst_dir/setup/
 
 # Install boxctl as a standalone command so `sudo boxctl` and `sudo mailinabox` both work
 # after setup, even if the repo directory is deleted.

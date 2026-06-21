@@ -56,7 +56,7 @@ watch(open, async (val) => {
           aria-modal="true"
           aria-labelledby="dialog-title"
           tabindex="-1"
-          class="bg-surface-raised/95 backdrop-blur-sm rounded-4xl w-full max-w-[32rem] p-6 shadow-3xl outline-none"
+          class="bg-surface-raised backdrop-blur-sm rounded-4xl w-full max-w-[32rem] p-6 shadow-3xl outline-none"
         >
           <h3 id="dialog-title" class="text-base font-semibold mb-1">{{ title }}</h3>
           <p v-if="description" class="text-sm text-muted mb-5">{{ description }}</p>

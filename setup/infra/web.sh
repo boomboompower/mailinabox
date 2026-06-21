@@ -126,6 +126,11 @@ cat > /etc/logrotate.d/nginx << 'EOF'
 }
 EOF
 
+# Install the web_update helper to a fixed path so boxctl doesn't depend
+# on the source repo surviving after setup.
+cp --remove-destination setup/tools/web_update /usr/local/lib/mailinabox/web_update
+chmod +x /usr/local/lib/mailinabox/web_update
+
 # Start services.
 restart_service nginx
 

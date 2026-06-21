@@ -199,6 +199,25 @@ sieve_script personal {
 }
 EOF
 
+	cat > /etc/dovecot/conf.d/auth-sql.conf.ext << EOF
+passdb sql {
+  sql_driver = sqlite
+  sqlite_path = $STORAGE_ROOT/mail/db/users.sqlite
+  passdb_default_password_scheme = BLF-CRYPT
+  passdb_sql_query = SELECT password FROM users WHERE email='%{user}'
+}
+userdb sql {
+  sql_driver = sqlite
+  sqlite_path = $STORAGE_ROOT/mail/db/users.sqlite
+  userdb_sql_query = SELECT email, \\
+    '$STORAGE_ROOT/mail/mailboxes/%{user|domain}/%{user|username}' AS home, \\
+    'mail' AS uid, 'mail' AS gid, \\
+    CASE WHEN quota='0' OR quota='' THEN 0 ELSE CAST(quota AS INTEGER) END AS quota_storage_size \\
+    FROM users WHERE email='%{user}'
+  userdb_sql_iterate_query = SELECT email AS user FROM users
+}
+EOF
+
 else # Dovecot 2.3
 
 	setup/tools/editconf.py /etc/dovecot/conf.d/10-mail.conf \
@@ -281,10 +300,23 @@ plugin {
 }
 EOF
 
+	cat > /etc/dovecot/conf.d/auth-sql.conf.ext << 'EOF'
+passdb {
+  driver = sql
+  args = /etc/dovecot/dovecot-sql.conf.ext
+}
+userdb {
+  driver = sql
+  args = /etc/dovecot/dovecot-sql.conf.ext
+}
+EOF
+
 fi # end version-specific configuration
 
-# Copy the global sieve script and compile it. Global scripts must be
-# compiled now because Dovecot won't have permission later.
+# Copy the global sieve script and compile it now, while running as root.
+# Dovecot's LMTP process won't have write access to /etc/dovecot at runtime,
+# so lazy compilation would silently fail. auth-sql.conf.ext is already written
+# above, so sievec's internal doveconf call succeeds.
 cp setup/conf/mail/sieve-spam.txt /etc/dovecot/sieve-spam.sieve
 sievec /etc/dovecot/sieve-spam.sieve
 

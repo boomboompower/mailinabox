@@ -14,14 +14,20 @@ if [ "${RUNTIME:-baremetal}" = "docker" ]; then
     # container provides clamav-milter, and entrypoint.sh wires the milter.
     apt_install_cached "clamav" clamav clamav-daemon
 else
+    # Mask clamav-milter before install so dpkg's postinst doesn't try to start
+    # it immediately (clamd isn't running yet and the milter would time out).
+    # We unmask and start it ourselves after clamd is up.
+    systemctl mask clamav-milter 2>/dev/null || true
     apt_install_cached "clamav" clamav clamav-daemon clamav-milter
 fi
 
-# freshclam downloads the signature database on first run. This can take
-# a minute. Run it once now so the daemon starts with an up-to-date DB.
-# Stop freshclam first if it's running (it locks the DB file).
-systemctl stop clamav-freshclam 2>/dev/null || true
-hide_output freshclam || echo "WARNING: freshclam could not update signatures - check network connectivity."
+# freshclam downloads the signature database. Only run it if the DB files are
+# missing - on reruns the running clamav-freshclam service keeps them current.
+if [ ! -f /var/lib/clamav/main.cvd ] && [ ! -f /var/lib/clamav/main.cld ]; then
+    echo "Downloading ClamAV signature database (first run, this may take a minute)..."
+    systemctl stop clamav-freshclam 2>/dev/null || true
+    hide_output freshclam || echo "WARNING: freshclam could not update signatures - check network connectivity."
+fi
 
 # Point clamd at the default socket path that Rspamd's antivirus module expects.
 setup/tools/editconf.py /etc/clamav/clamd.conf -s \
@@ -55,6 +61,7 @@ if [ "${RUNTIME:-baremetal}" != "docker" ]; then
     cat > /etc/clamav/clamav-milter.conf << 'EOF'
 MilterSocket unix:/run/clamav/clamav-milter.sock
 MilterSocketMode 660
+PidFile /run/clamav/clamav-milter.pid
 ClamdSocket unix:/run/clamav/clamd.ctl
 OnInfected Reject
 RejectMsg "Message rejected: virus detected"
@@ -64,8 +71,19 @@ LogFacility LOG_MAIL
 EOF
 
     append_milter "unix:/run/clamav/clamav-milter.sock"
-    restart_service clamav-milter
 fi
 
+# Start daemon first - milter connects to clamd.ctl so it must be up before milter starts.
 restart_service clamav-daemon
+echo -n "Waiting for clamd socket..."
+for i in $(seq 1 60); do
+    [ -S /run/clamav/clamd.ctl ] && break
+    sleep 2
+done
+[ -S /run/clamav/clamd.ctl ] && echo " ready." || echo " timed out (milter may fail to connect)."
+
+if [ "${RUNTIME:-baremetal}" != "docker" ]; then
+    systemctl unmask clamav-milter 2>/dev/null || true
+    restart_service clamav-milter
+fi
 restart_service clamav-freshclam

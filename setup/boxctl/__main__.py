@@ -166,13 +166,14 @@ def main():
         p = argparse.ArgumentParser(add_help=False)
         p.add_argument('command')
         p.add_argument('--show-cert', action='store_true')
+        p.add_argument('--install', action='store_true')
         _quick, _ = p.parse_known_args()
         if _quick.command == 'bootstrap':
             if __package__ in (None, ''):
                 from boxctl.bootstrap import run as run_bootstrap
             else:
                 from .bootstrap import run as run_bootstrap
-            run_bootstrap(show_cert=_quick.show_cert)
+            run_bootstrap(show_cert=_quick.show_cert, install=_quick.install)
         elif _quick.command == 'update':
             _run_update()
         return
@@ -238,6 +239,8 @@ def main():
                    help="generate a one-time setup code to create the first admin account via the web UI")
     pb.add_argument("--show-cert", action="store_true",
                     help="also print the TLS certificate fingerprint (useful when DNS is not yet resolving)")
+    pb.add_argument("--install", action="store_true",
+                    help="called from the installer: show a completion message if an admin already exists instead of an error")
 
     # ── update (bare metal only) ───────────────────────────────────────────────
     sub.add_parser("update",
@@ -302,7 +305,7 @@ def main():
                 from boxctl.bootstrap import run as run_bootstrap
             else:
                 from .bootstrap import run as run_bootstrap
-            run_bootstrap(show_cert=getattr(args, 'show_cert', False))
+            run_bootstrap(show_cert=getattr(args, 'show_cert', False), install=getattr(args, 'install', False))
 
         elif args.command == "update":
             _run_update()

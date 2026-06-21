@@ -13,8 +13,10 @@ echo "Installing Cypht (webmail)..."
 apt_install_cached "webmail" php-cli php-fpm php-curl php-mbstring php-zip \
     php-json php-intl php-xml php-soap php-gd ca-certificates composer unzip
 
-CYPHT_VERSION="2.10.1"
-CYPHT_SHA256="3d09e82828f10eb5b0ab93bba14a1aba0fd551e644165f3ab7aa65d061a0a05a"
+# Pinned to a commit rather than a release tag so merged upstream fixes land
+# without waiting for a release. Update CYPHT_COMMIT + CYPHT_SHA256 together.
+CYPHT_COMMIT="d4a9c43b109d019577b364fa89852264377ca03a"
+CYPHT_SHA256="d0d07588f1755eee258ba181e28bb103b9bc4374f8e54d3e5e4794e80f29d7a7"
 CYPHT_DIR="/usr/local/src/cypht"
 CYPHT_TARGET="/usr/local/share/cypht"
 _CYPHT_STAMP=/usr/local/share/cypht.version
@@ -22,29 +24,30 @@ _CYPHT_STAMP=/usr/local/share/cypht.version
 needs_download=0
 if [ ! -d "$CYPHT_DIR" ]; then
     needs_download=1
-elif [ ! -f "$_CYPHT_STAMP" ] || [ "$(cat "$_CYPHT_STAMP")" != "$CYPHT_VERSION" ]; then
+elif [ ! -f "$_CYPHT_STAMP" ] || [ "$(cat "$_CYPHT_STAMP")" != "$CYPHT_COMMIT" ]; then
     needs_download=1
 fi
 
 if [ "$needs_download" = "1" ]; then
-    echo "Downloading Cypht version ${CYPHT_VERSION}..."
+    echo "Downloading Cypht at ${CYPHT_COMMIT:0:8}..."
     rm -rf "$CYPHT_DIR"
     mkdir -p "$CYPHT_DIR"
     wget_verify_sha256 \
-        "https://github.com/cypht-org/cypht/archive/refs/tags/v${CYPHT_VERSION}.tar.gz" \
+        "https://github.com/cypht-org/cypht/archive/${CYPHT_COMMIT}.tar.gz" \
         "$CYPHT_SHA256" \
         /tmp/cypht.tar.gz
     tar -xzf /tmp/cypht.tar.gz --strip-components=1 -C "$CYPHT_DIR"
     rm -f /tmp/cypht.tar.gz
-    echo "$CYPHT_VERSION" > "$_CYPHT_STAMP"
+    echo "$CYPHT_COMMIT" > "$_CYPHT_STAMP"
 fi
 
 # Keyed on script content hash so a script change (e.g. module list update)
-# forces a redeploy even when the version string hasn't changed.
-_cypht_deploy_key="${CYPHT_VERSION}:$(hash_files "$PWD/setup/webmail/cypht.sh")"
+# forces a redeploy even when the commit hasn't changed.
+_cypht_deploy_key="${CYPHT_COMMIT}:$(hash_files "$PWD/setup/webmail/cypht.sh")"
 if needs_build "cypht-webmail" "$_cypht_deploy_key" || [ ! -d "$CYPHT_TARGET" ]; then
     echo "Installing Cypht vendor dependencies..."
     COMPOSER_ALLOW_SUPERUSER=1 hide_output composer install --no-dev --working-dir="$CYPHT_DIR"
+
     echo "Deploying Cypht..."
     mkdir -p "$CYPHT_TARGET"
     hide_output rsync -a --delete "$CYPHT_DIR/" "$CYPHT_TARGET/"
@@ -178,39 +181,6 @@ f = '$CYPHT_TARGET/modules/carddav_contacts/modules.php'
 with open(f) as fh: c = fh.read()
 if \"trans('Add Carddav')\" in c:
     c = c.replace(\"trans('Add Carddav')\", \"trans('Add Contact')\", 1)
-    with open(f, 'w') as fh: fh.write(c)
-"
-
-    # Upstream load_carddav_contacts passes $this->config->dump() (all module
-    # configs) to carddav_sources instead of just the CardDAV server list,
-    # causing the Account dropdown in the Add Contact form to show every config key.
-    python3 -c "
-f = '$CYPHT_TARGET/modules/carddav_contacts/modules.php'
-with open(f) as fh: c = fh.read()
-old = \"\\\$this->out('carddav_sources', \\\$details);\"
-new = \"\\\$this->out('carddav_sources', config('carddav'));\"
-if old in c:
-    c = c.replace(old, new, 1)
-    with open(f, 'w') as fh: fh.write(c)
-"
-
-    # Upstream url_concat() drops the port from the CardDAV server URL, causing
-    # discovery PROPFIND requests to hit port 80 (nginx) instead of Radicale.
-    python3 -c "
-f = '$CYPHT_TARGET/modules/carddav_contacts/hm-carddav.php'
-with open(f) as fh: c = fh.read()
-old = (\"    private function url_concat(\\\$path) {\\\n\"
-       \"        \\\$parsed = parse_url(\\\$this->url);\\\n\"
-       \"        return sprintf('%s://%s/%s', \\\$parsed['scheme'], \\\$parsed['host'], preg_replace('#^/#', '', \\\$path));\\\n\"
-       \"    }\")
-new = (\"    private function url_concat(\\\$path) {\\\n\"
-       \"        \\\$parsed = parse_url(\\\$this->url);\\\n\"
-       \"        \\\$host = \\\$parsed['host'];\\\n\"
-       \"        if (!empty(\\\$parsed['port'])) { \\\$host .= ':' . \\\$parsed['port']; }\\\n\"
-       \"        return sprintf('%s://%s/%s', \\\$parsed['scheme'], \\\$host, preg_replace('#^/#', '', \\\$path));\\\n\"
-       \"    }\")
-if old in c:
-    c = c.replace(old, new, 1)
     with open(f, 'w') as fh: fh.write(c)
 "
 

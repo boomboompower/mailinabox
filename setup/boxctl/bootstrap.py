@@ -11,7 +11,7 @@ import uuid
 BARE_METAL_CONF = "/etc/mailinabox.conf"
 
 
-def run(show_cert: bool = False) -> None:
+def run(show_cert: bool = False, install: bool = False) -> None:
     from .ui import bold, green, gray_desc, lavender, red, _term_width
 
     def line(): return gray_desc("─" * (_term_width() - 2))
@@ -49,6 +49,25 @@ def run(show_cert: bool = False) -> None:
     rows = conn.execute("SELECT privileges FROM users").fetchall()
     conn.close()
     if any('admin' in row[0].split('\n') for row in rows):
+        if install:
+            print()
+            print(f"  {bold('Mail-in-a-Box setup complete.')}")
+            print(f"  {line()}")
+            print(f"  {'Admin panel':<18} {lavender(f'https://{hostname}/admin')}")
+            if show_cert:
+                cert_path = os.path.join(storage_root, 'ssl/ssl_certificate.pem')
+                if os.path.exists(cert_path):
+                    import subprocess
+                    result = subprocess.run(
+                        ['openssl', 'x509', '-in', cert_path, '-noout', '-fingerprint', '-sha256'],
+                        capture_output=True, text=True,
+                    )
+                    fingerprint = result.stdout.strip().replace('sha256 Fingerprint=', '').replace('SHA256 Fingerprint=', '')
+                    if fingerprint:
+                        print(f"  {'TLS fingerprint':<18} {gray_desc(fingerprint)}")
+            print(f"  {line()}")
+            print()
+            return
         print(f"\n  {red('An admin account already exists. Bootstrap is not available.')}\n")
         sys.exit(1)
 

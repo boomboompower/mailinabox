@@ -1,10 +1,13 @@
+import os
 import sqlite3
 
 _DB_SUBPATH = "/mail/db/users.sqlite"
 
 def initialize_database(env):
-	# Create tables if they don't exist. Called once at daemon startup.
-	conn = sqlite3.connect(env["STORAGE_ROOT"] + _DB_SUBPATH)
+	# Create tables if they don't exist. Called once at daemon startup and
+	# once from users.sh during setup.
+	db_path = env["STORAGE_ROOT"] + _DB_SUBPATH
+	conn = sqlite3.connect(db_path)
 	conn.executescript("""
 		PRAGMA journal_mode=WAL;
 		CREATE TABLE IF NOT EXISTS users (
@@ -61,6 +64,11 @@ def initialize_database(env):
 	""")
 	conn.commit()
 	conn.close()
+	# SQLite copies the database file's mode when creating -shm, so setting
+	# 660 here ensures all future -shm files are group-writable for mail-db
+	# members (postfix proxymap, dovecot auth-workers) without any further
+	# intervention regardless of which process creates -shm first.
+	os.chmod(db_path, 0o660)
 
 def open_database(env, with_connection=False):
 	conn = sqlite3.connect(env["STORAGE_ROOT"] + _DB_SUBPATH)
