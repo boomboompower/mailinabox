@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive'
-type ButtonSize = 'sm' | 'md' | 'lg'
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'destructive' | 'link'
+type ButtonSize = 'sm' | 'md' | 'lg' | 'icon'
 
 const props = withDefaults(
   defineProps<{
@@ -25,12 +25,17 @@ const classes = computed(() => {
       'bg-surface text-text hover:bg-hover',
     ghost: 'hover:bg-hover text-text',
     destructive: 'bg-red-600 text-white hover:bg-red-700',
+    // Inline text button - no background, just text color transition. Suitable for
+    // "Change", "show more", icon-adjacent actions. Pass class="text-faint" to de-emphasise.
+    link: 'text-muted hover:text-text',
   }
 
   const sizes: Record<ButtonSize, string> = {
     sm: 'h-8 px-3 text-xs',
     md: 'h-9 px-4 text-sm',
     lg: 'h-10 px-5 text-sm',
+    // Icon-only: square with no horizontal padding. Set explicit size on the icon slot.
+    icon: 'size-8 p-0',
   }
 
   return [base, variants[props.variant], sizes[props.size]]

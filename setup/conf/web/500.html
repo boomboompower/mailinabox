@@ -51,9 +51,9 @@
   .card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    max-width: 360px;
+    border-radius: 1.25rem;
+    padding: 2rem;
+    max-width: 440px;
     width: 100%;
   }
 
@@ -82,15 +82,19 @@
     color: var(--muted);
     line-height: 1.55;
   }
-  p + p { margin-top: 0.375rem; }
+  p + p { margin-top: 0.625rem; }
 
   code {
+    display: block;
+    margin-top: 0.625rem;
     font-family: ui-monospace, 'Cascadia Code', monospace;
     font-size: 0.8125rem;
     background: var(--code-bg);
     color: var(--text-hi);
-    padding: 0.1em 0.4em;
-    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    white-space: nowrap;
+    overflow-x: auto;
   }
 
   .footer {
@@ -134,7 +138,8 @@
 
   <h1>Something went wrong</h1>
   <p>The server encountered an unexpected error. This has been logged.</p>
-  <p>If the problem persists, check <code>sudo journalctl -u mailinabox</code> for details.</p>
+  <p>If the problem persists, check the logs for details.</p>
+  <code>sudo journalctl -u mailinabox</code>
 
   <div class="footer">
     <a class="btn" href="">

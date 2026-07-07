@@ -31,6 +31,7 @@ _VERIFY_MAX_IPS = 1000
 _verify_failures: collections.OrderedDict[str, list[float]] = collections.OrderedDict()
 _verify_lock = threading.Lock()
 
+
 def _verify_rate_limited(ip: str) -> bool:
 	now = time.monotonic()
 	cutoff = now - _VERIFY_WINDOW_SECONDS
@@ -39,6 +40,7 @@ def _verify_rate_limited(ip: str) -> bool:
 		_verify_failures[ip] = attempts
 		_verify_failures.move_to_end(ip)
 		return len(attempts) >= _VERIFY_MAX_FAILURES
+
 
 def _verify_record_failure(ip: str) -> None:
 	now = time.monotonic()
@@ -50,6 +52,7 @@ def _verify_record_failure(ip: str) -> None:
 		_verify_failures.move_to_end(ip)
 		if len(_verify_failures) > _VERIFY_MAX_IPS:
 			_verify_failures.popitem(last=False)
+
 
 # Create a session key by checking the username/password in the Authorization header.
 @bp.route('/login', methods=["POST"])
@@ -78,11 +81,17 @@ def login():
 	session_key = auth_service.create_session_key(email, env, session_type='login')
 	current_app.logger.info("New login session created for %s", email)
 
-	response = make_response(json_response({
-		"status": "ok",
-		"email": email,
-		"privileges": privs,
-	}))
+	from core.views.spa_views import _build_capabilities
+	monitoring = env.get('MONITORING_TOOL', 'none')
+	response = make_response(
+		json_response({
+			"status": "ok",
+			"email": email,
+			"privileges": privs,
+			"monitoringTool": monitoring if monitoring != 'none' else None,
+			"capabilities": _build_capabilities(env),
+		})
+	)
 	response.set_cookie(
 		'admin_session',
 		session_key,
@@ -92,11 +101,13 @@ def login():
 	)
 	return response
 
+
 @bp.route('/auth/methods')
 def auth_methods():
 	# Returns the available login paths for an email address.
 	# Unknown emails return the password path to avoid account enumeration.
 	from auth.mfa import get_public_mfa_state, get_public_webauthn_credentials
+
 	email_raw = request.args.get('email', '')
 	try:
 		email = validate_email(email_raw)
@@ -117,6 +128,7 @@ def auth_methods():
 		paths.append("password")
 
 	return json_response({"paths": paths})
+
 
 @bp.route('/logout', methods=["POST"])
 def logout():
@@ -139,6 +151,7 @@ def logout():
 	response = make_response(json_response({"status": "ok"}))
 	response.delete_cookie('admin_session', httponly=True, secure=not current_app.debug, samesite='Strict')
 	return response
+
 
 @bp.route('/auth/verify', methods=['POST'])
 def auth_verify():
@@ -181,21 +194,29 @@ def auth_verify():
 		"privileges": privs if not isinstance(privs, tuple) else [],
 	})
 
+
 @bp.route('/whoami')
 @read_scope
 @require_admin_route
 def whoami():
-	return json_response({
-        "email": request.user_email,
-        "privileges": request.user_privs,
-    })
+	response = json_response({
+		"email": request.user_email,
+		"privileges": request.user_privs,
+	})
+	# X-Admin-Email is read by nginx auth_request_set for trusted-header proxy auth
+	# (e.g. Beszel). Never reaches the browser - nginx consumes it internally.
+	response.headers['X-Admin-Email'] = request.user_email
+	return response
+
 
 @bp.route('/tokens', methods=['GET'])
 @read_scope
 @require_admin_route
 def list_tokens():
 	from auth.api_tokens import list_tokens as _list_tokens
+
 	return json_response(_list_tokens(request.user_email, env))
+
 
 @bp.route('/tokens', methods=['POST'])
 @require_admin_route
@@ -204,6 +225,7 @@ def create_token():
 	if request.token_scope != 'full':
 		return ('API tokens cannot create other API tokens.', 403)
 	from auth.api_tokens import create_token as _create_token
+
 	name = request.form.get('name', '').strip()
 	scope = request.form.get('scope', 'write').strip()
 	if not name:
@@ -218,6 +240,7 @@ def create_token():
 		return (str(e), 400)
 	return json_response({'token': plaintext})
 
+
 @bp.route('/tokens/<int:token_id>', methods=['DELETE'])
 @require_admin_route
 def revoke_token(token_id: int):
@@ -225,6 +248,7 @@ def revoke_token(token_id: int):
 	if request.token_scope != 'full' and request.caller_token_id != token_id:
 		return ('API tokens can only revoke themselves.', 403)
 	from auth.api_tokens import revoke_token as _revoke_token
+
 	if not _revoke_token(request.user_email, token_id, env):
 		return ('Token not found.', 404)
 	return ('OK', 200)

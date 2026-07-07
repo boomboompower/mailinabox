@@ -2,9 +2,12 @@ from ..registry import check
 from ..reporter import CheckFailed
 from .. import utils
 
+
 def _web_domains(env):
 	from services.web_update import get_web_domains
+
 	return get_web_domains(env)
+
 
 @check("web-domain", category="web", per_domain=_web_domains, depends_on=["unbound"])
 def check_web_domain(env, domain, report):
@@ -21,8 +24,7 @@ def check_web_domain(env, domain, report):
 					continue
 				value = utils.query_dns(domain, rtype)
 				if value != utils.normalize_ip(expected):
-					raise CheckFailed(f"This domain should resolve to this box's IP address ({rtype} {expected}) to serve "
-						f"webmail or a website here. It currently resolves to {value}.")
+					raise CheckFailed(f"This domain should resolve to this box's IP address ({rtype} {expected}) to serve webmail or a website here. It currently resolves to {value}.")
 				ok_values.append(value)
 
 	with report.step("TLS certificate is signed and valid"):
@@ -34,8 +36,7 @@ def check_web_domain(env, domain, report):
 		ssl_certificates = get_ssl_certificates(env)
 		tls_cert = get_domain_ssl_files(domain, ssl_certificates, env, allow_missing_cert=True)
 		if tls_cert is None:
-			report.warn("No TLS (SSL) certificate is installed for this domain. Visitors will get a security warning. "
-				"Use the TLS Certificates page in the control panel to install one.")
+			report.warn("No TLS (SSL) certificate is installed for this domain. Visitors will get a security warning. Use the TLS Certificates page in the control panel to install one.")
 			return
 
 		cert_status, cert_status_details = check_certificate(domain, tls_cert["certificate"], tls_cert["private-key"], rounded_time=True)

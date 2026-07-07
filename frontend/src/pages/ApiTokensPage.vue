@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
-import { Key, WifiOff, Plus } from 'lucide-vue-next'
+import { Key, Plus } from 'lucide-vue-next'
+import AsyncState from '@/components/ui/AsyncState.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import Field from '@/components/ui/Field.vue'
 import Input from '@/components/ui/Input.vue'
 import Select from '@/components/ui/Select.vue'
-import Card from '@/components/ui/Card.vue'
 import Code from '@/components/ui/Code.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
@@ -138,54 +138,42 @@ onMounted(load)
 
 <template>
   <AppLayout>
-    <PageHeader title="API Tokens">
-      <template v-if="!loadError" #actions>
+    <PageHeader title="API Tokens" description="Allow external apps and automations to manage this box.">
+      <template #actions>
         <Button size="sm" @click="createOpen = true"><Plus class="size-3.5" />New token</Button>
       </template>
     </PageHeader>
 
-    <p class="text-sm text-muted mb-6">
-      API tokens let external scripts and tools authenticate to the admin API
-      without using your password. Each token can be scoped to read-only or
-      read-write access. Tokens cannot create other tokens or grant admin privileges.
-    </p>
-
-    <EmptyState
-      v-if="loadError"
-      title="Could not load tokens"
-      description="The server did not respond. Check your connection and try again."
-    >
-      <template #icon><WifiOff /></template>
-      <template #action>
-        <Button variant="secondary" @click="load">Try again</Button>
-      </template>
-    </EmptyState>
-
-    <Card v-else class="overflow-hidden">
-      <!-- Loading skeleton -->
-      <template v-if="loading">
-        <div class="p-5 space-y-3">
-          <Skeleton class="h-4 w-64" />
-          <Skeleton class="h-4 w-48" />
-          <Skeleton class="h-4 w-56" />
-        </div>
+    <AsyncState :loading="loading" :error="loadError" :empty="tokens.length === 0" error-title="Could not load tokens" @retry="load">
+      <template #loading>
+        <Table>
+          <TableHead>
+            <Th>Name</Th>
+            <Th>Scope</Th>
+            <Th>Created</Th>
+            <Th>Last used</Th>
+            <Th />
+          </TableHead>
+          <tbody>
+            <TableRow v-for="i in 2" :key="i">
+              <td class="px-4 py-3"><Skeleton class="h-4 w-48" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-14" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-32" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-24" /></td>
+              <td class="px-4 py-3"></td>
+            </TableRow>
+          </tbody>
+        </Table>
       </template>
 
-      <!-- Empty state -->
-      <EmptyState
-        v-else-if="tokens.length === 0"
-        title="No API tokens"
-        description="Create a token to authenticate scripts and tools against the admin API."
-        class="py-10"
-      >
-        <template #icon><Key /></template>
-        <template #action>
-          <Button @click="createOpen = true">New token</Button>
-        </template>
-      </EmptyState>
+      <template #empty>
+        <EmptyState title="No API tokens" description="Create a token to authenticate scripts and tools against the admin API.">
+          <template #icon><Key /></template>
+          <template #action><Button @click="createOpen = true">New token</Button></template>
+        </EmptyState>
+      </template>
 
-      <!-- Token table -->
-      <Table v-else>
+      <Table>
         <TableHead>
           <Th>Name</Th>
           <Th>Scope</Th>
@@ -197,7 +185,7 @@ onMounted(load)
           <TableRow v-for="token in tokens" :key="token.id">
             <td class="px-4 py-3 text-sm font-medium">{{ token.name }}</td>
             <td class="px-4 py-3">
-              <Badge :variant="token.scope === 'write' ? 'success' : 'default'">
+              <Badge :variant="token.scope === 'write' ? 'warning' : 'default'">
                 {{ token.scope }}
               </Badge>
             </td>
@@ -211,7 +199,7 @@ onMounted(load)
           </TableRow>
         </tbody>
       </Table>
-    </Card>
+    </AsyncState>
 
     <!-- Create token sheet -->
     <Sheet v-model="createOpen" title="New API token">

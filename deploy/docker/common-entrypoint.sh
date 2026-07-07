@@ -57,7 +57,7 @@ write_mailinabox_conf() {
     #   STORAGE_USER      - system user that owns STORAGE_ROOT (default user-data)
     #   PRIVATE_IP        - private/internal IPv4 (defaults to PUBLIC_IP)
     #   PRIVATE_IPV6      - private/internal IPv6 (defaults to PUBLIC_IPV6)
-    #   ENABLE_FILEBROWSER, ENABLE_RADICALE, WEBMAIL_CLIENT, DNS_MODE, BACKUP_TOOL
+    #   ENABLE_FILEBROWSER, ENABLE_RADICALE, WEBMAIL_CLIENT, DNS_MODE, BACKUP_TOOL, SPAM_FILTER
 
     : "${PRIMARY_HOSTNAME:?PRIMARY_HOSTNAME env var is required}"
     : "${PUBLIC_IP:?PUBLIC_IP env var is required}"
@@ -87,11 +87,12 @@ PUBLIC_IPV6=${public_ipv6}
 PRIVATE_IP=${private_ip}
 PRIVATE_IPV6=${private_ipv6}
 MTA_STS_MODE=${MTA_STS_MODE:-enforce}
-ENABLE_FILEBROWSER=${ENABLE_FILEBROWSER:-true}
-ENABLE_RADICALE=${ENABLE_RADICALE:-true}
+ENABLE_FILEBROWSER=${ENABLE_FILEBROWSER:-false}
+ENABLE_RADICALE=${ENABLE_RADICALE:-false}
 WEBMAIL_CLIENT=${WEBMAIL_CLIENT:-oxi}
 DNS_MODE=${DNS_MODE:-self}
-BACKUP_TOOL=${BACKUP_TOOL:-duplicity}
+BACKUP_TOOL=${BACKUP_TOOL:-restic}
+SPAM_FILTER=${SPAM_FILTER:-rspamd}
 MAIL_HOST=${mail_host}
 DNS_HOST=${dns_host}
 MANAGEMENT_HOST=${management_host}

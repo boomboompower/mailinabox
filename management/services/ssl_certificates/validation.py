@@ -8,6 +8,7 @@ import re
 
 from core.utils import shell
 
+
 def check_certificate(domain, ssl_certificate, ssl_private_key, warn_if_expiring_soon=10, rounded_time=False, just_check_domain=False):
 	# Check that the ssl_certificate & ssl_private_key files are good
 	# for the provided domain.
@@ -21,7 +22,8 @@ def check_certificate(domain, ssl_certificate, ssl_private_key, warn_if_expiring
 	try:
 		ssl_cert_chain = load_cert_chain(ssl_certificate)
 		cert = load_pem(ssl_cert_chain[0])
-		if not isinstance(cert, Certificate): raise ValueError("This is not a certificate file.")
+		if not isinstance(cert, Certificate):
+			raise ValueError("This is not a certificate file.")
 	except ValueError as e:
 		return (f"There is a problem with the certificate file: {e!s}", None)
 
@@ -45,9 +47,7 @@ def check_certificate(domain, ssl_certificate, ssl_private_key, warn_if_expiring
 		except ValueError as e:
 			return (f"The private key file {ssl_private_key} is not a private key file: {e!s}", None)
 
-		if (not isinstance(priv_key, rsa.RSAPrivateKey)
-			and not isinstance(priv_key, dsa.DSAPrivateKey)
-			and not isinstance(priv_key, ec.EllipticCurvePrivateKey)):
+		if not isinstance(priv_key, rsa.RSAPrivateKey) and not isinstance(priv_key, dsa.DSAPrivateKey) and not isinstance(priv_key, ec.EllipticCurvePrivateKey):
 			return (f"The private key file {ssl_private_key} is not a private key file.", None)
 
 		if priv_key.public_key().public_numbers() != cert.public_key().public_numbers():
@@ -71,8 +71,9 @@ def check_certificate(domain, ssl_certificate, ssl_private_key, warn_if_expiring
 	# Check that the certificate hasn't expired. The datetimes returned by the
 	# certificate are 'naive' and in UTC. We need to get the current time in UTC.
 	import datetime
+
 	now = datetime.datetime.now(datetime.timezone.utc)
-	if not(cert.not_valid_before_utc <= now <= cert.not_valid_after_utc):
+	if not (cert.not_valid_before_utc <= now <= cert.not_valid_after_utc):
 		return (f"The certificate has expired or is not yet valid. It is valid from {cert.not_valid_before_utc} to {cert.not_valid_after_utc}.", None)
 
 	# Next validate that the certificate is valid. This checks whether the certificate
@@ -82,14 +83,21 @@ def check_certificate(domain, ssl_certificate, ssl_private_key, warn_if_expiring
 
 	# The certificate chain has to be passed separately and is given via STDIN.
 	# This command returns a non-zero exit status in most cases, so trap errors.
-	retcode, verifyoutput = shell('check_output', [
-		"openssl",
-		"verify", "-verbose",
-		"-purpose", "sslserver", "-policy_check",]
+	retcode, verifyoutput = shell(
+		'check_output',
+		[
+			"openssl",
+			"verify",
+			"-verbose",
+			"-purpose",
+			"sslserver",
+			"-policy_check",
+		]
 		+ ([] if len(ssl_cert_chain) == 1 else ["-untrusted", "/proc/self/fd/0"])
 		+ [ssl_certificate],
 		input=b"\n\n".join(ssl_cert_chain[1:]),
-		trap=True)
+		trap=True,
+	)
 
 	if "self signed" in verifyoutput:
 		# Certificate is self-signed. Probably we detected this above.
@@ -107,7 +115,7 @@ def check_certificate(domain, ssl_certificate, ssl_private_key, warn_if_expiring
 
 	# But is it expiring soon?
 	cert_expiration_date = cert.not_valid_after_utc
-	ndays = (cert_expiration_date-now).days
+	ndays = (cert_expiration_date - now).days
 	if not rounded_time or ndays <= 10:
 		# Yikes better renew soon!
 		expiry_info = "The certificate expires in %d days on %s." % (ndays, cert_expiration_date.date().isoformat())
@@ -123,17 +131,19 @@ def check_certificate(domain, ssl_certificate, ssl_private_key, warn_if_expiring
 	# Return the special OK code.
 	return ("OK", expiry_info)
 
+
 def load_cert_chain(pemfile):
 	# A certificate .pem file may contain a chain of certificates.
 	# Load the file and split them apart.
 	re_pem = rb"(-+BEGIN (?:.+)-+[\r\n]+(?:[A-Za-z0-9+/=]{1,64}[\r\n]+)+-+END (?:.+)-+[\r\n]+)"
 	with open(pemfile, "rb") as f:
-		pem = f.read() + b"\n" # ensure trailing newline
+		pem = f.read() + b"\n"  # ensure trailing newline
 		pemblocks = re.findall(re_pem, pem)
 		if len(pemblocks) == 0:
 			msg = "File does not contain valid PEM data."
 			raise ValueError(msg)
 		return pemblocks
+
 
 def load_pem(pem):
 	# Parse a "---BEGIN .... END---" PEM string and return a Python object for it
@@ -141,6 +151,7 @@ def load_pem(pem):
 	from cryptography.x509 import load_pem_x509_certificate
 	from cryptography.hazmat.primitives import serialization
 	from cryptography.hazmat.backends import default_backend
+
 	pem_type = re.match(b"-+BEGIN (.*?)-+[\r\n]", pem)
 	if pem_type is None:
 		msg = "File is not a valid PEM-formatted file."
@@ -151,6 +162,7 @@ def load_pem(pem):
 	if pem_type == b"CERTIFICATE":
 		return load_pem_x509_certificate(pem, default_backend())
 	raise ValueError("Unsupported PEM object type: " + pem_type.decode("ascii", "replace"))
+
 
 def get_certificate_domains(cert):
 	from cryptography.x509 import DNSName, ExtensionNotFound, OID_COMMON_NAME, OID_SUBJECT_ALTERNATIVE_NAME

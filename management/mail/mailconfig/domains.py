@@ -1,6 +1,7 @@
 from .validation import get_domain
 
-def get_mail_domains(env, filter_aliases=lambda alias : True, users_only=False):
+
+def get_mail_domains(env, filter_aliases=lambda alias: True, users_only=False):
 	# Returns the domain names (IDNA-encoded) of all of the email addresses
 	# configured on the system. If users_only is True, only return domains
 	# with email addresses that correspond to user accounts. Exclude Unicode
@@ -11,5 +12,5 @@ def get_mail_domains(env, filter_aliases=lambda alias : True, users_only=False):
 	domains = []
 	domains.extend([get_domain(login, as_unicode=False) for login in get_mail_users(env)])
 	if not users_only:
-		domains.extend([get_domain(address, as_unicode=False) for address, _, _, auto in get_mail_aliases(env) if filter_aliases(address) and not auto ])
+		domains.extend([get_domain(address, as_unicode=False) for address, _, _, auto in get_mail_aliases(env) if filter_aliases(address) and not auto])
 	return set(domains)

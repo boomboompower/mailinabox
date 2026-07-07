@@ -1,6 +1,67 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Class-based dark mode (replaces darkMode: 'class' from tailwind.config.ts) */
+@custom-variant dark (&:is(.dark, .dark *));
+
+/* Theme tokens (replaces tailwind.config.ts - v4 ignores JS config) */
+@theme inline {
+  /* Semantic color tokens */
+  --color-bg:             var(--color-bg);
+  --color-sidebar:        var(--color-sidebar);
+  --color-surface:        var(--color-surface);
+  --color-surface-raised: var(--color-surface-raised);
+  --color-subtle:         var(--color-subtle);
+  --color-border:         var(--color-border);
+  --color-border-input:   var(--color-border-input);
+  --color-border-strong:  var(--color-border-strong);
+  --color-text:           var(--color-text);
+  --color-muted:          var(--color-muted);
+  --color-faint:          var(--color-faint);
+  --color-hover:          var(--color-hover);
+  --color-hover-subtle:   var(--color-hover-subtle);
+  --color-skeleton:       var(--color-skeleton);
+
+  /* Accent scale */
+  --color-accent:       var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg:    var(--accent-fg);
+  --color-accent-ring:  var(--accent-ring);
+
+  /* Gray palette scale */
+  --color-gray-50:  var(--p-50);
+  --color-gray-100: var(--p-100);
+  --color-gray-200: var(--p-200);
+  --color-gray-300: var(--p-300);
+  --color-gray-400: var(--p-400);
+  --color-gray-500: var(--p-500);
+  --color-gray-600: var(--p-600);
+  --color-gray-700: var(--p-700);
+  --color-gray-800: var(--p-800);
+  --color-gray-850: var(--p-850);
+  --color-gray-900: var(--p-900);
+  --color-gray-950: var(--p-950);
+
+  /* Border radius */
+  --radius-4xl: 2rem;
+
+  /* Shadows */
+  --shadow-3xl: 0 35px 60px -15px rgb(0 0 0 / 0.3);
+
+  /* Transition durations */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 250ms;
+
+  /* Font family */
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* transition-width utility (v4 has no @theme key for transitionProperty) */
+@utility transition-width {
+  transition-property: width;
+  transition-timing-function: var(--default-transition-timing-function, cubic-bezier(0.4, 0, 0.2, 1));
+  transition-duration: var(--default-transition-duration, 150ms);
+}
 
 @keyframes fade-in {
   from { opacity: 0; }

@@ -7,12 +7,10 @@ import tempfile
 
 from core.utils import shell, safe_domain_name
 
+
 def create_csr(domain, ssl_key, country_code, env):
-	return shell("check_output", [
-				"openssl", "req", "-new",
-				"-key", ssl_key,
-				"-sha256",
-				"-subj", f"/C={country_code}/CN={domain}"])
+	return shell("check_output", ["openssl", "req", "-new", "-key", ssl_key, "-sha256", "-subj", f"/C={country_code}/CN={domain}"])
+
 
 def install_cert(domain, ssl_cert, ssl_chain, env, raw=False):
 	from .validation import check_certificate
@@ -39,7 +37,8 @@ def install_cert(domain, ssl_cert, ssl_chain, env, raw=False):
 
 	# Run post-install steps.
 	ret = post_install_func(env)
-	if raw: return ret
+	if raw:
+		return ret
 	return "\n".join(ret)
 
 
@@ -50,18 +49,23 @@ def install_cert_copy_file(fn, env):
 	# Make a unique path for the certificate.
 	from cryptography.hazmat.primitives import hashes
 	from binascii import hexlify
+
 	cert = load_pem(load_cert_chain(fn)[0])
 	_all_domains, cn = get_certificate_domains(cert)
 	path = "{}-{}-{}.pem".format(
-		safe_domain_name(cn), # common name, which should be filename safe because it is IDNA-encoded, but in case of a malformed cert make sure it's ok to use as a filename
-		cert.not_valid_after_utc.date().isoformat().replace("-", ""), # expiration date
-		hexlify(cert.fingerprint(hashes.SHA256())).decode("ascii")[0:8], # fingerprint prefix
-		)
+		safe_domain_name(cn),  # common name, which should be filename safe because it is IDNA-encoded, but in case of a malformed cert make sure it's ok to use as a filename
+		cert.not_valid_after_utc.date().isoformat().replace("-", ""),  # expiration date
+		hexlify(cert.fingerprint(hashes.SHA256())).decode("ascii")[0:8],  # fingerprint prefix
+	)
 	ssl_certificate = os.path.join(os.path.join(env["STORAGE_ROOT"], 'ssl', path))
 
 	# Install the certificate.
 	os.makedirs(os.path.dirname(ssl_certificate), exist_ok=True)
 	shutil.move(fn, ssl_certificate)
+	# mkstemp creates 0600 files; make the cert readable by ssl-cert group
+	# so services like oxi can verify loopback TLS without keeping a stale copy.
+	shutil.chown(ssl_certificate, group="ssl-cert")
+	os.chmod(ssl_certificate, 0o640)
 
 
 def post_install_func(env):
@@ -90,8 +94,10 @@ def post_install_func(env):
 
 		# Restart postfix and dovecot so they pick up the new certificate.
 		from services.control_plane import restart as cp_restart
+
 		cp_restart("postfix")
 		cp_restart("dovecot")
+		cp_restart("oxi-email")
 		ret.append("mail services restarted")
 
 		# The DANE TLSA record will remain valid so long as the private key
@@ -100,6 +106,7 @@ def post_install_func(env):
 
 	# Update the web configuration so nginx picks up the new certificate file.
 	from services.web_update import do_web_update
-	ret.append( do_web_update(env) )
+
+	ret.append(do_web_update(env))
 
 	return ret

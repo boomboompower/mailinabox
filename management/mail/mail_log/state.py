@@ -11,30 +11,30 @@ import datetime
 from collections import OrderedDict
 
 LOG_FILES = (
-    '/var/log/mail.log.6.gz',
-    '/var/log/mail.log.5.gz',
-    '/var/log/mail.log.4.gz',
-    '/var/log/mail.log.3.gz',
-    '/var/log/mail.log.2.gz',
-    '/var/log/mail.log.1',
-    '/var/log/mail.log',
+	'/var/log/mail.log.6.gz',
+	'/var/log/mail.log.5.gz',
+	'/var/log/mail.log.4.gz',
+	'/var/log/mail.log.3.gz',
+	'/var/log/mail.log.2.gz',
+	'/var/log/mail.log.1',
+	'/var/log/mail.log',
 )
 
 TIME_DELTAS = OrderedDict([
-    ('all', datetime.timedelta(weeks=52)),
-    ('month', datetime.timedelta(weeks=4)),
-    ('2weeks', datetime.timedelta(days=14)),
-    ('week', datetime.timedelta(days=7)),
-    ('2days', datetime.timedelta(days=2)),
-    ('day', datetime.timedelta(days=1)),
-    ('12hours', datetime.timedelta(hours=12)),
-    ('6hours', datetime.timedelta(hours=6)),
-    ('hour', datetime.timedelta(hours=1)),
-    ('30min', datetime.timedelta(minutes=30)),
-    ('10min', datetime.timedelta(minutes=10)),
-    ('5min', datetime.timedelta(minutes=5)),
-    ('min', datetime.timedelta(minutes=1)),
-    ('today', datetime.datetime.now() - datetime.datetime.now().replace(hour=0, minute=0, second=0))
+	('all', datetime.timedelta(weeks=52)),
+	('month', datetime.timedelta(weeks=4)),
+	('2weeks', datetime.timedelta(days=14)),
+	('week', datetime.timedelta(days=7)),
+	('2days', datetime.timedelta(days=2)),
+	('day', datetime.timedelta(days=1)),
+	('12hours', datetime.timedelta(hours=12)),
+	('6hours', datetime.timedelta(hours=6)),
+	('hour', datetime.timedelta(hours=1)),
+	('30min', datetime.timedelta(minutes=30)),
+	('10min', datetime.timedelta(minutes=10)),
+	('5min', datetime.timedelta(minutes=5)),
+	('min', datetime.timedelta(minutes=1)),
+	('today', datetime.datetime.now() - datetime.datetime.now().replace(hour=0, minute=0, second=0)),
 ])
 
 # NOW is set once at import and never reassigned - safe to treat as a constant.

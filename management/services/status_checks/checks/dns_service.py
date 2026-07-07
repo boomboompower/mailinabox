@@ -6,6 +6,7 @@ from ..registry import check
 from ..reporter import CheckFailed
 from .. import utils
 
+
 @check("unbound", category="services")
 def check_unbound(env, report):
 	with report.step("Local DNS (unbound) is running"):

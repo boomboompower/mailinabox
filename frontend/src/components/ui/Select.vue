@@ -9,8 +9,8 @@ const props = withDefaults(defineProps<{ disabled?: boolean; size?: 'sm' | 'md' 
 
 const selectClass = computed(() =>
   props.size === 'sm'
-    ? 'w-full h-8 rounded-lg py-0 px-3 pr-8 text-xs border border-border-input bg-subtle text-text outline-none focus:border-accent transition-colors appearance-none'
-    : 'w-full rounded-lg py-2 px-3 pr-8 text-sm border border-border-input bg-subtle text-text outline-none focus:border-accent transition-colors appearance-none'
+    ? 'w-full h-8 rounded-lg py-0 px-3 pr-8 text-xs border border-border-input bg-subtle text-text outline-none focus:border-accent ring-2 ring-transparent focus:ring-accent-ring transition-colors appearance-none'
+    : 'w-full rounded-lg py-2 px-3 pr-8 text-sm border border-border-input bg-subtle text-text outline-none focus:border-accent ring-2 ring-transparent focus:ring-accent-ring transition-colors appearance-none'
 )
 </script>
 

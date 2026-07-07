@@ -1,25 +1,22 @@
-def build_recommended_dns(env):
+def build_external_dns_records(env):
 	from services.dns_update.zones import build_zones
 
 	ret = []
-	for (domain, _zonefile, records) in build_zones(env):
-		# remove records that we don't display
-		records = [r for r in records if r[3] is not False]
-
-		# put Required at the top, then Recommended, then everythiing else
-		records.sort(key = lambda r : 0 if r[3].startswith("Required.") else (1 if r[3].startswith("Recommended.") else 2))
-
-		# expand qnames
-		for i in range(len(records)):
-			qname = domain if records[i][0] is None else records[i][0] + "." + domain
-
-			records[i] = {
-				"qname": qname,
-				"rtype": records[i][1],
-				"value": records[i][2],
-				"explanation": records[i][3],
+	for domain, _zonefile, records in build_zones(env):
+		zone_records = [
+			{
+				"qname": domain if qname is None else f"{qname}.{domain}",
+				"rtype": rtype,
+				"value": value,
+				"category": category,
 			}
+			for qname, rtype, value, category in records
+			if category is not None
+		]
 
-		# return
-		ret.append((domain, records))
+		# Sort: required first, then recommended, then optional.
+		zone_records.sort(key=lambda r: 0 if r["category"] == "required" else (1 if r["category"] == "recommended" else 2))
+
+		if zone_records:
+			ret.append((domain, zone_records))
 	return ret

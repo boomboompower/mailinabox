@@ -7,6 +7,7 @@ EnvironmentFile=/etc/oxi/config.env
 ExecStart=/usr/local/bin/oxi-email-server
 User=www-data
 Group=www-data
+SupplementaryGroups=ssl-cert
 Restart=on-failure
 RestartSec=5
 WorkingDirectory=/usr/local/share/oxi-email

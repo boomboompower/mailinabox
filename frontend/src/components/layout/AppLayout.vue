@@ -23,7 +23,7 @@ const config = useConfigStore()
       <!-- Mobile top bar -->
       <div class="flex items-center gap-3 px-4 py-3 border-b border-border md:hidden">
         <button
-          class="rounded-xl hover:bg-hover size-9 flex items-center justify-center transition"
+          class="rounded-xl hover:bg-hover size-9 flex items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           @click="ui.openMobileSidebar()"
         >
           <Menu class="size-5" />

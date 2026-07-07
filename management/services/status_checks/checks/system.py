@@ -9,8 +9,10 @@ from ..registry import check
 from ..reporter import CheckFailed
 from .. import utils
 
+
 def _not_docker(env):
 	return not utils.is_docker()
+
 
 @check("ufw", category="system", enabled=_not_docker)
 def check_ufw(env, report):
@@ -35,9 +37,8 @@ def check_ufw(env, report):
 			if service["public"] and not any(re.match(str(service["port"]) + r"[/ \t].*", item) for item in ufw_lines):
 				not_allowed.append(service)
 		if not_allowed:
-			raise CheckFailed("; ".join(
-				"Port {} ({}) should be allowed in the firewall, please re-run the setup.".format(s["port"], s["name"])
-				for s in not_allowed))
+			raise CheckFailed("; ".join("Port {} ({}) should be allowed in the firewall, please re-run the setup.".format(s["port"], s["name"]) for s in not_allowed))
+
 
 @check("ssh-password-auth", category="system", enabled=_not_docker)
 def check_ssh_password(env, report):
@@ -49,6 +50,7 @@ def check_ssh_password(env, report):
 				that you can log in without a password, set 'PasswordAuthentication no' in /etc/ssh/sshd_config,
 				and restart ssh via 'sudo service ssh restart'.""")
 
+
 @check("software-updates", category="system", enabled=_not_docker)
 def check_software_updates(env, report):
 	with report.step("System software is up to date"):
@@ -56,8 +58,8 @@ def check_software_updates(env, report):
 			raise CheckFailed("System updates have been installed and a reboot of the machine is required.")
 		pkgs = utils.list_apt_updates(apt_update=False)
 		if len(pkgs) > 0:
-			raise CheckFailed("There are %d software packages that can be updated: %s" % (
-				len(pkgs), ", ".join(f"{p['package']} ({p['version']})" for p in pkgs)))
+			raise CheckFailed("There are %d software packages that can be updated: %s" % (len(pkgs), ", ".join(f"{p['package']} ({p['version']})" for p in pkgs)))
+
 
 @check("system-aliases", category="system")
 def check_system_aliases(env, report):
@@ -65,6 +67,7 @@ def check_system_aliases(env, report):
 		ok, msg = utils.alias_exists_message("System administrator address", "administrator@" + env['PRIMARY_HOSTNAME'], env)
 		if not ok:
 			raise CheckFailed(msg)
+
 
 @check("free-disk-space", category="system")
 def check_free_disk_space(env, report):
@@ -74,9 +77,9 @@ def check_free_disk_space(env, report):
 		bytes_free = st.f_bavail * st.f_frsize
 		disk_msg = "The disk has %.2f GB space remaining." % (bytes_free / 1024.0 / 1024.0 / 1024.0)
 
-		if bytes_free <= .15 * bytes_total:
+		if bytes_free <= 0.15 * bytes_total:
 			raise CheckFailed(disk_msg)
-		elif bytes_free <= .3 * bytes_total:
+		elif bytes_free <= 0.3 * bytes_total:
 			report.warn(disk_msg)
 
 		backup_cache_path = os.path.join(env['STORAGE_ROOT'], 'backup/cache')
@@ -87,6 +90,7 @@ def check_free_disk_space(env, report):
 		if backup_cache_count > 1:
 			report.warn(f"The backup cache directory {backup_cache_path} has more than one backup target cache. Consider clearing this directory to save disk space.")
 
+
 @check("free-memory", category="system")
 def check_free_memory(env, report):
 	with report.step("System has enough free memory"):
@@ -96,6 +100,7 @@ def check_free_memory(env, report):
 			raise CheckFailed(memory_msg)
 		elif percent_free < 20:
 			report.warn(memory_msg)
+
 
 @check("backup", category="system")
 def check_backup(env, report):
@@ -110,8 +115,7 @@ def check_backup(env, report):
 		backup_stat = backup_status(env)
 		backups = backup_stat.get("backups", {})
 		if not backups:
-			raise CheckFailed("Could not obtain backup status or no backup has been made (yet). "
-				"This could happen if you have just enabled backups. In that case, check back tomorrow.")
+			raise CheckFailed("Could not obtain backup status or no backup has been made (yet). This could happen if you have just enabled backups. In that case, check back tomorrow.")
 
 		most_recent = backups[0]["date"]
 		now = datetime.datetime.now(dateutil.tz.tzlocal())
@@ -119,6 +123,7 @@ def check_backup(env, report):
 		bk_age = dateutil.relativedelta.relativedelta(now, bk_date)
 		if bk_age.days > 7:
 			raise CheckFailed("Backup is more than a week old.")
+
 
 @check("time-sync", category="system", enabled=_not_docker)
 def check_time_synchronization(env, report):
@@ -134,6 +139,7 @@ def check_time_synchronization(env, report):
 			raise CheckFailed("""System clock is not synchronized. Time synchronization is critical for DNSSEC, SSL certificates,
 				and log accuracy. Enable NTP with: timedatectl set-ntp true""")
 
+
 @check("disk-health", category="system", enabled=_not_docker)
 def check_disk_health(env, report):
 	with report.step("No disk I/O errors in system logs"):
@@ -142,8 +148,16 @@ def check_disk_health(env, report):
 			return  # can't read dmesg, skip silently like before
 
 		error_patterns = [
-			'I/O error', 'Buffer I/O error', 'disk error', 'ata.*error', 'sd.*error',
-			'read error', 'write error', 'SMART.*error', 'medium error', 'disk failure',
+			'I/O error',
+			'Buffer I/O error',
+			'disk error',
+			'ata.*error',
+			'sd.*error',
+			'read error',
+			'write error',
+			'SMART.*error',
+			'medium error',
+			'disk failure',
 		]
 		errors_found = []
 		for line in dmesg_output.split('\n'):
@@ -156,8 +170,10 @@ def check_disk_health(env, report):
 			detail = "; ".join(e[:200] for e in recent[:3])
 			raise CheckFailed(f"Disk I/O errors detected in system logs ({len(errors_found)} total). This may indicate failing hardware. Recent: {detail}")
 
+
 def _webmail_enabled(env):
 	return env.get("WEBMAIL_CLIENT", "oxi") != "none"
+
 
 @check("webmail", category="system", enabled=_webmail_enabled)
 def check_webmail(env, report):
@@ -191,14 +207,14 @@ def check_webmail(env, report):
 
 	elif webmail in ("roundcube", "snappymail", "cypht"):
 		_WEBMAIL_DIRS = {
-			"roundcube":  "/usr/local/lib/roundcube",
+			"roundcube": "/usr/local/lib/roundcube",
 			"snappymail": "/usr/local/lib/snappymail",
-			"cypht":      "/usr/local/lib/cypht",
+			"cypht": "/usr/local/lib/cypht",
 		}
 		_WEBMAIL_LABELS = {
-			"roundcube":  "Roundcube",
+			"roundcube": "Roundcube",
 			"snappymail": "SnappyMail",
-			"cypht":      "Cypht",
+			"cypht": "Cypht",
 		}
 		label = _WEBMAIL_LABELS[webmail]
 		webmail_dir = _WEBMAIL_DIRS[webmail]
@@ -214,6 +230,7 @@ def check_webmail(env, report):
 				fpm_procs = [p for p in psutil.process_iter(['name']) if 'php-fpm' in (p.info['name'] or '')]
 				if not fpm_procs:
 					raise CheckFailed("PHP-FPM is not running. Run: systemctl start php*-fpm")
+
 
 @check("filebrowser", category="system")
 def check_filebrowser(env, report):
@@ -250,6 +267,7 @@ def check_filebrowser(env, report):
 		if not os.path.isdir(files_root):
 			raise CheckFailed(f"FileBrowser files root {files_root} is missing. Re-run setup.")
 
+
 @check("miab-version", category="system")
 def check_miab_version(env, report):
 	with report.step("Mail-in-a-Box is up to date"):
@@ -267,4 +285,4 @@ def check_miab_version(env, report):
 		if latest_ver is None:
 			raise CheckFailed(f"Latest Mail-in-a-Box version could not be determined. You are running version {this_ver}.")
 		if this_ver != latest_ver:
-			raise CheckFailed(f"A new version of Mail-in-a-Box is available. You are running {this_ver}. The latest is {latest_ver}. See https://mailinabox.email.")
+			raise CheckFailed(f"A new version is available. You are running {this_ver}. The latest is {latest_ver}. See https://github.com/boomboompower/mailinabox.")

@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 
+
 # A single step inside a check's run. Mirrors how a CI job shows its steps:
 # each one has a name, a status, and (if it failed) a message saying why.
 @dataclass
@@ -11,6 +12,7 @@ class StepResult:
 	started_at: float = 0.0
 	finished_at: Optional[float] = None
 
+
 # The result of one whole check (one or more steps).
 @dataclass
 class CheckResult:
@@ -20,6 +22,7 @@ class CheckResult:
 	message: str = ""
 	steps: list = field(default_factory=list)  # list[StepResult]
 	domain: Optional[str] = None  # set when this result is one instance of a per-domain check
+
 
 @dataclass
 class Check:
@@ -32,8 +35,10 @@ class Check:
 	# per_domain(env) -> iterable of domain strings. None means this check runs once.
 	per_domain: Optional[Callable] = None
 
+
 # All checks that have registered themselves by being imported.
 REGISTRY: dict = {}
+
 
 def check(name, category, depends_on=(), enabled=None, per_domain=None):
 	"""Decorator that registers a function as a status check.
@@ -42,6 +47,7 @@ def check(name, category, depends_on=(), enabled=None, per_domain=None):
 	checks/ and decorating one function in it is the entire registration
 	step. Deleting the file removes the check.
 	"""
+
 	def decorator(fn):
 		REGISTRY[name] = Check(
 			name=name,
@@ -52,4 +58,5 @@ def check(name, category, depends_on=(), enabled=None, per_domain=None):
 			per_domain=per_domain,
 		)
 		return fn
+
 	return decorator

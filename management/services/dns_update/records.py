@@ -5,6 +5,7 @@ import subprocess
 
 from core.utils import shell, get_ssh_port
 
+
 def build_tlsa_record(env):
 	# A DANE TLSA record in DNS specifies that connections on a port
 	# must use TLS and the certificate must match a particular criteria.
@@ -42,6 +43,7 @@ def build_tlsa_record(env):
 	# 1: Use SHA256.
 	return "3 1 1 " + pk_hash
 
+
 def build_sshfp_records():
 	# The SSHFP record is a way for us to embed this server's SSH public
 	# key fingerprint into the DNS so that remote hosts have an out-of-band
@@ -78,21 +80,21 @@ def build_sshfp_records():
 	# unsupported key type, etc.) skips SSHFP records rather than crashing
 	# the entire DNS update.
 	try:
-		keys = shell("check_output", ["ssh-keyscan", "-4", "-t", "rsa,ecdsa,ed25519", "-p", str(port), "localhost"],
-			suppress_stderr=True)
+		keys = shell("check_output", ["ssh-keyscan", "-4", "-t", "rsa,ecdsa,ed25519", "-p", str(port), "localhost"], suppress_stderr=True)
 	except subprocess.CalledProcessError:
 		return
 	keys = sorted(keys.split("\n"))
 
 	for key in keys:
-		if key.strip() == "" or key[0] == "#": continue
+		if key.strip() == "" or key[0] == "#":
+			continue
 		try:
 			_host, keytype, pubkey = key.split(" ")
 			yield "%d %d ( %s )" % (
 				algorithm_number[keytype],
-				2, # specifies we are using SHA-256 on next line
+				2,  # specifies we are using SHA-256 on next line
 				hashlib.sha256(base64.b64decode(pubkey)).hexdigest().upper(),
-				)
+			)
 		except Exception:
 			# Lots of things can go wrong. Don't let it disturb the DNS
 			# zone.

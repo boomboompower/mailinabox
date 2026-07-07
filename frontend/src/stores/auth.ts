@@ -13,6 +13,8 @@ export const useAuthStore = defineStore('auth', () => {
   const email = ref<string | null>(init.email ?? null)
   const privileges = ref<string[]>(init.privileges ?? [])
   const needsBootstrap = ref<boolean>(init.needsBootstrap ?? false)
+  const monitoringTool = ref<'munin' | 'beszel' | 'netdata' | null>(init.monitoringTool ?? null)
+  const capabilities = ref<string[]>(init.capabilities ?? [])
 
   const isLoggedIn = computed(() => !!email.value)
   const isAdmin = computed(() => privileges.value.includes('admin'))
@@ -20,9 +22,11 @@ export const useAuthStore = defineStore('auth', () => {
   /** Called by all login paths (password, password+TOTP, passkey) after the server
    *  sets the admin_session cookie. Only metadata is stored here - the session key
    *  lives exclusively in the HttpOnly cookie, never in JavaScript. */
-  function handleAuthSuccess(emailAddr: string, privs: string[]): void {
+  function handleAuthSuccess(emailAddr: string, privs: string[], tool?: 'munin' | 'beszel' | 'netdata' | null, caps?: string[]): void {
     email.value = emailAddr
     privileges.value = privs
+    if (tool !== undefined) monitoringTool.value = tool
+    if (caps !== undefined) capabilities.value = caps
   }
 
   function clearBootstrap(): void {
@@ -50,7 +54,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     if (data.status === 'ok' && data.email && data.privileges) {
       // Server has set the admin_session cookie. Store metadata in Pinia.
-      handleAuthSuccess(data.email, data.privileges)
+      handleAuthSuccess(data.email, data.privileges, data.monitoringTool, data.capabilities)
       return 'ok'
     }
     if (data.status === 'missing-totp-token') return 'missing-totp-token'
@@ -68,5 +72,5 @@ export const useAuthStore = defineStore('auth', () => {
     }).catch(() => {})
   }
 
-  return { email, privileges, needsBootstrap, isLoggedIn, isAdmin, handleAuthSuccess, clearBootstrap, clearSession, login, logout }
+  return { email, privileges, needsBootstrap, monitoringTool, capabilities, isLoggedIn, isAdmin, handleAuthSuccess, clearBootstrap, clearSession, login, logout }
 })

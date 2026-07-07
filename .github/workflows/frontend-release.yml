@@ -26,8 +26,7 @@ jobs:
       - name: Compute frontend content hash
         id: hash
         run: |
-          source setup/functions.sh
-          echo "hash=$(hash_files "$PWD/frontend")" >> "$GITHUB_OUTPUT"
+          echo "hash=$(python3 -c "import sys; sys.path.insert(0,'setup'); from components.artifacts import hash_files; print(hash_files('frontend'))")" >> "$GITHUB_OUTPUT"
 
       - name: Check if this hash was already published
         id: check
@@ -40,27 +39,18 @@ jobs:
             echo "exists=0" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         if: steps.check.outputs.exists == '0'
-        with:
-          node-version: 24
-
-      - name: Cache node_modules
-        if: steps.check.outputs.exists == '0'
-        uses: actions/cache@v4
-        with:
-          path: frontend/node_modules
-          key: frontend-deps-${{ hashFiles('frontend/package-lock.json') }}
 
       - name: Install dependencies
         if: steps.check.outputs.exists == '0'
         working-directory: frontend
-        run: npm ci --prefer-offline
+        run: bun install --frozen-lockfile
 
       - name: Build frontend
         if: steps.check.outputs.exists == '0'
         working-directory: frontend
-        run: npm run build
+        run: bunx vite build
 
       - name: Package dist
         if: steps.check.outputs.exists == '0'

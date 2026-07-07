@@ -10,6 +10,7 @@ from .reporter import Reporter, summarize
 
 _discovered = False
 
+
 def discover_checks():
 	"""Import every module under checks/ so its @check-decorated functions
 	register themselves. A broken check file is reported and skipped - it
@@ -18,6 +19,7 @@ def discover_checks():
 	if _discovered:
 		return
 	from . import checks as checks_pkg
+
 	for _, modname, _ in pkgutil.iter_modules(checks_pkg.__path__, checks_pkg.__name__ + "."):
 		try:
 			importlib.import_module(modname)
@@ -25,6 +27,7 @@ def discover_checks():
 			print(f"status check module {modname} failed to load:", file=sys.stderr)
 			traceback.print_exc()
 	_discovered = True
+
 
 def get_optimal_pool_size():
 	"""Calculate optimal worker count based on CPU count and workload."""
@@ -37,6 +40,7 @@ def get_optimal_pool_size():
 	# Most checks are I/O-bound (DNS, network, subprocess calls), so a higher
 	# thread count than CPU count pays off, capped to avoid resource exhaustion.
 	return min(cpu_count * 2, 20)
+
 
 def _work_items(env, domains_filter=None):
 	"""Expand every registered check into one or more work items. A normal
@@ -61,6 +65,7 @@ def _work_items(env, domains_filter=None):
 				items[f"{chk.name}:{domain}"] = (chk, domain)
 	return items
 
+
 def _run_one(chk, domain, env):
 	reporter = Reporter()
 	try:
@@ -75,10 +80,11 @@ def _run_one(chk, domain, env):
 		# instead of crashing the whole run.
 		if not reporter.steps or reporter.steps[-1].status != "error":
 			from .registry import StepResult
+
 			reporter.steps.append(StepResult(name="unhandled error", status="error", message=str(e)))
 	status, message = summarize(reporter.steps) if reporter.steps else ("ok", "")
-	return CheckResult(name=chk.name, category=chk.category, status=status, message=message,
-		steps=reporter.steps, domain=domain)
+	return CheckResult(name=chk.name, category=chk.category, status=status, message=message, steps=reporter.steps, domain=domain)
+
 
 def run_checks(env, on_progress=None, domains_filter=None):
 	"""Run every registered, applicable check. Returns {result_key: CheckResult}.
@@ -95,13 +101,11 @@ def run_checks(env, on_progress=None, domains_filter=None):
 		while remaining:
 			# A work item is ready once every check it depends on has finished
 			# (regardless of whether those dependencies passed or failed).
-			ready_keys = [key for key, (chk, _domain) in remaining.items()
-				if all(dep in results for dep in chk.depends_on)]
+			ready_keys = [key for key, (chk, _domain) in remaining.items() if all(dep in results for dep in chk.depends_on)]
 			if not ready_keys:
 				# A dependency cycle or a typo'd depends_on name - don't hang forever.
 				for key, (chk, domain) in remaining.items():
-					results[key] = CheckResult(name=chk.name, category=chk.category, status="skipped",
-						message="dependency could not be resolved", domain=domain)
+					results[key] = CheckResult(name=chk.name, category=chk.category, status="skipped", message="dependency could not be resolved", domain=domain)
 				break
 
 			runnable = {}
@@ -109,11 +113,9 @@ def run_checks(env, on_progress=None, domains_filter=None):
 				chk, domain = remaining[key]
 				failed_dep = next((d for d in chk.depends_on if results[d].status == "error"), None)
 				if failed_dep:
-					results[key] = CheckResult(name=chk.name, category=chk.category, status="skipped",
-						message=f"skipped: '{failed_dep}' failed", domain=domain)
+					results[key] = CheckResult(name=chk.name, category=chk.category, status="skipped", message=f"skipped: '{failed_dep}' failed", domain=domain)
 				elif chk.enabled is not None and not chk.enabled(env):
-					results[key] = CheckResult(name=chk.name, category=chk.category, status="skipped",
-						message="not applicable", domain=domain)
+					results[key] = CheckResult(name=chk.name, category=chk.category, status="skipped", message="not applicable", domain=domain)
 				else:
 					runnable[key] = (chk, domain)
 

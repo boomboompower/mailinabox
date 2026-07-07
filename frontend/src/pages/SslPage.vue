@@ -2,6 +2,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
 import { ShieldCheck, Upload } from 'lucide-vue-next'
+import AsyncState from '@/components/ui/AsyncState.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -33,6 +34,7 @@ async function ensureCountryCodes(): Promise<void> {
 }
 
 const loading = ref(true)
+const loadError = ref(false)
 const domains = ref<SslDomainStatus[]>([])
 const canProvision = ref<string[]>([])
 const provisioning = ref(false)
@@ -50,6 +52,7 @@ const installing = ref(false)
 
 async function load(): Promise<void> {
   loading.value = true
+  loadError.value = false
   provisionResult.value = null
   try {
     const res = await api.get('/admin/ssl/status')
@@ -57,6 +60,7 @@ async function load(): Promise<void> {
     canProvision.value = data.can_provision
     domains.value = data.status
   } catch {
+    loadError.value = true
     toast.error('Failed to load TLS certificate status.')
   } finally {
     loading.value = false
@@ -151,7 +155,7 @@ onMounted(load)
 
 <template>
   <AppLayout>
-    <PageHeader title="TLS Certificates">
+    <PageHeader title="TLS Certificates" description="Keep your domains trusted and connections encrypted.">
       <template #actions>
         <Button variant="secondary" size="sm" @click="openInstall()"><Upload class="size-3.5" />Install Certificate</Button>
       </template>
@@ -174,45 +178,48 @@ onMounted(load)
       <!-- Provision results -->
       <div v-if="provisionResult" class="mt-4 space-y-3">
         <div
-          v-for="(req, i) in provisionResult.requests.filter(r => r.result !== 'skipped')"
+          v-for="(req, i) in provisionResult.requests"
           :key="i"
           class="rounded-lg px-4 py-3 text-sm"
           :class="req.result === 'installed'
             ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-200'
-            : 'bg-red-50 dark:bg-red-950/30 text-red-800 dark:text-red-200'"
+            : req.result === 'skipped'
+              ? 'bg-surface text-muted'
+              : 'bg-red-50 dark:bg-red-950/30 text-red-800 dark:text-red-200'"
         >
           <p class="font-medium">{{ req.domains.join(', ') }}</p>
           <p v-if="req.message">{{ req.message }}</p>
           <p v-if="req.result === 'installed'">Certificate installed successfully.</p>
+          <p v-else-if="req.result === 'skipped'">Skipped - certificate already up to date.</p>
         </div>
       </div>
     </Card>
 
     <!-- Domain table -->
-    <template v-if="loading">
-      <Table>
-        <TableHead>
-          <Th>Domain</Th>
-          <Th>Status</Th>
-          <th scope="col" class="px-4 py-3"></th>
-        </TableHead>
-        <tbody>
-          <TableRow v-for="i in 5" :key="i">
-            <td class="px-4 py-3"><Skeleton class="h-4 w-48" /></td>
-            <td class="px-4 py-3"><Skeleton class="h-4 w-64" /></td>
-            <td class="px-4 py-3"></td>
-          </TableRow>
-        </tbody>
-      </Table>
-    </template>
+    <AsyncState :loading="loading" :error="loadError" :empty="domains.length === 0" error-title="Could not load TLS status" @retry="load">
+      <template #loading>
+        <Table>
+          <TableHead>
+            <Th>Domain</Th>
+            <Th>Status</Th>
+            <th scope="col" class="px-4 py-3"></th>
+          </TableHead>
+          <tbody>
+            <TableRow v-for="i in 5" :key="i">
+              <td class="px-4 py-3"><Skeleton class="h-4 w-48" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-64" /></td>
+              <td class="px-4 py-3"></td>
+            </TableRow>
+          </tbody>
+        </Table>
+      </template>
 
-    <template v-else-if="domains.length === 0">
-      <EmptyState title="No domains" description="No web domains are configured.">
-        <template #icon><ShieldCheck /></template>
-      </EmptyState>
-    </template>
+      <template #empty>
+        <EmptyState title="No domains" description="No web domains are configured.">
+          <template #icon><ShieldCheck /></template>
+        </EmptyState>
+      </template>
 
-    <template v-else>
       <Table>
         <TableHead>
           <Th>Domain</Th>
@@ -222,38 +229,24 @@ onMounted(load)
         <tbody>
           <TableRow v-for="d in domains" :key="d.domain">
             <td class="px-4 py-3 font-medium text-sm">
-              <a
-                v-if="d.status !== 'not-applicable'"
-                :href="`https://${d.domain}`"
-                target="_blank"
-                class="hover:underline"
-              >{{ d.domain }}</a>
+              <a v-if="d.status !== 'not-applicable'" :href="`https://${d.domain}`" target="_blank" class="hover:underline">{{ d.domain }}</a>
               <span v-else class="text-faint">{{ d.domain }}</span>
             </td>
             <td class="px-4 py-3 text-sm text-muted">
               <div class="flex items-start gap-2">
-                <StatusIcon
-                  v-if="d.status !== 'not-applicable'"
-                  :status="d.status === 'success' ? 'ok' : d.status"
-                  class="mt-0.5 shrink-0"
-                />
+                <StatusIcon v-if="d.status !== 'not-applicable'" :status="d.status === 'success' ? 'ok' : d.status" class="mt-0.5 shrink-0" />
                 <span>{{ d.text }}</span>
               </div>
             </td>
             <td class="px-4 py-3 text-right">
-              <Button
-                v-if="d.status !== 'not-applicable'"
-                variant="ghost"
-                size="sm"
-                @click="openInstall(d.domain)"
-              >
+              <Button v-if="d.status !== 'not-applicable'" variant="ghost" size="sm" @click="openInstall(d.domain)">
                 {{ d.status === 'success' ? 'Replace' : 'Install' }}
               </Button>
             </td>
           </TableRow>
         </tbody>
       </Table>
-    </template>
+    </AsyncState>
 
     <!-- Install cert sheet -->
     <Sheet v-model="installOpen" title="Install TLS Certificate">

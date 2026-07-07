@@ -1,28 +1,34 @@
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Infrastructure packages not owned by any component def.
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     supervisor \
-    # Munin master and node.
-    munin munin-node \
-    # libcgi-fast-perl is required by munin-cgi-graph.
-    libcgi-fast-perl \
     # python3 is required by tools/editconf.py (#!/usr/bin/python3 shebang)
-    python3 \
-    # sudo is required by munin.sh to run munin-cron as the munin user
-    sudo \
+    python3 python3-pip \
     # locales required by munin-node (Perl daemon - fails without a valid locale)
     locales \
-    # Utilities used by the setup script.
     ca-certificates curl \
     && locale-gen en_US.UTF-8 \
+    && pip3 install --break-system-packages --quiet doit exclusiveprocess \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . /opt/mailinabox
+# Copy component defs before the full source COPY so this layer is only
+# invalidated when component definitions change, not on every code change.
+COPY setup/components /opt/mailinabox/setup/components
 WORKDIR /opt/mailinabox
+
+# Install component packages (munin, munin-node, libcgi-fast-perl, procps, sudo).
+# RUNTIME is unset here so ensure_installed() runs apt normally.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
+    PYTHONPATH=/opt/mailinabox/setup python3 -m components.runner --build-mode munin
+
+COPY . /opt/mailinabox
 
 COPY deploy/docker/monitoring/supervisord.conf /etc/supervisor/conf.d/monitoring.conf
 

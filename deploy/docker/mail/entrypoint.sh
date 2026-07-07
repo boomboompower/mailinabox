@@ -30,19 +30,16 @@ export LC_TYPE=en_US.UTF-8
 source /etc/mailinabox.conf
 mkdir -p "$STORAGE_ROOT"
 
-link_conf_to_storage /etc/opendkim opendkim
+if [ "${SPAM_FILTER:-rspamd}" = "spamassassin" ]; then
+    link_conf_to_storage /etc/opendkim opendkim
+fi
 
-# Generate TLS certificates before Dovecot/Postfix start - they refuse to
-# start without a cert.  On bare metal this is done earlier in start.sh;
-# in Docker we do it here, before the mail setup scripts run.
-source setup/infra/ssl.sh
-
-# Run the mail setup scripts in order.  These write config files, create
-# system users, etc.  Packages are already installed via the Dockerfile.
+# Generate TLS certificates and configure mail services via the component runner.
+# ssl must run before postfix/dovecot (they refuse to start without a cert).
 echo "Configuring mail services..."
-source setup/mail/postfix.sh
-source setup/mail/dovecot.sh
-source setup/mail/users.sh
+cd "$MIAB/setup"
+python3 -m components.runner ssl postfix dovecot users
+cd "$MIAB"
 
 # Rspamd runs in its own container. Wire Postfix to use it as a milter and
 # set the transport/restrictions that rspamd.sh would normally set on bare metal.

@@ -2,9 +2,12 @@ from ..registry import check
 from ..reporter import CheckFailed
 from .. import utils
 
+
 def _mail_domains(env):
 	from mail.mailconfig import get_mail_domains
+
 	return get_mail_domains(env)
+
 
 @check("mail-domain-mx", category="mail", per_domain=_mail_domains, depends_on=["unbound"])
 def check_mail_domain_mx(env, domain, report):
@@ -27,8 +30,7 @@ def check_mail_domain_mx(env, domain, report):
 			raise CheckFailed(f"This domain's MX record is not set. It should be '{recommended_mx}'. Mail will not be delivered.")
 
 		if mxhost != env['PRIMARY_HOSTNAME']:
-			raise CheckFailed(f"This domain's MX record is incorrect. It is currently '{mx}' but should be '{recommended_mx}'. "
-				f"Mail will not be delivered.")
+			raise CheckFailed(f"This domain's MX record is incorrect. It is currently '{mx}' but should be '{recommended_mx}'. Mail will not be delivered.")
 
 		if mx != recommended_mx:
 			report.warn(f"MX is non-standard ('{mx}'). The recommended configuration is '{recommended_mx}'.")
@@ -44,6 +46,7 @@ def check_mail_domain_mx(env, domain, report):
 		if not (policy[1].get("mx") == [env['PRIMARY_HOSTNAME']] and policy[1].get("mode") == "enforce"):
 			raise CheckFailed(f"MTA-STS policy is present but has unexpected settings: {policy[1]}")
 
+
 @check("mail-domain-postmaster", category="mail", per_domain=_mail_domains)
 def check_mail_domain_postmaster(env, domain, report):
 	from mail.mailconfig import get_mail_aliases
@@ -55,6 +58,7 @@ def check_mail_domain_postmaster(env, domain, report):
 		ok, msg = utils.alias_exists_message("Postmaster contact address", "postmaster@" + domain, env)
 		if not ok:
 			raise CheckFailed(msg)
+
 
 @check("mail-domain-blacklist", category="mail", per_domain=_mail_domains, depends_on=["unbound"])
 def check_mail_domain_blacklist(env, domain, report):

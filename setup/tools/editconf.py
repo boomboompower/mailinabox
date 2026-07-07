@@ -26,7 +26,7 @@
 # NAME VAL
 #   UE
 
-import sys, re
+import os, sys, re, tempfile
 
 # sanity check
 if len(sys.argv) < 3:
@@ -70,14 +70,22 @@ for setting in settings:
 		name, value = setting.split("=", 1)
 	except:
 		import subprocess
+
 		print("Invalid command line: ", subprocess.list2cmdline(sys.argv))
 
 # create the new config file in memory
 
 found = set()
 buf = ""
-with open(filename, encoding="utf-8") as f:
-        input_lines = list(f)
+try:
+	with open(filename, encoding="utf-8") as f:
+		input_lines = list(f)
+except FileNotFoundError:
+	# File doesn't exist yet - start empty and let the settings be appended below.
+	import os as _os
+
+	_os.makedirs(_os.path.dirname(filename) or ".", exist_ok=True)
+	input_lines = []
 
 while len(input_lines) > 0:
 	line = input_lines.pop(0)
@@ -93,11 +101,13 @@ while len(input_lines) > 0:
 		# Check if this line contain this setting from the command-line arguments.
 		name, val = settings[i].split("=", 1)
 		m = re.match(
-			   r"(\s*)"
-			 "(" + re.escape(comment_char) + r"\s*)?"
-			 + re.escape(name) + delimiter_re + r"(.*?)\s*$",
-			 line, re.S)
-		if not m: continue
+			r"(\s*)"
+			"(" + re.escape(comment_char) + r"\s*)?" + re.escape(name) + delimiter_re + r"(.*?)\s*$",
+			line,
+			re.S,
+		)
+		if not m:
+			continue
 		indent, is_comment, existing_val = m.groups()
 
 		# If this is already the setting, keep it in the file, except:
@@ -106,7 +116,8 @@ while len(input_lines) > 0:
 		if is_comment is None and existing_val == val and not (not val and erase_setting):
 			# It may be that we've already inserted this setting higher
 			# in the file so check for that first.
-			if i in found: break
+			if i in found:
+				break
 			buf += line
 			found.add(i)
 			break
@@ -143,9 +154,19 @@ for i in range(len(settings)):
 			buf += name + delimiter + val + "\n"
 
 if not testing:
-	# Write out the new file.
-	with open(filename, "w", encoding="utf-8") as f:
-		f.write(buf)
+	# Write atomically via temp file so a kill mid-write never leaves a truncated config.
+	dir_ = os.path.dirname(os.path.abspath(filename))
+	fd, tmp = tempfile.mkstemp(dir=dir_)
+	try:
+		with os.fdopen(fd, "w", encoding="utf-8") as f:
+			f.write(buf)
+		os.replace(tmp, filename)
+	except Exception:
+		try:
+			os.unlink(tmp)
+		except OSError:
+			pass
+		raise
 else:
 	# Just print the new file to stdout.
 	print(buf)

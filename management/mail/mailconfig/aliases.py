@@ -5,19 +5,24 @@ import sqlite3
 from core import utils
 from .database import open_database
 from .validation import (
-	validate_email, sanitize_idn_email_address, prettify_idn_email_address,
-	is_dcv_address, get_domain,
+	validate_email,
+	sanitize_idn_email_address,
+	prettify_idn_email_address,
+	is_dcv_address,
+	get_domain,
 )
+
 
 def get_mail_aliases(env):
 	# Returns a sorted list of tuples of (address, forward-tos, permitted-senders, auto).
 	conn, c = open_database(env, with_connection=True)
 	c.execute('SELECT source, destination, permitted_senders, 0 as auto FROM aliases UNION SELECT source, destination, permitted_senders, 1 as auto FROM auto_aliases')
-	aliases = { row[0]: row for row in c.fetchall() } # make dict
+	aliases = {row[0]: row for row in c.fetchall()}  # make dict
 	conn.close()
 
 	# put in a canonical order: sort by domain, then by email address lexicographically
-	return [ aliases[address] for address in utils.sort_email_addresses(aliases.keys(), env) ]
+	return [aliases[address] for address in utils.sort_email_addresses(aliases.keys(), env)]
+
 
 def get_mail_aliases_ex(env):
 	# Returns a complex data structure of all mail aliases, similar
@@ -43,7 +48,8 @@ def get_mail_aliases_ex(env):
 	domains = {}
 	for address, forwards_to, permitted_senders, auto in get_mail_aliases(env):
 		# skip auto domain maps since these are not informative in the control panel's aliases list
-		if auto and address.startswith("@"): continue
+		if auto and address.startswith("@"):
+			continue
 
 		# get alias info
 		domain = get_domain(address)
@@ -67,8 +73,9 @@ def get_mail_aliases_ex(env):
 
 	# Sort aliases within each domain first by required-ness then lexicographically by address.
 	for domain in domains:
-		domain["aliases"].sort(key = operator.itemgetter("auto", "address"))
+		domain["aliases"].sort(key=operator.itemgetter("auto", "address"))
 	return domains
+
 
 def add_mail_alias(address, forwards_to, permitted_senders, env, update_if_exists=False, do_kick=True):
 	from .users import get_mail_users, get_mail_user_privileges
@@ -109,10 +116,11 @@ def add_mail_alias(address, forwards_to, permitted_senders, env, update_if_exist
 		for line in forwards_to.split("\n"):
 			for email in line.split(","):
 				email = email.strip()
-				if email == "": continue
-				email = sanitize_idn_email_address(email) # Unicode => IDNA
+				if email == "":
+					continue
+				email = sanitize_idn_email_address(email)  # Unicode => IDNA
 				# Strip any +tag from email alias and check privileges
-				privileged_email = re.sub(r"(?=\+)[^@]*(?=@)",'',email)
+				privileged_email = re.sub(r"(?=\+)[^@]*(?=@)", '', email)
 				if not validate_email(email):
 					return (f"Invalid receiver email address ({email}).", 400)
 				if is_dcv_source and not is_dcv_address(email) and "admin" not in get_mail_user_privileges(privileged_email, env, empty_on_error=True):
@@ -132,7 +140,8 @@ def add_mail_alias(address, forwards_to, permitted_senders, env, update_if_exist
 	for line in permitted_senders.split("\n"):
 		for login in line.split(","):
 			login = login.strip()
-			if login == "": continue
+			if login == "":
+				continue
 			if login not in valid_logins:
 				return (f"Invalid permitted sender: {login} is not a user on this system.", 400)
 			validated_permitted_senders.append(login)
@@ -164,8 +173,10 @@ def add_mail_alias(address, forwards_to, permitted_senders, env, update_if_exist
 	if do_kick:
 		# Update things in case any new domains are added.
 		from .sync import kick
+
 		return kick(env, return_status)
 	return None
+
 
 def remove_mail_alias(address, env, do_kick=True):
 	# convert Unicode domain to IDNA
@@ -183,8 +194,10 @@ def remove_mail_alias(address, env, do_kick=True):
 	if do_kick:
 		# Update things in case any domains are removed.
 		from .sync import kick
+
 		return kick(env, "alias removed")
 	return None
+
 
 def add_auto_aliases(aliases, env):
 	conn, c = open_database(env, with_connection=True)

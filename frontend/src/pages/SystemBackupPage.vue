@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
-import { HardDrive, Settings2 } from 'lucide-vue-next'
+import { HardDrive, Settings2, AlertTriangle, WifiOff } from 'lucide-vue-next'
+import AsyncState from '@/components/ui/AsyncState.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -29,6 +30,7 @@ const config = useConfigStore()
 type BackupTargetType = 'off' | 'local' | 'rsync' | 's3' | 'b2'
 
 const loadingStatus = ref(true)
+const statusLoadError = ref(false)
 const loadingConfig = ref(true)
 const saving = ref(false)
 const configSheetOpen = ref(false)
@@ -155,6 +157,7 @@ function buildTarget(): { target: string; target_user: string; target_pass: stri
 
 async function loadStatus(): Promise<void> {
   loadingStatus.value = true
+  statusLoadError.value = false
   try {
     const res = await api.get('/admin/system/backup/status')
     const data: BackupStatus = await res.json()
@@ -169,6 +172,7 @@ async function loadStatus(): Promise<void> {
       lastCheck.value = data.last_check ?? null
     }
   } catch {
+    statusLoadError.value = true
     toast.error('Failed to load backup status.')
   } finally {
     loadingStatus.value = false
@@ -232,66 +236,63 @@ onMounted(() => Promise.all([loadStatus(), loadConfig()]))
 
 <template>
   <AppLayout>
-    <PageHeader title="System Backup">
+    <PageHeader title="System Backup" description="Schedule and review backups of your mail, settings, and data.">
       <template #actions>
         <Button variant="secondary" size="sm" @click="configSheetOpen = true"><Settings2 class="size-3.5" />Configure</Button>
       </template>
     </PageHeader>
 
-    <!-- Integrity check warning -->
-    <Card v-if="lastCheck && !lastCheck.passed" class="p-5 mb-6 border-red-200 dark:border-red-800">
-      <p class="text-sm font-medium text-red-600 dark:text-red-400 mb-1">Backup integrity check failed</p>
-      <p class="text-xs text-muted mb-3">Last checked {{ new Date(lastCheck.timestamp).toLocaleString() }}. An email has been sent to the administrator.</p>
-      <pre v-if="lastCheck.output" class="text-xs font-mono whitespace-pre-wrap break-all text-text">{{ lastCheck.output }}</pre>
-    </Card>
-
     <!-- Backup history -->
     <SectionHeader title="Backup History" />
 
-    <template v-if="loadingStatus">
-      <Table>
-        <TableHead>
-          <Th>Date</Th>
-          <Th>Age</Th>
-          <Th>Type</Th>
-          <Th class="text-right">Size</Th>
-          <Th>Expires</Th>
-        </TableHead>
-        <tbody>
-          <TableRow v-for="i in 4" :key="i">
-            <td class="px-4 py-3"><Skeleton class="h-4 w-40" /></td>
-            <td class="px-4 py-3"><Skeleton class="h-4 w-24" /></td>
-            <td class="px-4 py-3"><Skeleton class="h-4 w-20" /></td>
-            <td class="px-4 py-3"><Skeleton class="h-4 w-16 ml-auto" /></td>
-            <td class="px-4 py-3"><Skeleton class="h-4 w-28" /></td>
-          </TableRow>
-        </tbody>
-      </Table>
-    </template>
+    <AsyncState :loading="loadingStatus" :error="statusLoadError || !!statusError" :empty="backupsOff || backups.length === 0" error-title="Could not load backup status" @retry="loadStatus">
+      <template #loading>
+        <Table>
+          <TableHead>
+            <Th>Date</Th>
+            <Th>Age</Th>
+            <Th>Type</Th>
+            <Th class="text-right">Size</Th>
+            <Th>Deletes in</Th>
+          </TableHead>
+          <tbody>
+            <TableRow v-for="i in 4" :key="i">
+              <td class="px-4 py-3"><Skeleton class="h-4 w-40" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-24" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-20" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-16 ml-auto" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-28" /></td>
+            </TableRow>
+          </tbody>
+        </Table>
+      </template>
 
-    <template v-else-if="statusError">
-      <Card class="p-5 border-red-200 dark:border-red-800">
-        <p class="text-sm text-red-600 dark:text-red-400">{{ statusError }}</p>
-      </Card>
-    </template>
+      <template #error>
+        <EmptyState v-if="statusError" title="Backup unavailable" :description="statusError">
+          <template #icon><AlertTriangle /></template>
+        </EmptyState>
+        <EmptyState v-else title="Could not load backup status" description="Check your connection and try again.">
+          <template #icon><WifiOff /></template>
+          <template #action><Button variant="secondary" @click="loadStatus">Try again</Button></template>
+        </EmptyState>
+      </template>
 
-    <template v-else-if="backupsOff || backups.length === 0">
-      <EmptyState
-        title="No backups"
-        :description="backupsOff ? 'Backups are turned off. Use Configure to set a backup target.' : 'No backups have been made yet.'"
-      >
-        <template #icon><HardDrive /></template>
-      </EmptyState>
-    </template>
+      <template #empty>
+        <EmptyState
+          title="No backups"
+          :description="backupsOff ? 'Backups are turned off. Use Configure to set a backup target.' : 'No backups have been made yet.'"
+        >
+          <template #icon><HardDrive /></template>
+        </EmptyState>
+      </template>
 
-    <template v-else>
       <Table>
         <TableHead>
           <Th>Date</Th>
           <Th>Age</Th>
           <Th>{{ backupBackend === 'restic' ? 'Snapshot' : 'Type' }}</Th>
           <Th class="text-right">Size</Th>
-          <Th>Expires</Th>
+          <Th>Deletes in</Th>
         </TableHead>
         <tbody>
           <TableRow v-for="b in backups" :key="b.date">
@@ -323,7 +324,14 @@ onMounted(() => Promise.all([loadStatus(), loadConfig()]))
       <p v-if="totalSize" class="text-xs text-muted mt-2 text-right px-1">
         Total storage: {{ totalSize }}
       </p>
-    </template>
+    </AsyncState>
+
+    <!-- Integrity check warning - rendered after the table so it doesn't cause a layout shift on load -->
+    <Card v-if="lastCheck && !lastCheck.passed" class="p-5 mt-6 border-red-200 dark:border-red-800">
+      <p class="text-sm font-medium text-red-600 dark:text-red-400 mb-1">Backup integrity check failed</p>
+      <p class="text-xs text-muted mb-3">Last checked {{ new Date(lastCheck.timestamp).toLocaleString() }}. An email has been sent to the administrator.</p>
+      <pre v-if="lastCheck.output" class="text-xs font-mono whitespace-pre-wrap break-all text-text">{{ lastCheck.output }}</pre>
+    </Card>
 
     <!-- Backup configuration sheet -->
     <Sheet v-model="configSheetOpen" title="Backup Configuration">
@@ -427,10 +435,16 @@ onMounted(() => Promise.all([loadStatus(), loadConfig()]))
           </div>
         </div>
 
-        <Button class="w-full" :disabled="saving" @click="save">
-          {{ saving ? 'Saving...' : 'Save Configuration' }}
-        </Button>
       </div>
+
+      <template #footer>
+        <div class="flex gap-2 justify-end">
+          <Button variant="secondary" @click="configSheetOpen = false">Cancel</Button>
+          <Button :disabled="saving" @click="save">
+            {{ saving ? 'Saving...' : 'Save Configuration' }}
+          </Button>
+        </div>
+      </template>
     </Sheet>
   </AppLayout>
 </template>

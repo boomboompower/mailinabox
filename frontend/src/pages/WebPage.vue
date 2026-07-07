@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
 import { Globe } from 'lucide-vue-next'
+import AsyncState from '@/components/ui/AsyncState.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -19,10 +20,14 @@ import { useApi } from '@/composables/useApi'
 import { useConfigStore } from '@/stores/config'
 import type { WebDomain } from '@/types'
 
+// TODO: replace with docs URL once docs site is live
+const DNS_GUIDE_URL = 'https://github.com/boomboompower/mailinabox'
+
 const api = useApi()
 const config = useConfigStore()
 
 const loading = ref(true)
+const loadError = ref(false)
 const updating = ref(false)
 const updateResult = ref<string | null>(null)
 const domains = ref<WebDomain[]>([])
@@ -33,11 +38,13 @@ const changeDomain = ref<WebDomain | null>(null)
 
 async function load(): Promise<void> {
   loading.value = true
+  loadError.value = false
   try {
     const res = await api.get('/admin/web/domains')
     const data: WebDomain[] = await res.json()
     domains.value = data.filter(d => d.static_enabled)
   } catch {
+    loadError.value = true
     toast.error('Failed to load web domains.')
   } finally {
     loading.value = false
@@ -74,7 +81,7 @@ onMounted(load)
 
 <template>
   <AppLayout>
-    <PageHeader title="Static Web Hosting" />
+    <PageHeader title="Static Web Hosting" description="Publish websites for domains hosted on this box." />
 
     <Card class="p-5 mb-6">
       <p class="text-sm text-muted mb-3">
@@ -111,33 +118,30 @@ onMounted(load)
       </template>
     </SectionHeader>
 
-    <template v-if="loading">
-      <Table>
-        <TableHead>
-          <Th>Site</Th>
-          <Th>Directory</Th>
-          <th scope="col" class="px-4 py-3"></th>
-        </TableHead>
-        <tbody>
-          <TableRow v-for="i in 3" :key="i">
-            <td class="px-4 py-3"><Skeleton class="h-4 w-48" /></td>
-            <td class="px-4 py-3"><Skeleton class="h-4 w-64" /></td>
-            <td class="px-4 py-3"></td>
-          </TableRow>
-        </tbody>
-      </Table>
-    </template>
+    <AsyncState :loading="loading" :error="loadError" :empty="domains.length === 0" error-title="Could not load web domains" @retry="load">
+      <template #loading>
+        <Table>
+          <TableHead>
+            <Th>Site</Th>
+            <Th>Directory</Th>
+            <th scope="col" class="px-4 py-3"></th>
+          </TableHead>
+          <tbody>
+            <TableRow v-for="i in 3" :key="i">
+              <td class="px-4 py-3"><Skeleton class="h-4 w-48" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-64" /></td>
+              <td class="px-4 py-3"></td>
+            </TableRow>
+          </tbody>
+        </Table>
+      </template>
 
-    <template v-else-if="domains.length === 0">
-      <EmptyState
-        title="No static websites"
-        description="Add a mail user or alias on a domain to enable static hosting for it."
-      >
-        <template #icon><Globe /></template>
-      </EmptyState>
-    </template>
+      <template #empty>
+        <EmptyState title="No static websites" description="Add a mail user or alias on a domain to enable static hosting for it.">
+          <template #icon><Globe /></template>
+        </EmptyState>
+      </template>
 
-    <template v-else>
       <Table>
         <TableHead>
           <Th>Site</Th>
@@ -153,25 +157,19 @@ onMounted(load)
             </td>
             <td class="px-4 py-3 font-mono text-xs text-muted">{{ d.root }}</td>
             <td class="px-4 py-3 text-right">
-              <Button
-                v-if="d.root !== d.custom_root"
-                variant="ghost"
-                size="sm"
-                @click="openChangeRoot(d)"
-              >
+              <Button v-if="d.root !== d.custom_root" variant="ghost" size="sm" @click="openChangeRoot(d)">
                 Change
               </Button>
             </td>
           </TableRow>
         </tbody>
       </Table>
-
       <p class="text-xs text-faint mt-2">
         To add a site, create a mail user or alias for that domain.
-        See the <a href="https://mailinabox.email/guide.html#domain-name-configuration" target="_blank" class="underline">setup guide</a>
+        See the <a :href="DNS_GUIDE_URL" target="_blank" class="underline">setup guide</a>
         for nameserver configuration.
       </p>
-    </template>
+    </AsyncState>
 
     <!-- Update result -->
     <Card v-if="updateResult" class="p-4 mt-4">
@@ -183,7 +181,7 @@ onMounted(load)
     <Dialog
       v-model="changeOpen"
       :title="`Change root for ${changeDomain?.domain}`"
-      :description="`The directory will be changed to ${changeDomain?.custom_root}. Create this directory on the server first, then click Update to apply.`"
+      :description="`Update the web root for ${changeDomain?.domain} to ${changeDomain?.custom_root}?`"
     >
       <template #actions>
         <Button variant="secondary" @click="changeOpen = false">Cancel</Button>

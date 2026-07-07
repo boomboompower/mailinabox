@@ -10,29 +10,37 @@ from core.web_helpers import json_response, sanitize_error_message, validate_hos
 bp = Blueprint("dns", __name__, url_prefix="/dns")
 bp.before_request(require_admin)
 
+
 @bp.route('/zones')
 @read_scope
 def dns_zones():
 	from services.dns_update import get_dns_zones
+
 	return json_response([z[0] for z in get_dns_zones(env)])
+
 
 @bp.route('/update', methods=['POST'])
 def dns_update():
 	from services.dns_update import do_dns_update
+
 	try:
 		return do_dns_update(env, force=request.form.get('force', '') == '1')
 	except Exception as e:
 		return (sanitize_error_message(str(e)), 500)
 
+
 @bp.route('/secondary-nameserver')
 @read_scope
 def dns_get_secondary_nameserver():
 	from services.dns_update import get_custom_dns_config, get_secondary_dns
-	return json_response({ "hostnames": get_secondary_dns(get_custom_dns_config(env), mode=None) })
+
+	return json_response({"hostnames": get_secondary_dns(get_custom_dns_config(env), mode=None)})
+
 
 @bp.route('/secondary-nameserver', methods=['POST'])
 def dns_set_secondary_nameserver():
 	from services.dns_update import set_secondary_dns
+
 	try:
 		# Parse and validate each hostname to prevent command injection
 		hostnames_input = request.form.get('hostnames') or ""
@@ -43,26 +51,28 @@ def dns_set_secondary_nameserver():
 	except ValueError as e:
 		return (sanitize_error_message(str(e)), 400)
 
+
 @bp.route('/custom')
 @read_scope
 def dns_get_records(qname=None, rtype=None):
 	# Get the current set of custom DNS records.
 	from services.dns_update import get_custom_dns_config, get_dns_zones
+
 	records = get_custom_dns_config(env, only_real_records=True)
 
 	# Filter per the arguments for the more complex GET routes below.
-	records = [r for r in records
-		if (not qname or r[0] == qname)
-		and (not rtype or r[1] == rtype) ]
+	records = [r for r in records if (not qname or r[0] == qname) and (not rtype or r[1] == rtype)]
 
 	# Make a better data structure.
 	records = [
-        {
-                "qname": r[0],
-                "rtype": r[1],
-                "value": r[2],
-		"sort-order": { },
-        } for r in records ]
+		{
+			"qname": r[0],
+			"rtype": r[1],
+			"value": r[2],
+			"sort-order": {},
+		}
+		for r in records
+	]
 
 	# To help with grouping by zone in qname sorting, label each record with which zone it is in.
 	# There's an inconsistency in how we handle zones in get_dns_zones and in sort_domains, so
@@ -82,19 +92,27 @@ def dns_get_records(qname=None, rtype=None):
 	for i, r in enumerate(records):
 		r["sort-order"]["created"] = i
 	domain_sort_order = utils.sort_domains([r["qname"] for r in records], env)
-	for i, r in enumerate(sorted(records, key = lambda r : (
-			zones.index(r["zone"]) if r.get("zone") else 0, # record is not within a zone managed by the box
-			domain_sort_order.index(r["qname"]),
-			r["rtype"]))):
+	for i, r in enumerate(
+		sorted(
+			records,
+			key=lambda r: (
+				zones.index(r["zone"]) if r.get("zone") else 0,  # record is not within a zone managed by the box
+				domain_sort_order.index(r["qname"]),
+				r["rtype"],
+			),
+		)
+	):
 		r["sort-order"]["qname"] = i
 
 	# Return.
 	return json_response(records)
 
+
 @bp.route('/custom/<qname>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @bp.route('/custom/<qname>/<rtype>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def dns_set_record(qname, rtype="A"):
 	from services.dns_update import do_dns_update, set_custom_dns_record
+
 	try:
 		# Normalize.
 		rtype = rtype.upper()
@@ -110,7 +128,7 @@ def dns_set_record(qname, rtype="A"):
 		if request.method in {"POST", "PUT"}:
 			# There is a default value for A/AAAA records.
 			if rtype in {"A", "AAAA"} and value == "":
-				value = request.environ.get("HTTP_X_FORWARDED_FOR") # normally REMOTE_ADDR but we're behind nginx as a reverse proxy
+				value = request.environ.get("HTTP_X_FORWARDED_FOR")  # normally REMOTE_ADDR but we're behind nginx as a reverse proxy
 
 			# Cannot add empty records.
 			if value == '':
@@ -142,14 +160,18 @@ def dns_set_record(qname, rtype="A"):
 	except ValueError as e:
 		return (sanitize_error_message(str(e)), 400)
 
+
 @bp.route('/dump')
 @read_scope
 def dns_get_dump():
-	from services.dns_update import build_recommended_dns
-	return json_response(build_recommended_dns(env))
+	from services.dns_update import build_external_dns_records
+
+	return json_response(build_external_dns_records(env))
+
 
 @bp.route('/zonefile/<zone>')
 @read_scope
 def dns_get_zonefile(zone):
 	from services.dns_update import get_dns_zonefile
+
 	return Response(get_dns_zonefile(zone, env), status=200, mimetype='text/plain')

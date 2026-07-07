@@ -3,9 +3,11 @@ from contextlib import contextmanager
 
 from .registry import StepResult
 
+
 class CheckFailed(Exception):
 	"""Raise inside a step to stop the check right there. The step is marked
 	as failed and no further steps in this check will run."""
+
 
 class Reporter:
 	"""Handed to every check function. Tracks the ordered list of steps a
@@ -14,6 +16,7 @@ class Reporter:
 	- A step that raises stops the check immediately (no later steps run).
 	- A step that calls warn() keeps going - a warning never stops a check.
 	"""
+
 	def __init__(self, on_progress=None, on_progress_key=None):
 		self.steps = []
 		self._on_progress = on_progress
@@ -51,6 +54,7 @@ class Reporter:
 	def _emit(self):
 		if self._on_progress:
 			self._on_progress(self._on_progress_key, list(self.steps))
+
 
 def summarize(steps):
 	"""Roll a list of StepResults up into one overall status + message."""

@@ -1,0 +1,33 @@
+[Unit]
+Description=Beszel Hub (monitoring dashboard)
+After=network.target
+
+[Service]
+ExecStartPre=+/bin/mkdir -p ${STORAGE_ROOT}/beszel
+ExecStartPre=+/bin/chown beszel:beszel ${STORAGE_ROOT}/beszel
+ExecStart=/usr/local/bin/beszel serve --http "127.0.0.1:8090" --dir "${STORAGE_ROOT}/beszel"
+User=beszel
+Group=beszel
+# hub.env supplies USER_EMAIL + USER_PASSWORD consumed by the initial migration
+# (first DB creation only). After that these are ignored.
+EnvironmentFile=${STORAGE_ROOT}/beszel/hub.env
+# nginx injects a fixed internal identity via this header after validating the
+# admin session. Password auth is disabled - this header is the only way in.
+# nginx MUST strip any client-supplied value of this header before proxying.
+Environment=TRUSTED_AUTH_HEADER=X-Beszel-User
+Environment=DISABLE_PASSWORD_AUTH=true
+Environment=APP_URL=https://${PRIMARY_HOSTNAME}/admin/beszel
+Restart=on-failure
+RestartSec=5
+
+# Sandboxing
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=${STORAGE_ROOT}/beszel
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

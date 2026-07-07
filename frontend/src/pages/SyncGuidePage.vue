@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Card from '@/components/ui/Card.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
 import Code from '@/components/ui/Code.vue'
 import Table from '@/components/ui/Table.vue'
@@ -15,6 +16,7 @@ const imapRows: SettingRow[] = [
   ['IMAP server', config.hostname],
   ['IMAP port', '993 (SSL/TLS)'],
   ['SMTP server', config.hostname],
+  ['SMTP port', '465 (SSL/TLS)'],
   ['SMTP port', '587 (STARTTLS)'],
   ['Username', 'Your full email address'],
   ['Password', 'Your mail password'],
@@ -29,7 +31,7 @@ const caldavRows: SettingRow[] = [
 
 <template>
   <AppLayout>
-    <h1 class="text-2xl font-semibold mb-6">Sync to Devices</h1>
+    <PageHeader title="Sync to Devices" description="Sync your calendar and contacts with your phone or desktop app." />
 
     <!-- IMAP / SMTP -->
     <SectionHeader title="Email (IMAP / SMTP)" />
@@ -40,7 +42,7 @@ const caldavRows: SettingRow[] = [
       </p>
       <Table>
         <tbody>
-          <TableRow v-for="[label, value] in imapRows" :key="label">
+          <TableRow v-for="([label, value], i) in imapRows" :key="i">
             <th scope="row" class="px-4 py-2.5 text-sm text-muted font-normal text-left w-48">{{ label }}</th>
             <td class="px-4 py-2.5 text-sm font-medium font-mono">{{ value }}</td>
           </TableRow>

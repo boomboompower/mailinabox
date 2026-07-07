@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -30,6 +30,10 @@ RUN wget -O /tmp/filebrowser.tar.gz \
     chmod +x /usr/local/bin/filebrowser && \
     rm /tmp/filebrowser.tar.gz && \
     mkdir -p /usr/local/share && echo "v2.63.11" > /usr/local/share/filebrowser.version
+
+RUN apt-get update && apt-get install -y --no-install-recommends python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+RUN pip3 install --break-system-packages --quiet doit exclusiveprocess
 
 COPY . /opt/mailinabox
 WORKDIR /opt/mailinabox

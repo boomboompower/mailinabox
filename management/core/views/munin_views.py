@@ -3,6 +3,7 @@
 # admin_session cookie) - they can't use require_admin or require_admin_route,
 # so this file defines its own decorator for them.
 
+import re
 from functools import wraps
 
 from flask import Blueprint, Response, current_app, make_response, request, send_from_directory
@@ -14,6 +15,7 @@ from mail.mailconfig import get_mail_user_privileges
 
 bp = Blueprint("munin", __name__, url_prefix="/munin")
 
+
 @bp.route('/')
 @require_admin_route
 def munin_start():
@@ -22,16 +24,19 @@ def munin_start():
 	# that subsequent requests will read for authorization. (We don't use cookies
 	# for the API to avoid CSRF vulnerabilities.)
 	response = make_response("OK")
-	response.set_cookie("session", auth_service.create_session_key(request.user_email, env, session_type='cookie'),
-	    max_age=60*30, secure=True, httponly=True, samesite="Strict") # 30 minute duration
+	response.set_cookie("session", auth_service.create_session_key(request.user_email, env, session_type='cookie'), max_age=60 * 30, secure=True, httponly=True, samesite="Strict")  # 30 minute duration
 	return response
+
 
 def check_request_cookie_for_admin_access():
 	session = auth_service.get_session(None, request.cookies.get("session", ""), "cookie", env)
-	if not session: return False
+	if not session:
+		return False
 	privs = get_mail_user_privileges(session["email"], env)
-	if not isinstance(privs, list): return False
+	if not isinstance(privs, list):
+		return False
 	return "admin" in privs
+
 
 def authorized_personnel_only_via_cookie(f):
 	@wraps(f)
@@ -39,19 +44,23 @@ def authorized_personnel_only_via_cookie(f):
 		if not check_request_cookie_for_admin_access():
 			return Response("Unauthorized", status=403, mimetype='text/plain', headers={})
 		return f(*args, **kwargs)
+
 	return g
+
 
 @bp.route('/<path:filename>')
 @authorized_personnel_only_via_cookie
 def munin_static_file(filename=""):
 	# Proxy the request to static files.
-	if filename == "": filename = "index.html"
+	if filename == "":
+		filename = "index.html"
 	return send_from_directory("/var/cache/munin/www", filename)
+
 
 @bp.route('/cgi-graph/<path:filename>')
 @authorized_personnel_only_via_cookie
 def munin_cgi(filename):
-	""" Relay munin cgi dynazoom requests
+	"""Relay munin cgi dynazoom requests
 	/usr/lib/munin/cgi/munin-cgi-graph is a perl cgi script in the munin package
 	that is responsible for generating binary png images _and_ associated HTTP
 	headers based on parameters in the requesting URL. All output is written
@@ -76,6 +85,8 @@ def munin_cgi(filename):
 
 	if filename == "":
 		return ("a path must be specified", 404)
+	if not re.fullmatch(r"[\w.\-/]+", filename) or ".." in filename:
+		return ("invalid path", 400)
 
 	query_str = request.query_string.decode("utf-8", 'ignore')
 
@@ -83,12 +94,14 @@ def munin_cgi(filename):
 	# to the module-level mailinabox settings 'env' imported above - same name,
 	# same as the original code, scoped to this function only.
 	cgi_env = {'PATH_INFO': f'/{filename}/', 'REQUEST_METHOD': 'GET', 'QUERY_STRING': query_str}
-	code, binout = utils.shell('check_output',
-							   COMMAND.split(" ", 5),
-							   # Using a maxsplit of 5 keeps the last arguments together
-							   env=cgi_env,
-							   return_bytes=True,
-							   trap=True)
+	code, binout = utils.shell(
+		'check_output',
+		COMMAND.split(" ", 5),
+		# Using a maxsplit of 5 keeps the last arguments together
+		env=cgi_env,
+		return_bytes=True,
+		trap=True,
+	)
 
 	if code != 0:
 		# nonzero returncode indicates error

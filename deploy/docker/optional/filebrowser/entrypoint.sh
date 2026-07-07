@@ -1,8 +1,8 @@
 #!/bin/bash
 # FileBrowser container entrypoint.
 #
-# Sources setup/optional/filebrowser.sh (which downloads the binary, writes
-# the auth hook, and initialises the database), then starts FileBrowser.
+# Runs the filebrowser component (downloads binary, writes auth hook,
+# initialises database), then starts FileBrowser.
 # The auth hook calls the management daemon's /auth/verify endpoint - no
 # Dovecot dependency.
 #
@@ -32,7 +32,9 @@ source /etc/mailinabox.conf
 mkdir -p "$STORAGE_ROOT"
 
 echo "Configuring FileBrowser..."
-source setup/optional/filebrowser.sh
+cd "$MIAB/setup"
+python3 -m components.runner filebrowser
+cd "$MIAB"
 
 echo "FileBrowser setup complete. Starting FileBrowser and control socket server via supervisord..."
 exec /usr/bin/supervisord -c /opt/mailinabox/deploy/docker/optional/filebrowser/supervisord.conf

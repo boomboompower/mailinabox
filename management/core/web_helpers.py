@@ -8,6 +8,7 @@ import time
 
 from flask import Response, current_app, request
 
+
 def validate_csrf():
 	if request.method in ('POST', 'PUT', 'DELETE'):
 		xhr_header = request.headers.get('X-Requested-With')
@@ -15,26 +16,39 @@ def validate_csrf():
 			return False
 	return True
 
+
 def json_response(data, status=200):
 	return Response(json.dumps(data, indent=2, sort_keys=True) + '\n', status=status, mimetype='application/json')
 
+
 def sanitize_error_message(error_msg):
 	"""
-	Sanitize error messages to prevent information disclosure.
-	Removes file paths, internal details, and other sensitive information.
+	Sanitize error messages to prevent credential disclosure.
+	Full tracebacks are replaced with a generic message.
+	Credentials embedded in backup target URLs are stripped.
+	File paths and line numbers are redacted.
 	"""
 	if not isinstance(error_msg, str):
 		error_msg = str(error_msg)
 
-	error_msg = re.sub(r'/[a-zA-Z0-9/_\-\.]+\.py', '[file]', error_msg)
-	error_msg = re.sub(r'/var/lib/mailinabox/[^\s]*', '[storage]', error_msg)
-	error_msg = re.sub(r'/home/[^\s]*', '[home]', error_msg)
-	error_msg = re.sub(r'line \d+', 'line [redacted]', error_msg)
-
 	if 'Traceback' in error_msg or 'File "' in error_msg:
 		return "An internal error occurred. Please contact your administrator."
 
+	# Strip credentials from backup target URLs (s3://, b2://, sftp://, etc.)
+	error_msg = re.sub(r'(\w+://)([^:@\s]+):([^@\s]+)@', r'\1***:***@', error_msg)
+
+	# Redact Python source file paths.
+	error_msg = re.sub(r'/\S+\.py', '[file]', error_msg)
+
+	# Shorten well-known internal path prefixes.
+	error_msg = re.sub(r'/var/lib/mailinabox/([^\s]*)', r'[storage]/\1', error_msg)
+	error_msg = re.sub(r'/home/[^/\s]+/([^\s]*)', r'[home]/\1', error_msg)
+
+	# Redact line numbers.
+	error_msg = re.sub(r'\bline \d+\b', 'line [redacted]', error_msg)
+
 	return error_msg
+
 
 def validate_email(email):
 	"""
@@ -77,6 +91,7 @@ def validate_email(email):
 
 	return email.strip()
 
+
 def validate_hostname(hostname):
 	"""
 	Validate hostname/domain format to prevent command injection attacks.
@@ -110,6 +125,7 @@ def validate_hostname(hostname):
 		raise ValueError("Hostname must contain a TLD")
 
 	return hostname.strip()
+
 
 def log_failed_login(req):
 	# We need to figure out the ip to list in the message, all our calls are routed

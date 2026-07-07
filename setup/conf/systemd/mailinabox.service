@@ -1,6 +1,6 @@
 [Unit]
 Description=Mail-in-a-Box System Management Service
-After=multi-user.target
+After=network.target
 Before=postfix.service dovecot.service
 
 [Service]

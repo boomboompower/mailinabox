@@ -13,15 +13,20 @@ if [ -z "$TAG" ]; then
 	#
 	# Allow point-release versions, e.g. 24.04.1 is treated as 24.04.
 	UBUNTU_VERSION=$( lsb_release -d | sed 's/.*:\s*//' | sed 's/\([0-9]*\.[0-9]*\)\.[0-9]/\1/' )
-	if [ "$UBUNTU_VERSION" == "Ubuntu 24.04 LTS" ] || [ "$UBUNTU_VERSION" == "Ubuntu 26.04 LTS" ]; then
-		TAG=v76
+	if [ "$UBUNTU_VERSION" == "Ubuntu 26.04 LTS" ]; then
+		TAG=main
+	elif [ "$UBUNTU_VERSION" == "Ubuntu 24.04 LTS" ]; then
+		echo "NOTE: Ubuntu 24.04 is supported but 26.04 is the recommended target."
+		echo "      Consider upgrading for the best experience."
+		echo
+		TAG=main
 	elif [ "$UBUNTU_VERSION" == "Ubuntu 22.04 LTS" ]; then
 		echo "WARNING: Ubuntu 22.04 reaches end of life in April 2027."
-		echo "         Consider upgrading to 24.04 before then."
+		echo "         Consider upgrading to 26.04 before then."
 		echo
-		TAG=v76
+		TAG=main
 	else
-		echo "Mail-in-a-Box supports Ubuntu 24.04 (recommended), 26.04, and 22.04."
+		echo "Mail-in-a-Box supports Ubuntu 26.04 (recommended), 24.04, and 22.04."
 		echo "You are running: $UBUNTU_VERSION"
 		exit 1
 	fi
@@ -43,7 +48,7 @@ if [ ! -d "$HOME/mailinabox" ]; then
 	fi
 
 	if [ "$SOURCE" == "" ]; then
-		SOURCE=https://github.com/mail-in-a-box/mailinabox
+		SOURCE=https://github.com/boomboompower/mailinabox
 	fi
 
 	echo "Downloading Mail-in-a-Box $TAG. . ."
@@ -71,4 +76,4 @@ if [ "$TAG" != "$(git describe --always)" ]; then
 fi
 
 # Start setup script.
-setup/start.sh
+setup/install.sh

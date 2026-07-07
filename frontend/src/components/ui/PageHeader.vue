@@ -1,10 +1,14 @@
 <script setup lang="ts">
-defineProps<{ title: string }>()
+defineProps<{ title: string; description?: string }>()
 </script>
 
 <template>
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-semibold">{{ title }}</h1>
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-semibold">{{ title }}</h1>
+      <p v-if="description" class="text-xs text-muted mt-0.5">{{ description }}</p>
+      <slot name="description" />
+    </div>
     <slot name="actions" />
   </div>
 </template>

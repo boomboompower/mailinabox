@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
-import { Globe, Plus } from 'lucide-vue-next'
+import { Globe, Plus, Copy } from 'lucide-vue-next'
+import AsyncState from '@/components/ui/AsyncState.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -12,10 +13,12 @@ import Card from '@/components/ui/Card.vue'
 import Sheet from '@/components/ui/Sheet.vue'
 import Table from '@/components/ui/Table.vue'
 import TableRow from '@/components/ui/TableRow.vue'
+import Code from '@/components/ui/Code.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import Dialog from '@/components/ui/Dialog.vue'
 import Select from '@/components/ui/Select.vue'
+import Badge from '@/components/ui/Badge.vue'
 import TableHead from '@/components/ui/TableHead.vue'
 import Th from '@/components/ui/Th.vue'
 import { useApi } from '@/composables/useApi'
@@ -26,6 +29,23 @@ const api = useApi()
 const records = ref<DnsRecord[]>([])
 const zones = ref<string[]>([])
 const loading = ref(true)
+const loadError = ref(false)
+const expandedKey = ref<string | null>(null)
+const copiedKey = ref<string | null>(null)
+
+function toggleExpand(key: string): void {
+  expandedKey.value = expandedKey.value === key ? null : key
+}
+
+async function copyValue(key: string, value: string): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(value)
+    copiedKey.value = key
+    setTimeout(() => { if (copiedKey.value === key) copiedKey.value = null }, 2000)
+  } catch {
+    toast.error('Could not copy to clipboard.')
+  }
+}
 const saving = ref(false)
 const sheetOpen = ref(false)
 const deleteOpen = ref(false)
@@ -70,10 +90,12 @@ async function loadZones(): Promise<void> {
 
 async function loadRecords(): Promise<void> {
   loading.value = true
+  loadError.value = false
   try {
     const res = await api.get('/admin/dns/custom')
     records.value = await res.json()
   } catch {
+    loadError.value = true
     toast.error('Failed to load DNS records.')
   } finally {
     loading.value = false
@@ -152,53 +174,79 @@ onMounted(async () => {
 
 <template>
   <AppLayout>
-    <PageHeader title="Custom DNS">
+    <PageHeader title="Custom DNS" description="Add DNS records that this box does not create automatically.">
       <template #actions>
         <Button size="sm" @click="sheetOpen = true"><Plus class="size-3.5" />Add Record</Button>
       </template>
     </PageHeader>
 
     <!-- Existing records -->
-    <SectionHeader title="Current Records" />
-    <Table>
-      <TableHead>
-        <Th>Name</Th>
-        <Th>Type</Th>
-        <Th>Value</Th>
-        <th scope="col" class="px-4 py-3"></th>
-      </TableHead>
-      <tbody>
-        <template v-if="loading">
-          <TableRow v-for="i in 3" :key="i">
-            <td class="px-4 py-3"><Skeleton class="h-4 w-40" /></td>
-            <td class="px-4 py-3"><Skeleton class="h-4 w-12" /></td>
-            <td class="px-4 py-3"><Skeleton class="h-4 w-32" /></td>
-            <td class="px-4 py-3"></td>
-          </TableRow>
-        </template>
-        <template v-else>
-          <TableRow v-for="record in records" :key="`${record.qname}/${record.rtype}/${record.value}`">
-            <td class="px-4 py-3 font-mono text-sm">{{ record.qname }}</td>
-            <td class="px-4 py-3 text-sm font-medium">{{ record.rtype }}</td>
-            <td class="px-4 py-3 font-mono text-sm text-muted max-w-xs truncate">{{ record.value }}</td>
-            <td class="px-4 py-3 text-right">
-              <Button variant="ghost" size="sm" @click="confirmDelete(record)">Delete</Button>
-            </td>
-          </TableRow>
-        </template>
-      </tbody>
-    </Table>
-
-    <EmptyState
-      v-if="!loading && records.length === 0"
-      title="No custom DNS records"
-      description="Add a record to override or extend this box's DNS."
-    >
-      <template #icon><Globe /></template>
-      <template #action>
-        <Button @click="sheetOpen = true">Add Record</Button>
+    <AsyncState :loading="loading" :error="loadError" :empty="records.length === 0" error-title="Could not load DNS records" @retry="loadRecords">
+      <template #loading>
+        <SectionHeader title="Current Records" />
+        <Table>
+          <TableHead>
+            <Th>Name</Th>
+            <Th>Type</Th>
+            <Th>Value</Th>
+            <th scope="col" class="px-4 py-3"></th>
+          </TableHead>
+          <tbody>
+            <TableRow v-for="i in 3" :key="i">
+              <td class="px-4 py-3"><Skeleton class="h-4 w-40" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-12" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-32" /></td>
+              <td class="px-4 py-3"></td>
+            </TableRow>
+          </tbody>
+        </Table>
       </template>
-    </EmptyState>
+
+      <template #empty>
+        <EmptyState title="No custom DNS records" description="Add a record to override or extend this box's DNS.">
+          <template #icon><Globe /></template>
+          <template #action><Button @click="sheetOpen = true">Add Record</Button></template>
+        </EmptyState>
+      </template>
+
+      <SectionHeader title="Current Records" />
+      <Table>
+        <TableHead>
+          <Th>Name</Th>
+          <Th>Type</Th>
+          <Th>Value</Th>
+          <th scope="col" class="px-4 py-3"></th>
+        </TableHead>
+        <tbody>
+          <template v-for="record in records" :key="`${record.qname}/${record.rtype}/${record.value}`">
+            <TableRow clickable @click="toggleExpand(`${record.qname}/${record.rtype}/${record.value}`)">
+              <td class="px-4 py-3">
+                <div class="font-mono text-sm max-w-[220px] truncate" :title="record.qname">{{ record.qname }}</div>
+              </td>
+              <td class="px-4 py-3">
+                <Badge variant="default" class="font-mono">{{ record.rtype }}</Badge>
+              </td>
+              <td class="px-4 py-3">
+                <div class="font-mono text-sm text-muted max-w-[280px] truncate" :title="record.value">{{ record.value }}</div>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <Button variant="ghost" size="sm" @click.stop="confirmDelete(record)">Delete</Button>
+              </td>
+            </TableRow>
+            <tr v-if="expandedKey === `${record.qname}/${record.rtype}/${record.value}`" class="border-b border-border">
+              <td colspan="4" class="bg-sidebar px-4 py-3">
+                <div class="flex items-start gap-3">
+                  <Code block wrap class="flex-1 min-w-0">{{ record.value }}</Code>
+                  <Button variant="ghost" size="sm" class="shrink-0 mt-1" @click.stop="copyValue(`${record.qname}/${record.rtype}/${record.value}`, record.value)">
+                    <Copy class="size-3" />{{ copiedKey === `${record.qname}/${record.rtype}/${record.value}` ? 'Copied!' : 'Copy' }}
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </Table>
+    </AsyncState>
 
     <!-- Secondary nameserver -->
     <Card class="p-5 mt-6">

@@ -1,6 +1,6 @@
 import base64, hmac, json, secrets
-from passlib.hash import bcrypt
 from datetime import timedelta
+from typing import Optional
 
 from expiringdict import ExpiringDict
 
@@ -10,19 +10,42 @@ from mail.mailconfig.users import verify_password, hash_password
 from mail.mailconfig.database import open_database
 from auth.mfa import get_hash_mfa_state, validate_auth_mfa
 
-DEFAULT_KEY_PATH   = '/var/lib/mailinabox/api.key'
+DEFAULT_KEY_PATH = '/var/lib/mailinabox/api.key'
 DEFAULT_AUTH_REALM = 'Mail-in-a-Box Management Server'
+
+
+def parse_http_authorization_basic(header: str) -> "tuple[Optional[str], Optional[str]]":
+	"""Parse an HTTP Basic Authorization header into (username, password).
+	Returns (None, None) if the header is absent, malformed, or not Basic scheme."""
+	if not header or " " not in header:
+		return None, None
+	scheme, credentials = header.split(maxsplit=1)
+	if scheme != 'Basic':
+		return None, None
+	try:
+		credentials = base64.b64decode(credentials.encode('ascii')).decode('ascii')
+	except Exception:
+		return None, None
+	if ":" not in credentials:
+		return None, None
+	username, password = credentials.split(':', maxsplit=1)
+	return username, password
+
 
 # Placeholder hash used when an email address is not found, so that passlib
 # still runs and response time is consistent regardless of whether the user exists.
 # Generated lazily on first use so startup cost is paid only when needed.
 _dummy_hash_cache: "str | None" = None
 
+
 def _get_dummy_hash() -> str:
 	global _dummy_hash_cache
 	if _dummy_hash_cache is None:
+		from passlib.hash import bcrypt
+
 		_dummy_hash_cache = "{BLF-CRYPT}" + bcrypt.hash("mailinabox-timing-dummy")
 	return _dummy_hash_cache
+
 
 class AuthService:
 	def __init__(self):
@@ -36,13 +59,19 @@ class AuthService:
 		# tokens (short-lived munin sessions). Keeping them apart prevents munin page
 		# load churn from evicting active admin login sessions.
 		duration = self.max_session_duration.total_seconds()
-		self.login_sessions  = ExpiringDict(max_len=1024, max_age_seconds=duration)
+		self.login_sessions = ExpiringDict(max_len=1024, max_age_seconds=duration)
 		self.cookie_sessions = ExpiringDict(max_len=1024, max_age_seconds=60 * 30)  # 30 min, mirrors daemon.py
 
 		# In-process challenge store for WebAuthn registration and authentication flows.
 		# The Flask daemon is assumed to run as a single process (no workers); if the
 		# deployment model ever changes, this must be replaced with a shared store.
 		self.webauthn_challenges = ExpiringDict(max_len=512, max_age_seconds=300)
+
+		# In-process store for the encryption-at-rest setup ceremony. Holds the
+		# pre-built (but uncommitted) key slots between /setup and /challenge so
+		# the MAIL_KEY is never persisted until the user proves they saved a
+		# recovery code. Same single-process assumption as webauthn_challenges.
+		self.encryption_setups = ExpiringDict(max_len=256, max_age_seconds=600)
 
 	def _session_store(self, session_type):
 		if session_type == 'cookie':
@@ -62,20 +91,6 @@ class AuthService:
 		('my@email', []) or ('my@email', ['admin']); raises a ValueError on login failure.
 		If the user used the system API key, the user's email is returned as None since
 		this key is not associated with a user."""
-
-		def parse_http_authorization_basic(header):
-			def decode(s):
-				return base64.b64decode(s.encode('ascii')).decode('ascii')
-			if " " not in header:
-				return None, None
-			scheme, credentials = header.split(maxsplit=1)
-			if scheme != 'Basic':
-				return None, None
-			credentials = decode(credentials)
-			if ":" not in credentials:
-				return None, None
-			username, password = credentials.split(':', maxsplit=1)
-			return username, password
 
 		username, password = parse_http_authorization_basic(request.headers.get('Authorization', ''))
 		if username in {None, ""}:
@@ -118,7 +133,8 @@ class AuthService:
 		# deleted after the session was granted. On error the call will return a tuple
 		# of an error message and an HTTP status code.
 		privs = get_mail_user_privileges(username, env)
-		if isinstance(privs, tuple): raise ValueError(privs[0])
+		if isinstance(privs, tuple):
+			raise ValueError(privs[0])
 
 		# Return the authorization information.
 		return (username, privs)
@@ -209,14 +225,18 @@ class AuthService:
 
 	def get_session(self, user_email, session_key, session_type, env):
 		store = self._session_store(session_type)
-		if session_key not in store: return None
+		if session_key not in store:
+			return None
 		session = store[session_key]
-		if session_type == "login" and not hmac.compare_digest(session["email"], user_email): return None
-		if session["type"] != session_type: return None
+		if session_type == "login" and not hmac.compare_digest(session["email"], user_email):
+			return None
+		if session["type"] != session_type:
+			return None
 		try:
 			current_token = self.create_user_password_state_token(session["email"], env)
 		except ValueError:
 			# User no longer exists - invalidate the session.
 			return None
-		if not hmac.compare_digest(session["password_token"], current_token): return None
+		if not hmac.compare_digest(session["password_token"], current_token):
+			return None
 		return session

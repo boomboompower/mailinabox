@@ -10,6 +10,7 @@ const router = createRouter({
     { path: '/setup', component: () => import('@/pages/OnboardingPage.vue'), meta: { public: true } },
     { path: '/', redirect: '/system-status' },
     { path: '/mfa', component: () => import('@/pages/MfaPage.vue') },
+    { path: '/encryption', component: () => import('@/pages/EncryptionPage.vue') },
     { path: '/api-tokens', component: () => import('@/pages/ApiTokensPage.vue'), meta: { adminOnly: true } },
     { path: '/users', component: () => import('@/pages/UsersPage.vue'), meta: { adminOnly: true } },
     { path: '/aliases', component: () => import('@/pages/AliasesPage.vue'), meta: { adminOnly: true } },
@@ -22,7 +23,7 @@ const router = createRouter({
     { path: '/web', component: () => import('@/pages/WebPage.vue'), meta: { adminOnly: true } },
     { path: '/mail-guide', component: () => import('@/pages/MailGuidePage.vue'), meta: { adminOnly: true } },
     { path: '/sync-guide', component: () => import('@/pages/SyncGuidePage.vue'), meta: { adminOnly: true } },
-    { path: '/munin', component: () => import('@/pages/MuninPage.vue'), meta: { adminOnly: true } },
+    { path: '/monitoring', component: () => import('@/pages/MonitoringPage.vue'), meta: { adminOnly: true } },
     { path: '/:pathMatch(.*)*', component: () => import('@/pages/NotFoundPage.vue'), meta: { public: true } },
   ],
 })
@@ -37,7 +38,7 @@ const legacyHashMap: Record<string, string> = {
   '#external_dns': '/external-dns',
   '#web': '/web',
   '#mfa': '/mfa',
-  '#munin': '/munin',
+
   '#mail-guide': '/mail-guide',
   '#sync-guide': '/sync-guide',
   '#welcome': '/system-status',

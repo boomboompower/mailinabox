@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
 import { AtSign, Plus } from 'lucide-vue-next'
+import AsyncState from '@/components/ui/AsyncState.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -25,6 +26,7 @@ const api = useApi()
 
 const aliases = ref<MailAlias[]>([])
 const loading = ref(true)
+const loadError = ref(false)
 const search = ref('')
 const sheetOpen = ref(false)
 const deleteOpen = ref(false)
@@ -44,6 +46,7 @@ const filteredAliases = computed(() =>
 
 async function load(): Promise<void> {
   loading.value = true
+  loadError.value = false
   try {
     const res = await api.get('/admin/mail/aliases?format=json')
     const domains: MailAliasDomain[] = await res.json()
@@ -52,6 +55,7 @@ async function load(): Promise<void> {
       .flatMap(d => d.aliases)
       .filter(a => !(a.auto && a.address.startsWith('@')))
   } catch {
+    loadError.value = true
     toast.error('Failed to load aliases.')
   } finally {
     loading.value = false
@@ -119,7 +123,7 @@ onMounted(load)
 
 <template>
   <AppLayout>
-    <PageHeader title="Aliases">
+    <PageHeader title="Aliases" description="Redirect mail sent to one address to one or more other addresses.">
       <template #actions>
         <Button size="sm" @click="openAdd"><Plus class="size-3.5" />Add Alias</Button>
       </template>
@@ -129,33 +133,44 @@ onMounted(load)
       <Input v-model="search" placeholder="Search aliases..." aria-label="Search aliases" />
     </div>
 
-    <Table>
-      <TableHead>
-        <Th>Address</Th>
-        <Th>Forwards To</Th>
-        <Th class="hidden sm:table-cell">Type</Th>
-        <th scope="col" class="px-4 py-3"></th>
-      </TableHead>
-      <tbody>
-        <template v-if="loading">
-          <TableRow v-for="i in 4" :key="i">
-            <td class="px-4 py-3"><Skeleton class="h-4 w-48" /></td>
-            <td class="px-4 py-3"><Skeleton class="h-4 w-40" /></td>
-            <td class="px-4 py-3 hidden sm:table-cell"><Skeleton class="h-4 w-16" /></td>
-            <td class="px-4 py-3"></td>
-          </TableRow>
-        </template>
-        <template v-else>
-          <TableRow
-            v-for="alias in filteredAliases"
-            :key="alias.address"
-            clickable
-            @click="openEdit(alias)"
-          >
+    <AsyncState :loading="loading" :error="loadError" :empty="aliases.length === 0" error-title="Could not load aliases" @retry="load">
+      <template #loading>
+        <Table>
+          <TableHead>
+            <Th>Address</Th>
+            <Th>Forwards To</Th>
+            <Th class="hidden sm:table-cell">Type</Th>
+            <Th />
+          </TableHead>
+          <tbody>
+            <TableRow v-for="i in 2" :key="i">
+              <td class="px-4 py-3"><Skeleton class="h-4 w-48" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-40" /></td>
+              <td class="px-4 py-3 hidden sm:table-cell"><Skeleton class="h-4 w-16" /></td>
+              <td class="px-4 py-3"></td>
+            </TableRow>
+          </tbody>
+        </Table>
+      </template>
+
+      <template #empty>
+        <EmptyState title="No aliases" description="Aliases forward mail from one address to another.">
+          <template #icon><AtSign /></template>
+          <template #action><Button @click="openAdd">Add Alias</Button></template>
+        </EmptyState>
+      </template>
+
+      <Table>
+        <TableHead>
+          <Th>Address</Th>
+          <Th>Forwards To</Th>
+          <Th class="hidden sm:table-cell">Type</Th>
+          <Th />
+        </TableHead>
+        <tbody>
+          <TableRow v-for="alias in filteredAliases" :key="alias.address" clickable @click="openEdit(alias)">
             <td class="px-4 py-3 font-medium">{{ alias.address_display }}</td>
-            <td class="px-4 py-3 text-sm text-muted">
-              {{ alias.forwards_to.join(', ') }}
-            </td>
+            <td class="px-4 py-3 text-sm text-muted">{{ alias.forwards_to.join(', ') }}</td>
             <td class="px-4 py-3 hidden sm:table-cell">
               <Badge v-if="alias.auto" variant="default">auto</Badge>
             </td>
@@ -163,20 +178,12 @@ onMounted(load)
               <Button variant="ghost" size="sm" @click.stop="openEdit(alias)">Edit</Button>
             </td>
           </TableRow>
-        </template>
-      </tbody>
-    </Table>
-
-    <EmptyState
-      v-if="!loading && aliases.length === 0"
-      title="No aliases"
-      description="Aliases forward mail from one address to another."
-    >
-      <template #icon><AtSign /></template>
-      <template #action>
-        <Button @click="openAdd">Add Alias</Button>
-      </template>
-    </EmptyState>
+          <tr v-if="filteredAliases.length === 0">
+            <td colspan="4" class="px-4 py-8 text-center text-sm text-muted">No aliases match your search.</td>
+          </tr>
+        </tbody>
+      </Table>
+    </AsyncState>
 
     <Sheet v-model="sheetOpen" :title="editingAlias ? 'Edit Alias' : 'Add Alias'">
       <template v-if="editingAlias && !editingAlias.auto" #danger>
@@ -209,11 +216,16 @@ onMounted(load)
           </Field>
         </div>
 
-        <Button class="w-full" :disabled="saving" @click="save">
-          {{ saving ? 'Saving...' : editingAlias ? 'Update Alias' : 'Add Alias' }}
-        </Button>
-
       </div>
+
+      <template #footer>
+        <div class="flex gap-2 justify-end">
+          <Button variant="secondary" @click="sheetOpen = false">Cancel</Button>
+          <Button :disabled="saving" @click="save">
+            {{ saving ? 'Saving...' : editingAlias ? 'Update Alias' : 'Add Alias' }}
+          </Button>
+        </div>
+      </template>
     </Sheet>
 
     <Dialog

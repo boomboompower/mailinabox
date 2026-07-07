@@ -3,6 +3,7 @@
 import os
 import re
 
+
 def get_ssl_certificates(env):
 	# Scan all of the installed SSL certificates and map every domain
 	# that the certificates are good for to the best certificate for
@@ -40,8 +41,8 @@ def get_ssl_certificates(env):
 						yield fn1
 
 	# Remember stuff.
-	private_keys = { }
-	certificates = [ ]
+	private_keys = {}
+	certificates = []
 
 	# Scan each of the files to find private keys and certificates.
 	# We must load all of the private keys first before processing
@@ -56,14 +57,13 @@ def get_ssl_certificates(env):
 
 		# Is it a certificate?
 		if isinstance(pem, Certificate):
-			certificates.append({ "filename": fn, "cert": pem })
+			certificates.append({"filename": fn, "cert": pem})
 		# It is a private key
-		elif (isinstance(pem, (rsa.RSAPrivateKey, dsa.DSAPrivateKey, ec.EllipticCurvePrivateKey))):
-			private_keys[pem.public_key().public_numbers()] = { "filename": fn, "key": pem }
-
+		elif isinstance(pem, (rsa.RSAPrivateKey, dsa.DSAPrivateKey, ec.EllipticCurvePrivateKey)):
+			private_keys[pem.public_key().public_numbers()] = {"filename": fn, "key": pem}
 
 	# Process the certificates.
-	domains = { }
+	domains = {}
 	for cert in certificates:
 		# What domains is this certificate good for?
 		cert_domains, primary_domain = get_certificate_domains(cert["cert"])
@@ -86,52 +86,51 @@ def get_ssl_certificates(env):
 
 	# Sort the certificates to prefer good ones.
 	import datetime
+
 	now = datetime.datetime.now(datetime.timezone.utc)
-	ret = { }
+	ret = {}
 	for domain, cert_list in domains.items():
-		#for c in cert_list: print(domain, c.not_valid_before_utc, c.not_valid_after_utc, "("+str(now)+")", c.issuer, c.subject, c._filename)
-		cert_list.sort(key = lambda cert : (
-			# must be valid NOW
-			cert["cert"].not_valid_before_utc <= now <= cert["cert"].not_valid_after_utc,
-
-			# prefer one that is not self-signed
-			cert["cert"].issuer != cert["cert"].subject,
-
-			###########################################################
-			# The above lines ensure that valid certificates are chosen
-			# over invalid certificates. The lines below choose between
-			# multiple valid certificates available for this domain.
-			###########################################################
-
-			# prefer one with the expiration furthest into the future so
-			# that we can easily rotate to new certs as we get them
-			cert["cert"].not_valid_after_utc,
-
-			###########################################################
-			# We always choose the certificate that is good for the
-			# longest period of time. This is important for how we
-			# provision certificates for Let's Encrypt. To ensure that
-			# we don't re-provision every night, we have to ensure that
-			# if we choose to provison a certificate that it will
-			# *actually* be used so the provisioning logic knows it
-			# doesn't still need to provision a certificate for the
-			# domain.
-			###########################################################
-
-			# in case a certificate is installed in multiple paths,
-			# prefer the... lexicographically last one?
-			cert["filename"],
-
-		), reverse=True)
+		# for c in cert_list: print(domain, c.not_valid_before_utc, c.not_valid_after_utc, "("+str(now)+")", c.issuer, c.subject, c._filename)
+		cert_list.sort(
+			key=lambda cert: (
+				# must be valid NOW
+				cert["cert"].not_valid_before_utc <= now <= cert["cert"].not_valid_after_utc,
+				# prefer one that is not self-signed
+				cert["cert"].issuer != cert["cert"].subject,
+				###########################################################
+				# The above lines ensure that valid certificates are chosen
+				# over invalid certificates. The lines below choose between
+				# multiple valid certificates available for this domain.
+				###########################################################
+				# prefer one with the expiration furthest into the future so
+				# that we can easily rotate to new certs as we get them
+				cert["cert"].not_valid_after_utc,
+				###########################################################
+				# We always choose the certificate that is good for the
+				# longest period of time. This is important for how we
+				# provision certificates for Let's Encrypt. To ensure that
+				# we don't re-provision every night, we have to ensure that
+				# if we choose to provison a certificate that it will
+				# *actually* be used so the provisioning logic knows it
+				# doesn't still need to provision a certificate for the
+				# domain.
+				###########################################################
+				# in case a certificate is installed in multiple paths,
+				# prefer the... lexicographically last one?
+				cert["filename"],
+			),
+			reverse=True,
+		)
 		cert = cert_list.pop(0)
 		ret[domain] = {
 			"private-key": cert["private_key"]["filename"],
 			"certificate": cert["filename"],
 			"primary-domain": cert["primary_domain"],
 			"certificate_object": cert["cert"],
-			}
+		}
 
 	return ret
+
 
 def get_domain_ssl_files(domain, ssl_certificates, env, allow_missing_cert=False, use_main_cert=True):
 	from .validation import load_pem, load_cert_chain

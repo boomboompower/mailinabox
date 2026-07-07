@@ -57,6 +57,7 @@ def resolve_caller(req):
 		token = auth_header[7:].strip()
 		if token.startswith('miab_'):
 			from auth.api_tokens import verify_token
+
 			result = verify_token(token, env)
 			if result is None:
 				log_failed_login(req)
@@ -144,14 +145,21 @@ def _unauthorized_response(error):
 
 	if request.headers.get('Accept') in {None, "", "*/*"}:
 		return Response(error + "\n", status=status, mimetype='text/plain', headers=headers)
-	return Response(json.dumps({
-		"status": "error",
-		"reason": error,
-		}) + "\n", status=status, mimetype='application/json', headers=headers)
+	return Response(
+		json.dumps({
+			"status": "error",
+			"reason": error,
+		})
+		+ "\n",
+		status=status,
+		mimetype='application/json',
+		headers=headers,
+	)
 
 
 def require_admin_route(viewfunc):
 	"""Per-route decorator for blueprints that mix public and admin-only routes."""
+
 	@wraps(viewfunc)
 	def newview(*args, **kwargs):
 		email, privs, scope, error, token_id = resolve_caller(request)
@@ -165,11 +173,13 @@ def require_admin_route(viewfunc):
 		request.token_scope = scope
 		request.caller_token_id = token_id
 		return viewfunc(*args, **kwargs)
+
 	return newview
 
 
 def require_user_route(viewfunc):
 	"""Per-route decorator requiring any authenticated user (not necessarily admin)."""
+
 	@wraps(viewfunc)
 	def newview(*args, **kwargs):
 		email, privs, error = _resolve_any_user(request)
@@ -180,6 +190,7 @@ def require_user_route(viewfunc):
 		request.token_scope = 'full'
 		request.caller_token_id = None
 		return viewfunc(*args, **kwargs)
+
 	return newview
 
 

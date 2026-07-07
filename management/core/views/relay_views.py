@@ -14,14 +14,18 @@ bp.before_request(require_admin)
 # Strict hostname/IP validation - prevents newline injection into postconf -e values.
 _HOSTNAME_RE = re.compile(r'^[a-zA-Z0-9]([a-zA-Z0-9\-\.]{0,251}[a-zA-Z0-9])?$')
 
+
 def _validate_host(host: str) -> bool:
 	return bool(_HOSTNAME_RE.match(host))
+
 
 def _relay_sasl_dir() -> str:
 	return os.path.join(env["STORAGE_ROOT"], "mail", "relay")
 
+
 def _relay_sasl_passwd() -> str:
 	return os.path.join(_relay_sasl_dir(), "sasl_passwd")
+
 
 def _relay_sasl_passwd_db() -> str:
 	return os.path.join(_relay_sasl_dir(), "sasl_passwd.db")
@@ -32,6 +36,7 @@ def relay_test():
 	# Pre-save connectivity probe. Uses STARTTLS on port 587 (submission), which
 	# is what Postfix will use. Does not save anything or touch Postfix config.
 	import smtplib, ssl as _ssl
+
 	host = request.form.get("host", "").strip()
 	port_str = request.form.get("port", "587").strip()
 	user = request.form.get("user", "").strip()
@@ -86,6 +91,7 @@ def relay_send_test():
 	admin_email = getattr(request, "user_email", None)
 	if not admin_email:
 		from mail.mailconfig.sync import get_system_administrator
+
 		admin_email = get_system_administrator(env)
 	if not admin_email:
 		return ("No admin email address could be determined. Ensure at least one admin user exists.", 500)
@@ -94,10 +100,7 @@ def relay_send_test():
 	msg["Subject"] = "Mail-in-a-Box relay test"
 	msg["From"] = admin_email
 	msg["To"] = admin_email
-	msg.set_content(
-		"This is a test email sent through your configured SMTP relay "
-		"to confirm that outbound mail is working correctly."
-	)
+	msg.set_content("This is a test email sent through your configured SMTP relay to confirm that outbound mail is working correctly.")
 
 	smtp_host = os.environ.get("MAIL_HOST", "localhost")
 	try:
@@ -136,12 +139,20 @@ def relay_set():
 		return ("Invalid relay host.", 400)
 	if spf_include and not _validate_host(spf_include):
 		return ("Invalid SPF include hostname.", 400)
+	if '\n' in user or '\r' in user or '\n' in password or '\r' in password:
+		return ("Relay username and password may not contain newlines.", 400)
 	try:
 		port = int(port_str)
 		if not (1 <= port <= 65535):
 			raise ValueError
 	except ValueError:
 		return ("Invalid port number.", 400)
+
+	# Apply to Postfix before persisting so a failure leaves settings unchanged.
+	try:
+		_apply_relay_config(host, port, user, password)
+	except Exception as e:
+		return (f"Failed to apply relay config to Postfix: {sanitize_error_message(str(e))}", 500)
 
 	config = utils.load_settings(env)
 	if not host:
@@ -156,17 +167,15 @@ def relay_set():
 		}
 	utils.write_settings(config, env)
 
-	try:
-		_apply_relay_config(host, port, user, password)
-	except Exception as e:
-		return (f"Settings saved but failed to apply to Postfix: {sanitize_error_message(str(e))}", 500)
-
 	# Regenerate DNS zones so the SPF record picks up the new spf_include.
 	try:
 		from services.dns_update import do_dns_update
+
 		do_dns_update(env)
-	except Exception:
-		pass
+	except Exception as e:
+		from flask import current_app
+
+		current_app.logger.warning("DNS update after relay change failed: %s", e)
 
 	return "OK"
 
@@ -219,27 +228,39 @@ def _apply_relay_config(host: str, port: int, user: str, password: str) -> None:
 			# The handler reads sasl_passwd from the shared volume if present,
 			# runs postmap, deletes the plaintext, then updates main.cf.
 			from services.control_plane import _send
+
 			_send("postfix", "configure-relay")
 		else:
-			utils.shell("check_call", ["postconf", "-e",
-				f"relayhost=[{host}]:{port}",
-				"smtp_sasl_auth_enable=yes",
-				f"smtp_sasl_password_maps=hash:{sasl_passwd_db[:-3]}",  # path without .db
-				"smtp_sasl_security_options=noanonymous",
-				"smtp_tls_security_level=verify",
-			])
+			utils.shell(
+				"check_call",
+				[
+					"postconf",
+					"-e",
+					f"relayhost=[{host}]:{port}",
+					"smtp_sasl_auth_enable=yes",
+					f"smtp_sasl_password_maps=hash:{sasl_passwd_db[:-3]}",  # path without .db
+					"smtp_sasl_security_options=noanonymous",
+					"smtp_tls_security_level=verify",
+				],
+			)
 	else:
 		if RUNTIME == "docker":
 			from services.control_plane import _send
+
 			_send("postfix", "configure-relay")
 		else:
-			utils.shell("check_call", ["postconf", "-e",
-				"relayhost=",
-				"smtp_sasl_auth_enable=no",
-				"smtp_sasl_password_maps=",
-				"smtp_sasl_security_options=",
-				"smtp_tls_security_level=dane",
-			])
+			utils.shell(
+				"check_call",
+				[
+					"postconf",
+					"-e",
+					"relayhost=",
+					"smtp_sasl_auth_enable=no",
+					"smtp_sasl_password_maps=",
+					"smtp_sasl_security_options=",
+					"smtp_tls_security_level=dane",
+				],
+			)
 			for path in [sasl_passwd, sasl_passwd_db]:
 				if os.path.exists(path):
 					os.remove(path)

@@ -2,6 +2,7 @@ import os
 
 import rtyaml
 
+
 def get_backup_config(env, for_save=False, for_ui=False):
 	backup_root = os.path.join(env["STORAGE_ROOT"], 'backup')
 
@@ -23,6 +24,7 @@ def get_backup_config(env, for_save=False, for_ui=False):
 		pass  # first run - no custom config yet
 	except Exception as e:
 		import sys
+
 		print(f"WARNING: backup config could not be read ({e}), using defaults", file=sys.stderr)
 
 	# When updating config.yaml, don't do any further processing on what we find.
@@ -56,8 +58,10 @@ def get_backup_config(env, for_save=False, for_ui=False):
 
 	return config
 
+
 def write_backup_config(env, newconfig):
 	import tempfile
+
 	backup_root = os.path.join(env["STORAGE_ROOT"], 'backup')
 	target = os.path.join(backup_root, 'custom.yaml')
 	# Atomic write: truncate only happens on os.replace, so a crash mid-write
@@ -74,6 +78,7 @@ def write_backup_config(env, newconfig):
 		except OSError:
 			pass
 		raise
+
 
 def backup_set_custom(env, target, target_user, target_pass, min_age, check_after_backup=True):
 	from .status import list_target_files
@@ -103,6 +108,7 @@ def backup_set_custom(env, target, target_user, target_pass, min_age, check_afte
 
 	return "OK"
 
+
 def get_passphrase(env):
 	# Get the encryption passphrase. secret_key.txt is 2048 random
 	# bits base64-encoded and with line breaks every 65 characters.
@@ -117,11 +123,15 @@ def get_passphrase(env):
 	# unreadable, exactly as it already makes duplicity's GPG-encrypted
 	# backups unreadable today.
 	backup_root = os.path.join(env["STORAGE_ROOT"], 'backup')
+	if not os.path.exists(os.path.join(backup_root, 'secret_key.txt')):
+		raise FileNotFoundError("secret_key.txt is missing. This file is required to read your backups. Please restore it from a backup if you have lost it.")
 	with open(os.path.join(backup_root, 'secret_key.txt'), encoding="utf-8") as f:
 		passphrase = f.readline().strip()
-	if len(passphrase) < 43: raise Exception("secret_key.txt's first line is too short!")
+	if len(passphrase) < 43:
+		raise Exception("secret_key.txt's first line is too short!")
 
 	return passphrase
+
 
 def get_target_type(config):
 	return config["target"].split(":")[0]

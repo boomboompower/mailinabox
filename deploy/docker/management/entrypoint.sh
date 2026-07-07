@@ -2,7 +2,7 @@
 # Management container entrypoint.
 #
 # Gunicorn starts immediately using the pre-built start script (copied into
-# the image at build time). setup/management.sh and web_update.py run in
+# the image at build time). The management component and web_update.py run in
 # the background - nginx waits for local.conf to appear before it serves,
 # so config generation can happen asynchronously without delaying the API.
 
@@ -30,8 +30,10 @@ mkdir -p "$STORAGE_ROOT"
 # so that service containers (dns, mail, nginx) can read the same files.
 link_conf_to_storage /etc/nsd nsd
 mkdir -p /etc/nsd/nsd.conf.d
-link_conf_to_storage /etc/opendkim opendkim
 link_conf_to_storage /etc/nginx/conf.d nginx/conf.d
+if [ "${SPAM_FILTER:-rspamd}" = "spamassassin" ]; then
+    link_conf_to_storage /etc/opendkim opendkim
+fi
 
 # Symlink munin HTML dir so the management daemon can serve files generated
 # by the munin container, which writes to the same storage volume path.
@@ -55,15 +57,10 @@ deactivate
 # Run setup and nginx config generation in the background so gunicorn
 # starts without any delay. nginx waits for local.conf to appear.
 (
-    echo "[management-setup] Running setup/management.sh..."
-    source "$MIAB/setup/management.sh"
-
-    # setup/management.sh writes the start script with 127.0.0.1:10222;
-    # patch it so anything that re-reads the file sees the right address.
-    # gunicorn has already exec'd so the running process is unaffected.
-    if grep -q '127\.0\.0\.1:10222' /usr/local/lib/mailinabox/start 2>/dev/null; then
-        sed -i 's/127\.0\.0\.1:10222/0.0.0.0:10222/' /usr/local/lib/mailinabox/start
-    fi
+    echo "[management-setup] Running component runner..."
+    cd "$MIAB/setup"
+    python3 -m components.runner management
+    cd "$MIAB"
 
     echo "[management-setup] Writing nginx config (web_update)..."
     source /usr/local/lib/mailinabox/env/bin/activate
@@ -76,6 +73,19 @@ print('[management-setup] nginx config written to /etc/nginx/conf.d/local.conf')
 "
 ) &
 disown
+
+# Generate secret key if it doesn't exist yet. This is used for signing cookies and other secrets.
+KEY_FILE="$STORAGE_ROOT/backup/secret_key.txt"
+
+if [ ! -f "$KEY_FILE" ]; then
+    echo "[management-setup] Generating secret key..."
+    mkdir -p "$(dirname "$KEY_FILE")"
+    tmpfile=$(mktemp "$STORAGE_ROOT/backup/secret_key.XXXXXX")
+    openssl rand -base64 64 > "$tmpfile" || { echo "Failed to generate secret key"; exit 1; }
+    chmod 600 "$tmpfile"
+    mv "$tmpfile" "$KEY_FILE"
+    echo "[management-setup] Secret key generated."
+fi
 
 # Start cron for nightly maintenance tasks (backup, cert renewal, status checks).
 # cron runs as a background daemon; gunicorn (below) becomes PID 1 via exec.

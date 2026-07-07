@@ -23,6 +23,10 @@ type InitData = {
   noAdminsExist?: boolean
   /** Present when authenticated. */
   backupS3Hosts?: [string, string][]
+  /** Present when authenticated. Null means no monitoring tool is configured. */
+  monitoringTool?: 'munin' | 'beszel' | 'netdata' | null
+  /** Present when authenticated. Feature flags enabled on this box. */
+  capabilities?: string[]
 }
 
 /** Response from POST /admin/bootstrap/setup. */
@@ -44,6 +48,10 @@ type LoginApiResponse = {
   email?: string
   /** User privilege list, e.g. ["admin"] (present on ok). */
   privileges?: string[]
+  /** Monitoring tool configured on the box (present on ok). */
+  monitoringTool?: 'munin' | 'beszel' | 'netdata' | null
+  /** Feature flags enabled on this box (present on ok). */
+  capabilities?: string[]
   /** Human-readable failure reason (present on invalid / missing-totp-token). */
   reason?: string
 }
@@ -122,12 +130,16 @@ type DnsRecord = {
   zone?: string
 }
 
-/** A recommended external DNS record from GET /admin/dns/dump. */
+/** A DNS record from GET /admin/dns/dump, representing what an external DNS provider should have set. */
 type ExternalDnsEntry = {
+  /** Fully-qualified record name. */
   qname: string
+  /** DNS record type (A, MX, TXT, etc.). */
   rtype: string
+  /** Record value. */
   value: string
-  explanation: string
+  /** Importance level. required = mail breaks without it; recommended = deliverability/security; hardening = anti-spoofing for non-mail subdomains; optional = nice to have. */
+  category: 'required' | 'recommended' | 'hardening' | 'optional'
 }
 
 // ---------------------------------------------------------------------------
@@ -293,6 +305,41 @@ type MfaStatus = {
 }
 
 // ---------------------------------------------------------------------------
+// Encryption at rest - /admin/user/encryption/{status,setup,challenge}
+// ---------------------------------------------------------------------------
+
+/**
+ * The kind of secret that unwraps a MAIL_KEY slot.
+ * passkey_prf is deferred until WebAuthn PRF is wired into management.
+ */
+type EncryptionSlotType = 'password' | 'recovery_code' | 'app_password' | 'passkey_prf'
+
+/** Response from GET /admin/user/encryption/status. */
+type EncryptionStatus = {
+  /** True once a committed password slot exists for the user. */
+  enabled: boolean
+  /** Distinct slot types the user has committed. */
+  slot_types: EncryptionSlotType[]
+  /** Whether a passkey PRF slot exists. Always false while PRF is deferred. */
+  has_prf_slot: boolean
+}
+
+/**
+ * Response from POST /admin/user/encryption/setup.
+ * The recovery codes are returned exactly once and never stored in plaintext;
+ * they must be shown to the user immediately and then discarded from memory.
+ */
+type EncryptionSetupResponse = {
+  recovery_codes: string[]
+}
+
+/** Response from POST /admin/user/encryption/challenge on success. */
+type EncryptionChallengeResponse = {
+  status: 'ok'
+  enabled: true
+}
+
+// ---------------------------------------------------------------------------
 // Web hosting - GET /admin/web/domains
 // ---------------------------------------------------------------------------
 
@@ -354,6 +401,7 @@ export type {
   SslDomainStatus, SslStatus, SslProvisionRequest, SslProvisionResult,
   BackupEntry, BackupStatus, BackupConfig, BackupCheckResult,
   MfaEntry, TotpProvision, MfaStatus,
+  EncryptionSlotType, EncryptionStatus, EncryptionSetupResponse, EncryptionChallengeResponse,
   WebDomain,
   ApiToken, ApiTokenCreateResponse,
   SmtpRelayConfig,

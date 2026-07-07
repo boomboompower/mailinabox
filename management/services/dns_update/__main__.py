@@ -10,12 +10,12 @@ if __package__ in (None, ''):
 	from core.utils import load_environment
 	from services.dns_update.zones import do_dns_update
 	from services.dns_update.custom_records import get_custom_dns_config, write_custom_dns_config
-	from services.dns_update.recommended import build_recommended_dns
+	from services.dns_update.recommended import build_external_dns_records
 else:
 	from core.utils import load_environment
 	from .zones import do_dns_update
 	from .custom_records import get_custom_dns_config, write_custom_dns_config
-	from .recommended import build_recommended_dns
+	from .recommended import build_external_dns_records
 
 if __name__ == "__main__":
 	env = load_environment()
@@ -24,8 +24,6 @@ if __name__ == "__main__":
 	elif sys.argv[-1] == "--update":
 		do_dns_update(env, force=True)
 	else:
-		for _zone, records in build_recommended_dns(env):
+		for _zone, records in build_external_dns_records(env):
 			for record in records:
-				print("; " + record['explanation'])
-				print(record['qname'], record['rtype'], record['value'], sep="\t")
-				print()
+				print(record['qname'], record['rtype'], record['value'], f"[{record['category']}]", sep="\t")

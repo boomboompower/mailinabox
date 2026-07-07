@@ -4,7 +4,13 @@ from .nsd import write_nsd_zone, get_dns_zonefile, write_nsd_conf
 from .dnssec import find_dnssec_signing_keys, hash_dnssec_keys, sign_zone
 from .opendkim import write_opendkim_tables
 from .custom_records import (
-	DOMAIN_RE, get_custom_dns_config, filter_custom_records, write_custom_dns_config,
-	set_custom_dns_record, get_secondary_dns, set_secondary_dns, get_custom_dns_records,
+	DOMAIN_RE,
+	get_custom_dns_config,
+	filter_custom_records,
+	write_custom_dns_config,
+	set_custom_dns_record,
+	get_secondary_dns,
+	set_secondary_dns,
+	get_custom_dns_records,
 )
-from .recommended import build_recommended_dns
+from .recommended import build_external_dns_records

@@ -12,7 +12,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 # In Python 3.6:
-#from email.message import Message
+# from email.message import Message
 
 # Allow running this file directly as well as importing it as part of the
 # management package - both need management/ on sys.path.
@@ -25,7 +25,7 @@ env = load_environment()
 
 # Sanity check command line args.
 if len(sys.argv) < 2:
-    sys.exit("Missing subject argument")
+	sys.exit("Missing subject argument")
 
 # Process command line args.
 subject = sys.argv[1]
@@ -38,13 +38,13 @@ content = sys.stdin.read().strip()
 
 # If there's nothing coming in, just exit.
 if content == "":
-    sys.exit(0)
+	sys.exit(0)
 
 # create MIME message
 msg = MIMEMultipart('alternative')
 
 # In Python 3.6:
-#msg = Message()
+# msg = Message()
 
 msg['From'] = '"{}" <{}>'.format(env['PRIMARY_HOSTNAME'], admin_addr)
 msg['To'] = admin_addr
@@ -89,14 +89,38 @@ msg.attach(MIMEText(content, 'plain'))
 msg.attach(MIMEText(content_html, 'html'))
 
 # In Python 3.6:
-#msg.set_content(content)
-#msg.add_alternative(content_html, "html")
+# msg.set_content(content)
+# msg.add_alternative(content_html, "html")
 
 # send
-smtpclient = smtplib.SMTP(os.environ.get('MAIL_HOST', '127.0.0.1'), 25)
-smtpclient.ehlo()
-smtpclient.sendmail(
-        admin_addr, # MAIL FROM
-        admin_addr, # RCPT TO
-        msg.as_string())
-smtpclient.quit()
+try:
+	smtpclient = smtplib.SMTP(os.environ.get('MAIL_HOST', '127.0.0.1'), 25)
+	smtpclient.ehlo()
+	smtpclient.sendmail(admin_addr, admin_addr, msg.as_string())
+	smtpclient.quit()
+except Exception:
+	_deliver_to_maildir(admin_addr, msg.as_string(), env)
+
+
+def _deliver_to_maildir(addr: str, raw_message: str, env: dict) -> None:
+	# Drop the message directly into the admin's Maildir when SMTP is unavailable.
+	# Maildir spec: write to new/ with a unique filename; Dovecot picks it up on
+	# next folder scan without any index update needed.
+	import time
+	import socket
+	import random
+
+	user, domain = addr.split('@', 1)
+	maildir_new = os.path.join(env['STORAGE_ROOT'], 'mail', 'mailboxes', domain, user, 'Maildir', 'new')
+	if not os.path.isdir(maildir_new):
+		return  # mailbox doesn't exist, nothing we can do
+
+	# Unique filename: <timestamp>.<pid>_<random>.<hostname>
+	filename = f"{int(time.time())}.{os.getpid()}_{random.randint(0, 99999)}.{socket.gethostname()}"
+	tmp_path = os.path.join(os.path.dirname(maildir_new), 'tmp', filename)
+	new_path = os.path.join(maildir_new, filename)
+
+	os.makedirs(os.path.dirname(tmp_path), exist_ok=True)
+	with open(tmp_path, 'w', encoding='utf-8') as f:
+		f.write(raw_message)
+	os.rename(tmp_path, new_path)

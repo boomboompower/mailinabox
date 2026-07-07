@@ -1,6 +1,8 @@
 # Local tooling configuration (uppercase root-level markdown)
 /[A-Z]*.md
+.[A-Za-z]*/
 !/README.md
+!/.github/
 *~
 __pycache__/
 externals/
@@ -11,7 +13,12 @@ management/api/docs/api-docs.html
 .idea/
 frontend/node_modules/
 frontend/dist/
+frontend/package-lock.json
 docs/node_modules/
 docs/.next/
 docs/out/
+docs/*.zip
+docs/tsconfig.tsbuildinfo
+deploy/docker/.env
+*.zip
 .*/

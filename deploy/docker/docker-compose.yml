@@ -12,7 +12,8 @@
 #   --profile oxi          webmail (oxi.email)
 #   --profile filebrowser  FileBrowser file manager
 #   --profile radicale     Radicale CardDAV/CalDAV
-#   --profile monitoring   Munin system monitoring
+#   --profile munin        Munin system monitoring
+#   --profile beszel       Beszel system monitoring
 #   --profile clamav       ClamAV antivirus milter
 
 networks:
@@ -24,6 +25,15 @@ networks:
       config:
         - subnet: 172.28.0.0/24
           ip_range: 172.28.0.128/25
+
+  # Isolated network shared only by nginx and webmail. Keeping oxi off the
+  # main internal network means no other container can reach it to spoof
+  # X-Real-IP headers, even if compromised. nginx bridges both networks.
+  oxi-internal:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.29.0.0/29
 
 volumes:
   storage:
@@ -39,6 +49,7 @@ volumes:
 
 services:
   dns:
+    image: ghcr.io/boomboompower/mailinabox-dns:latest
     build:
       context: ../..
       dockerfile: deploy/docker/dns/Dockerfile
@@ -83,6 +94,7 @@ services:
       retries: 10
 
   rspamd:
+    image: ghcr.io/boomboompower/mailinabox-rspamd:latest
     build:
       context: ../..
       dockerfile: deploy/docker/rspamd/Dockerfile
@@ -112,6 +124,7 @@ services:
       start_period: 60s
 
   mail:
+    image: ghcr.io/boomboompower/mailinabox-mail:latest
     build:
       context: ../..
       dockerfile: deploy/docker/mail/Dockerfile
@@ -152,6 +165,7 @@ services:
       start_period: 300s
 
   management:
+    image: ghcr.io/boomboompower/mailinabox-management:latest
     build:
       context: ../..
       dockerfile: deploy/docker/management/Dockerfile
@@ -178,6 +192,7 @@ services:
       RADICALE_HOST: radicale
       WEBMAIL_HOST: webmail
       FILEBROWSER_HOST: filebrowser
+      BESZEL_HUB_HOST: beszel-hub
     depends_on:
       mail:
         condition: service_healthy
@@ -191,6 +206,7 @@ services:
       start_period: 5s
 
   nginx:
+    image: ghcr.io/boomboompower/mailinabox-nginx:latest
     build:
       context: ../..
       dockerfile: deploy/docker/nginx/Dockerfile
@@ -198,6 +214,7 @@ services:
     restart: unless-stopped
     networks:
       - miab-internal
+      - oxi-internal
     dns:
       - 172.28.0.2
     ports:
@@ -224,6 +241,7 @@ services:
   # ---------------------------------------------------------------------------
 
   webmail:
+    image: ghcr.io/boomboompower/mailinabox-webmail:latest
     build:
       context: ../..
       dockerfile: deploy/docker/webmail/Dockerfile
@@ -233,6 +251,7 @@ services:
       - oxi
     networks:
       - miab-internal
+      - oxi-internal
     dns:
       - 172.28.0.2
     expose:
@@ -246,6 +265,10 @@ services:
       # oxi connects to Dovecot and Postfix by container service name.
       IMAP_HOST: mail
       SMTP_HOST: mail
+      # Only trust forwarded IP headers from connections arriving on oxi-internal,
+      # which only nginx can reach. Other miab-internal containers connect on a
+      # separate interface and are not in the trusted range.
+      TRUSTED_PROXIES: "172.29.0.0/29"
     depends_on:
       mail:
         condition: service_healthy
@@ -261,6 +284,7 @@ services:
   # ---------------------------------------------------------------------------
 
   filebrowser:
+    image: ghcr.io/boomboompower/mailinabox-filebrowser:latest
     build:
       context: ../..
       dockerfile: deploy/docker/optional/filebrowser/Dockerfile
@@ -297,6 +321,7 @@ services:
   # ---------------------------------------------------------------------------
 
   radicale:
+    image: ghcr.io/boomboompower/mailinabox-radicale:latest
     build:
       context: ../..
       dockerfile: deploy/docker/optional/radicale/Dockerfile
@@ -318,7 +343,6 @@ services:
     environment:
       RUNTIME: docker
       MANAGEMENT_HOST: management
-      WEBMAIL_CLIENT: ${WEBMAIL_CLIENT:-oxi}
     depends_on:
       management:
         condition: service_healthy
@@ -330,23 +354,24 @@ services:
       start_period: 15s
 
   # ---------------------------------------------------------------------------
-  # Optional: Munin monitoring  (--profile monitoring)
+  # Optional: Munin monitoring  (--profile munin)
   # ---------------------------------------------------------------------------
 
   munin:
+    image: ghcr.io/boomboompower/mailinabox-munin:latest
     build:
       context: ../..
       dockerfile: deploy/docker/monitoring/Dockerfile
     container_name: miab-munin
     restart: unless-stopped
     profiles:
-      - monitoring
+      - munin
     networks:
       - miab-internal
     dns:
       - 172.28.0.2
     expose:
-      - "4948"
+      - "4949"
     volumes:
       - storage:${STORAGE_ROOT:-/home/user-data}
     env_file:
@@ -359,7 +384,7 @@ services:
       nginx:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "bash", "-c", "echo '' > /dev/tcp/127.0.0.1/4948"]
+      test: ["CMD", "bash", "-c", "echo '' > /dev/tcp/127.0.0.1/4949"]
       interval: 10s
       timeout: 3s
       retries: 6
@@ -370,6 +395,7 @@ services:
   # ---------------------------------------------------------------------------
 
   clamav:
+    image: ghcr.io/boomboompower/mailinabox-clamav:latest
     build:
       context: ../..
       dockerfile: deploy/docker/optional/clamav/Dockerfile
@@ -387,3 +413,70 @@ services:
       timeout: 5s
       retries: 12
       start_period: 120s
+
+  # ---------------------------------------------------------------------------
+  # Optional: Beszel system monitoring  (--profile beszel)
+  # ---------------------------------------------------------------------------
+
+  beszel-hub:
+    image: ghcr.io/boomboompower/mailinabox-beszel-hub:latest
+    build:
+      context: ../..
+      dockerfile: deploy/docker/beszel-hub/Dockerfile
+    container_name: miab-beszel-hub
+    restart: unless-stopped
+    profiles:
+      - beszel
+    networks:
+      - miab-internal
+    dns:
+      - 172.28.0.2
+    expose:
+      - "8090"
+    volumes:
+      - storage:${STORAGE_ROOT:-/home/user-data}
+    env_file:
+      - .env
+    environment:
+      RUNTIME: docker
+      TRUSTED_AUTH_HEADER: X-Beszel-User
+      DISABLE_PASSWORD_AUTH: "true"
+    depends_on:
+      management:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo '' > /dev/tcp/127.0.0.1/8090"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
+
+  beszel-agent:
+    image: ghcr.io/boomboompower/mailinabox-beszel-agent:latest
+    build:
+      context: ../..
+      dockerfile: deploy/docker/beszel-agent/Dockerfile
+    container_name: miab-beszel-agent
+    restart: unless-stopped
+    profiles:
+      - beszel
+    networks:
+      - miab-internal
+    expose:
+      - "45876"
+    volumes:
+      - storage:${STORAGE_ROOT:-/home/user-data}
+      # Host proc/sys mounts so the agent reports host-level metrics.
+      - /proc:/proc:ro
+      - /sys:/sys:ro
+    pid: "host"
+    env_file:
+      - .env
+    environment:
+      RUNTIME: docker
+      HUB_URL: http://beszel-hub:8090
+      PORT: "45876"
+      LISTEN: "0.0.0.0"
+    depends_on:
+      beszel-hub:
+        condition: service_healthy

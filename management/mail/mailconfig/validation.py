@@ -6,6 +6,7 @@ import re
 
 import idna
 
+
 def validate_email(email, mode=None):
 	# Checks that an email address is syntactically valid. Returns True/False.
 	# An email address may contain ASCII characters only because Dovecot's
@@ -20,12 +21,9 @@ def validate_email(email, mode=None):
 
 	# Check the syntax of the address.
 	from email_validator import validate_email as validate_email_, EmailNotValidError
+
 	try:
-		validate_email_(email,
-			allow_smtputf8=False,
-			check_deliverability=False,
-			allow_empty_local=(mode=="alias")
-			)
+		validate_email_(email, allow_smtputf8=False, check_deliverability=False, allow_empty_local=(mode == "alias"))
 	except EmailNotValidError:
 		return False
 
@@ -38,12 +36,14 @@ def validate_email(email, mode=None):
 		# Our database is case sensitive (oops), which affects mail delivery
 		# (Postfix always queries in lowercase?), so also only permit lowercase
 		# letters.
-		if len(email) > 255: return False
+		if len(email) > 255:
+			return False
 		if re.search(r'[^\@\.a-z0-9_\-]+', email):
 			return False
 
 	# Everything looks good.
 	return True
+
 
 def sanitize_idn_email_address(email):
 	# The user may enter Unicode in an email address. Convert the domain part
@@ -65,6 +65,7 @@ def sanitize_idn_email_address(email):
 		# validate_email.
 		return email
 
+
 def prettify_idn_email_address(email):
 	# This is the opposite of sanitize_idn_email_address. We store domain
 	# names in IDNA in the database, but we want to show Unicode to the user.
@@ -77,9 +78,11 @@ def prettify_idn_email_address(email):
 		# single @-sign. Should never happen.
 		return email
 
+
 def is_dcv_address(email):
 	email = email.lower()
 	return any(email.startswith((localpart + "@", localpart + "+")) for localpart in ("admin", "administrator", "postmaster", "hostmaster", "webmaster", "abuse"))
+
 
 def get_domain(emailaddr, as_unicode=True):
 	# Gets the domain part of an email address. Turns IDNA
@@ -94,6 +97,7 @@ def get_domain(emailaddr, as_unicode=True):
 			pass
 	return ret
 
+
 def validate_password(pw):
 	# validate password
 	if pw.strip() == "":
@@ -102,6 +106,10 @@ def validate_password(pw):
 	if len(pw) < 8:
 		msg = "Passwords must be at least eight characters."
 		raise ValueError(msg)
+	if len(pw) > 1024:
+		msg = "Passwords must be at most 1024 characters."
+		raise ValueError(msg)
+
 
 def validate_quota(quota):
 	# validate quota
@@ -119,10 +127,12 @@ def validate_quota(quota):
 
 	return quota
 
+
 def parse_privs(value):
 	return [p for p in value.split("\n") if p.strip() != ""]
 
+
 def validate_privilege(priv):
-	if "\n" in priv or priv.strip() == "":
+	if priv != "admin":
 		return (f"That's not a valid privilege ({priv}).", 400)
 	return None

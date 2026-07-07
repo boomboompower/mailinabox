@@ -108,7 +108,7 @@ async function submit(): Promise<void> {
             class="font-mono tracking-widest uppercase"
             required
           />
-          <p v-if="attemptsRemaining !== null" class="mt-1.5 text-xs text-red-500">
+          <p v-if="attemptsRemaining !== null" class="mt-1.5 text-xs text-red-600 dark:text-red-400">
             {{ attemptsRemaining }} {{ attemptsRemaining === 1 ? 'attempt' : 'attempts' }} remaining before lockout.
           </p>
         </div>

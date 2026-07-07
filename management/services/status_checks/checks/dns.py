@@ -4,17 +4,20 @@ from ..registry import check
 from ..reporter import CheckFailed
 from .. import utils
 
+
 def _get_dns_zonefiles(env):
 	from services.dns_update import get_dns_zones
+
 	return dict(get_dns_zones(env))
+
 
 def _check_dnssec(env, report, domain, dns_zonefiles, is_checking_primary=False):
 	"""Shared by the primary-hostname check and the per-zone check: does this
 	domain have a valid DNSSEC DS record at the registrar matching one of the
 	keys we signed the zone with? Ported as-is from the original implementation -
 	this is security-sensitive path/file validation, kept byte-for-byte faithful."""
-	alg_name_map = { '7': 'RSASHA1-NSEC3-SHA1', '8': 'RSASHA256', '13': 'ECDSAP256SHA256' }
-	digalg_name_map = { '1': 'SHA-1', '2': 'SHA-256', '4': 'SHA-384' }
+	alg_name_map = {'7': 'RSASHA1-NSEC3-SHA1', '8': 'RSASHA256', '13': 'ECDSAP256SHA256'}
+	digalg_name_map = {'1': 'SHA-1', '2': 'SHA-256', '4': 'SHA-384'}
 
 	expected_ds_records = {}
 
@@ -69,8 +72,13 @@ def _check_dnssec(env, report, domain, dns_zonefiles, is_checking_primary=False)
 				dnsssec_pubkey = key_content.split("\t")[3].split(" ")[3]
 
 			expected_ds_records[ds_keytag, ds_alg, ds_digalg, ds_digest] = {
-				"record": rr_ds, "keytag": ds_keytag, "alg": ds_alg, "alg_name": alg_name_map[ds_alg],
-				"digalg": ds_digalg, "digalg_name": digalg_name_map[ds_digalg], "digest": ds_digest,
+				"record": rr_ds,
+				"keytag": ds_keytag,
+				"alg": ds_alg,
+				"alg_name": alg_name_map[ds_alg],
+				"digalg": ds_digalg,
+				"digalg_name": digalg_name_map[ds_digalg],
+				"digest": ds_digest,
 				"pubkey": dnsssec_pubkey,
 			}
 	except (OSError, IndexError, KeyError, ValueError):
@@ -93,14 +101,13 @@ def _check_dnssec(env, report, domain, dns_zonefiles, is_checking_primary=False)
 			return  # all alg 13, digest 2/4 - fully correct, nothing to report
 		if any(r[1] == '13' and r[2] in {'2', '4'} for r in matched_ds):
 			return  # some are alg 13 - correct enough
-		report.warn("DNSSEC 'DS' record set at registrar is valid but should be updated to ECDSAP256SHA256 and SHA-256. "
-			"IMPORTANT: Do not delete existing DNSSEC 'DS' records until the new one is confirmed valid. " + suggestion_text)
+		report.warn("DNSSEC 'DS' record set at registrar is valid but should be updated to ECDSAP256SHA256 and SHA-256. IMPORTANT: Do not delete existing DNSSEC 'DS' records until the new one is confirmed valid. " + suggestion_text)
 		return
 
 	if is_checking_primary:
 		raise CheckFailed(f"The DNSSEC 'DS' record for {domain} is incorrect. {suggestion_text}")
-	raise CheckFailed("This domain's DNSSEC DS record is incorrect. The chain of trust is broken between the public DNS "
-		"system and this machine's DNS server. " + suggestion_text)
+	raise CheckFailed("This domain's DNSSEC DS record is incorrect. The chain of trust is broken between the public DNS system and this machine's DNS server. " + suggestion_text)
+
 
 def _format_ds_suggestions(expected_ds_records, current_ds):
 	preferred_ds_order = [(7, 2), (8, 4), (13, 4), (8, 2), (13, 2)]  # low to high, see upstream issue #1998
@@ -113,12 +120,11 @@ def _format_ds_suggestions(expected_ds_records, current_ds):
 	for i, s in enumerate(sorted(expected_ds_records.values(), key=order_key, reverse=True)):
 		if order_key(s) == -1:
 			continue
-		lines.append(f"Option {i + 1}: Key Tag {s['keytag']}, Flags KSK/257, Algorithm {s['alg']}/{s['alg_name']}, "
-			f"Digest Type {s['digalg']}/{s['digalg_name']}, Digest {s['digest']}")
+		lines.append(f"Option {i + 1}: Key Tag {s['keytag']}, Flags KSK/257, Algorithm {s['alg']}/{s['alg_name']}, Digest Type {s['digalg']}/{s['digalg_name']}, Digest {s['digest']}")
 	if current_ds:
-		lines.append("Currently set to: " + "; ".join(
-			"Key Tag {}, Algorithm {}, Digest Type {}, Digest {}".format(*rr) for rr in sorted(current_ds)))
+		lines.append("Currently set to: " + "; ".join("Key Tag {}, Algorithm {}, Digest Type {}, Digest {}".format(*rr) for rr in sorted(current_ds)))
 	return " ".join(lines)
+
 
 @check("primary-hostname-dns", category="dns", depends_on=["unbound"])
 def check_primary_hostname_dns(env, report):
@@ -143,26 +149,21 @@ def check_primary_hostname_dns(env, report):
 			ns_ips = utils.query_dns("ns1." + domain, "A") + '/' + utils.query_dns("ns2." + domain, "A")
 			if ns_ips != env['PUBLIC_IP'] + '/' + env['PUBLIC_IP']:
 				if ip == env['PUBLIC_IP']:
-					report.warn(f"Nameserver glue records (ns1/ns2.{domain}) should report this box's IP ({env['PUBLIC_IP']}). "
-						f"They currently report {ns_ips}. If you have set up External DNS, this may be OK.")
+					report.warn(f"Nameserver glue records (ns1/ns2.{domain}) should report this box's IP ({env['PUBLIC_IP']}). They currently report {ns_ips}. If you have set up External DNS, this may be OK.")
 				else:
-					raise CheckFailed(f"Nameserver glue records are incorrect. ns1/ns2.{domain} must be configured at your "
-						f"registrar with IP {env['PUBLIC_IP']}. They currently report {ns_ips}.")
+					raise CheckFailed(f"Nameserver glue records are incorrect. ns1/ns2.{domain} must be configured at your registrar with IP {env['PUBLIC_IP']}. They currently report {ns_ips}.")
 
 	with report.step("Domain resolves to this box's IP address"):
 		ipv6 = utils.query_dns(domain, "AAAA") if env.get("PUBLIC_IPV6") else None
 		my_ips = env['PUBLIC_IP'] + ((" / " + env['PUBLIC_IPV6']) if env.get("PUBLIC_IPV6") else "")
 		if not (ip == env['PUBLIC_IP'] and not (ipv6 and env['PUBLIC_IPV6'] and ipv6 != utils.normalize_ip(env['PUBLIC_IPV6']))):
-			raise CheckFailed(f"This domain must resolve to this box's IP address ({my_ips}) but currently resolves to "
-				f"{ip + ((' / ' + ipv6) if ipv6 is not None else '')}.")
+			raise CheckFailed(f"This domain must resolve to this box's IP address ({my_ips}) but currently resolves to {ip + ((' / ' + ipv6) if ipv6 is not None else '')}.")
 
 	with report.step("Reverse DNS is set correctly at ISP"):
 		existing_rdns_v4 = utils.query_dns(_rn.from_address(env['PUBLIC_IP']), "PTR")
 		existing_rdns_v6 = utils.query_dns(_rn.from_address(env['PUBLIC_IPV6']), "PTR") if env.get("PUBLIC_IPV6") else None
 		if not (existing_rdns_v4 == domain and existing_rdns_v6 in {None, domain}):
-			raise CheckFailed(f"This box's reverse DNS is currently {existing_rdns_v4}"
-				+ (f" (IPv4) and {existing_rdns_v6} (IPv6)" if existing_rdns_v6 not in {None, existing_rdns_v4} else "")
-				+ f", but it should be {domain}. Your ISP or cloud provider has instructions for setting up reverse DNS.")
+			raise CheckFailed(f"This box's reverse DNS is currently {existing_rdns_v4}" + (f" (IPv4) and {existing_rdns_v6} (IPv6)" if existing_rdns_v6 not in {None, existing_rdns_v4} else "") + f", but it should be {domain}. Your ISP or cloud provider has instructions for setting up reverse DNS.")
 
 	with report.step("DANE TLSA record for incoming mail is correct"):
 		tlsa_qname = "_25._tcp." + domain
@@ -179,6 +180,7 @@ def check_primary_hostname_dns(env, report):
 		ok, msg = utils.alias_exists_message("Hostmaster contact address", "hostmaster@" + domain, env)
 		if not ok:
 			raise CheckFailed(msg)
+
 
 @check("dns-zone", category="dns", per_domain=lambda env: _get_dns_zonefiles(env).keys(), depends_on=["unbound"])
 def check_dns_zone(env, domain, report):
@@ -210,12 +212,10 @@ def check_dns_zone(env, domain, report):
 
 			if existing_ns.lower() != correct_ns.lower():
 				if ip == correct_ip:
-					report.warn(f"The nameservers set on this domain at your registrar should be {correct_ns}. "
-						f"They are currently {existing_ns}. If you are using External DNS, this may be OK.")
+					report.warn(f"The nameservers set on this domain at your registrar should be {correct_ns}. They are currently {existing_ns}. If you are using External DNS, this may be OK.")
 					probably_external_dns = True
 				else:
-					raise CheckFailed(f"The nameservers set on this domain are incorrect. They are currently {existing_ns}. "
-						f"Set them to {correct_ns} at your registrar.")
+					raise CheckFailed(f"The nameservers set on this domain are incorrect. They are currently {existing_ns}. Set them to {correct_ns} at your registrar.")
 
 	if custom_secondary_ns and not probably_external_dns:
 		with report.step("Secondary nameservers are configured correctly"):
@@ -246,8 +246,7 @@ def check_dns_zone(env, domain, report):
 					elif SOASecondary == '[timeout]':
 						report.warn(f"Secondary nameserver {ns} timed out on checking SOA record.")
 					elif SOARecord != SOASecondary:
-						problems.append(f"Secondary nameserver {ns} has inconsistent SOA record "
-							f"(primary: {SOARecord} vs secondary: {SOASecondary}). Check synchronization.")
+						problems.append(f"Secondary nameserver {ns} has inconsistent SOA record (primary: {SOARecord} vs secondary: {SOASecondary}). Check synchronization.")
 			if problems:
 				raise CheckFailed("; ".join(problems))
 

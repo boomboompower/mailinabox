@@ -9,6 +9,7 @@
 import sys, getpass, urllib.request, urllib.error, json, csv
 import contextlib
 
+
 def mgmt(cmd, data=None, is_json=False):
 	# The base URL for the management daemon. (Listens on IPv4 only.)
 	mgmt_uri = 'http://127.0.0.1:10222'
@@ -29,21 +30,24 @@ def mgmt(cmd, data=None, is_json=False):
 			print(e, file=sys.stderr)
 		sys.exit(1)
 	resp = response.read().decode('utf8')
-	if is_json: resp = json.loads(resp)
+	if is_json:
+		resp = json.loads(resp)
 	return resp
 
+
 def read_password():
-    while True:
-        first = getpass.getpass('password: ')
-        if len(first) < 8:
-            print("Passwords must be at least eight characters.", file=sys.stderr, flush=True)
-            continue
-        second = getpass.getpass(' (again): ')
-        if first != second:
-            print("Passwords not the same. Try again.", file=sys.stderr, flush=True)
-            continue
-        break
-    return first
+	while True:
+		first = getpass.getpass('password: ')
+		if len(first) < 8:
+			print("Passwords must be at least eight characters.", file=sys.stderr, flush=True)
+			continue
+		second = getpass.getpass(' (again): ')
+		if first != second:
+			print("Passwords not the same. Try again.", file=sys.stderr, flush=True)
+			continue
+		break
+	return first
+
 
 def setup_key_auth(mgmt_uri):
 	try:
@@ -54,16 +58,14 @@ def setup_key_auth(mgmt_uri):
 		sys.exit(1)
 
 	auth_handler = urllib.request.HTTPBasicAuthHandler()
-	auth_handler.add_password(
-		realm='Mail-in-a-Box Management Server',
-		uri=mgmt_uri,
-		user=key,
-		passwd='')
+	auth_handler.add_password(realm='Mail-in-a-Box Management Server', uri=mgmt_uri, user=key, passwd='')
 	opener = urllib.request.build_opener(auth_handler)
 	urllib.request.install_opener(opener)
 
+
 if len(sys.argv) < 2:
-	print("""Usage:
+	print(
+		"""Usage:
   {cli} user                                     (lists users)
   {cli} user add user@domain.com [password]
   {cli} user password user@domain.com [password]
@@ -74,6 +76,9 @@ if len(sys.argv) < 2:
   {cli} user admins                              (lists admins)
   {cli} user mfa show user@domain.com            (shows MFA devices for user, if any)
   {cli} user mfa disable user@domain.com [id]    (disables MFA for user)
+  {cli} user encryption status user@domain.com   (shows encryption status and active key slots)
+  {cli} user encryption list                     (lists all users with encryption enabled)
+  {cli} user encryption disable user@domain.com  (removes encryption key slots - any encrypted mail becomes unrecoverable)
   {cli} alias                                    (lists aliases)
   {cli} alias add incoming.name@domain.com sent.to@other.domain.com
   {cli} alias add incoming.name@domain.com 'sent.to@other.domain.com, multiple.people@other.domain.com'
@@ -83,16 +88,16 @@ if len(sys.argv) < 2:
   {cli} filebrowser status                       (show whether FileBrowser is enabled)
 
 Removing a mail user does not delete their mail folders on disk. It only prevents IMAP/SMTP login.
-""".format(
-	cli="management/cli.py"
-		))
+""".format(cli="management/cli.py")
+	)
 
 elif sys.argv[1] == "user" and len(sys.argv) == 2:
 	# Dump a list of users, one per line. Mark admins with an asterisk.
 	users = mgmt("/mail/users?format=json", is_json=True)
 	for domain in users:
 		for user in domain["users"]:
-			if user['status'] == 'inactive': continue
+			if user['status'] == 'inactive':
+				continue
 			print(user['email'], end='')
 			if "admin" in user['privileges']:
 				print("*", end='')
@@ -111,16 +116,16 @@ elif sys.argv[1] == "user" and sys.argv[2] in {"add", "password"}:
 		email, pw = args[0], args[1]
 
 	if sys.argv[2] == "add":
-		print(mgmt("/mail/users/add", { "email": email, "password": pw }))
+		print(mgmt("/mail/users/add", {"email": email, "password": pw}))
 	elif sys.argv[2] == "password":
-		print(mgmt("/mail/users/password", { "email": email, "password": pw }))
+		print(mgmt("/mail/users/password", {"email": email, "password": pw}))
 
 elif sys.argv[1] == "user" and sys.argv[2] == "remove" and len(sys.argv) == 4:
-	print(mgmt("/mail/users/remove", { "email": sys.argv[3] }))
+	print(mgmt("/mail/users/remove", {"email": sys.argv[3]}))
 
 elif sys.argv[1] == "user" and sys.argv[2] in {"make-admin", "remove-admin"} and len(sys.argv) == 4:
 	action = 'add' if sys.argv[2] == 'make-admin' else 'remove'
-	print(mgmt("/mail/users/privileges/" + action, { "email": sys.argv[3], "privilege": "admin" }))
+	print(mgmt("/mail/users/privileges/" + action, {"email": sys.argv[3], "privilege": "admin"}))
 
 elif sys.argv[1] == "user" and sys.argv[2] == "admins":
 	# Dump a list of admin users.
@@ -136,11 +141,11 @@ elif sys.argv[1] == "user" and sys.argv[2] == "quota" and len(sys.argv) == 4:
 
 elif sys.argv[1] == "user" and sys.argv[2] == "quota" and len(sys.argv) == 5:
 	# Set a user's quota
-	users = mgmt("/mail/users/quota", { "email": sys.argv[3], "quota": sys.argv[4] })
+	users = mgmt("/mail/users/quota", {"email": sys.argv[3], "quota": sys.argv[4]})
 
 elif sys.argv[1] == "user" and len(sys.argv) == 5 and sys.argv[2:4] == ["mfa", "show"]:
 	# Show MFA status for a user.
-	status = mgmt("/mfa/status", { "user": sys.argv[4] }, is_json=True)
+	status = mgmt("/mfa/status", {"user": sys.argv[4]}, is_json=True)
 	W = csv.writer(sys.stdout)
 	W.writerow(["id", "type", "label/name", "last_used"])
 	for mfa in status["enabled_mfa"]:
@@ -148,19 +153,108 @@ elif sys.argv[1] == "user" and len(sys.argv) == 5 and sys.argv[2:4] == ["mfa", "
 
 elif sys.argv[1] == "user" and len(sys.argv) in {5, 6} and sys.argv[2:4] == ["mfa", "disable"]:
 	# Disable MFA (all or a particular device) for a user.
-	print(mgmt("/mfa/disable", { "user": sys.argv[4], "mfa-id": sys.argv[5] if len(sys.argv) == 6 else None }))
+	print(mgmt("/mfa/disable", {"user": sys.argv[4], "mfa-id": sys.argv[5] if len(sys.argv) == 6 else None}))
+
+elif sys.argv[1] == "user" and len(sys.argv) == 5 and sys.argv[2:4] == ["encryption", "status"]:
+	email = sys.argv[4]
+	import os as _os
+	_sys_path_base = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+	sys.path.insert(0, _sys_path_base)
+	from core.utils import load_environment
+	from mail.mailconfig.database import open_database
+	_env = load_environment()
+	conn, c = open_database(_env, with_connection=True)
+	try:
+		c.execute("SELECT id FROM users WHERE email=?", (email,))
+		row = c.fetchone()
+		if not row:
+			print("User not found:", email)
+			sys.exit(1)
+		c.execute("SELECT slot_type, slot_label FROM mail_keys WHERE user_id=?", (row[0],))
+		slots = c.fetchall()
+	finally:
+		conn.close()
+	if not slots:
+		print(email, "- encryption disabled (no key slots)")
+	else:
+		print(email, "- encryption enabled")
+		for slot_type, slot_label in sorted(slots):
+			print(f"  {slot_type}:{slot_label}")
+
+elif sys.argv[1] == "user" and len(sys.argv) == 4 and sys.argv[2:4] == ["encryption", "list"]:
+	import os as _os
+	_sys_path_base = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+	sys.path.insert(0, _sys_path_base)
+	from core.utils import load_environment
+	from mail.mailconfig.database import open_database
+	_env = load_environment()
+	conn, c = open_database(_env, with_connection=True)
+	try:
+		c.execute(
+			"SELECT u.email, mk.slot_type FROM users u"
+			" JOIN mail_keys mk ON mk.user_id = u.id"
+			" ORDER BY u.email, mk.slot_type"
+		)
+		rows = c.fetchall()
+	finally:
+		conn.close()
+	if not rows:
+		print("No users have encryption enabled.")
+	else:
+		current = None
+		for email, slot_type in rows:
+			if email != current:
+				print(email)
+				current = email
+			print(f"  {slot_type}")
+
+elif sys.argv[1] == "user" and len(sys.argv) == 5 and sys.argv[2:4] == ["encryption", "disable"]:
+	email = sys.argv[4]
+	print("WARNING: This removes all encryption key slots for", email)
+	print("Any mail that was encrypted at rest will be permanently unrecoverable.")
+	print("Only proceed if the mailbox has no encrypted mail.")
+	print()
+	confirm = input("Type the email address to confirm: ").strip()
+	if confirm != email:
+		print("Confirmation did not match. Aborting.")
+		sys.exit(1)
+	import os as _os
+	_sys_path_base = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+	sys.path.insert(0, _sys_path_base)
+	from core.utils import load_environment
+	from mail.mailconfig.database import open_database
+	_env = load_environment()
+	conn, c = open_database(_env, with_connection=True)
+	try:
+		c.execute("SELECT id FROM users WHERE email=?", (email,))
+		row = c.fetchone()
+		if not row:
+			print("User not found:", email)
+			sys.exit(1)
+		user_id = row[0]
+		c.execute("SELECT COUNT(*) FROM mail_keys WHERE user_id=?", (user_id,))
+		count = c.fetchone()[0]
+		if count == 0:
+			print("No encryption key slots found for", email)
+			sys.exit(0)
+		c.execute("DELETE FROM mail_keys WHERE user_id=?", (user_id,))
+		conn.commit()
+	finally:
+		conn.close()
+	print(f"Removed {count} key slot(s) for {email}. Encryption is now disabled.")
 
 elif sys.argv[1] == "alias" and len(sys.argv) == 2:
 	print(mgmt("/mail/aliases"))
 
 elif sys.argv[1] == "alias" and sys.argv[2] == "add" and len(sys.argv) == 5:
-	print(mgmt("/mail/aliases/add", { "address": sys.argv[3], "forwards_to": sys.argv[4] }))
+	print(mgmt("/mail/aliases/add", {"address": sys.argv[3], "forwards_to": sys.argv[4]}))
 
 elif sys.argv[1] == "alias" and sys.argv[2] == "remove" and len(sys.argv) == 4:
-	print(mgmt("/mail/aliases/remove", { "address": sys.argv[3] }))
+	print(mgmt("/mail/aliases/remove", {"address": sys.argv[3]}))
 
 elif sys.argv[1] == "filebrowser" and len(sys.argv) == 3 and sys.argv[2] in {"enable", "disable", "status"}:
 	import re
+
 	conf = "/etc/mailinabox.conf"
 	with open(conf, encoding="utf-8") as f:
 		content = f.read()
@@ -178,8 +272,11 @@ elif sys.argv[1] == "filebrowser" and len(sys.argv) == 3 and sys.argv[2] in {"en
 		content = re.sub(r'^ENABLE_FILEBROWSER=.*$', 'ENABLE_FILEBROWSER=false', content, flags=re.MULTILINE)
 		with open(conf, "w", encoding="utf-8") as f:
 			f.write(content)
-		import os; sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+		import os
+
+		sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 		from services.control_plane import stop as cp_stop, disable as cp_disable
+
 		try:
 			cp_stop("filebrowser")
 		except Exception:

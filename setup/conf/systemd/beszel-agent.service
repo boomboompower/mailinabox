@@ -1,0 +1,26 @@
+[Unit]
+Description=Beszel Agent (local metrics collector)
+After=network.target beszel-hub.service
+
+[Service]
+ExecStart=/usr/local/bin/beszel-agent
+User=beszel
+Group=beszel
+EnvironmentFile=${STORAGE_ROOT}/beszel/agent.env
+Environment=PORT=45876
+# Only accept connections from the local hub.
+Environment=LISTEN=127.0.0.1
+Environment=HUB_URL=http://127.0.0.1:8090
+Restart=on-failure
+RestartSec=5
+
+# Sandboxing
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

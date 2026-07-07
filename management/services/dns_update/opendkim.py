@@ -1,5 +1,6 @@
 import os
 
+
 def write_opendkim_tables(domains, env):
 	# Append a record to OpenDKIM's KeyTable and SigningTable for each domain
 	# that we send mail from (zones and all subdomains).
@@ -9,7 +10,9 @@ def write_opendkim_tables(domains, env):
 	if not os.path.exists(opendkim_key_file):
 		return False
 
-	if not os.path.isdir("/etc/opendkim"):
+	import shutil
+
+	if not shutil.which("opendkim"):
 		# Rspamd path: DKIM key exists but OpenDKIM is not installed. DNS records
 		# are still generated from mail.txt; no OpenDKIM table files to write.
 		return False
@@ -22,20 +25,11 @@ def write_opendkim_tables(domains, env):
 		# Elsewhere we set the DMARC policy for each domain such that mail claiming
 		# to be From: the domain must be signed with a DKIM key on the same domain.
 		# So we must have a separate KeyTable entry for each domain.
-		"SigningTable":
-			"".join(
-				f"*@{domain} {domain}\n"
-				for domain in domains
-			),
-
+		"SigningTable": "".join(f"*@{domain} {domain}\n" for domain in domains),
 		# The KeyTable specifies the signing domain, the DKIM selector, and the
 		# path to the private key to use for signing some mail. Per DMARC, the
 		# signing domain must match the sender's From: domain.
-		"KeyTable":
-			"".join(
-				f"{domain} {domain}:mail:{opendkim_key_file}\n"
-				for domain in domains
-			),
+		"KeyTable": "".join(f"{domain} {domain}:mail:{opendkim_key_file}\n" for domain in domains),
 	}
 
 	did_update = False

@@ -15,9 +15,6 @@ import io
 import json as _json
 import os
 import time
-import pyotp
-import qrcode
-
 from mail.mailconfig import open_database
 
 
@@ -26,7 +23,8 @@ def get_user_id(email, c):
 	Raises ValueError if the user does not exist."""
 	c.execute('SELECT id FROM users WHERE email=?', (email,))
 	r = c.fetchone()
-	if not r: raise ValueError("User does not exist.")
+	if not r:
+		raise ValueError("User does not exist.")
 	return r[0]
 
 
@@ -37,23 +35,14 @@ def get_mfa_state(email, env):
 	c.execute('SELECT id, type, secret, mru_token, label FROM mfa WHERE user_id=?', (get_user_id(email, c),))
 	rows = c.fetchall()
 	conn.close()
-	return [
-		{ "id": r[0], "type": r[1], "secret": r[2], "mru_token": r[3], "label": r[4] }
-		for r in rows
-	]
+	return [{"id": r[0], "type": r[1], "secret": r[2], "mru_token": r[3], "label": r[4]} for r in rows]
 
 
 def get_public_mfa_state(email, env):
 	"""Return MFA state safe to send to the frontend - no secrets, no replay tokens.
 	Combines TOTP entries and passkeys into a single list."""
-	totp = [
-		{ "id": s["id"], "type": s["type"], "label": s["label"] }
-		for s in get_mfa_state(email, env)
-	]
-	passkeys = [
-		{ "id": p["id"], "type": "webauthn", "name": p["name"], "last_used": p["last_used"] }
-		for p in get_public_webauthn_credentials(email, env)
-	]
+	totp = [{"id": s["id"], "type": s["type"], "label": s["label"]} for s in get_mfa_state(email, env)]
+	passkeys = [{"id": p["id"], "type": "webauthn", "name": p["name"], "last_used": p["last_used"]} for p in get_public_webauthn_credentials(email, env)]
 	return totp + passkeys
 
 
@@ -61,14 +50,13 @@ def get_hash_mfa_state(email, env):
 	"""Return only the fields needed to verify a TOTP code - id, type, and secret.
 	Used by the auth pipeline; strips label and replay state."""
 	mfa_state = get_mfa_state(email, env)
-	return [
-		{ "id": s["id"], "type": s["type"], "secret": s["secret"] }
-		for s in mfa_state
-	]
+	return [{"id": s["id"], "type": s["type"], "secret": s["secret"]} for s in mfa_state]
 
 
 def enable_mfa(email, type, secret, token, label, env):
 	if type == "totp":
+		import pyotp
+
 		validate_totp_secret(secret)
 		# Verify the user's current code before saving so we don't lock them
 		# out with a secret their app can't actually produce.
@@ -97,14 +85,12 @@ def consume_totp_step(email, mfa_id, env) -> bool:
 	Returns False if the step was already consumed (replay attempt)."""
 	step = str(int(time.time()) // 30)
 	conn, c = open_database(env, with_connection=True)
-	c.execute(
-		'UPDATE mfa SET mru_token=? WHERE id=? AND user_id=? AND (mru_token IS NULL OR CAST(mru_token AS INTEGER) < ?)',
-		(step, mfa_id, get_user_id(email, c), step)
-	)
+	c.execute('UPDATE mfa SET mru_token=? WHERE id=? AND user_id=? AND (mru_token IS NULL OR CAST(mru_token AS INTEGER) < ?)', (step, mfa_id, get_user_id(email, c), step))
 	consumed = c.rowcount > 0
 	conn.commit()
 	conn.close()
 	return consumed
+
 
 def disable_mfa(email, mfa_id, env):
 	conn, c = open_database(env, with_connection=True)
@@ -124,6 +110,7 @@ def disable_mfa(email, mfa_id, env):
 	conn.close()
 	return deleted
 
+
 def validate_totp_secret(secret):
 	if not isinstance(secret, str) or secret.strip() == "":
 		msg = "No secret provided."
@@ -132,16 +119,17 @@ def validate_totp_secret(secret):
 		msg = "Secret should be a 32 characters base32 string"
 		raise ValueError(msg)
 
+
 def provision_totp(email, env):
+	import pyotp
+	import qrcode
+
 	# Make a new secret.
 	secret = base64.b32encode(os.urandom(20)).decode('utf-8')
-	validate_totp_secret(secret) # sanity check
+	validate_totp_secret(secret)  # sanity check
 
 	# Make a URI that we encode within a QR code.
-	uri = pyotp.TOTP(secret).provisioning_uri(
-		name=email,
-		issuer_name=env["PRIMARY_HOSTNAME"] + " Mail-in-a-Box Control Panel"
-	)
+	uri = pyotp.TOTP(secret).provisioning_uri(name=email, issuer_name=env["PRIMARY_HOSTNAME"] + " Mail-in-a-Box Control Panel")
 
 	# Generate a QR code as a base64-encode PNG image.
 	qr = qrcode.make(uri)
@@ -149,36 +137,39 @@ def provision_totp(email, env):
 	qr.save(byte_arr, format='PNG')
 	png_b64 = base64.b64encode(byte_arr.getvalue()).decode('utf-8')
 
-	return {
-		"type": "totp",
-		"secret": secret,
-		"qr_code_base64": png_b64
-	}
+	return {"type": "totp", "secret": secret, "qr_code_base64": png_b64}
+
 
 ###################################
 # WebAuthn / Passkeys
 
+
 def _get_fido2_server(env):
 	from fido2.server import Fido2Server
 	from fido2.webauthn import PublicKeyCredentialRpEntity
+
 	# rpId is fixed to PRIMARY_HOSTNAME. Moving the admin panel to a different
 	# hostname will invalidate all registered passkeys. Users must re-register.
 	rp = PublicKeyCredentialRpEntity(id=env["PRIMARY_HOSTNAME"], name="Mail-in-a-Box")
 	return Fido2Server(rp)
+
 
 def _options_to_dict(options):
 	# Convert fido2 CredentialCreationOptions / CredentialRequestOptions to a plain
 	# Python dict safe for json.dumps. The double-pass guarantees no fido2 types leak.
 	return _json.loads(_json.dumps(dict(options)))
 
+
 def get_webauthn_credentials(email, env):
 	"""Return stored AttestedCredentialData objects for a user."""
 	from fido2.webauthn import AttestedCredentialData
+
 	conn, c = open_database(env, with_connection=True)
 	c.execute('SELECT public_key FROM webauthn_credentials WHERE user_id=?', (get_user_id(email, c),))
 	rows = c.fetchall()
 	conn.close()
 	return [AttestedCredentialData(row[0]) for row in rows]
+
 
 def get_public_webauthn_credentials(email, env):
 	"""Return name/id/last_used for each passkey without key material."""
@@ -188,9 +179,11 @@ def get_public_webauthn_credentials(email, env):
 	conn.close()
 	return [{"id": r[0], "name": r[1], "last_used": r[2]} for r in rows]
 
+
 def webauthn_register_begin(email, env):
 	"""Begin passkey registration. Returns (options_dict, state); caller stores state."""
 	from fido2.webauthn import PublicKeyCredentialUserEntity
+
 	server = _get_fido2_server(env)
 	conn, c = open_database(env, with_connection=True)
 	user_id = get_user_id(email, c)
@@ -209,9 +202,11 @@ def webauthn_register_begin(email, env):
 	)
 	return _options_to_dict(options), state
 
+
 def webauthn_register_complete(email, state, client_response, name, env):
 	"""Complete passkey registration and store the new credential."""
 	from fido2.webauthn import RegistrationResponse
+
 	server = _get_fido2_server(env)
 	response = RegistrationResponse.from_dict(client_response)
 	auth_data = server.register_complete(state, response)
@@ -224,21 +219,44 @@ def webauthn_register_complete(email, state, client_response, name, env):
 	conn.commit()
 	conn.close()
 
+
 def webauthn_authenticate_begin(email, env):
-	"""Begin passkey authentication. Returns (options_dict, state); caller stores state."""
+	"""Begin passkey authentication. Returns (options_dict, state); caller stores state.
+
+	When no passkeys are registered we return a synthetic challenge indistinguishable
+	from a real one so callers cannot enumerate which accounts have passkeys.
+	"""
 	server = _get_fido2_server(env)
 	credentials = get_webauthn_credentials(email, env)
 	if not credentials:
-		raise ValueError("No passkeys registered for this account.")
+		# Return a fake challenge with the same shape as a real response.
+		# The nonce stored in webauthn_challenges will have no credentials list,
+		# so authenticate_complete will always reject it.
+		import os as _os
+
+		fake_challenge = _os.urandom(32)
+		fake_options = {
+			"challenge": list(fake_challenge),
+			"timeout": 60000,
+			"rpId": env.get("PRIMARY_HOSTNAME", "localhost"),
+			"allowCredentials": [],
+			"userVerification": "required",
+		}
+		return fake_options, {"fake": True}
 	options, state = server.authenticate_begin(
 		credentials,
 		user_verification='required',
 	)
 	return _options_to_dict(options), state
 
+
 def webauthn_authenticate_complete(email, state, client_response, env):
 	"""Verify passkey assertion and update sign_count/last_used. Raises on failure."""
 	from fido2.webauthn import AuthenticationResponse
+
+	if state.get("fake"):
+		raise ValueError("Authentication failed.")
+
 	server = _get_fido2_server(env)
 	credentials = get_webauthn_credentials(email, env)
 	response = AuthenticationResponse.from_dict(client_response)
@@ -253,7 +271,9 @@ def webauthn_authenticate_complete(email, state, client_response, env):
 	conn.commit()
 	conn.close()
 
+
 ###################################
+
 
 def validate_auth_mfa(email, request, env):
 	"""Validate that a login request satisfies the user's enabled MFA methods.
@@ -282,6 +302,8 @@ def validate_auth_mfa(email, request, env):
 			if not token:
 				hints.add("missing-totp-token")
 				continue
+
+			import pyotp
 
 			totp = pyotp.TOTP(mfa_mode["secret"])
 			if not totp.verify(token, valid_window=1):

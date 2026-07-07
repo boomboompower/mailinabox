@@ -1,8 +1,8 @@
 #!/bin/bash
 # Munin monitoring container entrypoint.
 #
-# Sources setup/monitoring/munin.sh to write the Munin configuration and
-# activate plugins, then starts munin and munin-node via supervisord.
+# Runs the munin component to write configuration and activate plugins,
+# then starts munin and munin-node via supervisord.
 
 set -euo pipefail
 
@@ -33,7 +33,9 @@ mkdir -p /var/cache/munin
 ln -sfn "$STORAGE_ROOT/munin/www" /var/cache/munin/www
 
 echo "Configuring Munin..."
-source setup/monitoring/munin.sh
+cd "$MIAB/setup"
+python3 -m components.runner munin
+cd "$MIAB"
 
 echo "Munin setup complete. Starting supervisord..."
 exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf

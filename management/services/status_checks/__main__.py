@@ -21,6 +21,7 @@ else:
 
 _STATUS_CACHE_FILE = "/var/cache/mailinabox/status_checks.json"
 
+
 def render_console(results):
 	by_category = {}
 	for r in results.values():
@@ -41,6 +42,7 @@ def render_console(results):
 			for s in r.steps:
 				if s.status in {"warning", "error"}:
 					print(f"      - {s.name}: {s.message}" if s.message else f"      - {s.name}")
+
 
 def show_changes(env):
 	"""Run checks, diff against the last saved snapshot, print only what changed,
@@ -65,8 +67,7 @@ def show_changes(env):
 
 	added = [c for key, c in cur_by_key.items() if key not in prev_by_key]
 	removed = [p for key, p in prev_by_key.items() if key not in cur_by_key]
-	changed = [(prev_by_key[key], c) for key, c in cur_by_key.items()
-		if key in prev_by_key and prev_by_key[key]["status"] != c["status"]]
+	changed = [(prev_by_key[key], c) for key, c in cur_by_key.items() if key in prev_by_key and prev_by_key[key]["status"] != c["status"]]
 
 	if not (added or removed or changed):
 		print("No changes since the last check.")
@@ -82,6 +83,7 @@ def show_changes(env):
 	with open(_STATUS_CACHE_FILE, "w", encoding="utf-8") as f:
 		json.dump(cur, f, indent=True)
 
+
 if __name__ == "__main__":
 	env = load_environment()
 
@@ -94,6 +96,7 @@ if __name__ == "__main__":
 	elif sys.argv[1] == "--check-primary-hostname":
 		# See if the primary hostname appears resolvable and has a signed certificate.
 		from services.ssl_certificates import get_ssl_certificates, get_domain_ssl_files, check_certificate
+
 		domain = env['PRIMARY_HOSTNAME']
 		if utils.query_dns(domain, "A") != env['PUBLIC_IP']:
 			sys.exit(1)

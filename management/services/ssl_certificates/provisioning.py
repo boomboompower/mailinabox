@@ -9,6 +9,7 @@ import tempfile
 
 from core.utils import sort_domains
 
+
 def get_certificates_to_provision(env, limit_domains=None, show_valid_certs=True):
 	# Get a set of domain names that we can provision certificates for
 	# using certbot. We start with domains that the box is serving web
@@ -29,7 +30,7 @@ def get_certificates_to_provision(env, limit_domains=None, show_valid_certs=True
 	actual_web_domains = get_web_domains(env)
 
 	domains_to_provision = set()
-	domains_cant_provision = { }
+	domains_cant_provision = {}
 
 	for domain in plausible_web_domains:
 		# Skip domains that the user doesn't want to provision now.
@@ -42,22 +43,20 @@ def get_certificates_to_provision(env, limit_domains=None, show_valid_certs=True
 
 		# Check that the DNS resolves to here.
 		else:
-
 			# Does the domain resolve to this machine in public DNS? If not,
 			# we can't do domain control validation. For IPv6 is configured,
 			# make sure both IPv4 and IPv6 are correct because we don't know
 			# how Let's Encrypt will connect.
 			bad_dns = []
 			for rtype, value in [("A", env["PUBLIC_IP"]), ("AAAA", env.get("PUBLIC_IPV6"))]:
-				if not value: continue # IPv6 is not configured
+				if not value:
+					continue  # IPv6 is not configured
 				response = query_dns(domain, rtype)
 				if response != normalize_ip(value):
 					bad_dns.append(f"{response} ({rtype})")
 
 			if bad_dns:
-				domains_cant_provision[domain] = "The domain name does not resolve to this machine: " \
-					+ (", ".join(bad_dns)) \
-					+ "."
+				domains_cant_provision[domain] = "The domain name does not resolve to this machine: " + (", ".join(bad_dns)) + "."
 
 			else:
 				# DNS is all good.
@@ -65,19 +64,16 @@ def get_certificates_to_provision(env, limit_domains=None, show_valid_certs=True
 				# Check for a good existing cert.
 				existing_cert = get_domain_ssl_files(domain, existing_certs, env, use_main_cert=False, allow_missing_cert=True)
 				if existing_cert:
-					existing_cert_check = check_certificate(domain, existing_cert['certificate'], existing_cert['private-key'],
-						warn_if_expiring_soon=14)
+					existing_cert_check = check_certificate(domain, existing_cert['certificate'], existing_cert['private-key'], warn_if_expiring_soon=14)
 					if existing_cert_check[0] == "OK":
 						if show_valid_certs:
-							domains_cant_provision[domain] = "The domain has a valid certificate already. ({} Certificate: {}, private key {})".format(
-								existing_cert_check[1],
-								existing_cert['certificate'],
-								existing_cert['private-key'])
+							domains_cant_provision[domain] = "The domain has a valid certificate already. ({} Certificate: {}, private key {})".format(existing_cert_check[1], existing_cert['certificate'], existing_cert['private-key'])
 						continue
 
 				domains_to_provision.add(domain)
 
 	return (domains_to_provision, domains_cant_provision)
+
 
 def provision_certificates(env, limit_domains):
 	from .install import install_cert_copy_file, post_install_func
@@ -107,7 +103,8 @@ def provision_certificates(env, limit_domains):
 	# entry in each list (unless we overflow beyond 100) which ends up as the
 	# primary domain listed in each certificate.
 	from services.dns_update import get_dns_zones
-	certs = { }
+
+	certs = {}
 	for zone, _zonefile in get_dns_zones(env):
 		certs[zone] = [[]]
 	for domain in sort_domains(domains, env):
@@ -165,12 +162,11 @@ def provision_certificates(env, limit_domains):
 				from cryptography.hazmat.primitives.serialization import Encoding
 				from cryptography.hazmat.primitives import hashes
 				from cryptography.x509.oid import NameOID
+
 				builder = x509.CertificateSigningRequestBuilder()
-				builder = builder.subject_name(x509.Name([ x509.NameAttribute(NameOID.COMMON_NAME, domain_list[0]) ]))
+				builder = builder.subject_name(x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, domain_list[0])]))
 				builder = builder.add_extension(x509.BasicConstraints(ca=False, path_length=None), critical=True)
-				builder = builder.add_extension(x509.SubjectAlternativeName(
-					[x509.DNSName(d) for d in domain_list]
-				), critical=False)
+				builder = builder.add_extension(x509.SubjectAlternativeName([x509.DNSName(d) for d in domain_list]), critical=False)
 				request = builder.sign(load_pem(load_cert_chain(key_file)[0]), hashes.SHA256(), default_backend())
 				with open(csr_file.name, "wb") as f:
 					f.write(request.public_bytes(Encoding.PEM))
@@ -181,24 +177,31 @@ def provision_certificates(env, limit_domains):
 				with tempfile.TemporaryDirectory() as d:
 					cert_file = os.path.join(d, 'cert_and_chain.pem')
 					print("Provisioning TLS certificates for " + ", ".join(domain_list) + ".")
-					certbotret = subprocess.check_output([
-						"certbot",
-						"certonly",
-						#"-v", # just enough to see ACME errors
-						"--non-interactive", # will fail if user hasn't registered during Mail-in-a-Box setup
-
-						"-d", ",".join(domain_list), # first will be main domain
-
-						"--csr", csr_file.name, # use our private key; unfortunately this doesn't work with auto-renew so we need to save cert manually
-						"--cert-path", os.path.join(d, 'cert'), # we only use the full chain
-						"--chain-path", os.path.join(d, 'chain'), # we only use the full chain
-						"--fullchain-path", cert_file,
-
-						"--webroot", "--webroot-path", webroot,
-
-						"--config-dir", account_path,
-						#"--staging",
-					], stderr=subprocess.STDOUT).decode("utf8")
+					certbotret = subprocess.check_output(
+						[
+							"certbot",
+							"certonly",
+							# "-v", # just enough to see ACME errors
+							"--non-interactive",  # will fail if user hasn't registered during Mail-in-a-Box setup
+							"-d",
+							",".join(domain_list),  # first will be main domain
+							"--csr",
+							csr_file.name,  # use our private key; unfortunately this doesn't work with auto-renew so we need to save cert manually
+							"--cert-path",
+							os.path.join(d, 'cert'),  # we only use the full chain
+							"--chain-path",
+							os.path.join(d, 'chain'),  # we only use the full chain
+							"--fullchain-path",
+							cert_file,
+							"--webroot",
+							"--webroot-path",
+							webroot,
+							"--config-dir",
+							account_path,
+							# "--staging",
+						],
+						stderr=subprocess.STDOUT,
+					).decode("utf8")
 					install_cert_copy_file(cert_file, env)
 
 			ret[-1]["log"].append(certbotret)
@@ -216,12 +219,11 @@ def provision_certificates(env, limit_domains):
 	# Return what happened with each certificate request.
 	return ret
 
+
 def provision_certificates_cmdline():
-	from exclusiveprocess import Lock
+	from core.utils import load_environment, acquire_process_lock
 
-	from core.utils import load_environment
-
-	Lock(die=True).forever()
+	_ssl_lock = acquire_process_lock("/tmp/mailinabox-ssl.lock")  # noqa: F841
 	env = load_environment()
 
 	quiet = False

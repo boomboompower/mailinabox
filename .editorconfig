@@ -28,6 +28,9 @@ indent_style = tab
 [*.js]
 indent_size = 2
 
+[*.tsx]
+indent_size = 2
+
 [*.ts]
 indent_size = 2
 
@@ -38,4 +41,7 @@ indent_size = 2
 indent_size = 2
 
 [*.css]
+indent_size = 2
+
+[.github/workflows/*.yml]
 indent_size = 2

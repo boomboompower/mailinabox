@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useConfigStore } from '@/stores/config'
 import {
   Users, AtSign, Globe, ExternalLink, Activity, Database, Shield,
-  Lock, Key, Layout, BookOpen, RefreshCw, BarChart2, Send,
+  Lock, LockKeyhole, Key, Layout, BookOpen, RefreshCw, BarChart2, Send,
   ChevronLeft, ChevronRight, LogOut, Settings, Info, Sun, Moon, Monitor,
 } from 'lucide-vue-next'
 import type { NavGroup, Palette } from '@/types'
@@ -19,53 +19,56 @@ const config = useConfigStore()
 const route = useRoute()
 const router = useRouter()
 
-const navGroups: NavGroup[] = [
-  {
-    label: 'Mail',
-    items: [
-      { label: 'Users', path: '/users', icon: Users, adminOnly: true },
-      { label: 'Aliases', path: '/aliases', icon: AtSign, adminOnly: true },
-    ],
-  },
-  {
-    label: 'System',
-    items: [
-      { label: 'Status', path: '/system-status', icon: Activity, adminOnly: true },
-      { label: 'Backup', path: '/system-backup', icon: Database, adminOnly: true },
-      { label: 'TLS', path: '/ssl', icon: Shield, adminOnly: true },
-      { label: 'Relay', path: '/smtp-relay', icon: Send, adminOnly: true },
-    ],
-  },
-  {
-    label: 'DNS',
-    items: [
-      { label: 'Custom DNS', path: '/custom-dns', icon: Globe, adminOnly: true },
-      { label: 'External DNS', path: '/external-dns', icon: ExternalLink, adminOnly: true },
-    ],
-  },
-  {
-    label: 'Settings',
-    items: [
-      { label: 'Two-Factor Auth', path: '/mfa', icon: Lock },
-      { label: 'API Tokens', path: '/api-tokens', icon: Key, adminOnly: true },
-      { label: 'Web', path: '/web', icon: Layout, adminOnly: true },
-    ],
-  },
-  {
-    label: 'Guides',
-    items: [
-      { label: 'Mail', path: '/mail-guide', icon: BookOpen, adminOnly: true },
-      { label: 'Sync', path: '/sync-guide', icon: RefreshCw, adminOnly: true },
-      { label: 'Munin', path: '/munin', icon: BarChart2, adminOnly: true },
-    ],
-  },
-]
+const visibleNavGroups = computed<NavGroup[]>(() => {
+  const groups: NavGroup[] = [
+    {
+      label: 'Mail',
+      items: [
+        { label: 'Users', path: '/users', icon: Users, adminOnly: true },
+        { label: 'Aliases', path: '/aliases', icon: AtSign, adminOnly: true },
+      ],
+    },
+    {
+      label: 'System',
+      items: [
+        { label: 'Status', path: '/system-status', icon: Activity, adminOnly: true },
+        { label: 'Backup', path: '/system-backup', icon: Database, adminOnly: true },
+        { label: 'TLS', path: '/ssl', icon: Shield, adminOnly: true },
+        { label: 'Relay', path: '/smtp-relay', icon: Send, adminOnly: true },
+      ],
+    },
+    {
+      label: 'DNS',
+      items: [
+        { label: 'Custom DNS', path: '/custom-dns', icon: Globe, adminOnly: true },
+        { label: 'External DNS', path: '/external-dns', icon: ExternalLink, adminOnly: true },
+      ],
+    },
+    {
+      label: 'Settings',
+      items: [
+        { label: 'Two-Factor Auth', path: '/mfa', icon: Lock },
+        // Self-service, only shown when the box has encryption at rest enabled.
+        ...(auth.capabilities.includes('encryption_at_rest') ? [{ label: 'Encryption', path: '/encryption', icon: LockKeyhole }] : []),
+        { label: 'API Tokens', path: '/api-tokens', icon: Key, adminOnly: true },
+        { label: 'Web', path: '/web', icon: Layout, adminOnly: true },
+      ],
+    },
+  ]
 
-const visibleNavGroups = computed(() =>
-  navGroups
+  const guidesItems = [
+    { label: 'Mail', path: '/mail-guide', icon: BookOpen, adminOnly: true },
+    { label: 'Sync', path: '/sync-guide', icon: RefreshCw, adminOnly: true },
+  ]
+  if (auth.monitoringTool) {
+    guidesItems.push({ label: 'Monitoring', path: '/monitoring', icon: BarChart2, adminOnly: true })
+  }
+  groups.push({ label: 'Guides', items: guidesItems })
+
+  return groups
     .map(g => ({ ...g, items: g.items.filter(i => !i.adminOnly || auth.isAdmin) }))
     .filter(g => g.items.length > 0)
-)
+})
 
 const collapsed = computed(() => props.forceExpanded ? false : ui.sidebarCollapsed)
 
@@ -128,7 +131,7 @@ const PALETTES: [Palette, string, string][] = [
         <button
           v-if="!forceExpanded"
           :class="[
-            'flex items-center justify-center transition rounded-xl',
+            'flex items-center justify-center transition rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
             collapsed ? 'size-9 hover:bg-hover' : 'size-7 hover:bg-hover',
           ]"
           :title="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
@@ -174,7 +177,7 @@ const PALETTES: [Palette, string, string][] = [
       <div ref="settingsRef" class="relative">
         <button
           :class="[
-            'flex items-center transition',
+            'flex items-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
             collapsed
               ? 'mx-auto justify-center rounded-xl size-9 hover:bg-hover'
               : 'w-full space-x-3 h-9 items-center rounded-2xl px-2.5 hover:bg-hover',
@@ -200,7 +203,7 @@ const PALETTES: [Palette, string, string][] = [
               v-for="[p, color, label] in PALETTES"
               :key="p"
               :title="label"
-              class="flex items-center justify-center py-1.5 rounded-lg transition hover:bg-hover"
+              class="flex items-center justify-center py-1.5 rounded-lg transition hover:bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               :class="ui.palette === p ? 'bg-hover' : ''"
               @click="ui.setPalette(p)"
             >
@@ -219,7 +222,7 @@ const PALETTES: [Palette, string, string][] = [
               :key="t"
               :title="t.charAt(0).toUpperCase() + t.slice(1)"
               :class="[
-                'flex-1 flex items-center justify-center py-1 rounded-lg transition',
+                'flex-1 flex items-center justify-center py-1 rounded-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent',
                 ui.theme === t
                   ? 'bg-hover text-text'
                   : 'text-faint hover:bg-hover-subtle',
@@ -230,7 +233,7 @@ const PALETTES: [Palette, string, string][] = [
             </button>
           </div>
           <button
-            class="flex w-full items-center gap-2 rounded-xl py-1.5 px-3 text-sm hover:bg-hover-subtle transition text-text"
+            class="flex w-full items-center gap-2 rounded-xl py-1.5 px-3 text-sm hover:bg-hover-subtle transition text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             @click="handleLogout"
           >
             <LogOut class="size-4 shrink-0" />

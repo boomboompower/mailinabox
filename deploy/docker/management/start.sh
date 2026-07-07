@@ -1,8 +1,8 @@
 #!/bin/bash
 # Management daemon start script.
 # Pre-written at image build time so gunicorn starts immediately at container
-# startup without waiting for setup/management.sh to run.
-# setup/management.sh also writes this file (and may overwrite it) - that is fine
+# startup without waiting for the management component to run.
+# The component also writes this file and may overwrite it - that is fine
 # because exec has already happened by then.
 
 export LANGUAGE=en_US.UTF-8

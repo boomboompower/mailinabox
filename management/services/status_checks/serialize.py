@@ -5,6 +5,7 @@ def step_to_dict(step):
 		"message": step.message,
 	}
 
+
 def result_to_dict(result):
 	return {
 		"name": result.name,
@@ -14,6 +15,7 @@ def result_to_dict(result):
 		"domain": result.domain,
 		"steps": [step_to_dict(s) for s in result.steps],
 	}
+
 
 def results_to_list(results):
 	"""results is {key: CheckResult} as returned by run_checks(). Sorted by

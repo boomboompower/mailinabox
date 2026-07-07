@@ -1,9 +1,15 @@
+import contextlib
 import datetime
 import os
+import pathlib
 import re
+import tempfile
+
+from services.dns_update.dnssec import hash_dnssec_keys
+from services.dns_update.custom_records import get_secondary_dns
+
 
 def write_nsd_zone(domain, zonefile, records, env, force):
-	from services.dns_update.dnssec import hash_dnssec_keys
 
 	# On the $ORIGIN line, there's typically a ';' comment at the end explaining
 	# what the $ORIGIN line does. Any further data after the domain confuses
@@ -42,16 +48,18 @@ $TTL 86400          ; default time to live
 		zone += "\tIN\t" + querytype + "\t"
 		if querytype == "TXT":
 			# Divide into 255-byte max substrings.
-			v2 = ""
-			while len(value) > 0:
-				s = value[0:255]
-				value = value[255:]
-				s = s.replace('\\', '\\\\') # escape backslashes
-				s = s.replace('"', '\\"') # escape quotes
-				s = '"' + s + '"' # wrap in quotes
-				v2 += s + " "
-			value = v2
-		zone += value + "\n"
+			encoded = ""
+			remaining = value.replace('\r', '').replace('\n', '')
+			while remaining:
+				s = remaining[0:255]
+				remaining = remaining[255:]
+				s = s.replace('\\', '\\\\')  # escape backslashes
+				s = s.replace('"', '\\"')  # escape quotes
+				s = '"' + s + '"'  # wrap in quotes
+				encoded += s + " "
+			zone += encoded + "\n"
+		else:
+			zone += value + "\n"
 
 	# Append a stable hash of DNSSEC signing keys in a comment.
 	zone += f"\n; DNSSEC signing keys hash: {hash_dnssec_keys(domain, env)}\n"
@@ -70,8 +78,7 @@ $TTL 86400          ; default time to live
 		# We've signed the domain. Check if we are close to the expiration
 		# time of the signature. If so, we'll force a bump of the serial
 		# number so we can re-sign it.
-		with open(zonefile + ".signed", encoding="utf-8") as f:
-			signed_zone = f.read()
+		signed_zone = pathlib.Path(zonefile + ".signed").read_text(encoding="utf-8")
 		expiration_times = re.findall(r"\sRRSIG\s+SOA\s+\d+\s+\d+\s\d+\s+(\d{14})", signed_zone)
 		if len(expiration_times) == 0:
 			# weird
@@ -89,42 +96,41 @@ $TTL 86400          ; default time to live
 	if os.path.exists(zonefile):
 		# If the zone already exists, is different, and has a later serial number,
 		# increment the number.
-		with open(zonefile, encoding="utf-8") as f:
-			existing_zone = f.read()
-			m = re.search(r"(\d+)\s*;\s*serial number", existing_zone)
-			if m:
-				# Clear out the serial number in the existing zone file for the
-				# purposes of seeing if anything *else* in the zone has changed.
-				existing_serial = m.group(1)
-				existing_zone = existing_zone.replace(m.group(0), "__SERIAL__     ; serial number")
+		existing_zone = pathlib.Path(zonefile).read_text(encoding="utf-8")
+		m = re.search(r"(\d+)\s*;\s*serial number", existing_zone)
+		if m:
+			# Clear out the serial number in the existing zone file for the
+			# purposes of seeing if anything *else* in the zone has changed.
+			existing_serial = m.group(1)
+			existing_zone = existing_zone.replace(m.group(0), "__SERIAL__     ; serial number")
 
-				# If the existing zone is the same as the new zone (modulo the serial number),
-				# there is no need to update the file. Unless we're forcing a bump.
-				if zone == existing_zone and not force_bump and not force:
-					return False
+			# If the existing zone is the same as the new zone (modulo the serial number),
+			# there is no need to update the file. Unless we're forcing a bump.
+			if zone == existing_zone and not force_bump and not force:
+				return False
 
-				# If the existing serial is not less than a serial number
-				# based on the current date plus 00, increment it. Otherwise,
-				# the serial number is less than our desired new serial number
-				# so we'll use the desired new number.
-				if existing_serial >= serial:
-					serial = str(int(existing_serial) + 1)
+			# If the existing serial is not less than a serial number
+			# based on the current date plus 00, increment it. Otherwise,
+			# the serial number is less than our desired new serial number
+			# so we'll use the desired new number.
+			if existing_serial >= serial:
+				serial = str(int(existing_serial) + 1)
 
 	zone = zone.replace("__SERIAL__", serial)
 
 	# Write the zone file.
-	with open(zonefile, "w", encoding="utf-8") as f:
-		f.write(zone)
+	pathlib.Path(zonefile).write_text(zone, encoding="utf-8")
 
-	return True # file is updated
+	return True  # file is updated
+
 
 def get_dns_zonefile(zone, env):
-	from services.dns_update.zones import get_dns_zones
+	from services.dns_update.zones import get_dns_zones, build_zones  # noqa: PLC0415
 
 	# zone is validated against the managed-zone list here; fn (not zone) is used
 	# in the path, so there is no path traversal even though the caller passes zone
 	# directly from a URL parameter.
-	for domain, fn in get_dns_zones(env):
+	for domain, fn in get_dns_zones(env):  # noqa: B007
 		if zone == domain:
 			break
 	else:
@@ -132,11 +138,28 @@ def get_dns_zonefile(zone, env):
 		raise ValueError(msg)
 
 	nsd_zonefile = "/etc/nsd/zones/" + fn
-	with open(nsd_zonefile, encoding="utf-8") as f:
-		return f.read()
+	if os.path.exists(nsd_zonefile):
+		return pathlib.Path(nsd_zonefile).read_text(encoding="utf-8")
 
-def write_nsd_conf(zonefiles, additional_records, env):
-	from services.dns_update.custom_records import get_secondary_dns
+	# Zone file not on disk (e.g. Docker where NSD runs in a separate container).
+	# Generate the content from the DNS database using a temp file so that serial
+	# number logic and DNSSEC key hashing in write_nsd_zone work unchanged.
+	with tempfile.NamedTemporaryFile(suffix=".zone", delete=False) as tmp:
+		tmppath = tmp.name
+	try:
+		for d, _zf, records in build_zones(env):
+			if d == zone:
+				write_nsd_zone(zone, tmppath, records, env, force=True)
+				return pathlib.Path(tmppath).read_text(encoding="utf-8")
+	finally:
+		with contextlib.suppress(FileNotFoundError):
+			os.unlink(tmppath)
+
+	msg = f"Could not generate zone content for {zone}."
+	raise ValueError(msg)
+
+
+def write_nsd_conf(zonefiles, additional_records, _env):
 
 	# Write the list of zones to a configuration file.
 	nsd_conf_file = "/etc/nsd/nsd.conf.d/zones.conf"
@@ -159,13 +182,10 @@ zone:
 
 	# Check if the file is changing. If it isn't changing,
 	# return False to flag that no change was made.
-	if os.path.exists(nsd_conf_file):
-		with open(nsd_conf_file, encoding="utf-8") as f:
-			if f.read() == nsdconf:
-				return False
+	if os.path.exists(nsd_conf_file) and pathlib.Path(nsd_conf_file).read_text(encoding="utf-8") == nsdconf:
+		return False
 
 	# Write out new contents and return True to signal that
 	# configuration changed.
-	with open(nsd_conf_file, "w", encoding="utf-8") as f:
-		f.write(nsdconf)
+	pathlib.Path(nsd_conf_file).write_text(nsdconf, encoding="utf-8")
 	return True

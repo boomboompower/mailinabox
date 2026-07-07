@@ -1,27 +1,34 @@
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Infrastructure packages not owned by any component def.
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     supervisor \
-    # Authoritative DNS (public zones)
-    nsd \
-    # Recursive/caching resolver with DNSSEC validation (used by other containers)
-    unbound unbound-anchor \
-    # DNSSEC signing tools (ldns-keygen, ldns-signzone, ldns-key2ds)
-    ldnsutils \
-    # ssh-keyscan for SSHFP record generation
-    openssh-client \
+    # python3-pip needed to install doit; python3 pulled in as a dep
+    python3 python3-pip \
     # locales required for en_US.UTF-8
     locales \
-    # Status checks
+    # dnsutils (dig/nslookup) for healthchecks and debugging - Docker-specific
     dnsutils \
-    # Misc utilities
     ca-certificates curl \
     && locale-gen en_US.UTF-8 \
+    && pip3 install --break-system-packages --quiet doit exclusiveprocess \
     && rm -rf /var/lib/apt/lists/*
+
+# Copy component defs before the full source COPY so this layer is only
+# invalidated when component definitions change, not on every code change.
+COPY setup/components /opt/mailinabox/setup/components
+WORKDIR /opt/mailinabox
+
+# Install component packages (nsd, ldnsutils, openssh-client, unbound, unbound-anchor).
+# RUNTIME is unset here so ensure_installed() runs apt normally.
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && \
+    PYTHONPATH=/opt/mailinabox/setup python3 -m components.runner --build-mode dns
 
 COPY . /opt/mailinabox
 WORKDIR /opt/mailinabox

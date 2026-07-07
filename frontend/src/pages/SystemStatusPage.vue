@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { toast } from 'vue-sonner'
-import { RefreshCw, WifiOff } from 'lucide-vue-next'
+import { RefreshCw } from 'lucide-vue-next'
+import AsyncState from '@/components/ui/AsyncState.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import Card from '@/components/ui/Card.vue'
 import Dialog from '@/components/ui/Dialog.vue'
 import Divider from '@/components/ui/Divider.vue'
-import EmptyState from '@/components/ui/EmptyState.vue'
 import StatusIcon from '@/components/shared/StatusIcon.vue'
 import { useApi } from '@/composables/useApi'
 import type { StatusCheckItem, StatusCheckResponse } from '@/types'
@@ -20,6 +21,7 @@ const POLL_INTERVAL_MS = 8_000
 
 const api = useApi()
 
+const loading = ref(true)
 const jobStatus = ref<'idle' | 'running' | 'done'>('idle')
 const items = ref<StatusCheckItem[]>([])
 const checkedAt = ref<string | null>(null)
@@ -34,6 +36,8 @@ const privacy = ref<boolean | null>(null)
 const rebootNeeded = ref<boolean | null>(null)
 const rebootOpen = ref(false)
 const rebooting = ref(false)
+
+const activeTab = ref<string | null>(null)
 
 type SectionItem = { item: StatusCheckItem; idx: number }
 type Section = { heading: string; items: SectionItem[] }
@@ -61,11 +65,25 @@ const sections = computed<Section[]>(() => {
   return result
 })
 
-const summary = computed(() => ({
-  ok: items.value.filter(i => i.type === 'ok').length,
-  errors: items.value.filter(i => i.type === 'error').length,
-  warnings: items.value.filter(i => i.type === 'warning').length,
-}))
+// Auto-select: keep current tab if it still exists, otherwise pick first section with errors.
+watch(sections, (newSections) => {
+  if (!newSections.length) return
+  if (activeTab.value && newSections.some(s => s.heading === activeTab.value)) return
+  const withErrors = newSections.find(s => s.items.some(({ item }) => item.type === 'error'))
+  activeTab.value = (withErrors ?? newSections[0]).heading
+}, { immediate: true })
+
+const activeSection = computed(() =>
+  sections.value.find(s => s.heading === activeTab.value) ?? null
+)
+
+function sectionErrors(section: Section): number {
+  return section.items.filter(({ item }) => item.type === 'error').length
+}
+
+function sectionWarnings(section: Section): number {
+  return section.items.filter(({ item }) => item.type === 'warning').length
+}
 
 const checkedAtLabel = computed(() => {
   if (!checkedAt.value) return null
@@ -105,6 +123,7 @@ function stopPolling(): void {
 }
 
 async function loadStatus(): Promise<void> {
+  loading.value = true
   loadError.value = false
   try {
     const res = await api.get('/admin/system/status')
@@ -119,6 +138,8 @@ async function loadStatus(): Promise<void> {
   } catch {
     loadError.value = true
     toast.error('Failed to load system status.')
+  } finally {
+    loading.value = false
   }
 }
 
@@ -193,24 +214,24 @@ onUnmounted(stopPolling)
 
 <template>
   <AppLayout>
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-semibold">System Status</h1>
-        <p v-if="checkedAtLabel" class="text-xs text-muted mt-0.5">
-          Last checked {{ checkedAtLabel }}
-          <span v-if="source === 'cron'" class="ml-1 text-faint">(nightly)</span>
+    <PageHeader title="System Status" description="Health and configuration checks for this server.">
+      <template v-if="checkedAtLabel" #description>
+        <p class="text-xs text-faint mt-0.5">
+          Last checked {{ checkedAtLabel }}<span v-if="source === 'cron'" class="ml-1">(nightly)</span>
         </p>
-      </div>
-      <Button
-        variant="secondary"
-        size="sm"
-        :disabled="jobStatus === 'running'"
-        @click="triggerRefresh"
-      >
-        <RefreshCw class="size-4 mr-1.5" :class="{ 'animate-spin': jobStatus === 'running' }" />
-        {{ jobStatus === 'running' ? 'Checking...' : 'Refresh' }}
-      </Button>
-    </div>
+      </template>
+      <template #actions>
+        <Button
+          variant="secondary"
+          size="sm"
+          :disabled="jobStatus === 'running'"
+          @click="triggerRefresh"
+        >
+          <RefreshCw class="size-4 mr-1.5" :class="{ 'animate-spin': jobStatus === 'running' }" />
+          {{ jobStatus === 'running' ? 'Checking...' : 'Refresh' }}
+        </Button>
+      </template>
+    </PageHeader>
 
     <!-- Reboot banner -->
     <Card
@@ -225,123 +246,118 @@ onUnmounted(stopPolling)
       </Button>
     </Card>
 
-    <!-- Error state -->
-    <EmptyState
-      v-if="loadError"
-      title="Could not load status checks"
-      description="The server did not respond. Check your connection and try again."
+    <AsyncState
+      :loading="loading || (jobStatus === 'running' && items.length === 0)"
+      :error="loadError"
+      :empty="false"
+      error-title="Could not load status checks"
+      @retry="loadStatus"
     >
-      <template #icon><WifiOff /></template>
-      <template #action>
-        <Button variant="secondary" @click="loadStatus">Try again</Button>
-      </template>
-    </EmptyState>
-
-    <template v-else>
-      <!-- Running with no prior results: skeleton -->
-      <template v-if="jobStatus === 'running' && items.length === 0">
-        <div v-for="s in 3" :key="s" class="mb-6">
-          <Skeleton class="h-5 w-40 mb-3" />
-          <div class="space-y-2">
-            <div v-for="i in 4" :key="i" class="flex items-center gap-3 py-2">
-              <Skeleton class="size-4 rounded-full shrink-0" />
-              <Skeleton class="h-4" :class="i % 2 === 0 ? 'w-3/4' : 'w-1/2'" />
-            </div>
+      <template #loading>
+        <div class="flex gap-0 border-b border-border mb-6">
+          <Skeleton v-for="i in 4" :key="i" class="h-9 w-24 mr-2 mb-px rounded-b-none" />
+        </div>
+        <div class="space-y-2">
+          <div v-for="i in 6" :key="i" class="flex items-center gap-3 py-2">
+            <Skeleton class="size-4 rounded-full shrink-0" />
+            <Skeleton class="h-4" :class="i % 2 === 0 ? 'w-3/4' : 'w-1/2'" />
           </div>
         </div>
       </template>
 
-      <!-- Results (shown even while running if we have prior cached data) -->
-      <template v-else-if="items.length > 0">
-        <p v-if="jobStatus === 'running'" class="text-xs text-faint mb-4">
-          Showing previous results while the new check runs...
-        </p>
+      <!-- Stale cache notice while a new check runs -->
+      <p v-if="jobStatus === 'running'" class="text-xs text-faint mb-4">
+        Showing previous results while the new check runs...
+      </p>
 
-        <!-- Summary -->
-        <div class="flex gap-4 mb-6 text-sm font-medium">
-          <span v-if="summary.ok" class="text-emerald-600 dark:text-emerald-400">
-            {{ summary.ok }} OK
-          </span>
-          <span v-if="summary.errors" class="text-red-600 dark:text-red-400">
-            {{ summary.errors }} {{ summary.errors === 1 ? 'error' : 'errors' }}
-          </span>
-          <span v-if="summary.warnings" class="text-yellow-600 dark:text-yellow-400">
-            {{ summary.warnings }} {{ summary.warnings === 1 ? 'warning' : 'warnings' }}
-          </span>
+      <!-- Tab bar -->
+      <div class="flex gap-0 border-b border-border mb-6">
+        <button
+          v-for="section in sections"
+          :key="section.heading"
+          :class="[
+            'px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded',
+            activeTab === section.heading
+              ? 'border-text text-text'
+              : 'border-transparent text-muted hover:text-text',
+          ]"
+          @click="activeTab = section.heading; expanded = new Set()"
+        >
+          {{ section.heading }}
           <span
-            v-if="!summary.errors && !summary.warnings"
-            class="text-emerald-600 dark:text-emerald-400 font-semibold"
-          >
-            All checks passed
-          </span>
-        </div>
+            v-if="sectionErrors(section) > 0"
+            class="text-xs px-1.5 py-0.5 rounded-full font-medium bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400"
+          >{{ sectionErrors(section) }}</span>
+          <span
+            v-else-if="sectionWarnings(section) > 0"
+            class="text-xs px-1.5 py-0.5 rounded-full font-medium bg-yellow-100 dark:bg-yellow-950/50 text-yellow-600 dark:text-yellow-400"
+          >{{ sectionWarnings(section) }}</span>
+          <span v-else class="size-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+        </button>
+      </div>
 
-        <!-- Sections -->
-        <div v-for="section in sections" :key="section.heading" class="mb-6">
-          <h2 class="text-xs font-semibold uppercase tracking-wider text-muted dark:text-faint mb-2 px-1">
-            {{ section.heading }}
-          </h2>
-          <Card>
-            <template
-              v-for="({ item, idx }, i) in section.items"
-              :key="idx"
-            >
-              <Divider v-if="i > 0" />
-              <div class="px-4 py-3">
-              <div class="flex items-start gap-3">
-                <StatusIcon :status="item.type as 'ok' | 'error' | 'warning'" class="mt-0.5 shrink-0" />
-                <div class="flex-1 min-w-0 break-words">
-                  <p class="text-sm font-medium">{{ item.text }}</p>
-                  <p v-if="item.detail" class="text-sm text-muted dark:text-faint mt-0.5">{{ item.detail }}</p>
-                  <div v-if="expanded.has(idx) && item.extra.length" class="mt-2 space-y-1">
-                    <p
-                      v-for="(ex, ei) in item.extra.filter(e => e.text.trim())"
-                      :key="ei"
-                      class="text-xs text-muted dark:text-faint"
-                      :class="{ 'font-mono whitespace-pre-wrap': ex.monospace }"
-                    >
-                      {{ ex.text }}
-                    </p>
-                  </div>
-                  <button
-                    v-if="item.extra.some(e => e.text.trim())"
-                    :aria-expanded="expanded.has(idx)"
-                    class="mt-1 text-xs text-faint hover:text-text transition-colors"
-                    @click="toggleExpand(idx)"
+      <!-- Active section -->
+      <Card v-if="activeSection">
+        <template
+          v-for="({ item, idx }, i) in activeSection.items"
+          :key="idx"
+        >
+          <Divider v-if="i > 0" />
+          <div class="px-4 py-3">
+            <div class="flex items-start gap-3">
+              <StatusIcon :status="item.type as 'ok' | 'error' | 'warning'" class="mt-0.5 shrink-0" />
+              <div class="flex-1 min-w-0 break-words">
+                <p class="text-sm font-medium">{{ item.text }}</p>
+                <p v-if="item.detail" class="text-sm text-muted dark:text-faint mt-0.5">{{ item.detail }}</p>
+                <div v-if="expanded.has(idx) && item.extra.length" class="mt-2 space-y-1">
+                  <p
+                    v-for="(ex, ei) in item.extra.filter(e => e.text.trim())"
+                    :key="ei"
+                    class="text-xs text-muted dark:text-faint"
+                    :class="{ 'font-mono whitespace-pre-wrap': ex.monospace }"
                   >
-                    {{ expanded.has(idx) ? 'show less' : 'show more' }}
-                  </button>
+                    {{ ex.text }}
+                  </p>
                 </div>
+                <Button
+                  v-if="item.extra.some(e => e.text.trim())"
+                  variant="link"
+                  size="sm"
+                  class="mt-1 text-faint"
+                  :aria-expanded="expanded.has(idx)"
+                  @click="toggleExpand(idx)"
+                >
+                  {{ expanded.has(idx) ? 'show less' : 'show more' }}
+                </Button>
               </div>
             </div>
-            </template>
-          </Card>
-        </div>
-
-        <!-- System Tools -->
-        <Card class="p-5 mt-6">
-          <h2 class="text-sm font-semibold mb-3">System Tools</h2>
-          <div class="flex flex-wrap gap-3">
-            <div>
-              <p class="text-xs text-muted mb-1.5">
-                Version check: {{ privacy === true ? 'enabled' : privacy === false ? 'disabled' : '...' }}
-              </p>
-              <Button variant="secondary" size="sm" :disabled="privacy === null" @click="togglePrivacy">
-                {{ privacy ? 'Disable Version Check' : 'Enable Version Check' }}
-              </Button>
-            </div>
-            <div v-if="rebootNeeded === false">
-              <p class="text-xs text-muted mb-1.5">No reboot required.</p>
-              <Button variant="secondary" size="sm" disabled>Reboot</Button>
-            </div>
-            <div v-else-if="rebootNeeded">
-              <p class="text-xs text-muted mb-1.5">Reboot pending.</p>
-              <Button variant="secondary" size="sm" @click="rebootOpen = true">Reboot Now</Button>
-            </div>
           </div>
-        </Card>
-      </template>
-    </template>
+        </template>
+      </Card>
+
+      <!-- System Tools -->
+      <Card class="p-5 mt-6">
+        <h2 class="text-sm font-semibold mb-3">System Tools</h2>
+        <div class="flex flex-wrap gap-3">
+          <div>
+            <p class="text-xs text-muted mb-1.5">
+              Version check: {{ privacy === true ? 'enabled' : privacy === false ? 'disabled' : '...' }}
+            </p>
+            <Button variant="secondary" size="sm" :disabled="privacy === null" @click="togglePrivacy">
+              {{ privacy ? 'Disable Version Check' : 'Enable Version Check' }}
+            </Button>
+          </div>
+          <div v-if="rebootNeeded === false">
+            <p class="text-xs text-muted mb-1.5">No reboot required.</p>
+            <Button variant="secondary" size="sm" disabled>Reboot</Button>
+          </div>
+          <div v-else-if="rebootNeeded">
+            <p class="text-xs text-muted mb-1.5">Reboot pending.</p>
+            <Button variant="secondary" size="sm" @click="rebootOpen = true">Reboot Now</Button>
+          </div>
+        </div>
+      </Card>
+    </AsyncState>
 
     <!-- Reboot confirm -->
     <Dialog

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Card from '@/components/ui/Card.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
 import Code from '@/components/ui/Code.vue'
 import Divider from '@/components/ui/Divider.vue'
@@ -15,10 +16,9 @@ type SettingRow = [string, string]
 const imapSmtpRows: SettingRow[] = [
   ['Protocol', 'IMAP'],
   ['Mail server', config.hostname],
-  ['IMAP port', '993'],
-  ['IMAP security', 'SSL or TLS'],
-  ['SMTP port', '465'],
-  ['SMTP security', 'SSL or TLS'],
+  ['IMAP port', '993 (SSL/TLS)'],
+  ['SMTP port', '465 (SSL/TLS)'],
+  ['SMTP port', '587 (STARTTLS)'],
   ['Username', 'Your full email address'],
   ['Password', 'Your mail password'],
 ]
@@ -27,7 +27,7 @@ const imapSmtpRows: SettingRow[] = [
 
 <template>
   <AppLayout>
-    <h1 class="text-2xl font-semibold mb-6">Checking and Sending Mail</h1>
+    <PageHeader title="Checking and Sending Mail" description="How to connect your mail app, or use the built-in webmail." />
 
     <!-- Webmail -->
     <SectionHeader title="Webmail" />
@@ -65,7 +65,7 @@ const imapSmtpRows: SettingRow[] = [
         <p class="text-sm font-medium mb-3">Manual IMAP / SMTP settings</p>
         <Table>
           <tbody>
-            <TableRow v-for="[label, value] in imapSmtpRows" :key="label">
+            <TableRow v-for="([label, value], i) in imapSmtpRows" :key="i">
               <th scope="row" class="px-4 py-2.5 text-sm text-muted font-normal text-left w-40">{{ label }}</th>
               <td class="px-4 py-2.5 text-sm font-medium">{{ value }}</td>
             </TableRow>

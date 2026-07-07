@@ -118,7 +118,7 @@ async function submitPasskey(): Promise<void> {
     const result = await completeRes.json()
 
     if (result.status === 'ok') {
-      auth.handleAuthSuccess(result.email, result.privileges)
+      auth.handleAuthSuccess(result.email, result.privileges, result.monitoringTool)
       saveEmailPreference()
       await router.push('/system-status')
     } else {
@@ -168,9 +168,7 @@ function backToEmail(): void {
       <form v-else-if="step === 'password' || step === 'totp'" class="space-y-4" @submit.prevent="submitPassword">
         <div class="flex items-center justify-between text-sm mb-1">
           <span class="text-muted">{{ email }}</span>
-          <button type="button" class="text-faint hover:text-text transition-colors" @click="backToEmail">
-            Change
-          </button>
+          <Button variant="link" size="sm" class="text-faint" @click="backToEmail">Change</Button>
         </div>
 
         <div>
@@ -200,23 +198,21 @@ function backToEmail(): void {
       <div v-else-if="step === 'passkey'" class="space-y-4">
         <div class="flex items-center justify-between text-sm mb-1">
           <span class="text-muted">{{ email }}</span>
-          <button type="button" class="text-faint hover:text-text transition-colors" @click="backToEmail">
-            Change
-          </button>
+          <Button variant="link" size="sm" class="text-faint" @click="backToEmail">Change</Button>
         </div>
 
         <Button class="w-full" :disabled="loading" @click="submitPasskey">
           {{ loading ? 'Waiting for passkey...' : 'Sign in with passkey' }}
         </Button>
 
-        <button
+        <Button
           v-if="availablePaths.includes('password') || availablePaths.includes('password+totp')"
-          type="button"
-          class="w-full text-sm text-muted hover:text-text transition-colors py-2"
+          variant="link"
+          class="w-full py-2 text-sm"
           @click="step = 'password'"
         >
           Use password instead
-        </button>
+        </Button>
       </div>
     </Card>
   </PageBackground>

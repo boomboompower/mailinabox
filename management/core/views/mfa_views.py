@@ -13,12 +13,19 @@ from core.auth_decorators import require_user_route
 from core.web_helpers import json_response, sanitize_error_message, validate_email, log_failed_login
 from mail.mailconfig import get_mail_user_privileges
 from auth.mfa import (
-	get_public_mfa_state, provision_totp, validate_totp_secret, enable_mfa, disable_mfa,
-	webauthn_register_begin, webauthn_register_complete,
-	webauthn_authenticate_begin, webauthn_authenticate_complete,
+	get_public_mfa_state,
+	provision_totp,
+	validate_totp_secret,
+	enable_mfa,
+	disable_mfa,
+	webauthn_register_begin,
+	webauthn_register_complete,
+	webauthn_authenticate_begin,
+	webauthn_authenticate_complete,
 )
 
 bp = Blueprint("mfa", __name__, url_prefix="/mfa")
+
 
 @bp.route('/status', methods=['POST'])
 @require_user_route
@@ -31,18 +38,13 @@ def mfa_get_status():
 	except ValueError as e:
 		return (sanitize_error_message(str(e)), 400)
 	try:
-		resp = {
-			"enabled_mfa": get_public_mfa_state(email, env)
-		}
+		resp = {"enabled_mfa": get_public_mfa_state(email, env)}
 		if email == request.user_email:
-			resp.update({
-				"new_mfa": {
-					"totp": provision_totp(email, env)
-				}
-			})
+			resp.update({"new_mfa": {"totp": provision_totp(email, env)}})
 	except ValueError as e:
 		return (sanitize_error_message(str(e)), 400)
 	return json_response(resp)
+
 
 @bp.route('/totp/enable', methods=['POST'])
 @require_user_route
@@ -58,6 +60,7 @@ def totp_post_enable():
 	except ValueError as e:
 		return (sanitize_error_message(str(e)), 400)
 	return "OK"
+
 
 @bp.route('/disable', methods=['POST'])
 @require_user_route
@@ -78,13 +81,14 @@ def totp_post_disable():
 			if "admin" in target_privs:
 				return ("Cannot disable MFA for other administrator accounts", 403)
 
-		result = disable_mfa(email, request.form.get('mfa-id') or None, env) # convert empty string to None
+		result = disable_mfa(email, request.form.get('mfa-id') or None, env)  # convert empty string to None
 	except ValueError as e:
 		return (sanitize_error_message(str(e)), 400)
-	if result: # success
+	if result:  # success
 		return "OK"
 	# error
 	return ("Invalid user or MFA id.", 400)
+
 
 @bp.route('/webauthn/register/begin', methods=['POST'])
 @require_user_route
@@ -96,6 +100,7 @@ def webauthn_register_begin_route():
 	nonce = secrets.token_hex(32)
 	auth_service.webauthn_challenges[nonce] = {"state": state, "email": request.user_email, "type": "register"}
 	return json_response({"options": options, "nonce": nonce})
+
 
 @bp.route('/webauthn/register/complete', methods=['POST'])
 @require_user_route
@@ -114,6 +119,7 @@ def webauthn_register_complete_route():
 		return (sanitize_error_message(str(e)), 400)
 	return json_response({"status": "ok"})
 
+
 @bp.route('/webauthn/authenticate/begin', methods=['POST'])
 def webauthn_auth_begin():
 	email_raw = request.form.get('email', '')
@@ -125,6 +131,7 @@ def webauthn_auth_begin():
 	nonce = secrets.token_hex(32)
 	auth_service.webauthn_challenges[nonce] = {"state": state, "email": email, "type": "authenticate"}
 	return json_response({"options": options, "nonce": nonce})
+
 
 @bp.route('/webauthn/authenticate/complete', methods=['POST'])
 def webauthn_auth_complete():
@@ -144,9 +151,19 @@ def webauthn_auth_complete():
 	privs = get_mail_user_privileges(email, env)
 	if isinstance(privs, tuple):
 		return json_response({"status": "invalid", "reason": "Account error."})
+	# Session is created regardless of admin privilege - non-admin sessions are
+	# blocked by require_admin_route on every downstream route, so this is harmless.
 	session_key = auth_service.create_session_key(email, env, session_type='login')
 	current_app.logger.info("New passkey login session created for %s", email)
-	response = make_response(json_response({"status": "ok", "email": email, "privileges": privs}))
+	monitoring = env.get('MONITORING_TOOL', 'none')
+	response = make_response(
+		json_response({
+			"status": "ok",
+			"email": email,
+			"privileges": privs,
+			"monitoringTool": monitoring if monitoring != 'none' else None,
+		})
+	)
 	response.set_cookie(
 		'admin_session',
 		session_key,

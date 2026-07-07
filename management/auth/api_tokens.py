@@ -71,10 +71,7 @@ def create_token(email: str, name: str, scope: str, env) -> str:
 	token_hash = _hash_secret(secret, env)
 	conn, c = open_database(env, with_connection=True)
 	try:
-		c.execute(
-			'INSERT INTO api_tokens (user_id, name, token_hash, scope) VALUES (?, ?, ?, ?)',
-			(get_user_id(email, c), name, token_hash, scope)
-		)
+		c.execute('INSERT INTO api_tokens (user_id, name, token_hash, scope) VALUES (?, ?, ?, ?)', (get_user_id(email, c), name, token_hash, scope))
 		conn.commit()
 	except sqlite3.IntegrityError as e:
 		conn.close()
@@ -89,27 +86,17 @@ def create_token(email: str, name: str, scope: str, env) -> str:
 def list_tokens(email: str, env) -> list:
 	"""Return metadata for all tokens owned by this user. Never includes the hash."""
 	conn, c = open_database(env, with_connection=True)
-	c.execute(
-		'SELECT t.id, t.name, t.scope, t.created_at, t.last_used '
-		'FROM api_tokens t WHERE t.user_id = ?',
-		(get_user_id(email, c),)
-	)
+	c.execute('SELECT t.id, t.name, t.scope, t.created_at, t.last_used FROM api_tokens t WHERE t.user_id = ?', (get_user_id(email, c),))
 	rows = c.fetchall()
 	conn.close()
-	return [
-		{'id': r[0], 'name': r[1], 'scope': r[2], 'created_at': r[3], 'last_used': r[4]}
-		for r in rows
-	]
+	return [{'id': r[0], 'name': r[1], 'scope': r[2], 'created_at': r[3], 'last_used': r[4]} for r in rows]
 
 
 def revoke_token(email: str, token_id: int, env) -> bool:
 	"""Revoke a single token by id. Scoped to the owner so one admin cannot
 	revoke another admin's tokens. Returns True if a row was deleted."""
 	conn, c = open_database(env, with_connection=True)
-	c.execute(
-		'DELETE FROM api_tokens WHERE id = ? AND user_id = ?',
-		(token_id, get_user_id(email, c))
-	)
+	c.execute('DELETE FROM api_tokens WHERE id = ? AND user_id = ?', (token_id, get_user_id(email, c)))
 	deleted = c.rowcount > 0
 	conn.commit()
 	conn.close()
@@ -140,17 +127,12 @@ def verify_token(plaintext: str, env):
 	on every request when tokens are used for automation."""
 	if not plaintext.startswith("miab_"):
 		return None
-	secret = plaintext[len("miab_"):]
+	secret = plaintext[len("miab_") :]
 	if not secret:
 		return None
 	token_hash = _hash_secret(secret, env)
 	conn, c = open_database(env, with_connection=True)
-	c.execute(
-		'SELECT t.id, t.scope, u.email '
-		'FROM api_tokens t JOIN users u ON t.user_id = u.id '
-		'WHERE t.token_hash = ?',
-		(token_hash,)
-	)
+	c.execute('SELECT t.id, t.scope, u.email FROM api_tokens t JOIN users u ON t.user_id = u.id WHERE t.token_hash = ?', (token_hash,))
 	row = c.fetchone()
 	if row is None:
 		conn.close()
@@ -158,11 +140,7 @@ def verify_token(plaintext: str, env):
 	token_id, scope, email = row
 	now = datetime.now(timezone.utc)
 	fmt = '%Y-%m-%d %H:%M:%S'
-	c.execute(
-		'UPDATE api_tokens SET last_used = ? WHERE id = ? '
-		'AND (last_used IS NULL OR last_used < ?)',
-		(now.strftime(fmt), token_id, (now - timedelta(seconds=60)).strftime(fmt))
-	)
+	c.execute('UPDATE api_tokens SET last_used = ? WHERE id = ? AND (last_used IS NULL OR last_used < ?)', (now.strftime(fmt), token_id, (now - timedelta(seconds=60)).strftime(fmt)))
 	conn.commit()
 	conn.close()
 	return (email, scope, token_id)

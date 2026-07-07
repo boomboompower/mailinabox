@@ -14,30 +14,35 @@ _dns_cache_lock = threading.Lock()
 _DNS_CACHE_TTL = 60  # 1 minute TTL to prevent stale/poisoned cache entries
 _DNS_CACHE_MAX_SIZE = 1000  # Max entries to prevent memory exhaustion attacks
 
+
 def clear_dns_cache():
 	"""Clear the DNS cache - useful when DNS changes are expected."""
 	global _dns_cache
 	with _dns_cache_lock:
 		_dns_cache = {}
 
+
 def _is_cache_entry_valid(timestamp):
 	return (datetime.datetime.now() - timestamp).total_seconds() < _DNS_CACHE_TTL
+
 
 def _evict_expired_cache_entries():
 	global _dns_cache
 	now = datetime.datetime.now()
-	_dns_cache = {k: v for k, v in _dns_cache.items()
-	              if (now - v[1]).total_seconds() < _DNS_CACHE_TTL}
+	_dns_cache = {k: v for k, v in _dns_cache.items() if (now - v[1]).total_seconds() < _DNS_CACHE_TTL}
+
 
 def normalize_ip(ip):
 	# Use ipaddress module to normalize the IPv6 notation and
 	# ensure we are matching IPv6 addresses written in different
 	# representations according to rfc5952.
 	import ipaddress
+
 	try:
 		return str(ipaddress.ip_address(ip))
 	except Exception:
 		return ip
+
 
 def query_dns(qname, rtype, nxdomain='[Not Set]', at=None, as_list=False):
 	global _dns_cache
@@ -115,53 +120,56 @@ def query_dns(qname, rtype, nxdomain='[Not Set]', at=None, as_list=False):
 
 	return result
 
+
 def get_services(env):
 	# Service host addresses come from env (set via /etc/mailinabox.conf).
 	# On bare metal everything defaults to 127.0.0.1; in Docker these point
 	# to the container service names written by write_mailinabox_conf.
 	mail_host = env.get('MAIL_HOST', '127.0.0.1')
-	dns_host  = env.get('DNS_HOST',  '127.0.0.1')
+	dns_host = env.get('DNS_HOST', '127.0.0.1')
 	webmail_host = env.get('WEBMAIL_HOST', '127.0.0.1')
 
 	spam_filter = env.get("SPAM_FILTER", "spamassassin")
 	rspamd_host = env.get('RSPAMD_HOST', '127.0.0.1')
-	redis_host  = env.get('REDIS_HOST',  '127.0.0.1')
+	redis_host = env.get('REDIS_HOST', '127.0.0.1')
 
 	services = [
-		{ "name": "Local DNS (unbound)",                  "port": 53,    "public": False, "host": dns_host },
-		{ "name": "Dovecot LMTP LDA",                     "port": 10026, "public": False, "host": mail_host },
-		{ "name": "Mail-in-a-Box Management Daemon",      "port": 10222, "public": False },
-		{ "name": "SSH Login (ssh)",                      "port": get_ssh_port(), "public": True },
-		{ "name": "Public DNS (nsd4)",                    "port": 53,    "public": True,  "host": dns_host },
-		{ "name": "Incoming Mail (SMTP/postfix)",         "port": 25,    "public": True,  "host": mail_host },
-		{ "name": "Outgoing Mail (SMTP 465/postfix)",     "port": 465,   "public": True,  "host": mail_host },
-		{ "name": "Outgoing Mail (SMTP 587/postfix)",     "port": 587,   "public": True,  "host": mail_host },
-		{ "name": "IMAPS (dovecot)",                      "port": 993,   "public": True,  "host": mail_host },
-		{ "name": "Mail Filters (Sieve/dovecot)",         "port": 4190,  "public": True,  "host": mail_host },
-		{ "name": "HTTP Web (nginx)",                     "port": 80,    "public": True },
-		{ "name": "HTTPS Web (nginx)",                    "port": 443,   "public": True },
+		{"name": "Local DNS (unbound)", "port": 53, "public": False, "host": dns_host},
+		{"name": "Dovecot LMTP LDA", "port": 10026, "public": False, "host": mail_host},
+		{"name": "Mail-in-a-Box Management Daemon", "port": 10222, "public": False},
+		{"name": "SSH Login (ssh)", "port": get_ssh_port(), "public": True},
+		{"name": "Public DNS (nsd4)", "port": 53, "public": True, "host": dns_host},
+		{"name": "Incoming Mail (SMTP/postfix)", "port": 25, "public": True, "host": mail_host},
+		{"name": "Outgoing Mail (SMTP 465/postfix)", "port": 465, "public": True, "host": mail_host},
+		{"name": "Outgoing Mail (SMTP 587/postfix)", "port": 587, "public": True, "host": mail_host},
+		{"name": "IMAPS (dovecot)", "port": 993, "public": True, "host": mail_host},
+		{"name": "Mail Filters (Sieve/dovecot)", "port": 4190, "public": True, "host": mail_host},
+		{"name": "HTTP Web (nginx)", "port": 80, "public": True},
+		{"name": "HTTPS Web (nginx)", "port": 443, "public": True},
 	]
 
 	if spam_filter == "rspamd":
 		# rspamd proxy worker (milter interface used by postfix) + its Redis backend
 		services += [
-			{ "name": "rspamd",  "port": 11332, "public": False, "host": rspamd_host },
-			{ "name": "Redis",   "port": 6379,  "public": False, "host": redis_host },
+			{"name": "rspamd", "port": 11332, "public": False, "host": rspamd_host},
+			{"name": "Redis", "port": 6379, "public": False, "host": redis_host},
 		]
 	else:
 		services += [
-			{ "name": "Postgrey",   "port": 10023, "public": False, "host": mail_host },
-			{ "name": "Spamassassin", "port": 10025, "public": False, "host": mail_host },
-			{ "name": "OpenDKIM",   "port": 8891,  "public": False, "host": mail_host },
-			{ "name": "OpenDMARC",  "port": 8893,  "public": False, "host": mail_host },
+			{"name": "Postgrey", "port": 10023, "public": False, "host": mail_host},
+			{"name": "Spamassassin", "port": 10025, "public": False, "host": mail_host},
+			{"name": "OpenDKIM", "port": 8891, "public": False, "host": mail_host},
+			{"name": "OpenDMARC", "port": 8893, "public": False, "host": mail_host},
 		]
 
 	if env.get("WEBMAIL_CLIENT", "oxi") == "oxi":
-		services.append({ "name": "oxi.email Webmail (oxi-email)", "port": 3001, "public": False, "host": webmail_host })
+		services.append({"name": "oxi.email Webmail (oxi-email)", "port": 3001, "public": False, "host": webmail_host})
 	return services
+
 
 _apt_updates = None
 _apt_updates_lock = threading.Lock()  # Prevent concurrent apt-get operations
+
 
 def list_apt_updates(apt_update=True):
 	# See if we have this information cached recently. Keep it for 8 hours.
@@ -183,18 +191,21 @@ def list_apt_updates(apt_update=True):
 				continue
 			m = re.match(r'^Inst (.*) \[(.*)\] \((\S*)', line)
 			if m:
-				pkgs.append({ "package": m.group(1), "version": m.group(3), "current_version": m.group(2) })
+				pkgs.append({"package": m.group(1), "version": m.group(3), "current_version": m.group(2)})
 			else:
-				pkgs.append({ "package": "[" + line + "]", "version": "", "current_version": "" })
+				pkgs.append({"package": "[" + line + "]", "version": "", "current_version": ""})
 
 		_apt_updates = (datetime.datetime.now(), pkgs)
 
 	return pkgs
 
+
 def is_reboot_needed_due_to_package_installation():
 	return os.path.exists("/var/run/reboot-required")
 
+
 _VERSION_FILE = "/usr/local/share/mailinabox/version"
+
 
 def what_version_is_this(env):
 	# Prefer the version written by the installer so this works even if the
@@ -205,16 +216,24 @@ def what_version_is_this(env):
 		if v:
 			return v
 	miab_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-	return shell("check_output", ["/usr/bin/git", "describe", "--always", "--abbrev=0"], env={"GIT_DIR": os.path.join(miab_dir, '.git')}).strip()
+	return shell("check_output", ["/usr/bin/git", "rev-parse", "HEAD"], env={"GIT_DIR": os.path.join(miab_dir, '.git')}).strip()
+
 
 def get_latest_miab_version():
-	# This pings https://mailinabox.email/setup.sh and extracts the tag named in
-	# the script to determine the current product version.
-	from urllib.request import urlopen, HTTPError, URLError
+	# Fetches the latest commit SHA on main from the GitHub API.
+	import json
+	from urllib.request import urlopen, Request, HTTPError, URLError
+
 	try:
-		return re.search(b'TAG=(.*)', urlopen("https://mailinabox.email/setup.sh?ping=1", timeout=5).read()).group(1).decode("utf8")
-	except (TimeoutError, HTTPError, URLError):
+		req = Request(
+			"https://api.github.com/repos/boomboompower/mailinabox/commits/main",
+			headers={"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"},
+		)
+		data = json.loads(urlopen(req, timeout=5).read())
+		return data["sha"]
+	except (TimeoutError, HTTPError, URLError, KeyError, ValueError):
 		return None
+
 
 def evaluate_spamhaus_code(zen):
 	"""Translate a Spamhaus-style RBL return code into (status, message). Shared
@@ -234,7 +253,9 @@ def evaluate_spamhaus_code(zen):
 		return "warning", "Too many queries have been performed on the spamhaus server. Could not determine blacklist status."
 	return "error", f"Listed in the Spamhaus block list (code {zen}), which may prevent recipients from receiving your mail."
 
+
 import socket
+
 
 def _try_connect(ip, port):
 	s = socket.socket(socket.AF_INET if ":" not in ip else socket.AF_INET6, socket.SOCK_STREAM)
@@ -247,6 +268,7 @@ def _try_connect(ip, port):
 		return False
 	finally:
 		s.close()
+
 
 def check_service_reachable(service, env):
 	"""Try to connect to a service's port. Returns (running: bool, error_message: str|None).
@@ -276,15 +298,18 @@ def check_service_reachable(service, env):
 	else:
 		return False, "%s is not running (port %d)." % (service['name'], service['port'])
 
+
 def alias_exists_message(alias_name, alias, env):
 	"""Returns (ok: bool, message: str) for whether a mail alias exists and has a destination."""
 	from mail.mailconfig import get_mail_aliases
+
 	mail_aliases = {address: receivers for address, receivers, *_ in get_mail_aliases(env)}
 	if alias in mail_aliases:
 		if mail_aliases[alias]:
 			return True, f"{alias_name} exists as a mail alias. [{alias} -> {mail_aliases[alias]}]"
 		return False, f"You must set the destination of the mail alias for {alias} to direct email to you or another administrator."
 	return False, f"You must add a mail alias for {alias} which directs email to you or another administrator."
+
 
 def is_docker():
 	return os.environ.get("RUNTIME") == "docker"

@@ -27,7 +27,9 @@ mkdir -p "$STORAGE_ROOT"
 link_conf_to_storage /etc/nsd nsd
 
 echo "Configuring DNS services..."
-source setup/infra/dns.sh
+cd "$MIAB/setup"
+python3 -m components.runner dns
+cd "$MIAB"
 
 # Write a Docker-specific unbound config. On bare metal unbound listens only on
 # 127.0.0.1; here it must answer on all interfaces so other containers can reach

@@ -32,6 +32,7 @@ if __name__ == "__main__":
 	elif sys.argv[-1] == "--status":
 		# Show backup status.
 		import rtyaml
+
 		ret = backup_status(load_environment())
 		print(rtyaml.dump(ret["backups"]))
 		print("Storage for unmatched files:", ret["unmatched_file_size"])

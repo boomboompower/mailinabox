@@ -9,6 +9,7 @@ from services.dns_update import get_custom_dns_config, get_dns_zones
 from services.ssl_certificates import get_ssl_certificates, get_domain_ssl_files, check_certificate
 from core.utils import shell, safe_domain_name, sort_domains
 
+
 def get_web_domains(env, include_www_redirects=True, include_auto=True, exclude_dns_elsewhere=True):
 	# What domains should we serve HTTP(S) for?
 	domains = set()
@@ -56,38 +57,42 @@ def get_domains_with_a_records(env):
 			domains.add(domain)
 	return domains
 
+
 def get_web_domains_with_root_overrides(env):
 	# Load custom settings so we can tell what domains have a redirect or proxy set up on '/',
 	# which means static hosting is not happening.
-	root_overrides = { }
+	root_overrides = {}
 	nginx_conf_custom_fn = os.path.join(env["STORAGE_ROOT"], "www/custom.yaml")
 	if os.path.exists(nginx_conf_custom_fn):
 		with open(nginx_conf_custom_fn, encoding='utf-8') as f:
 			custom_settings = rtyaml.load(f)
 		for domain, settings in custom_settings.items():
-			for type, value in [('redirect', settings.get('redirects', {}).get('/')),
-				('proxy', settings.get('proxies', {}).get('/'))]:
+			for type, value in [('redirect', settings.get('redirects', {}).get('/')), ('proxy', settings.get('proxies', {}).get('/'))]:
 				if value:
 					root_overrides[domain] = (type, value)
 	return root_overrides
 
+
 def get_php_fpm_socket():
-	# Mirrors setup/functions.sh's php_fpm_service(): Debian/Ubuntu's php-fpm
+	# Debian/Ubuntu's php-fpm
 	# packages always name their default pool socket
 	# /run/php/php{MAJOR}.{MINOR}-fpm.sock, so glob for whatever version is
 	# actually installed instead of hardcoding one that breaks the moment
 	# Ubuntu's default PHP version changes.
 	import glob
+
 	matches = sorted(glob.glob("/run/php/php*-fpm.sock"))
 	return matches[0] if matches else "/run/php/php8.3-fpm.sock"
+
 
 def do_web_update(env):
 	# Backend hostnames: 127.0.0.1 on bare metal; container service names in Docker.
 	# Set MANAGEMENT_HOST etc. in the environment to override (docker-compose does this).
 	env.setdefault('MANAGEMENT_HOST', os.environ.get('MANAGEMENT_HOST', '127.0.0.1'))
-	env.setdefault('RADICALE_HOST',   os.environ.get('RADICALE_HOST',   '127.0.0.1'))
-	env.setdefault('WEBMAIL_HOST',    os.environ.get('WEBMAIL_HOST',    '127.0.0.1'))
-	env.setdefault('FILEBROWSER_HOST',os.environ.get('FILEBROWSER_HOST','127.0.0.1'))
+	env.setdefault('RADICALE_HOST', os.environ.get('RADICALE_HOST', '127.0.0.1'))
+	env.setdefault('WEBMAIL_HOST', os.environ.get('WEBMAIL_HOST', '127.0.0.1'))
+	env.setdefault('FILEBROWSER_HOST', os.environ.get('FILEBROWSER_HOST', '127.0.0.1'))
+	env.setdefault('BESZEL_HUB_HOST', os.environ.get('BESZEL_HUB_HOST', '127.0.0.1'))
 
 	# Pre-load what SSL certificates we will use for each domain.
 	ssl_certificates = get_ssl_certificates(env)
@@ -95,6 +100,7 @@ def do_web_update(env):
 	# Helper for reading config files and templates
 	_NGINX_TEMPLATES = "/usr/local/share/mailinabox/nginx-templates"
 	_NGINX_TEMPLATES_FALLBACK = os.path.join(os.path.dirname(__file__), "../../setup/conf/nginx")
+
 	def read_conf(conf_fn):
 		base = _NGINX_TEMPLATES if os.path.isdir(_NGINX_TEMPLATES) else _NGINX_TEMPLATES_FALLBACK
 		with open(os.path.join(base, conf_fn), encoding='utf-8') as f:
@@ -121,11 +127,18 @@ def do_web_update(env):
 	# nginx_conf_extra that make_domain_config appends after).
 	primary_templates = [template0, template1, template2]
 
-	extras = []
+	extras = [read_conf("nginx-internal-auth.conf")]
 	if env.get('ENABLE_RADICALE', 'true') == 'true':
 		extras.append(read_conf("nginx-radicale.conf"))
 	if env.get('ENABLE_FILEBROWSER', 'true') == 'true':
 		extras.append(read_conf("nginx-filebrowser.conf"))
+	monitoring = env.get('MONITORING_TOOL', 'none')
+	if monitoring == 'netdata':
+		extras.append(read_conf("nginx-netdata.conf"))
+	elif monitoring == 'beszel':
+		user_file = os.path.join(env['STORAGE_ROOT'], 'beszel', 'beszel-user')
+		beszel_user = open(user_file).read().strip() if os.path.isfile(user_file) else ''
+		extras.append(read_conf("nginx-beszel.conf").replace('${BESZEL_USER}', beszel_user))
 
 	# The webmail catch-all (location /) depends on which client is selected.
 	# 'none' means no catch-all: the primary domain falls back to the same
@@ -177,12 +190,14 @@ def do_web_update(env):
 	# On first boot nginx may not be up yet (socket missing or not listening);
 	# swallow OSError - nginx will read the config when it starts.
 	from services.control_plane import reload as cp_reload
+
 	try:
 		cp_reload("nginx")
 	except OSError:
 		pass
 
 	return "web updated\n"
+
 
 def make_domain_config(domain, templates, ssl_certificates, env):
 	# GET SOME VARIABLES
@@ -201,10 +216,12 @@ def make_domain_config(domain, templates, ssl_certificates, env):
 	# can trigger an nginx update.
 	def hashfile(filepath):
 		import hashlib
+
 		sha1 = hashlib.sha1()
 		with open(filepath, 'rb') as f:
 			sha1.update(f.read())
 		return sha1.hexdigest()
+
 	nginx_conf_extra += "\t# ssl files sha1: {} / {}\n".format(hashfile(tls_cert["private-key"]), hashfile(tls_cert["certificate"]))
 
 	# Add in any user customizations in YAML format.
@@ -287,20 +304,23 @@ def make_domain_config(domain, templates, ssl_certificates, env):
 	nginx_conf = nginx_conf.replace("$ROOT", root)
 	nginx_conf = nginx_conf.replace("$SSL_KEY", tls_cert["private-key"])
 	nginx_conf = nginx_conf.replace("$SSL_CERTIFICATE", tls_cert["certificate"])
-	nginx_conf = nginx_conf.replace("$MANAGEMENT_HOST",  env.get('MANAGEMENT_HOST',  '127.0.0.1'))
-	nginx_conf = nginx_conf.replace("$RADICALE_HOST",    env.get('RADICALE_HOST',    '127.0.0.1'))
-	nginx_conf = nginx_conf.replace("$WEBMAIL_HOST",     env.get('WEBMAIL_HOST',     '127.0.0.1'))
+	nginx_conf = nginx_conf.replace("$MANAGEMENT_HOST", env.get('MANAGEMENT_HOST', '127.0.0.1'))
+	nginx_conf = nginx_conf.replace("$RADICALE_HOST", env.get('RADICALE_HOST', '127.0.0.1'))
+	nginx_conf = nginx_conf.replace("$WEBMAIL_HOST", env.get('WEBMAIL_HOST', '127.0.0.1'))
 	nginx_conf = nginx_conf.replace("$FILEBROWSER_HOST", env.get('FILEBROWSER_HOST', '127.0.0.1'))
-	nginx_conf = nginx_conf.replace("$PHP_FPM_SOCK",     get_php_fpm_socket())
-	return nginx_conf.replace("$REDIRECT_DOMAIN", re.sub(r"^www\.", "", domain)) # for default www redirects to parent domain
+	nginx_conf = nginx_conf.replace("$BESZEL_HUB_HOST", env.get('BESZEL_HUB_HOST', '127.0.0.1'))
+	nginx_conf = nginx_conf.replace("$PHP_FPM_SOCK", get_php_fpm_socket())
+	return nginx_conf.replace("$REDIRECT_DOMAIN", re.sub(r"^www\.", "", domain))  # for default www redirects to parent domain
 
 
 def get_web_root(domain, env, test_exists=True):
 	# Try STORAGE_ROOT/web/domain_name if it exists, but fall back to STORAGE_ROOT/web/default.
 	for test_domain in (domain, 'default'):
 		root = os.path.join(env["STORAGE_ROOT"], "www", safe_domain_name(test_domain))
-		if os.path.exists(root) or not test_exists: break
+		if os.path.exists(root) or not test_exists:
+			break
 	return root
+
 
 def get_web_domains_info(env):
 	www_redirects = set(get_web_domains(env)) - set(get_web_domains(env, include_www_redirects=False))
@@ -311,9 +331,10 @@ def get_web_domains_info(env):
 	def check_cert(domain):
 		try:
 			tls_cert = get_domain_ssl_files(domain, ssl_certificates, env, allow_missing_cert=True)
-		except OSError: # PRIMARY_HOSTNAME cert is missing
+		except OSError:  # PRIMARY_HOSTNAME cert is missing
 			tls_cert = None
-		if tls_cert is None: return ("danger", "No certificate installed.")
+		if tls_cert is None:
+			return ("danger", "No certificate installed.")
 		cert_status, cert_status_details = check_certificate(domain, tls_cert["certificate"], tls_cert["private-key"])
 		if cert_status == "OK":
 			return ("success", "Signed & valid. " + cert_status_details)
@@ -331,4 +352,3 @@ def get_web_domains_info(env):
 		}
 		for domain in get_web_domains(env)
 	]
-

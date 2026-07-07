@@ -1,6 +1,8 @@
 import { useAuthStore } from '@/stores/auth'
 import router from '@/router'
 
+const TIMEOUT_MS = 15_000
+
 export function useApi() {
   async function request(
     method: string,
@@ -28,7 +30,16 @@ export function useApi() {
       }
     }
 
-    const res = await fetch(url, init)
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
+    init.signal = controller.signal
+
+    let res: Response
+    try {
+      res = await fetch(url, init)
+    } finally {
+      clearTimeout(timer)
+    }
 
     if (res.status === 401 || res.status === 403) {
       useAuthStore().clearSession()

@@ -28,7 +28,9 @@ mkdir -p "$STORAGE_ROOT"
 link_conf_to_storage /etc/nginx/conf.d nginx/conf.d
 
 echo "Configuring nginx..."
-source setup/infra/web.sh
+cd "$MIAB/setup"
+python3 -m components.runner web
+cd "$MIAB"
 
 echo "Nginx setup complete. Waiting for management to write local.conf..."
 # web_update.py (running in the management container) writes local.conf to the

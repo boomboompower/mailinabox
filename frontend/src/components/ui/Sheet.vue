@@ -55,7 +55,7 @@ watch(open, async (val) => {
         <div class="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
           <h2 class="text-base font-semibold">{{ title }}</h2>
           <button
-            class="rounded-xl hover:bg-hover size-8 flex items-center justify-center transition"
+            class="rounded-xl hover:bg-hover size-8 flex items-center justify-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             aria-label="Close"
             @click="open = false"
           >

@@ -3,7 +3,7 @@
 # Backend binary + built frontend are fetched as a single prebuilt release
 # tarball from boomboompower/oxi-miab's release CI - nothing is compiled here.
 
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 SHELL ["/bin/bash", "-c"]
 
@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && rm -rf /var/lib/apt/lists/*
 
 # Pinned prebuilt release - keep these three in sync with
-# setup/webmail/oxi.sh's OXI_VERSION/OXI_ASSET/OXI_SHA256. The hash is
+# setup/components/defs/oxi.py's OXI_VERSION/OXI_ASSET/OXI_SHA256. The hash is
 # copied here from that release's checksums.txt, not fetched at build time -
 # fetching it from the same place as the binary would give a compromised
 # release nothing independent to be caught by.
@@ -43,8 +43,8 @@ RUN set -euo pipefail && \
     cp -a /tmp/oxi-extract/static/. /usr/local/share/oxi-email/static/ && \
     rm -rf /tmp/oxi.tar.gz /tmp/oxi-extract
 
-# Copy the MIAB repo so the entrypoint can source setup/webmail/oxi.sh if
-# needed (primarily for config file generation logic).
+# Copy the MIAB repo so the entrypoint has access to shared helpers
+# (common-entrypoint.sh) and the storage volume config path.
 COPY . /opt/mailinabox
 WORKDIR /opt/mailinabox
 

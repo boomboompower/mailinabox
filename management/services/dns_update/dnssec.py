@@ -6,6 +6,7 @@ import tempfile
 
 from core.utils import shell, load_env_vars_from_file
 
+
 def find_dnssec_signing_keys(domain, env):
 	# For key that we generated (one per algorithm)...
 	d = os.path.join(env['STORAGE_ROOT'], 'dns/dnssec')
@@ -28,6 +29,7 @@ def find_dnssec_signing_keys(domain, env):
 		for keytype in ("KSK", "ZSK"):
 			yield keytype, keyinfo[keytype]
 
+
 def hash_dnssec_keys(domain, env):
 	# Create a stable (by sorting the items) hash of all of the private keys
 	# that will be used to sign this domain.
@@ -36,9 +38,10 @@ def hash_dnssec_keys(domain, env):
 		oldkeyfn = os.path.join(env['STORAGE_ROOT'], 'dns/dnssec', keyfn + ".private")
 		keydata.extend((keytype, keyfn))
 		with open(oldkeyfn, encoding="utf-8") as fr:
-			keydata.append( fr.read() )
+			keydata.append(fr.read())
 	keydata = "".join(keydata).encode("utf8")
 	return hashlib.sha1(keydata).hexdigest()
+
 
 def sign_zone(domain, zonefile, env):
 	# Sign the zone with all of the keys that were generated during
@@ -76,22 +79,26 @@ def sign_zone(domain, zonefile, env):
 
 			# Put the patched key filename base (without extension) into the list of keys we'll sign with.
 			all_keys.append(newkeyfn)
-			if keytype == "KSK": ksk_keys.append(newkeyfn)
+			if keytype == "KSK":
+				ksk_keys.append(newkeyfn)
 
 		# Do the signing.
 		expiry_date = (datetime.datetime.now() + datetime.timedelta(days=30)).strftime("%Y%m%d")
-		shell('check_call', ["/usr/bin/ldns-signzone",
-			# expire the zone after 30 days
-			"-e", expiry_date,
-
-			# use NSEC3
-			"-n",
-
-			# zonefile to sign
-			"/etc/nsd/zones/" + zonefile,
-			# keys to sign with (order doesn't matter -- it'll figure it out)
-			*all_keys
-		])
+		shell(
+			'check_call',
+			[
+				"/usr/bin/ldns-signzone",
+				# expire the zone after 30 days
+				"-e",
+				expiry_date,
+				# use NSEC3
+				"-n",
+				# zonefile to sign
+				"/etc/nsd/zones/" + zonefile,
+				# keys to sign with (order doesn't matter -- it'll figure it out)
+				*all_keys,
+			],
+		)
 
 		# Create a DS record based on the patched-up key files. The DS record is specific to the
 		# zone being signed, so we can't use the .ds files generated when we created the keys.
@@ -105,11 +112,15 @@ def sign_zone(domain, zonefile, env):
 		with open("/etc/nsd/zones/" + zonefile + ".ds", "w", encoding="utf-8") as f:
 			for key in ksk_keys:
 				for digest_type in ('1', '2', '4'):
-					rr_ds = shell('check_output', ["/usr/bin/ldns-key2ds",
-						"-n", # output to stdout
-						"-" + digest_type, # 1=SHA1, 2=SHA256, 4=SHA384
-						key + ".key"
-					])
+					rr_ds = shell(
+						'check_output',
+						[
+							"/usr/bin/ldns-key2ds",
+							"-n",  # output to stdout
+							"-" + digest_type,  # 1=SHA1, 2=SHA256, 4=SHA384
+							key + ".key",
+						],
+					)
 					f.write(rr_ds)
 
 	finally:

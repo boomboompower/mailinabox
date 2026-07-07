@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
-import { KeyRound, WifiOff } from 'lucide-vue-next'
+import { KeyRound } from 'lucide-vue-next'
 import { startRegistration } from '@simplewebauthn/browser'
+import AsyncState from '@/components/ui/AsyncState.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
+import PageHeader from '@/components/ui/PageHeader.vue'
 import SectionHeader from '@/components/ui/SectionHeader.vue'
 import Field from '@/components/ui/Field.vue'
 import Input from '@/components/ui/Input.vue'
@@ -39,6 +41,13 @@ const enrolling = ref(false)
 const disableOpen = ref(false)
 const disableTarget = ref<MfaEntry | null>(null)
 const disabling = ref(false)
+
+const disableDescription = computed(() => {
+  if (disableTarget.value?.type === 'totp') {
+    return 'You will be logged out and can log back in without a one-time code.'
+  }
+  return `Remove "${disableTarget.value?.name || 'this passkey'}"? You will no longer be able to sign in with it.`
+})
 
 // Passkey add state
 const showAddPasskey = ref(false)
@@ -154,6 +163,7 @@ async function addPasskey(): Promise<void> {
     await load()
   } catch (e) {
     if (e instanceof Error && e.name !== 'NotAllowedError') {
+      console.error('Failed to add a passkey', e)
       toast.error('Failed to add passkey.')
     }
   } finally {
@@ -166,104 +176,86 @@ onMounted(load)
 
 <template>
   <AppLayout>
-    <h1 class="text-2xl font-semibold mb-6">Two-Factor Authentication</h1>
+    <PageHeader title="Two-Factor Authentication" description="Protect your admin account with a second login step." />
 
-    <p class="text-sm text-muted mb-6">
-      Two-factor authentication adds an extra layer of security to this control panel.
-      It does not protect email access - use a strong password for that.
-    </p>
-
-    <!-- Top-level error state replaces both cards -->
-    <EmptyState
-      v-if="loadError"
-      title="Could not load MFA settings"
-      description="The server did not respond. Check your connection and try again."
-    >
-      <template #icon>
-        <WifiOff/>
+    <AsyncState :loading="loading" :error="loadError" :empty="false" error-title="Could not load MFA settings" @retry="load">
+      <template #loading>
+        <SectionHeader title="Passkeys" />
+        <Card class="p-5 mb-6">
+          <Skeleton class="h-4 w-48 mb-3"/>
+          <Skeleton class="h-9 w-32"/>
+        </Card>
+        <SectionHeader title="Authenticator App (TOTP)" />
+        <Card class="p-5">
+          <Skeleton class="h-4 w-64 mb-3"/>
+          <Skeleton class="h-9 w-40"/>
+        </Card>
       </template>
-      <template #action>
-        <Button variant="secondary" @click="load">Try again</Button>
-      </template>
-    </EmptyState>
 
-    <template v-else>
       <!-- Passkeys Section -->
       <SectionHeader title="Passkeys" />
       <Card class="p-5 mb-6">
-        <template v-if="loading">
-          <Skeleton class="h-4 w-48 mb-3"/>
-          <Skeleton class="h-9 w-32"/>
+        <!-- Existing passkeys -->
+        <div v-if="passkeyEntries.length > 0" class="mb-4 divide-y divide-border">
+          <div
+            v-for="entry in passkeyEntries"
+            :key="entry.id"
+            class="flex items-center justify-between py-3 first:pt-0 last:pb-0"
+          >
+            <div>
+              <p class="text-sm font-medium">{{ entry.name || 'Unnamed passkey' }}</p>
+              <p v-if="entry.last_used" class="text-xs text-muted mt-0.5">Last used {{ entry.last_used }}</p>
+              <p v-else class="text-xs text-muted mt-0.5">Never used</p>
+            </div>
+            <Button variant="ghost" size="sm" @click="openDisable(entry)">Remove</Button>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <EmptyState
+          v-else-if="!showAddPasskey"
+          title="No passkeys registered"
+          description="Passkeys let you sign in with your fingerprint, face, or device PIN."
+          class="py-4"
+        >
+          <template #icon>
+            <KeyRound/>
+          </template>
+          <template #action>
+            <Button @click="showAddPasskey = true">Add a passkey</Button>
+          </template>
+        </EmptyState>
+
+        <!-- Add passkey button (when passkeys exist) -->
+        <template v-if="passkeyEntries.length > 0 && !showAddPasskey">
+          <Divider class="mt-4" />
+          <div class="pt-4">
+            <Button variant="secondary" @click="showAddPasskey = true">Add a passkey</Button>
+          </div>
         </template>
 
-        <template v-else>
-          <!-- Existing passkeys -->
-          <div v-if="passkeyEntries.length > 0" class="mb-4 divide-y divide-border">
-            <div
-              v-for="entry in passkeyEntries"
-              :key="entry.id"
-              class="flex items-center justify-between py-3 first:pt-0 last:pb-0"
-            >
-              <div>
-                <p class="text-sm font-medium">{{ entry.name || 'Unnamed passkey' }}</p>
-                <p v-if="entry.last_used" class="text-xs text-muted mt-0.5">Last used {{ entry.last_used }}</p>
-                <p v-else class="text-xs text-muted mt-0.5">Never used</p>
-              </div>
-              <Button variant="ghost" size="sm" @click="openDisable(entry)">Remove</Button>
+        <!-- Add passkey form -->
+        <template v-if="showAddPasskey">
+          <Divider v-if="passkeyEntries.length > 0" class="mt-4"/>
+          <div :class="{ 'pt-4': passkeyEntries.length > 0 }">
+            <label for="passkeyName" class="block text-sm font-medium mb-2">Name this passkey:</label>
+            <div class="flex gap-2 max-w-sm">
+              <Input id="passkeyName" v-model="passkeyName" placeholder="e.g. My MacBook"/>
+              <Button :disabled="!passkeyName.trim() || addingPasskey" @click="addPasskey">
+                {{ addingPasskey ? 'Adding...' : 'Add' }}
+              </Button>
+              <Button variant="ghost" @click="showAddPasskey = false; passkeyName = ''">Cancel</Button>
             </div>
+            <p class="text-xs text-muted mt-1.5">Your browser will prompt you to create a passkey.</p>
           </div>
-
-          <!-- Empty state -->
-          <EmptyState
-            v-else-if="!showAddPasskey"
-            title="No passkeys registered"
-            description="Passkeys let you sign in with your fingerprint, face, or device PIN."
-            class="py-4"
-          >
-            <template #icon>
-              <KeyRound/>
-            </template>
-            <template #action>
-              <Button @click="showAddPasskey = true">Add a passkey</Button>
-            </template>
-          </EmptyState>
-
-          <!-- Add passkey button (when passkeys exist) -->
-          <template v-if="passkeyEntries.length > 0 && !showAddPasskey">
-            <Divider class="mt-4" />
-            <div class="pt-4">
-              <Button variant="secondary" @click="showAddPasskey = true">Add a passkey</Button>
-            </div>
-          </template>
-
-          <!-- Add passkey form -->
-          <template v-if="showAddPasskey">
-            <Divider v-if="passkeyEntries.length > 0" class="mt-4"/>
-            <div :class="{ 'pt-4': passkeyEntries.length > 0 }">
-              <label for="passkeyName" class="block text-sm font-medium mb-2">Name this passkey:</label>
-              <div class="flex gap-2 max-w-sm">
-                <Input id="passkeyName" v-model="passkeyName" placeholder="e.g. My MacBook"/>
-                <Button :disabled="!passkeyName.trim() || addingPasskey" @click="addPasskey">
-                  {{ addingPasskey ? 'Adding...' : 'Add' }}
-                </Button>
-                <Button variant="ghost" @click="showAddPasskey = false; passkeyName = ''">Cancel</Button>
-              </div>
-              <p class="text-xs text-muted mt-1.5">Your browser will prompt you to create a passkey.</p>
-            </div>
-          </template>
         </template>
       </Card>
 
       <!-- TOTP Section -->
       <SectionHeader title="Authenticator App (TOTP)" />
       <Card class="p-5">
-        <template v-if="loading">
-          <Skeleton class="h-4 w-64 mb-3"/>
-          <Skeleton class="h-9 w-40"/>
-        </template>
-
         <!-- TOTP active -->
-        <template v-else-if="totpEntries.length > 0">
+        <template v-if="totpEntries.length > 0">
           <div v-for="entry in totpEntries" :key="entry.id" class="flex items-center justify-between">
             <div class="flex items-center gap-3">
               <Badge variant="success">Active</Badge>
@@ -277,9 +269,12 @@ onMounted(load)
         </template>
 
         <!-- TOTP empty state -->
-        <template v-else-if="!totpSetup">
-          <p class="text-sm text-muted">No TOTP configured. Refresh the page if this persists.</p>
-        </template>
+        <EmptyState
+          v-else-if="!totpSetup"
+          title="No authenticator app configured"
+          description="Refresh the page if this persists."
+          class="py-4"
+        />
 
         <!-- TOTP setup form -->
         <template v-else>
@@ -339,15 +334,13 @@ onMounted(load)
           </div>
         </template>
       </Card>
-    </template>
+    </AsyncState>
 
     <!-- Disable confirm dialog -->
     <Dialog
       v-model="disableOpen"
       :title="disableTarget?.type === 'totp' ? 'Disable TOTP?' : 'Remove passkey?'"
-      :description="disableTarget?.type === 'totp'
-        ? 'You will be logged out and can log back in without a one-time code.'
-        : `Remove &quot;${disableTarget?.name || 'this passkey'}&quot;? You will no longer be able to sign in with it.`"
+      :description="disableDescription"
     >
       <template #actions>
         <Button variant="secondary" @click="disableOpen = false">Cancel</Button>

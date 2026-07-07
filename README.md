@@ -188,10 +188,10 @@ python3 setup/boxctl baremetal
 Or run the installer directly if you already have a config:
 
 ```bash
-sudo setup/start.sh
+sudo setup/install.sh
 ```
 
-Re-running `setup/start.sh` at any time is safe - it is fully idempotent.
+Re-running `sudo setup/install.sh` at any time is safe - it is fully idempotent.
 
 ## API
 

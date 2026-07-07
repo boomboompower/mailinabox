@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
 import { Settings2, Send, CheckCircle, XCircle } from 'lucide-vue-next'
+import AsyncState from '@/components/ui/AsyncState.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -43,6 +44,7 @@ const PROVIDERS: Record<ProviderId, ProviderPreset> = {
 }
 
 const loading = ref(true)
+const loadError = ref(false)
 const saving = ref(false)
 const testing = ref(false)
 const sendingTest = ref(false)
@@ -133,10 +135,12 @@ function openSheet(): void {
 
 async function load(): Promise<void> {
   loading.value = true
+  loadError.value = false
   try {
     const res = await api.get('/admin/system/relay')
     current.value = await res.json()
   } catch {
+    loadError.value = true
     toast.error('Failed to load relay configuration.')
   } finally {
     loading.value = false
@@ -216,20 +220,23 @@ onMounted(load)
 
 <template>
   <AppLayout>
-    <PageHeader title="Outbound Mail Relay">
+    <PageHeader title="Outbound Mail Relay" description="Send outbound mail through an external mail provider.">
       <template #actions>
         <Button variant="secondary" size="sm" @click="openSheet"><Settings2 class="size-3.5" />Configure</Button>
       </template>
     </PageHeader>
 
     <!-- Status card -->
-    <Card v-if="loading" class="p-5 space-y-3">
-      <Skeleton class="h-5 w-32" />
-      <Skeleton class="h-4 w-64" />
-      <Skeleton class="h-4 w-48" />
-    </Card>
+    <AsyncState :loading="loading" :error="loadError" error-title="Could not load relay configuration" @retry="load">
+      <template #loading>
+        <Card class="p-5 space-y-3">
+          <Skeleton class="h-5 w-32" />
+          <Skeleton class="h-4 w-64" />
+          <Skeleton class="h-4 w-48" />
+        </Card>
+      </template>
 
-    <Card v-else class="p-5">
+      <Card class="p-5">
       <!-- Active relay -->
       <template v-if="isActive">
         <div class="flex items-start justify-between gap-4 mb-4">
@@ -306,6 +313,7 @@ onMounted(load)
         </div>
       </template>
     </Card>
+    </AsyncState>
 
     <Sheet v-model="sheetOpen" title="Relay Configuration">
       <div class="space-y-5">
@@ -366,7 +374,7 @@ onMounted(load)
         <Button v-else class="w-full" :disabled="saving" @click="save">
           {{ saving ? 'Saving...' : 'Disable Relay' }}
         </Button>
-        <p v-if="testResult" class="text-xs" :class="testResult.ok ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+        <p v-if="testResult" class="text-xs" :class="testResult.ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'">
           {{ testResult.message }}
         </p>
       </div>

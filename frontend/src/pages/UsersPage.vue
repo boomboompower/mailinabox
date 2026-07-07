@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { toast } from 'vue-sonner'
 import { UserPlus } from 'lucide-vue-next'
+import AsyncState from '@/components/ui/AsyncState.vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Button from '@/components/ui/Button.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -26,6 +27,7 @@ const auth = useAuthStore()
 
 const users = ref<MailUser[]>([])
 const loading = ref(true)
+const loadError = ref(false)
 const search = ref('')
 const sheetOpen = ref(false)
 const deleteOpen = ref(false)
@@ -43,11 +45,13 @@ const filteredUsers = computed(() =>
 
 async function load(): Promise<void> {
   loading.value = true
+  loadError.value = false
   try {
     const res = await api.get('/admin/mail/users?format=json')
     const domains: MailUserDomain[] = await res.json()
     users.value = domains.flatMap(d => d.users).filter(u => u.status === 'active')
   } catch {
+    loadError.value = true
     toast.error('Failed to load users.')
   } finally {
     loading.value = false
@@ -147,7 +151,7 @@ onMounted(load)
 
 <template>
   <AppLayout>
-    <PageHeader title="Users">
+    <PageHeader title="Users" description="Add or remove accounts that can send and receive mail on this box.">
       <template #actions>
         <Button size="sm" @click="openAdd"><UserPlus class="size-3.5" />Add User</Button>
       </template>
@@ -157,33 +161,44 @@ onMounted(load)
       <Input v-model="search" placeholder="Search users..." aria-label="Search users" />
     </div>
 
-    <Table>
-      <TableHead>
-        <Th class="w-full">Email</Th>
-        <Th class="whitespace-nowrap">Privileges</Th>
-        <Th class="whitespace-nowrap">Quota</Th>
-        <th scope="col" class="px-4 py-3"></th>
-      </TableHead>
-      <tbody>
-        <template v-if="loading">
-          <TableRow v-for="i in 4" :key="i">
-            <td class="px-4 py-3"><Skeleton class="h-4 w-48" /></td>
-            <td class="px-4 py-3"><Skeleton class="h-4 w-16" /></td>
-            <td class="px-4 py-3"><Skeleton class="h-4 w-20" /></td>
-            <td class="px-4 py-3"></td>
-          </TableRow>
-        </template>
-        <template v-else>
-          <TableRow
-            v-for="user in filteredUsers"
-            :key="user.email"
-            clickable
-            @click="openEdit(user)"
-          >
+    <AsyncState :loading="loading" :error="loadError" :empty="users.length === 0" error-title="Could not load users" @retry="load">
+      <template #loading>
+        <Table>
+          <TableHead>
+            <Th class="w-full">Email</Th>
+            <Th class="whitespace-nowrap">Privileges</Th>
+            <Th class="whitespace-nowrap">Quota</Th>
+            <Th />
+          </TableHead>
+          <tbody>
+            <TableRow v-for="i in 2" :key="i">
+              <td class="px-4 py-3"><Skeleton class="h-4 w-48" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-16" /></td>
+              <td class="px-4 py-3"><Skeleton class="h-4 w-20" /></td>
+              <td class="px-4 py-3"></td>
+            </TableRow>
+          </tbody>
+        </Table>
+      </template>
+
+      <template #empty>
+        <EmptyState title="No mail users" description="Create your first account to get started.">
+          <template #icon><UserPlus /></template>
+          <template #action><Button @click="openAdd">Add User</Button></template>
+        </EmptyState>
+      </template>
+
+      <Table>
+        <TableHead>
+          <Th class="w-full">Email</Th>
+          <Th class="whitespace-nowrap">Privileges</Th>
+          <Th class="whitespace-nowrap">Quota</Th>
+          <Th />
+        </TableHead>
+        <tbody>
+          <TableRow v-for="user in filteredUsers" :key="user.email" clickable @click="openEdit(user)">
             <td class="px-4 py-3 font-medium">{{ user.email }}</td>
-            <td class="px-4 py-3">
-              <Badge v-if="user.privileges.includes('admin')">admin</Badge>
-            </td>
+            <td class="px-4 py-3"><Badge v-if="user.privileges.includes('admin')">admin</Badge></td>
             <td class="px-4 py-3 text-sm text-muted">
               {{ user.quota === '0' ? 'unlimited' : user.quota }}
               <span v-if="user.percent?.trim()" class="ml-1 text-xs">({{ user.percent.trim() }})</span>
@@ -192,20 +207,12 @@ onMounted(load)
               <Button variant="ghost" size="sm" @click.stop="openEdit(user)">Edit</Button>
             </td>
           </TableRow>
-        </template>
-      </tbody>
-    </Table>
-
-    <EmptyState
-      v-if="!loading && users.length === 0"
-      title="No mail users"
-      description="Create your first account to get started."
-    >
-      <template #icon><UserPlus /></template>
-      <template #action>
-        <Button @click="openAdd">Add User</Button>
-      </template>
-    </EmptyState>
+          <tr v-if="filteredUsers.length === 0">
+            <td colspan="4" class="px-4 py-8 text-center text-sm text-muted">No users match your search.</td>
+          </tr>
+        </tbody>
+      </Table>
+    </AsyncState>
 
     <Sheet v-model="sheetOpen" :title="editingUser ? 'Edit User' : 'Add User'">
       <template v-if="editingUser" #danger>
@@ -249,11 +256,16 @@ onMounted(load)
           <label for="fAdmin" class="text-sm">Administrator</label>
         </div>
 
-        <Button class="w-full" :disabled="saving" @click="save">
-          {{ saving ? 'Saving...' : editingUser ? 'Save Changes' : 'Add User' }}
-        </Button>
-
       </div>
+
+      <template #footer>
+        <div class="flex gap-2 justify-end">
+          <Button variant="secondary" @click="sheetOpen = false">Cancel</Button>
+          <Button :disabled="saving" @click="save">
+            {{ saving ? 'Saving...' : editingUser ? 'Save Changes' : 'Add User' }}
+          </Button>
+        </div>
+      </template>
     </Sheet>
 
     <Dialog

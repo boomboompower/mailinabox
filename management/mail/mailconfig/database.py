@@ -3,6 +3,7 @@ import sqlite3
 
 _DB_SUBPATH = "/mail/db/users.sqlite"
 
+
 def initialize_database(env):
 	# Create tables if they don't exist. Called once at daemon startup and
 	# once from users.sh during setup.
@@ -61,6 +62,17 @@ def initialize_database(env):
 			last_used TEXT,
 			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 		);
+		CREATE TABLE IF NOT EXISTS mail_keys (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			slot_type TEXT NOT NULL,
+			slot_label TEXT,
+			wrapped_key BLOB NOT NULL,
+			nonce BLOB NOT NULL,
+			kdf_salt BLOB NOT NULL,
+			created_at TEXT NOT NULL DEFAULT (datetime('now')),
+			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+		);
 	""")
 	conn.commit()
 	conn.close()
@@ -69,6 +81,7 @@ def initialize_database(env):
 	# members (postfix proxymap, dovecot auth-workers) without any further
 	# intervention regardless of which process creates -shm first.
 	os.chmod(db_path, 0o660)
+
 
 def open_database(env, with_connection=False):
 	conn = sqlite3.connect(env["STORAGE_ROOT"] + _DB_SUBPATH)
