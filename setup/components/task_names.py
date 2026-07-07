@@ -27,3 +27,6 @@ DKIM_POSTFIX_MILTERS = "dkim:postfix-milters"
 
 # management - duplicity pip-install depends on the management venv existing first
 MANAGEMENT_VIRTUALENV = "management:virtualenv"
+
+# ssl - self-signed cert generation; oxi's config references the cert paths
+SSL_CERT = "ssl:cert"

@@ -19,6 +19,7 @@ from doit.tools import config_changed
 
 from ... import artifacts, SETUP_DIR
 from ...component import Component
+from ...task_names import SSL_CERT
 
 # ── Component declaration ─────────────────────────────────────────────────────
 
@@ -69,7 +70,7 @@ def make_tasks(env: dict, runtime: str) -> list[dict]:
 		{
 			"name": "config",
 			"uptodate": [False],
-			"task_dep": ["oxi:fetch", "ssl:cert"],
+			"task_dep": ["oxi:fetch", SSL_CERT],
 			"actions": [(_config, [storage_root, hostname, pgp_enabled])],
 		},
 	]
@@ -159,11 +160,11 @@ def _config(storage_root: str, hostname: str, pgp_enabled: bool) -> None:
 		"PORT=3001",
 		f"IMAP_HOST={hostname}",
 		"IMAP_PORT=993",
-		f"IMAP_CONNECT_HOST=127.0.0.1",
+		"IMAP_CONNECT_HOST=127.0.0.1",
 		"TLS_ENABLED=true",
 		f"SMTP_HOST={hostname}",
 		"SMTP_PORT=587",
-		f"SMTP_CONNECT_HOST=127.0.0.1",
+		"SMTP_CONNECT_HOST=127.0.0.1",
 		"ALLOW_CUSTOM_MAIL_SERVERS=false",
 		f"DATA_DIR={storage_root}/oxi",
 		f"STATIC_DIR={_OXI_STATIC_DIR}",
