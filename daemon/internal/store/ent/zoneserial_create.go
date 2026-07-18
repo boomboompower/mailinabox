@@ -22,36 +22,36 @@ type ZoneSerialCreate struct {
 }
 
 // SetZone sets the "zone" field.
-func (zsc *ZoneSerialCreate) SetZone(s string) *ZoneSerialCreate {
-	zsc.mutation.SetZone(s)
-	return zsc
+func (_c *ZoneSerialCreate) SetZone(v string) *ZoneSerialCreate {
+	_c.mutation.SetZone(v)
+	return _c
 }
 
 // SetSerial sets the "serial" field.
-func (zsc *ZoneSerialCreate) SetSerial(i int64) *ZoneSerialCreate {
-	zsc.mutation.SetSerial(i)
-	return zsc
+func (_c *ZoneSerialCreate) SetSerial(v int64) *ZoneSerialCreate {
+	_c.mutation.SetSerial(v)
+	return _c
 }
 
 // SetContentHash sets the "content_hash" field.
-func (zsc *ZoneSerialCreate) SetContentHash(s string) *ZoneSerialCreate {
-	zsc.mutation.SetContentHash(s)
-	return zsc
+func (_c *ZoneSerialCreate) SetContentHash(v string) *ZoneSerialCreate {
+	_c.mutation.SetContentHash(v)
+	return _c
 }
 
 // Mutation returns the ZoneSerialMutation object of the builder.
-func (zsc *ZoneSerialCreate) Mutation() *ZoneSerialMutation {
-	return zsc.mutation
+func (_c *ZoneSerialCreate) Mutation() *ZoneSerialMutation {
+	return _c.mutation
 }
 
 // Save creates the ZoneSerial in the database.
-func (zsc *ZoneSerialCreate) Save(ctx context.Context) (*ZoneSerial, error) {
-	return withHooks(ctx, zsc.sqlSave, zsc.mutation, zsc.hooks)
+func (_c *ZoneSerialCreate) Save(ctx context.Context) (*ZoneSerial, error) {
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (zsc *ZoneSerialCreate) SaveX(ctx context.Context) *ZoneSerial {
-	v, err := zsc.Save(ctx)
+func (_c *ZoneSerialCreate) SaveX(ctx context.Context) *ZoneSerial {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -59,40 +59,40 @@ func (zsc *ZoneSerialCreate) SaveX(ctx context.Context) *ZoneSerial {
 }
 
 // Exec executes the query.
-func (zsc *ZoneSerialCreate) Exec(ctx context.Context) error {
-	_, err := zsc.Save(ctx)
+func (_c *ZoneSerialCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (zsc *ZoneSerialCreate) ExecX(ctx context.Context) {
-	if err := zsc.Exec(ctx); err != nil {
+func (_c *ZoneSerialCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (zsc *ZoneSerialCreate) check() error {
-	if _, ok := zsc.mutation.Zone(); !ok {
+func (_c *ZoneSerialCreate) check() error {
+	if _, ok := _c.mutation.Zone(); !ok {
 		return &ValidationError{Name: "zone", err: errors.New(`ent: missing required field "ZoneSerial.zone"`)}
 	}
-	if v, ok := zsc.mutation.Zone(); ok {
+	if v, ok := _c.mutation.Zone(); ok {
 		if err := zoneserial.ZoneValidator(v); err != nil {
 			return &ValidationError{Name: "zone", err: fmt.Errorf(`ent: validator failed for field "ZoneSerial.zone": %w`, err)}
 		}
 	}
-	if _, ok := zsc.mutation.Serial(); !ok {
+	if _, ok := _c.mutation.Serial(); !ok {
 		return &ValidationError{Name: "serial", err: errors.New(`ent: missing required field "ZoneSerial.serial"`)}
 	}
-	if v, ok := zsc.mutation.Serial(); ok {
+	if v, ok := _c.mutation.Serial(); ok {
 		if err := zoneserial.SerialValidator(v); err != nil {
 			return &ValidationError{Name: "serial", err: fmt.Errorf(`ent: validator failed for field "ZoneSerial.serial": %w`, err)}
 		}
 	}
-	if _, ok := zsc.mutation.ContentHash(); !ok {
+	if _, ok := _c.mutation.ContentHash(); !ok {
 		return &ValidationError{Name: "content_hash", err: errors.New(`ent: missing required field "ZoneSerial.content_hash"`)}
 	}
-	if v, ok := zsc.mutation.ContentHash(); ok {
+	if v, ok := _c.mutation.ContentHash(); ok {
 		if err := zoneserial.ContentHashValidator(v); err != nil {
 			return &ValidationError{Name: "content_hash", err: fmt.Errorf(`ent: validator failed for field "ZoneSerial.content_hash": %w`, err)}
 		}
@@ -100,12 +100,12 @@ func (zsc *ZoneSerialCreate) check() error {
 	return nil
 }
 
-func (zsc *ZoneSerialCreate) sqlSave(ctx context.Context) (*ZoneSerial, error) {
-	if err := zsc.check(); err != nil {
+func (_c *ZoneSerialCreate) sqlSave(ctx context.Context) (*ZoneSerial, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := zsc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, zsc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -113,26 +113,26 @@ func (zsc *ZoneSerialCreate) sqlSave(ctx context.Context) (*ZoneSerial, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	zsc.mutation.id = &_node.ID
-	zsc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (zsc *ZoneSerialCreate) createSpec() (*ZoneSerial, *sqlgraph.CreateSpec) {
+func (_c *ZoneSerialCreate) createSpec() (*ZoneSerial, *sqlgraph.CreateSpec) {
 	var (
-		_node = &ZoneSerial{config: zsc.config}
+		_node = &ZoneSerial{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(zoneserial.Table, sqlgraph.NewFieldSpec(zoneserial.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = zsc.conflict
-	if value, ok := zsc.mutation.Zone(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.Zone(); ok {
 		_spec.SetField(zoneserial.FieldZone, field.TypeString, value)
 		_node.Zone = value
 	}
-	if value, ok := zsc.mutation.Serial(); ok {
+	if value, ok := _c.mutation.Serial(); ok {
 		_spec.SetField(zoneserial.FieldSerial, field.TypeInt64, value)
 		_node.Serial = value
 	}
-	if value, ok := zsc.mutation.ContentHash(); ok {
+	if value, ok := _c.mutation.ContentHash(); ok {
 		_spec.SetField(zoneserial.FieldContentHash, field.TypeString, value)
 		_node.ContentHash = value
 	}
@@ -155,10 +155,10 @@ func (zsc *ZoneSerialCreate) createSpec() (*ZoneSerial, *sqlgraph.CreateSpec) {
 //			SetZone(v+v).
 //		}).
 //		Exec(ctx)
-func (zsc *ZoneSerialCreate) OnConflict(opts ...sql.ConflictOption) *ZoneSerialUpsertOne {
-	zsc.conflict = opts
+func (_c *ZoneSerialCreate) OnConflict(opts ...sql.ConflictOption) *ZoneSerialUpsertOne {
+	_c.conflict = opts
 	return &ZoneSerialUpsertOne{
-		create: zsc,
+		create: _c,
 	}
 }
 
@@ -168,10 +168,10 @@ func (zsc *ZoneSerialCreate) OnConflict(opts ...sql.ConflictOption) *ZoneSerialU
 //	client.ZoneSerial.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (zsc *ZoneSerialCreate) OnConflictColumns(columns ...string) *ZoneSerialUpsertOne {
-	zsc.conflict = append(zsc.conflict, sql.ConflictColumns(columns...))
+func (_c *ZoneSerialCreate) OnConflictColumns(columns ...string) *ZoneSerialUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &ZoneSerialUpsertOne{
-		create: zsc,
+		create: _c,
 	}
 }
 
@@ -361,16 +361,16 @@ type ZoneSerialCreateBulk struct {
 }
 
 // Save creates the ZoneSerial entities in the database.
-func (zscb *ZoneSerialCreateBulk) Save(ctx context.Context) ([]*ZoneSerial, error) {
-	if zscb.err != nil {
-		return nil, zscb.err
+func (_c *ZoneSerialCreateBulk) Save(ctx context.Context) ([]*ZoneSerial, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(zscb.builders))
-	nodes := make([]*ZoneSerial, len(zscb.builders))
-	mutators := make([]Mutator, len(zscb.builders))
-	for i := range zscb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*ZoneSerial, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := zscb.builders[i]
+			builder := _c.builders[i]
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ZoneSerialMutation)
 				if !ok {
@@ -383,12 +383,12 @@ func (zscb *ZoneSerialCreateBulk) Save(ctx context.Context) ([]*ZoneSerial, erro
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, zscb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = zscb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, zscb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -412,7 +412,7 @@ func (zscb *ZoneSerialCreateBulk) Save(ctx context.Context) ([]*ZoneSerial, erro
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, zscb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -420,8 +420,8 @@ func (zscb *ZoneSerialCreateBulk) Save(ctx context.Context) ([]*ZoneSerial, erro
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (zscb *ZoneSerialCreateBulk) SaveX(ctx context.Context) []*ZoneSerial {
-	v, err := zscb.Save(ctx)
+func (_c *ZoneSerialCreateBulk) SaveX(ctx context.Context) []*ZoneSerial {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -429,14 +429,14 @@ func (zscb *ZoneSerialCreateBulk) SaveX(ctx context.Context) []*ZoneSerial {
 }
 
 // Exec executes the query.
-func (zscb *ZoneSerialCreateBulk) Exec(ctx context.Context) error {
-	_, err := zscb.Save(ctx)
+func (_c *ZoneSerialCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (zscb *ZoneSerialCreateBulk) ExecX(ctx context.Context) {
-	if err := zscb.Exec(ctx); err != nil {
+func (_c *ZoneSerialCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -456,10 +456,10 @@ func (zscb *ZoneSerialCreateBulk) ExecX(ctx context.Context) {
 //			SetZone(v+v).
 //		}).
 //		Exec(ctx)
-func (zscb *ZoneSerialCreateBulk) OnConflict(opts ...sql.ConflictOption) *ZoneSerialUpsertBulk {
-	zscb.conflict = opts
+func (_c *ZoneSerialCreateBulk) OnConflict(opts ...sql.ConflictOption) *ZoneSerialUpsertBulk {
+	_c.conflict = opts
 	return &ZoneSerialUpsertBulk{
-		create: zscb,
+		create: _c,
 	}
 }
 
@@ -469,10 +469,10 @@ func (zscb *ZoneSerialCreateBulk) OnConflict(opts ...sql.ConflictOption) *ZoneSe
 //	client.ZoneSerial.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (zscb *ZoneSerialCreateBulk) OnConflictColumns(columns ...string) *ZoneSerialUpsertBulk {
-	zscb.conflict = append(zscb.conflict, sql.ConflictColumns(columns...))
+func (_c *ZoneSerialCreateBulk) OnConflictColumns(columns ...string) *ZoneSerialUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &ZoneSerialUpsertBulk{
-		create: zscb,
+		create: _c,
 	}
 }
 

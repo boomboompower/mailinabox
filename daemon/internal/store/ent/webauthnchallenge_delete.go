@@ -20,56 +20,56 @@ type WebAuthnChallengeDelete struct {
 }
 
 // Where appends a list predicates to the WebAuthnChallengeDelete builder.
-func (wacd *WebAuthnChallengeDelete) Where(ps ...predicate.WebAuthnChallenge) *WebAuthnChallengeDelete {
-	wacd.mutation.Where(ps...)
-	return wacd
+func (_d *WebAuthnChallengeDelete) Where(ps ...predicate.WebAuthnChallenge) *WebAuthnChallengeDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (wacd *WebAuthnChallengeDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, wacd.sqlExec, wacd.mutation, wacd.hooks)
+func (_d *WebAuthnChallengeDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wacd *WebAuthnChallengeDelete) ExecX(ctx context.Context) int {
-	n, err := wacd.Exec(ctx)
+func (_d *WebAuthnChallengeDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (wacd *WebAuthnChallengeDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *WebAuthnChallengeDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(webauthnchallenge.Table, sqlgraph.NewFieldSpec(webauthnchallenge.FieldID, field.TypeInt))
-	if ps := wacd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, wacd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	wacd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // WebAuthnChallengeDeleteOne is the builder for deleting a single WebAuthnChallenge entity.
 type WebAuthnChallengeDeleteOne struct {
-	wacd *WebAuthnChallengeDelete
+	_d *WebAuthnChallengeDelete
 }
 
 // Where appends a list predicates to the WebAuthnChallengeDelete builder.
-func (wacdo *WebAuthnChallengeDeleteOne) Where(ps ...predicate.WebAuthnChallenge) *WebAuthnChallengeDeleteOne {
-	wacdo.wacd.mutation.Where(ps...)
-	return wacdo
+func (_d *WebAuthnChallengeDeleteOne) Where(ps ...predicate.WebAuthnChallenge) *WebAuthnChallengeDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (wacdo *WebAuthnChallengeDeleteOne) Exec(ctx context.Context) error {
-	n, err := wacdo.wacd.Exec(ctx)
+func (_d *WebAuthnChallengeDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (wacdo *WebAuthnChallengeDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wacdo *WebAuthnChallengeDeleteOne) ExecX(ctx context.Context) {
-	if err := wacdo.Exec(ctx); err != nil {
+func (_d *WebAuthnChallengeDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

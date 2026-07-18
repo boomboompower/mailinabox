@@ -20,56 +20,56 @@ type LeaseDelete struct {
 }
 
 // Where appends a list predicates to the LeaseDelete builder.
-func (ld *LeaseDelete) Where(ps ...predicate.Lease) *LeaseDelete {
-	ld.mutation.Where(ps...)
-	return ld
+func (_d *LeaseDelete) Where(ps ...predicate.Lease) *LeaseDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (ld *LeaseDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, ld.sqlExec, ld.mutation, ld.hooks)
+func (_d *LeaseDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ld *LeaseDelete) ExecX(ctx context.Context) int {
-	n, err := ld.Exec(ctx)
+func (_d *LeaseDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (ld *LeaseDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *LeaseDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(lease.Table, sqlgraph.NewFieldSpec(lease.FieldID, field.TypeInt))
-	if ps := ld.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, ld.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	ld.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // LeaseDeleteOne is the builder for deleting a single Lease entity.
 type LeaseDeleteOne struct {
-	ld *LeaseDelete
+	_d *LeaseDelete
 }
 
 // Where appends a list predicates to the LeaseDelete builder.
-func (ldo *LeaseDeleteOne) Where(ps ...predicate.Lease) *LeaseDeleteOne {
-	ldo.ld.mutation.Where(ps...)
-	return ldo
+func (_d *LeaseDeleteOne) Where(ps ...predicate.Lease) *LeaseDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (ldo *LeaseDeleteOne) Exec(ctx context.Context) error {
-	n, err := ldo.ld.Exec(ctx)
+func (_d *LeaseDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (ldo *LeaseDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ldo *LeaseDeleteOne) ExecX(ctx context.Context) {
-	if err := ldo.Exec(ctx); err != nil {
+func (_d *LeaseDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -23,66 +23,66 @@ type LeaseUpdate struct {
 }
 
 // Where appends a list predicates to the LeaseUpdate builder.
-func (lu *LeaseUpdate) Where(ps ...predicate.Lease) *LeaseUpdate {
-	lu.mutation.Where(ps...)
-	return lu
+func (_u *LeaseUpdate) Where(ps ...predicate.Lease) *LeaseUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetName sets the "name" field.
-func (lu *LeaseUpdate) SetName(s string) *LeaseUpdate {
-	lu.mutation.SetName(s)
-	return lu
+func (_u *LeaseUpdate) SetName(v string) *LeaseUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (lu *LeaseUpdate) SetNillableName(s *string) *LeaseUpdate {
-	if s != nil {
-		lu.SetName(*s)
+func (_u *LeaseUpdate) SetNillableName(v *string) *LeaseUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return lu
+	return _u
 }
 
 // SetHolder sets the "holder" field.
-func (lu *LeaseUpdate) SetHolder(s string) *LeaseUpdate {
-	lu.mutation.SetHolder(s)
-	return lu
+func (_u *LeaseUpdate) SetHolder(v string) *LeaseUpdate {
+	_u.mutation.SetHolder(v)
+	return _u
 }
 
 // SetNillableHolder sets the "holder" field if the given value is not nil.
-func (lu *LeaseUpdate) SetNillableHolder(s *string) *LeaseUpdate {
-	if s != nil {
-		lu.SetHolder(*s)
+func (_u *LeaseUpdate) SetNillableHolder(v *string) *LeaseUpdate {
+	if v != nil {
+		_u.SetHolder(*v)
 	}
-	return lu
+	return _u
 }
 
 // SetExpiresAt sets the "expires_at" field.
-func (lu *LeaseUpdate) SetExpiresAt(t time.Time) *LeaseUpdate {
-	lu.mutation.SetExpiresAt(t)
-	return lu
+func (_u *LeaseUpdate) SetExpiresAt(v time.Time) *LeaseUpdate {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
-func (lu *LeaseUpdate) SetNillableExpiresAt(t *time.Time) *LeaseUpdate {
-	if t != nil {
-		lu.SetExpiresAt(*t)
+func (_u *LeaseUpdate) SetNillableExpiresAt(v *time.Time) *LeaseUpdate {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return lu
+	return _u
 }
 
 // Mutation returns the LeaseMutation object of the builder.
-func (lu *LeaseUpdate) Mutation() *LeaseMutation {
-	return lu.mutation
+func (_u *LeaseUpdate) Mutation() *LeaseMutation {
+	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (lu *LeaseUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, lu.sqlSave, lu.mutation, lu.hooks)
+func (_u *LeaseUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (lu *LeaseUpdate) SaveX(ctx context.Context) int {
-	affected, err := lu.Save(ctx)
+func (_u *LeaseUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -90,21 +90,21 @@ func (lu *LeaseUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (lu *LeaseUpdate) Exec(ctx context.Context) error {
-	_, err := lu.Save(ctx)
+func (_u *LeaseUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (lu *LeaseUpdate) ExecX(ctx context.Context) {
-	if err := lu.Exec(ctx); err != nil {
+func (_u *LeaseUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (lu *LeaseUpdate) check() error {
-	if v, ok := lu.mutation.Name(); ok {
+func (_u *LeaseUpdate) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := lease.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Lease.name": %w`, err)}
 		}
@@ -112,28 +112,28 @@ func (lu *LeaseUpdate) check() error {
 	return nil
 }
 
-func (lu *LeaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := lu.check(); err != nil {
-		return n, err
+func (_u *LeaseUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(lease.Table, lease.Columns, sqlgraph.NewFieldSpec(lease.FieldID, field.TypeInt))
-	if ps := lu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := lu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(lease.FieldName, field.TypeString, value)
 	}
-	if value, ok := lu.mutation.Holder(); ok {
+	if value, ok := _u.mutation.Holder(); ok {
 		_spec.SetField(lease.FieldHolder, field.TypeString, value)
 	}
-	if value, ok := lu.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(lease.FieldExpiresAt, field.TypeTime, value)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, lu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{lease.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -141,8 +141,8 @@ func (lu *LeaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	lu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // LeaseUpdateOne is the builder for updating a single Lease entity.
@@ -154,73 +154,73 @@ type LeaseUpdateOne struct {
 }
 
 // SetName sets the "name" field.
-func (luo *LeaseUpdateOne) SetName(s string) *LeaseUpdateOne {
-	luo.mutation.SetName(s)
-	return luo
+func (_u *LeaseUpdateOne) SetName(v string) *LeaseUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (luo *LeaseUpdateOne) SetNillableName(s *string) *LeaseUpdateOne {
-	if s != nil {
-		luo.SetName(*s)
+func (_u *LeaseUpdateOne) SetNillableName(v *string) *LeaseUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return luo
+	return _u
 }
 
 // SetHolder sets the "holder" field.
-func (luo *LeaseUpdateOne) SetHolder(s string) *LeaseUpdateOne {
-	luo.mutation.SetHolder(s)
-	return luo
+func (_u *LeaseUpdateOne) SetHolder(v string) *LeaseUpdateOne {
+	_u.mutation.SetHolder(v)
+	return _u
 }
 
 // SetNillableHolder sets the "holder" field if the given value is not nil.
-func (luo *LeaseUpdateOne) SetNillableHolder(s *string) *LeaseUpdateOne {
-	if s != nil {
-		luo.SetHolder(*s)
+func (_u *LeaseUpdateOne) SetNillableHolder(v *string) *LeaseUpdateOne {
+	if v != nil {
+		_u.SetHolder(*v)
 	}
-	return luo
+	return _u
 }
 
 // SetExpiresAt sets the "expires_at" field.
-func (luo *LeaseUpdateOne) SetExpiresAt(t time.Time) *LeaseUpdateOne {
-	luo.mutation.SetExpiresAt(t)
-	return luo
+func (_u *LeaseUpdateOne) SetExpiresAt(v time.Time) *LeaseUpdateOne {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
-func (luo *LeaseUpdateOne) SetNillableExpiresAt(t *time.Time) *LeaseUpdateOne {
-	if t != nil {
-		luo.SetExpiresAt(*t)
+func (_u *LeaseUpdateOne) SetNillableExpiresAt(v *time.Time) *LeaseUpdateOne {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return luo
+	return _u
 }
 
 // Mutation returns the LeaseMutation object of the builder.
-func (luo *LeaseUpdateOne) Mutation() *LeaseMutation {
-	return luo.mutation
+func (_u *LeaseUpdateOne) Mutation() *LeaseMutation {
+	return _u.mutation
 }
 
 // Where appends a list predicates to the LeaseUpdate builder.
-func (luo *LeaseUpdateOne) Where(ps ...predicate.Lease) *LeaseUpdateOne {
-	luo.mutation.Where(ps...)
-	return luo
+func (_u *LeaseUpdateOne) Where(ps ...predicate.Lease) *LeaseUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (luo *LeaseUpdateOne) Select(field string, fields ...string) *LeaseUpdateOne {
-	luo.fields = append([]string{field}, fields...)
-	return luo
+func (_u *LeaseUpdateOne) Select(field string, fields ...string) *LeaseUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Lease entity.
-func (luo *LeaseUpdateOne) Save(ctx context.Context) (*Lease, error) {
-	return withHooks(ctx, luo.sqlSave, luo.mutation, luo.hooks)
+func (_u *LeaseUpdateOne) Save(ctx context.Context) (*Lease, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (luo *LeaseUpdateOne) SaveX(ctx context.Context) *Lease {
-	node, err := luo.Save(ctx)
+func (_u *LeaseUpdateOne) SaveX(ctx context.Context) *Lease {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -228,21 +228,21 @@ func (luo *LeaseUpdateOne) SaveX(ctx context.Context) *Lease {
 }
 
 // Exec executes the query on the entity.
-func (luo *LeaseUpdateOne) Exec(ctx context.Context) error {
-	_, err := luo.Save(ctx)
+func (_u *LeaseUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (luo *LeaseUpdateOne) ExecX(ctx context.Context) {
-	if err := luo.Exec(ctx); err != nil {
+func (_u *LeaseUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (luo *LeaseUpdateOne) check() error {
-	if v, ok := luo.mutation.Name(); ok {
+func (_u *LeaseUpdateOne) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := lease.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Lease.name": %w`, err)}
 		}
@@ -250,17 +250,17 @@ func (luo *LeaseUpdateOne) check() error {
 	return nil
 }
 
-func (luo *LeaseUpdateOne) sqlSave(ctx context.Context) (_node *Lease, err error) {
-	if err := luo.check(); err != nil {
+func (_u *LeaseUpdateOne) sqlSave(ctx context.Context) (_node *Lease, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(lease.Table, lease.Columns, sqlgraph.NewFieldSpec(lease.FieldID, field.TypeInt))
-	id, ok := luo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Lease.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := luo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, lease.FieldID)
 		for _, f := range fields {
@@ -272,26 +272,26 @@ func (luo *LeaseUpdateOne) sqlSave(ctx context.Context) (_node *Lease, err error
 			}
 		}
 	}
-	if ps := luo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := luo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(lease.FieldName, field.TypeString, value)
 	}
-	if value, ok := luo.mutation.Holder(); ok {
+	if value, ok := _u.mutation.Holder(); ok {
 		_spec.SetField(lease.FieldHolder, field.TypeString, value)
 	}
-	if value, ok := luo.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(lease.FieldExpiresAt, field.TypeTime, value)
 	}
-	_node = &Lease{config: luo.config}
+	_node = &Lease{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, luo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{lease.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -299,6 +299,6 @@ func (luo *LeaseUpdateOne) sqlSave(ctx context.Context) (_node *Lease, err error
 		}
 		return nil, err
 	}
-	luo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

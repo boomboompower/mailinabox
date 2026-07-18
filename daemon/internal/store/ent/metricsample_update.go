@@ -23,73 +23,73 @@ type MetricSampleUpdate struct {
 }
 
 // Where appends a list predicates to the MetricSampleUpdate builder.
-func (msu *MetricSampleUpdate) Where(ps ...predicate.MetricSample) *MetricSampleUpdate {
-	msu.mutation.Where(ps...)
-	return msu
+func (_u *MetricSampleUpdate) Where(ps ...predicate.MetricSample) *MetricSampleUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetMetric sets the "metric" field.
-func (msu *MetricSampleUpdate) SetMetric(s string) *MetricSampleUpdate {
-	msu.mutation.SetMetric(s)
-	return msu
+func (_u *MetricSampleUpdate) SetMetric(v string) *MetricSampleUpdate {
+	_u.mutation.SetMetric(v)
+	return _u
 }
 
 // SetNillableMetric sets the "metric" field if the given value is not nil.
-func (msu *MetricSampleUpdate) SetNillableMetric(s *string) *MetricSampleUpdate {
-	if s != nil {
-		msu.SetMetric(*s)
+func (_u *MetricSampleUpdate) SetNillableMetric(v *string) *MetricSampleUpdate {
+	if v != nil {
+		_u.SetMetric(*v)
 	}
-	return msu
+	return _u
 }
 
 // SetSampledAt sets the "sampled_at" field.
-func (msu *MetricSampleUpdate) SetSampledAt(t time.Time) *MetricSampleUpdate {
-	msu.mutation.SetSampledAt(t)
-	return msu
+func (_u *MetricSampleUpdate) SetSampledAt(v time.Time) *MetricSampleUpdate {
+	_u.mutation.SetSampledAt(v)
+	return _u
 }
 
 // SetNillableSampledAt sets the "sampled_at" field if the given value is not nil.
-func (msu *MetricSampleUpdate) SetNillableSampledAt(t *time.Time) *MetricSampleUpdate {
-	if t != nil {
-		msu.SetSampledAt(*t)
+func (_u *MetricSampleUpdate) SetNillableSampledAt(v *time.Time) *MetricSampleUpdate {
+	if v != nil {
+		_u.SetSampledAt(*v)
 	}
-	return msu
+	return _u
 }
 
 // SetValue sets the "value" field.
-func (msu *MetricSampleUpdate) SetValue(f float64) *MetricSampleUpdate {
-	msu.mutation.ResetValue()
-	msu.mutation.SetValue(f)
-	return msu
+func (_u *MetricSampleUpdate) SetValue(v float64) *MetricSampleUpdate {
+	_u.mutation.ResetValue()
+	_u.mutation.SetValue(v)
+	return _u
 }
 
 // SetNillableValue sets the "value" field if the given value is not nil.
-func (msu *MetricSampleUpdate) SetNillableValue(f *float64) *MetricSampleUpdate {
-	if f != nil {
-		msu.SetValue(*f)
+func (_u *MetricSampleUpdate) SetNillableValue(v *float64) *MetricSampleUpdate {
+	if v != nil {
+		_u.SetValue(*v)
 	}
-	return msu
+	return _u
 }
 
-// AddValue adds f to the "value" field.
-func (msu *MetricSampleUpdate) AddValue(f float64) *MetricSampleUpdate {
-	msu.mutation.AddValue(f)
-	return msu
+// AddValue adds value to the "value" field.
+func (_u *MetricSampleUpdate) AddValue(v float64) *MetricSampleUpdate {
+	_u.mutation.AddValue(v)
+	return _u
 }
 
 // Mutation returns the MetricSampleMutation object of the builder.
-func (msu *MetricSampleUpdate) Mutation() *MetricSampleMutation {
-	return msu.mutation
+func (_u *MetricSampleUpdate) Mutation() *MetricSampleMutation {
+	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (msu *MetricSampleUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, msu.sqlSave, msu.mutation, msu.hooks)
+func (_u *MetricSampleUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (msu *MetricSampleUpdate) SaveX(ctx context.Context) int {
-	affected, err := msu.Save(ctx)
+func (_u *MetricSampleUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -97,21 +97,21 @@ func (msu *MetricSampleUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (msu *MetricSampleUpdate) Exec(ctx context.Context) error {
-	_, err := msu.Save(ctx)
+func (_u *MetricSampleUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (msu *MetricSampleUpdate) ExecX(ctx context.Context) {
-	if err := msu.Exec(ctx); err != nil {
+func (_u *MetricSampleUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (msu *MetricSampleUpdate) check() error {
-	if v, ok := msu.mutation.Metric(); ok {
+func (_u *MetricSampleUpdate) check() error {
+	if v, ok := _u.mutation.Metric(); ok {
 		if err := metricsample.MetricValidator(v); err != nil {
 			return &ValidationError{Name: "metric", err: fmt.Errorf(`ent: validator failed for field "MetricSample.metric": %w`, err)}
 		}
@@ -119,31 +119,31 @@ func (msu *MetricSampleUpdate) check() error {
 	return nil
 }
 
-func (msu *MetricSampleUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := msu.check(); err != nil {
-		return n, err
+func (_u *MetricSampleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(metricsample.Table, metricsample.Columns, sqlgraph.NewFieldSpec(metricsample.FieldID, field.TypeInt))
-	if ps := msu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := msu.mutation.Metric(); ok {
+	if value, ok := _u.mutation.Metric(); ok {
 		_spec.SetField(metricsample.FieldMetric, field.TypeString, value)
 	}
-	if value, ok := msu.mutation.SampledAt(); ok {
+	if value, ok := _u.mutation.SampledAt(); ok {
 		_spec.SetField(metricsample.FieldSampledAt, field.TypeTime, value)
 	}
-	if value, ok := msu.mutation.Value(); ok {
+	if value, ok := _u.mutation.Value(); ok {
 		_spec.SetField(metricsample.FieldValue, field.TypeFloat64, value)
 	}
-	if value, ok := msu.mutation.AddedValue(); ok {
+	if value, ok := _u.mutation.AddedValue(); ok {
 		_spec.AddField(metricsample.FieldValue, field.TypeFloat64, value)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, msu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{metricsample.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -151,8 +151,8 @@ func (msu *MetricSampleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	msu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // MetricSampleUpdateOne is the builder for updating a single MetricSample entity.
@@ -164,80 +164,80 @@ type MetricSampleUpdateOne struct {
 }
 
 // SetMetric sets the "metric" field.
-func (msuo *MetricSampleUpdateOne) SetMetric(s string) *MetricSampleUpdateOne {
-	msuo.mutation.SetMetric(s)
-	return msuo
+func (_u *MetricSampleUpdateOne) SetMetric(v string) *MetricSampleUpdateOne {
+	_u.mutation.SetMetric(v)
+	return _u
 }
 
 // SetNillableMetric sets the "metric" field if the given value is not nil.
-func (msuo *MetricSampleUpdateOne) SetNillableMetric(s *string) *MetricSampleUpdateOne {
-	if s != nil {
-		msuo.SetMetric(*s)
+func (_u *MetricSampleUpdateOne) SetNillableMetric(v *string) *MetricSampleUpdateOne {
+	if v != nil {
+		_u.SetMetric(*v)
 	}
-	return msuo
+	return _u
 }
 
 // SetSampledAt sets the "sampled_at" field.
-func (msuo *MetricSampleUpdateOne) SetSampledAt(t time.Time) *MetricSampleUpdateOne {
-	msuo.mutation.SetSampledAt(t)
-	return msuo
+func (_u *MetricSampleUpdateOne) SetSampledAt(v time.Time) *MetricSampleUpdateOne {
+	_u.mutation.SetSampledAt(v)
+	return _u
 }
 
 // SetNillableSampledAt sets the "sampled_at" field if the given value is not nil.
-func (msuo *MetricSampleUpdateOne) SetNillableSampledAt(t *time.Time) *MetricSampleUpdateOne {
-	if t != nil {
-		msuo.SetSampledAt(*t)
+func (_u *MetricSampleUpdateOne) SetNillableSampledAt(v *time.Time) *MetricSampleUpdateOne {
+	if v != nil {
+		_u.SetSampledAt(*v)
 	}
-	return msuo
+	return _u
 }
 
 // SetValue sets the "value" field.
-func (msuo *MetricSampleUpdateOne) SetValue(f float64) *MetricSampleUpdateOne {
-	msuo.mutation.ResetValue()
-	msuo.mutation.SetValue(f)
-	return msuo
+func (_u *MetricSampleUpdateOne) SetValue(v float64) *MetricSampleUpdateOne {
+	_u.mutation.ResetValue()
+	_u.mutation.SetValue(v)
+	return _u
 }
 
 // SetNillableValue sets the "value" field if the given value is not nil.
-func (msuo *MetricSampleUpdateOne) SetNillableValue(f *float64) *MetricSampleUpdateOne {
-	if f != nil {
-		msuo.SetValue(*f)
+func (_u *MetricSampleUpdateOne) SetNillableValue(v *float64) *MetricSampleUpdateOne {
+	if v != nil {
+		_u.SetValue(*v)
 	}
-	return msuo
+	return _u
 }
 
-// AddValue adds f to the "value" field.
-func (msuo *MetricSampleUpdateOne) AddValue(f float64) *MetricSampleUpdateOne {
-	msuo.mutation.AddValue(f)
-	return msuo
+// AddValue adds value to the "value" field.
+func (_u *MetricSampleUpdateOne) AddValue(v float64) *MetricSampleUpdateOne {
+	_u.mutation.AddValue(v)
+	return _u
 }
 
 // Mutation returns the MetricSampleMutation object of the builder.
-func (msuo *MetricSampleUpdateOne) Mutation() *MetricSampleMutation {
-	return msuo.mutation
+func (_u *MetricSampleUpdateOne) Mutation() *MetricSampleMutation {
+	return _u.mutation
 }
 
 // Where appends a list predicates to the MetricSampleUpdate builder.
-func (msuo *MetricSampleUpdateOne) Where(ps ...predicate.MetricSample) *MetricSampleUpdateOne {
-	msuo.mutation.Where(ps...)
-	return msuo
+func (_u *MetricSampleUpdateOne) Where(ps ...predicate.MetricSample) *MetricSampleUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (msuo *MetricSampleUpdateOne) Select(field string, fields ...string) *MetricSampleUpdateOne {
-	msuo.fields = append([]string{field}, fields...)
-	return msuo
+func (_u *MetricSampleUpdateOne) Select(field string, fields ...string) *MetricSampleUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated MetricSample entity.
-func (msuo *MetricSampleUpdateOne) Save(ctx context.Context) (*MetricSample, error) {
-	return withHooks(ctx, msuo.sqlSave, msuo.mutation, msuo.hooks)
+func (_u *MetricSampleUpdateOne) Save(ctx context.Context) (*MetricSample, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (msuo *MetricSampleUpdateOne) SaveX(ctx context.Context) *MetricSample {
-	node, err := msuo.Save(ctx)
+func (_u *MetricSampleUpdateOne) SaveX(ctx context.Context) *MetricSample {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -245,21 +245,21 @@ func (msuo *MetricSampleUpdateOne) SaveX(ctx context.Context) *MetricSample {
 }
 
 // Exec executes the query on the entity.
-func (msuo *MetricSampleUpdateOne) Exec(ctx context.Context) error {
-	_, err := msuo.Save(ctx)
+func (_u *MetricSampleUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (msuo *MetricSampleUpdateOne) ExecX(ctx context.Context) {
-	if err := msuo.Exec(ctx); err != nil {
+func (_u *MetricSampleUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (msuo *MetricSampleUpdateOne) check() error {
-	if v, ok := msuo.mutation.Metric(); ok {
+func (_u *MetricSampleUpdateOne) check() error {
+	if v, ok := _u.mutation.Metric(); ok {
 		if err := metricsample.MetricValidator(v); err != nil {
 			return &ValidationError{Name: "metric", err: fmt.Errorf(`ent: validator failed for field "MetricSample.metric": %w`, err)}
 		}
@@ -267,17 +267,17 @@ func (msuo *MetricSampleUpdateOne) check() error {
 	return nil
 }
 
-func (msuo *MetricSampleUpdateOne) sqlSave(ctx context.Context) (_node *MetricSample, err error) {
-	if err := msuo.check(); err != nil {
+func (_u *MetricSampleUpdateOne) sqlSave(ctx context.Context) (_node *MetricSample, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(metricsample.Table, metricsample.Columns, sqlgraph.NewFieldSpec(metricsample.FieldID, field.TypeInt))
-	id, ok := msuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "MetricSample.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := msuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, metricsample.FieldID)
 		for _, f := range fields {
@@ -289,29 +289,29 @@ func (msuo *MetricSampleUpdateOne) sqlSave(ctx context.Context) (_node *MetricSa
 			}
 		}
 	}
-	if ps := msuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := msuo.mutation.Metric(); ok {
+	if value, ok := _u.mutation.Metric(); ok {
 		_spec.SetField(metricsample.FieldMetric, field.TypeString, value)
 	}
-	if value, ok := msuo.mutation.SampledAt(); ok {
+	if value, ok := _u.mutation.SampledAt(); ok {
 		_spec.SetField(metricsample.FieldSampledAt, field.TypeTime, value)
 	}
-	if value, ok := msuo.mutation.Value(); ok {
+	if value, ok := _u.mutation.Value(); ok {
 		_spec.SetField(metricsample.FieldValue, field.TypeFloat64, value)
 	}
-	if value, ok := msuo.mutation.AddedValue(); ok {
+	if value, ok := _u.mutation.AddedValue(); ok {
 		_spec.AddField(metricsample.FieldValue, field.TypeFloat64, value)
 	}
-	_node = &MetricSample{config: msuo.config}
+	_node = &MetricSample{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, msuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{metricsample.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -319,6 +319,6 @@ func (msuo *MetricSampleUpdateOne) sqlSave(ctx context.Context) (_node *MetricSa
 		}
 		return nil, err
 	}
-	msuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

@@ -23,120 +23,120 @@ type MailKeySlotUpdate struct {
 }
 
 // Where appends a list predicates to the MailKeySlotUpdate builder.
-func (mksu *MailKeySlotUpdate) Where(ps ...predicate.MailKeySlot) *MailKeySlotUpdate {
-	mksu.mutation.Where(ps...)
-	return mksu
+func (_u *MailKeySlotUpdate) Where(ps ...predicate.MailKeySlot) *MailKeySlotUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetSlotType sets the "slot_type" field.
-func (mksu *MailKeySlotUpdate) SetSlotType(mt mailkeyslot.SlotType) *MailKeySlotUpdate {
-	mksu.mutation.SetSlotType(mt)
-	return mksu
+func (_u *MailKeySlotUpdate) SetSlotType(v mailkeyslot.SlotType) *MailKeySlotUpdate {
+	_u.mutation.SetSlotType(v)
+	return _u
 }
 
 // SetNillableSlotType sets the "slot_type" field if the given value is not nil.
-func (mksu *MailKeySlotUpdate) SetNillableSlotType(mt *mailkeyslot.SlotType) *MailKeySlotUpdate {
-	if mt != nil {
-		mksu.SetSlotType(*mt)
+func (_u *MailKeySlotUpdate) SetNillableSlotType(v *mailkeyslot.SlotType) *MailKeySlotUpdate {
+	if v != nil {
+		_u.SetSlotType(*v)
 	}
-	return mksu
+	return _u
 }
 
 // SetLabel sets the "label" field.
-func (mksu *MailKeySlotUpdate) SetLabel(s string) *MailKeySlotUpdate {
-	mksu.mutation.SetLabel(s)
-	return mksu
+func (_u *MailKeySlotUpdate) SetLabel(v string) *MailKeySlotUpdate {
+	_u.mutation.SetLabel(v)
+	return _u
 }
 
 // SetNillableLabel sets the "label" field if the given value is not nil.
-func (mksu *MailKeySlotUpdate) SetNillableLabel(s *string) *MailKeySlotUpdate {
-	if s != nil {
-		mksu.SetLabel(*s)
+func (_u *MailKeySlotUpdate) SetNillableLabel(v *string) *MailKeySlotUpdate {
+	if v != nil {
+		_u.SetLabel(*v)
 	}
-	return mksu
+	return _u
 }
 
 // SetVersion sets the "version" field.
-func (mksu *MailKeySlotUpdate) SetVersion(i int) *MailKeySlotUpdate {
-	mksu.mutation.ResetVersion()
-	mksu.mutation.SetVersion(i)
-	return mksu
+func (_u *MailKeySlotUpdate) SetVersion(v int) *MailKeySlotUpdate {
+	_u.mutation.ResetVersion()
+	_u.mutation.SetVersion(v)
+	return _u
 }
 
 // SetNillableVersion sets the "version" field if the given value is not nil.
-func (mksu *MailKeySlotUpdate) SetNillableVersion(i *int) *MailKeySlotUpdate {
-	if i != nil {
-		mksu.SetVersion(*i)
+func (_u *MailKeySlotUpdate) SetNillableVersion(v *int) *MailKeySlotUpdate {
+	if v != nil {
+		_u.SetVersion(*v)
 	}
-	return mksu
+	return _u
 }
 
-// AddVersion adds i to the "version" field.
-func (mksu *MailKeySlotUpdate) AddVersion(i int) *MailKeySlotUpdate {
-	mksu.mutation.AddVersion(i)
-	return mksu
+// AddVersion adds value to the "version" field.
+func (_u *MailKeySlotUpdate) AddVersion(v int) *MailKeySlotUpdate {
+	_u.mutation.AddVersion(v)
+	return _u
 }
 
 // SetWrappedKey sets the "wrapped_key" field.
-func (mksu *MailKeySlotUpdate) SetWrappedKey(b []byte) *MailKeySlotUpdate {
-	mksu.mutation.SetWrappedKey(b)
-	return mksu
+func (_u *MailKeySlotUpdate) SetWrappedKey(v []byte) *MailKeySlotUpdate {
+	_u.mutation.SetWrappedKey(v)
+	return _u
 }
 
 // SetNonce sets the "nonce" field.
-func (mksu *MailKeySlotUpdate) SetNonce(b []byte) *MailKeySlotUpdate {
-	mksu.mutation.SetNonce(b)
-	return mksu
+func (_u *MailKeySlotUpdate) SetNonce(v []byte) *MailKeySlotUpdate {
+	_u.mutation.SetNonce(v)
+	return _u
 }
 
 // SetKdfSalt sets the "kdf_salt" field.
-func (mksu *MailKeySlotUpdate) SetKdfSalt(b []byte) *MailKeySlotUpdate {
-	mksu.mutation.SetKdfSalt(b)
-	return mksu
+func (_u *MailKeySlotUpdate) SetKdfSalt(v []byte) *MailKeySlotUpdate {
+	_u.mutation.SetKdfSalt(v)
+	return _u
 }
 
 // SetPrfSalt sets the "prf_salt" field.
-func (mksu *MailKeySlotUpdate) SetPrfSalt(b []byte) *MailKeySlotUpdate {
-	mksu.mutation.SetPrfSalt(b)
-	return mksu
+func (_u *MailKeySlotUpdate) SetPrfSalt(v []byte) *MailKeySlotUpdate {
+	_u.mutation.SetPrfSalt(v)
+	return _u
 }
 
 // ClearPrfSalt clears the value of the "prf_salt" field.
-func (mksu *MailKeySlotUpdate) ClearPrfSalt() *MailKeySlotUpdate {
-	mksu.mutation.ClearPrfSalt()
-	return mksu
+func (_u *MailKeySlotUpdate) ClearPrfSalt() *MailKeySlotUpdate {
+	_u.mutation.ClearPrfSalt()
+	return _u
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (mksu *MailKeySlotUpdate) SetUserID(id int) *MailKeySlotUpdate {
-	mksu.mutation.SetUserID(id)
-	return mksu
+func (_u *MailKeySlotUpdate) SetUserID(id int) *MailKeySlotUpdate {
+	_u.mutation.SetUserID(id)
+	return _u
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (mksu *MailKeySlotUpdate) SetUser(u *User) *MailKeySlotUpdate {
-	return mksu.SetUserID(u.ID)
+func (_u *MailKeySlotUpdate) SetUser(v *User) *MailKeySlotUpdate {
+	return _u.SetUserID(v.ID)
 }
 
 // Mutation returns the MailKeySlotMutation object of the builder.
-func (mksu *MailKeySlotUpdate) Mutation() *MailKeySlotMutation {
-	return mksu.mutation
+func (_u *MailKeySlotUpdate) Mutation() *MailKeySlotMutation {
+	return _u.mutation
 }
 
 // ClearUser clears the "user" edge to the User entity.
-func (mksu *MailKeySlotUpdate) ClearUser() *MailKeySlotUpdate {
-	mksu.mutation.ClearUser()
-	return mksu
+func (_u *MailKeySlotUpdate) ClearUser() *MailKeySlotUpdate {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (mksu *MailKeySlotUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, mksu.sqlSave, mksu.mutation, mksu.hooks)
+func (_u *MailKeySlotUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mksu *MailKeySlotUpdate) SaveX(ctx context.Context) int {
-	affected, err := mksu.Save(ctx)
+func (_u *MailKeySlotUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -144,71 +144,71 @@ func (mksu *MailKeySlotUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (mksu *MailKeySlotUpdate) Exec(ctx context.Context) error {
-	_, err := mksu.Save(ctx)
+func (_u *MailKeySlotUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mksu *MailKeySlotUpdate) ExecX(ctx context.Context) {
-	if err := mksu.Exec(ctx); err != nil {
+func (_u *MailKeySlotUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mksu *MailKeySlotUpdate) check() error {
-	if v, ok := mksu.mutation.SlotType(); ok {
+func (_u *MailKeySlotUpdate) check() error {
+	if v, ok := _u.mutation.SlotType(); ok {
 		if err := mailkeyslot.SlotTypeValidator(v); err != nil {
 			return &ValidationError{Name: "slot_type", err: fmt.Errorf(`ent: validator failed for field "MailKeySlot.slot_type": %w`, err)}
 		}
 	}
-	if _, ok := mksu.mutation.UserID(); mksu.mutation.UserCleared() && !ok {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MailKeySlot.user"`)
 	}
 	return nil
 }
 
-func (mksu *MailKeySlotUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := mksu.check(); err != nil {
-		return n, err
+func (_u *MailKeySlotUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(mailkeyslot.Table, mailkeyslot.Columns, sqlgraph.NewFieldSpec(mailkeyslot.FieldID, field.TypeInt))
-	if ps := mksu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := mksu.mutation.SlotType(); ok {
+	if value, ok := _u.mutation.SlotType(); ok {
 		_spec.SetField(mailkeyslot.FieldSlotType, field.TypeEnum, value)
 	}
-	if value, ok := mksu.mutation.Label(); ok {
+	if value, ok := _u.mutation.Label(); ok {
 		_spec.SetField(mailkeyslot.FieldLabel, field.TypeString, value)
 	}
-	if value, ok := mksu.mutation.Version(); ok {
+	if value, ok := _u.mutation.Version(); ok {
 		_spec.SetField(mailkeyslot.FieldVersion, field.TypeInt, value)
 	}
-	if value, ok := mksu.mutation.AddedVersion(); ok {
+	if value, ok := _u.mutation.AddedVersion(); ok {
 		_spec.AddField(mailkeyslot.FieldVersion, field.TypeInt, value)
 	}
-	if value, ok := mksu.mutation.WrappedKey(); ok {
+	if value, ok := _u.mutation.WrappedKey(); ok {
 		_spec.SetField(mailkeyslot.FieldWrappedKey, field.TypeBytes, value)
 	}
-	if value, ok := mksu.mutation.Nonce(); ok {
+	if value, ok := _u.mutation.Nonce(); ok {
 		_spec.SetField(mailkeyslot.FieldNonce, field.TypeBytes, value)
 	}
-	if value, ok := mksu.mutation.KdfSalt(); ok {
+	if value, ok := _u.mutation.KdfSalt(); ok {
 		_spec.SetField(mailkeyslot.FieldKdfSalt, field.TypeBytes, value)
 	}
-	if value, ok := mksu.mutation.PrfSalt(); ok {
+	if value, ok := _u.mutation.PrfSalt(); ok {
 		_spec.SetField(mailkeyslot.FieldPrfSalt, field.TypeBytes, value)
 	}
-	if mksu.mutation.PrfSaltCleared() {
+	if _u.mutation.PrfSaltCleared() {
 		_spec.ClearField(mailkeyslot.FieldPrfSalt, field.TypeBytes)
 	}
-	if mksu.mutation.UserCleared() {
+	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -221,7 +221,7 @@ func (mksu *MailKeySlotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mksu.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -237,7 +237,7 @@ func (mksu *MailKeySlotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, mksu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{mailkeyslot.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -245,8 +245,8 @@ func (mksu *MailKeySlotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	mksu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // MailKeySlotUpdateOne is the builder for updating a single MailKeySlot entity.
@@ -258,127 +258,127 @@ type MailKeySlotUpdateOne struct {
 }
 
 // SetSlotType sets the "slot_type" field.
-func (mksuo *MailKeySlotUpdateOne) SetSlotType(mt mailkeyslot.SlotType) *MailKeySlotUpdateOne {
-	mksuo.mutation.SetSlotType(mt)
-	return mksuo
+func (_u *MailKeySlotUpdateOne) SetSlotType(v mailkeyslot.SlotType) *MailKeySlotUpdateOne {
+	_u.mutation.SetSlotType(v)
+	return _u
 }
 
 // SetNillableSlotType sets the "slot_type" field if the given value is not nil.
-func (mksuo *MailKeySlotUpdateOne) SetNillableSlotType(mt *mailkeyslot.SlotType) *MailKeySlotUpdateOne {
-	if mt != nil {
-		mksuo.SetSlotType(*mt)
+func (_u *MailKeySlotUpdateOne) SetNillableSlotType(v *mailkeyslot.SlotType) *MailKeySlotUpdateOne {
+	if v != nil {
+		_u.SetSlotType(*v)
 	}
-	return mksuo
+	return _u
 }
 
 // SetLabel sets the "label" field.
-func (mksuo *MailKeySlotUpdateOne) SetLabel(s string) *MailKeySlotUpdateOne {
-	mksuo.mutation.SetLabel(s)
-	return mksuo
+func (_u *MailKeySlotUpdateOne) SetLabel(v string) *MailKeySlotUpdateOne {
+	_u.mutation.SetLabel(v)
+	return _u
 }
 
 // SetNillableLabel sets the "label" field if the given value is not nil.
-func (mksuo *MailKeySlotUpdateOne) SetNillableLabel(s *string) *MailKeySlotUpdateOne {
-	if s != nil {
-		mksuo.SetLabel(*s)
+func (_u *MailKeySlotUpdateOne) SetNillableLabel(v *string) *MailKeySlotUpdateOne {
+	if v != nil {
+		_u.SetLabel(*v)
 	}
-	return mksuo
+	return _u
 }
 
 // SetVersion sets the "version" field.
-func (mksuo *MailKeySlotUpdateOne) SetVersion(i int) *MailKeySlotUpdateOne {
-	mksuo.mutation.ResetVersion()
-	mksuo.mutation.SetVersion(i)
-	return mksuo
+func (_u *MailKeySlotUpdateOne) SetVersion(v int) *MailKeySlotUpdateOne {
+	_u.mutation.ResetVersion()
+	_u.mutation.SetVersion(v)
+	return _u
 }
 
 // SetNillableVersion sets the "version" field if the given value is not nil.
-func (mksuo *MailKeySlotUpdateOne) SetNillableVersion(i *int) *MailKeySlotUpdateOne {
-	if i != nil {
-		mksuo.SetVersion(*i)
+func (_u *MailKeySlotUpdateOne) SetNillableVersion(v *int) *MailKeySlotUpdateOne {
+	if v != nil {
+		_u.SetVersion(*v)
 	}
-	return mksuo
+	return _u
 }
 
-// AddVersion adds i to the "version" field.
-func (mksuo *MailKeySlotUpdateOne) AddVersion(i int) *MailKeySlotUpdateOne {
-	mksuo.mutation.AddVersion(i)
-	return mksuo
+// AddVersion adds value to the "version" field.
+func (_u *MailKeySlotUpdateOne) AddVersion(v int) *MailKeySlotUpdateOne {
+	_u.mutation.AddVersion(v)
+	return _u
 }
 
 // SetWrappedKey sets the "wrapped_key" field.
-func (mksuo *MailKeySlotUpdateOne) SetWrappedKey(b []byte) *MailKeySlotUpdateOne {
-	mksuo.mutation.SetWrappedKey(b)
-	return mksuo
+func (_u *MailKeySlotUpdateOne) SetWrappedKey(v []byte) *MailKeySlotUpdateOne {
+	_u.mutation.SetWrappedKey(v)
+	return _u
 }
 
 // SetNonce sets the "nonce" field.
-func (mksuo *MailKeySlotUpdateOne) SetNonce(b []byte) *MailKeySlotUpdateOne {
-	mksuo.mutation.SetNonce(b)
-	return mksuo
+func (_u *MailKeySlotUpdateOne) SetNonce(v []byte) *MailKeySlotUpdateOne {
+	_u.mutation.SetNonce(v)
+	return _u
 }
 
 // SetKdfSalt sets the "kdf_salt" field.
-func (mksuo *MailKeySlotUpdateOne) SetKdfSalt(b []byte) *MailKeySlotUpdateOne {
-	mksuo.mutation.SetKdfSalt(b)
-	return mksuo
+func (_u *MailKeySlotUpdateOne) SetKdfSalt(v []byte) *MailKeySlotUpdateOne {
+	_u.mutation.SetKdfSalt(v)
+	return _u
 }
 
 // SetPrfSalt sets the "prf_salt" field.
-func (mksuo *MailKeySlotUpdateOne) SetPrfSalt(b []byte) *MailKeySlotUpdateOne {
-	mksuo.mutation.SetPrfSalt(b)
-	return mksuo
+func (_u *MailKeySlotUpdateOne) SetPrfSalt(v []byte) *MailKeySlotUpdateOne {
+	_u.mutation.SetPrfSalt(v)
+	return _u
 }
 
 // ClearPrfSalt clears the value of the "prf_salt" field.
-func (mksuo *MailKeySlotUpdateOne) ClearPrfSalt() *MailKeySlotUpdateOne {
-	mksuo.mutation.ClearPrfSalt()
-	return mksuo
+func (_u *MailKeySlotUpdateOne) ClearPrfSalt() *MailKeySlotUpdateOne {
+	_u.mutation.ClearPrfSalt()
+	return _u
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (mksuo *MailKeySlotUpdateOne) SetUserID(id int) *MailKeySlotUpdateOne {
-	mksuo.mutation.SetUserID(id)
-	return mksuo
+func (_u *MailKeySlotUpdateOne) SetUserID(id int) *MailKeySlotUpdateOne {
+	_u.mutation.SetUserID(id)
+	return _u
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (mksuo *MailKeySlotUpdateOne) SetUser(u *User) *MailKeySlotUpdateOne {
-	return mksuo.SetUserID(u.ID)
+func (_u *MailKeySlotUpdateOne) SetUser(v *User) *MailKeySlotUpdateOne {
+	return _u.SetUserID(v.ID)
 }
 
 // Mutation returns the MailKeySlotMutation object of the builder.
-func (mksuo *MailKeySlotUpdateOne) Mutation() *MailKeySlotMutation {
-	return mksuo.mutation
+func (_u *MailKeySlotUpdateOne) Mutation() *MailKeySlotMutation {
+	return _u.mutation
 }
 
 // ClearUser clears the "user" edge to the User entity.
-func (mksuo *MailKeySlotUpdateOne) ClearUser() *MailKeySlotUpdateOne {
-	mksuo.mutation.ClearUser()
-	return mksuo
+func (_u *MailKeySlotUpdateOne) ClearUser() *MailKeySlotUpdateOne {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Where appends a list predicates to the MailKeySlotUpdate builder.
-func (mksuo *MailKeySlotUpdateOne) Where(ps ...predicate.MailKeySlot) *MailKeySlotUpdateOne {
-	mksuo.mutation.Where(ps...)
-	return mksuo
+func (_u *MailKeySlotUpdateOne) Where(ps ...predicate.MailKeySlot) *MailKeySlotUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (mksuo *MailKeySlotUpdateOne) Select(field string, fields ...string) *MailKeySlotUpdateOne {
-	mksuo.fields = append([]string{field}, fields...)
-	return mksuo
+func (_u *MailKeySlotUpdateOne) Select(field string, fields ...string) *MailKeySlotUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated MailKeySlot entity.
-func (mksuo *MailKeySlotUpdateOne) Save(ctx context.Context) (*MailKeySlot, error) {
-	return withHooks(ctx, mksuo.sqlSave, mksuo.mutation, mksuo.hooks)
+func (_u *MailKeySlotUpdateOne) Save(ctx context.Context) (*MailKeySlot, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mksuo *MailKeySlotUpdateOne) SaveX(ctx context.Context) *MailKeySlot {
-	node, err := mksuo.Save(ctx)
+func (_u *MailKeySlotUpdateOne) SaveX(ctx context.Context) *MailKeySlot {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -386,42 +386,42 @@ func (mksuo *MailKeySlotUpdateOne) SaveX(ctx context.Context) *MailKeySlot {
 }
 
 // Exec executes the query on the entity.
-func (mksuo *MailKeySlotUpdateOne) Exec(ctx context.Context) error {
-	_, err := mksuo.Save(ctx)
+func (_u *MailKeySlotUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mksuo *MailKeySlotUpdateOne) ExecX(ctx context.Context) {
-	if err := mksuo.Exec(ctx); err != nil {
+func (_u *MailKeySlotUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mksuo *MailKeySlotUpdateOne) check() error {
-	if v, ok := mksuo.mutation.SlotType(); ok {
+func (_u *MailKeySlotUpdateOne) check() error {
+	if v, ok := _u.mutation.SlotType(); ok {
 		if err := mailkeyslot.SlotTypeValidator(v); err != nil {
 			return &ValidationError{Name: "slot_type", err: fmt.Errorf(`ent: validator failed for field "MailKeySlot.slot_type": %w`, err)}
 		}
 	}
-	if _, ok := mksuo.mutation.UserID(); mksuo.mutation.UserCleared() && !ok {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MailKeySlot.user"`)
 	}
 	return nil
 }
 
-func (mksuo *MailKeySlotUpdateOne) sqlSave(ctx context.Context) (_node *MailKeySlot, err error) {
-	if err := mksuo.check(); err != nil {
+func (_u *MailKeySlotUpdateOne) sqlSave(ctx context.Context) (_node *MailKeySlot, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(mailkeyslot.Table, mailkeyslot.Columns, sqlgraph.NewFieldSpec(mailkeyslot.FieldID, field.TypeInt))
-	id, ok := mksuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "MailKeySlot.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := mksuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, mailkeyslot.FieldID)
 		for _, f := range fields {
@@ -433,41 +433,41 @@ func (mksuo *MailKeySlotUpdateOne) sqlSave(ctx context.Context) (_node *MailKeyS
 			}
 		}
 	}
-	if ps := mksuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := mksuo.mutation.SlotType(); ok {
+	if value, ok := _u.mutation.SlotType(); ok {
 		_spec.SetField(mailkeyslot.FieldSlotType, field.TypeEnum, value)
 	}
-	if value, ok := mksuo.mutation.Label(); ok {
+	if value, ok := _u.mutation.Label(); ok {
 		_spec.SetField(mailkeyslot.FieldLabel, field.TypeString, value)
 	}
-	if value, ok := mksuo.mutation.Version(); ok {
+	if value, ok := _u.mutation.Version(); ok {
 		_spec.SetField(mailkeyslot.FieldVersion, field.TypeInt, value)
 	}
-	if value, ok := mksuo.mutation.AddedVersion(); ok {
+	if value, ok := _u.mutation.AddedVersion(); ok {
 		_spec.AddField(mailkeyslot.FieldVersion, field.TypeInt, value)
 	}
-	if value, ok := mksuo.mutation.WrappedKey(); ok {
+	if value, ok := _u.mutation.WrappedKey(); ok {
 		_spec.SetField(mailkeyslot.FieldWrappedKey, field.TypeBytes, value)
 	}
-	if value, ok := mksuo.mutation.Nonce(); ok {
+	if value, ok := _u.mutation.Nonce(); ok {
 		_spec.SetField(mailkeyslot.FieldNonce, field.TypeBytes, value)
 	}
-	if value, ok := mksuo.mutation.KdfSalt(); ok {
+	if value, ok := _u.mutation.KdfSalt(); ok {
 		_spec.SetField(mailkeyslot.FieldKdfSalt, field.TypeBytes, value)
 	}
-	if value, ok := mksuo.mutation.PrfSalt(); ok {
+	if value, ok := _u.mutation.PrfSalt(); ok {
 		_spec.SetField(mailkeyslot.FieldPrfSalt, field.TypeBytes, value)
 	}
-	if mksuo.mutation.PrfSaltCleared() {
+	if _u.mutation.PrfSaltCleared() {
 		_spec.ClearField(mailkeyslot.FieldPrfSalt, field.TypeBytes)
 	}
-	if mksuo.mutation.UserCleared() {
+	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -480,7 +480,7 @@ func (mksuo *MailKeySlotUpdateOne) sqlSave(ctx context.Context) (_node *MailKeyS
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mksuo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -496,10 +496,10 @@ func (mksuo *MailKeySlotUpdateOne) sqlSave(ctx context.Context) (_node *MailKeyS
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &MailKeySlot{config: mksuo.config}
+	_node = &MailKeySlot{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, mksuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{mailkeyslot.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -507,6 +507,6 @@ func (mksuo *MailKeySlotUpdateOne) sqlSave(ctx context.Context) (_node *MailKeyS
 		}
 		return nil, err
 	}
-	mksuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

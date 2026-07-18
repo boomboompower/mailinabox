@@ -20,56 +20,56 @@ type CheckResultDelete struct {
 }
 
 // Where appends a list predicates to the CheckResultDelete builder.
-func (crd *CheckResultDelete) Where(ps ...predicate.CheckResult) *CheckResultDelete {
-	crd.mutation.Where(ps...)
-	return crd
+func (_d *CheckResultDelete) Where(ps ...predicate.CheckResult) *CheckResultDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (crd *CheckResultDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, crd.sqlExec, crd.mutation, crd.hooks)
+func (_d *CheckResultDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (crd *CheckResultDelete) ExecX(ctx context.Context) int {
-	n, err := crd.Exec(ctx)
+func (_d *CheckResultDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (crd *CheckResultDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *CheckResultDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(checkresult.Table, sqlgraph.NewFieldSpec(checkresult.FieldID, field.TypeInt))
-	if ps := crd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, crd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	crd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // CheckResultDeleteOne is the builder for deleting a single CheckResult entity.
 type CheckResultDeleteOne struct {
-	crd *CheckResultDelete
+	_d *CheckResultDelete
 }
 
 // Where appends a list predicates to the CheckResultDelete builder.
-func (crdo *CheckResultDeleteOne) Where(ps ...predicate.CheckResult) *CheckResultDeleteOne {
-	crdo.crd.mutation.Where(ps...)
-	return crdo
+func (_d *CheckResultDeleteOne) Where(ps ...predicate.CheckResult) *CheckResultDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (crdo *CheckResultDeleteOne) Exec(ctx context.Context) error {
-	n, err := crdo.crd.Exec(ctx)
+func (_d *CheckResultDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (crdo *CheckResultDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (crdo *CheckResultDeleteOne) ExecX(ctx context.Context) {
-	if err := crdo.Exec(ctx); err != nil {
+func (_d *CheckResultDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

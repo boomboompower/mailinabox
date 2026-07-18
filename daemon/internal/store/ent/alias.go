@@ -48,12 +48,10 @@ type AliasEdges struct {
 // TenantOrErr returns the Tenant value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e AliasEdges) TenantOrErr() (*Tenant, error) {
-	if e.loadedTypes[0] {
-		if e.Tenant == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: tenant.Label}
-		}
+	if e.Tenant != nil {
 		return e.Tenant, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: tenant.Label}
 	}
 	return nil, &NotLoadedError{edge: "tenant"}
 }
@@ -84,7 +82,7 @@ func (*Alias) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Alias fields.
-func (a *Alias) assignValues(columns []string, values []any) error {
+func (_m *Alias) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -95,18 +93,18 @@ func (a *Alias) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			a.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case alias.FieldSource:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field source", values[i])
 			} else if value.Valid {
-				a.Source = value.String
+				_m.Source = value.String
 			}
 		case alias.FieldDestinations:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field destinations", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &a.Destinations); err != nil {
+				if err := json.Unmarshal(*value, &_m.Destinations); err != nil {
 					return fmt.Errorf("unmarshal field destinations: %w", err)
 				}
 			}
@@ -114,7 +112,7 @@ func (a *Alias) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field permitted_senders", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &a.PermittedSenders); err != nil {
+				if err := json.Unmarshal(*value, &_m.PermittedSenders); err != nil {
 					return fmt.Errorf("unmarshal field permitted_senders: %w", err)
 				}
 			}
@@ -122,23 +120,23 @@ func (a *Alias) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field auto", values[i])
 			} else if value.Valid {
-				a.Auto = value.Bool
+				_m.Auto = value.Bool
 			}
 		case alias.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				a.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case alias.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field tenant_aliases", value)
 			} else if value.Valid {
-				a.tenant_aliases = new(int)
-				*a.tenant_aliases = int(value.Int64)
+				_m.tenant_aliases = new(int)
+				*_m.tenant_aliases = int(value.Int64)
 			}
 		default:
-			a.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -146,52 +144,52 @@ func (a *Alias) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Alias.
 // This includes values selected through modifiers, order, etc.
-func (a *Alias) Value(name string) (ent.Value, error) {
-	return a.selectValues.Get(name)
+func (_m *Alias) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryTenant queries the "tenant" edge of the Alias entity.
-func (a *Alias) QueryTenant() *TenantQuery {
-	return NewAliasClient(a.config).QueryTenant(a)
+func (_m *Alias) QueryTenant() *TenantQuery {
+	return NewAliasClient(_m.config).QueryTenant(_m)
 }
 
 // Update returns a builder for updating this Alias.
 // Note that you need to call Alias.Unwrap() before calling this method if this Alias
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (a *Alias) Update() *AliasUpdateOne {
-	return NewAliasClient(a.config).UpdateOne(a)
+func (_m *Alias) Update() *AliasUpdateOne {
+	return NewAliasClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Alias entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (a *Alias) Unwrap() *Alias {
-	_tx, ok := a.config.driver.(*txDriver)
+func (_m *Alias) Unwrap() *Alias {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Alias is not a transactional entity")
 	}
-	a.config.driver = _tx.drv
-	return a
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (a *Alias) String() string {
+func (_m *Alias) String() string {
 	var builder strings.Builder
 	builder.WriteString("Alias(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("source=")
-	builder.WriteString(a.Source)
+	builder.WriteString(_m.Source)
 	builder.WriteString(", ")
 	builder.WriteString("destinations=")
-	builder.WriteString(fmt.Sprintf("%v", a.Destinations))
+	builder.WriteString(fmt.Sprintf("%v", _m.Destinations))
 	builder.WriteString(", ")
 	builder.WriteString("permitted_senders=")
-	builder.WriteString(fmt.Sprintf("%v", a.PermittedSenders))
+	builder.WriteString(fmt.Sprintf("%v", _m.PermittedSenders))
 	builder.WriteString(", ")
 	builder.WriteString("auto=")
-	builder.WriteString(fmt.Sprintf("%v", a.Auto))
+	builder.WriteString(fmt.Sprintf("%v", _m.Auto))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

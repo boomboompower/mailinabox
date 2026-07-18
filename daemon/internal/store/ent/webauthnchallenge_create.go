@@ -24,53 +24,53 @@ type WebAuthnChallengeCreate struct {
 }
 
 // SetNonceHash sets the "nonce_hash" field.
-func (wacc *WebAuthnChallengeCreate) SetNonceHash(s string) *WebAuthnChallengeCreate {
-	wacc.mutation.SetNonceHash(s)
-	return wacc
+func (_c *WebAuthnChallengeCreate) SetNonceHash(v string) *WebAuthnChallengeCreate {
+	_c.mutation.SetNonceHash(v)
+	return _c
 }
 
 // SetSessionData sets the "session_data" field.
-func (wacc *WebAuthnChallengeCreate) SetSessionData(s string) *WebAuthnChallengeCreate {
-	wacc.mutation.SetSessionData(s)
-	return wacc
+func (_c *WebAuthnChallengeCreate) SetSessionData(v string) *WebAuthnChallengeCreate {
+	_c.mutation.SetSessionData(v)
+	return _c
 }
 
 // SetKind sets the "kind" field.
-func (wacc *WebAuthnChallengeCreate) SetKind(w webauthnchallenge.Kind) *WebAuthnChallengeCreate {
-	wacc.mutation.SetKind(w)
-	return wacc
+func (_c *WebAuthnChallengeCreate) SetKind(v webauthnchallenge.Kind) *WebAuthnChallengeCreate {
+	_c.mutation.SetKind(v)
+	return _c
 }
 
 // SetExpiresAt sets the "expires_at" field.
-func (wacc *WebAuthnChallengeCreate) SetExpiresAt(t time.Time) *WebAuthnChallengeCreate {
-	wacc.mutation.SetExpiresAt(t)
-	return wacc
+func (_c *WebAuthnChallengeCreate) SetExpiresAt(v time.Time) *WebAuthnChallengeCreate {
+	_c.mutation.SetExpiresAt(v)
+	return _c
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (wacc *WebAuthnChallengeCreate) SetUserID(id int) *WebAuthnChallengeCreate {
-	wacc.mutation.SetUserID(id)
-	return wacc
+func (_c *WebAuthnChallengeCreate) SetUserID(id int) *WebAuthnChallengeCreate {
+	_c.mutation.SetUserID(id)
+	return _c
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (wacc *WebAuthnChallengeCreate) SetUser(u *User) *WebAuthnChallengeCreate {
-	return wacc.SetUserID(u.ID)
+func (_c *WebAuthnChallengeCreate) SetUser(v *User) *WebAuthnChallengeCreate {
+	return _c.SetUserID(v.ID)
 }
 
 // Mutation returns the WebAuthnChallengeMutation object of the builder.
-func (wacc *WebAuthnChallengeCreate) Mutation() *WebAuthnChallengeMutation {
-	return wacc.mutation
+func (_c *WebAuthnChallengeCreate) Mutation() *WebAuthnChallengeMutation {
+	return _c.mutation
 }
 
 // Save creates the WebAuthnChallenge in the database.
-func (wacc *WebAuthnChallengeCreate) Save(ctx context.Context) (*WebAuthnChallenge, error) {
-	return withHooks(ctx, wacc.sqlSave, wacc.mutation, wacc.hooks)
+func (_c *WebAuthnChallengeCreate) Save(ctx context.Context) (*WebAuthnChallenge, error) {
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (wacc *WebAuthnChallengeCreate) SaveX(ctx context.Context) *WebAuthnChallenge {
-	v, err := wacc.Save(ctx)
+func (_c *WebAuthnChallengeCreate) SaveX(ctx context.Context) *WebAuthnChallenge {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -78,54 +78,54 @@ func (wacc *WebAuthnChallengeCreate) SaveX(ctx context.Context) *WebAuthnChallen
 }
 
 // Exec executes the query.
-func (wacc *WebAuthnChallengeCreate) Exec(ctx context.Context) error {
-	_, err := wacc.Save(ctx)
+func (_c *WebAuthnChallengeCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wacc *WebAuthnChallengeCreate) ExecX(ctx context.Context) {
-	if err := wacc.Exec(ctx); err != nil {
+func (_c *WebAuthnChallengeCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (wacc *WebAuthnChallengeCreate) check() error {
-	if _, ok := wacc.mutation.NonceHash(); !ok {
+func (_c *WebAuthnChallengeCreate) check() error {
+	if _, ok := _c.mutation.NonceHash(); !ok {
 		return &ValidationError{Name: "nonce_hash", err: errors.New(`ent: missing required field "WebAuthnChallenge.nonce_hash"`)}
 	}
-	if _, ok := wacc.mutation.SessionData(); !ok {
+	if _, ok := _c.mutation.SessionData(); !ok {
 		return &ValidationError{Name: "session_data", err: errors.New(`ent: missing required field "WebAuthnChallenge.session_data"`)}
 	}
-	if v, ok := wacc.mutation.SessionData(); ok {
+	if v, ok := _c.mutation.SessionData(); ok {
 		if err := webauthnchallenge.SessionDataValidator(v); err != nil {
 			return &ValidationError{Name: "session_data", err: fmt.Errorf(`ent: validator failed for field "WebAuthnChallenge.session_data": %w`, err)}
 		}
 	}
-	if _, ok := wacc.mutation.Kind(); !ok {
+	if _, ok := _c.mutation.Kind(); !ok {
 		return &ValidationError{Name: "kind", err: errors.New(`ent: missing required field "WebAuthnChallenge.kind"`)}
 	}
-	if v, ok := wacc.mutation.Kind(); ok {
+	if v, ok := _c.mutation.Kind(); ok {
 		if err := webauthnchallenge.KindValidator(v); err != nil {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "WebAuthnChallenge.kind": %w`, err)}
 		}
 	}
-	if _, ok := wacc.mutation.ExpiresAt(); !ok {
+	if _, ok := _c.mutation.ExpiresAt(); !ok {
 		return &ValidationError{Name: "expires_at", err: errors.New(`ent: missing required field "WebAuthnChallenge.expires_at"`)}
 	}
-	if _, ok := wacc.mutation.UserID(); !ok {
+	if len(_c.mutation.UserIDs()) == 0 {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "WebAuthnChallenge.user"`)}
 	}
 	return nil
 }
 
-func (wacc *WebAuthnChallengeCreate) sqlSave(ctx context.Context) (*WebAuthnChallenge, error) {
-	if err := wacc.check(); err != nil {
+func (_c *WebAuthnChallengeCreate) sqlSave(ctx context.Context) (*WebAuthnChallenge, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := wacc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, wacc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -133,34 +133,34 @@ func (wacc *WebAuthnChallengeCreate) sqlSave(ctx context.Context) (*WebAuthnChal
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	wacc.mutation.id = &_node.ID
-	wacc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (wacc *WebAuthnChallengeCreate) createSpec() (*WebAuthnChallenge, *sqlgraph.CreateSpec) {
+func (_c *WebAuthnChallengeCreate) createSpec() (*WebAuthnChallenge, *sqlgraph.CreateSpec) {
 	var (
-		_node = &WebAuthnChallenge{config: wacc.config}
+		_node = &WebAuthnChallenge{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(webauthnchallenge.Table, sqlgraph.NewFieldSpec(webauthnchallenge.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = wacc.conflict
-	if value, ok := wacc.mutation.NonceHash(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.NonceHash(); ok {
 		_spec.SetField(webauthnchallenge.FieldNonceHash, field.TypeString, value)
 		_node.NonceHash = value
 	}
-	if value, ok := wacc.mutation.SessionData(); ok {
+	if value, ok := _c.mutation.SessionData(); ok {
 		_spec.SetField(webauthnchallenge.FieldSessionData, field.TypeString, value)
 		_node.SessionData = value
 	}
-	if value, ok := wacc.mutation.Kind(); ok {
+	if value, ok := _c.mutation.Kind(); ok {
 		_spec.SetField(webauthnchallenge.FieldKind, field.TypeEnum, value)
 		_node.Kind = value
 	}
-	if value, ok := wacc.mutation.ExpiresAt(); ok {
+	if value, ok := _c.mutation.ExpiresAt(); ok {
 		_spec.SetField(webauthnchallenge.FieldExpiresAt, field.TypeTime, value)
 		_node.ExpiresAt = value
 	}
-	if nodes := wacc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -196,10 +196,10 @@ func (wacc *WebAuthnChallengeCreate) createSpec() (*WebAuthnChallenge, *sqlgraph
 //			SetNonceHash(v+v).
 //		}).
 //		Exec(ctx)
-func (wacc *WebAuthnChallengeCreate) OnConflict(opts ...sql.ConflictOption) *WebAuthnChallengeUpsertOne {
-	wacc.conflict = opts
+func (_c *WebAuthnChallengeCreate) OnConflict(opts ...sql.ConflictOption) *WebAuthnChallengeUpsertOne {
+	_c.conflict = opts
 	return &WebAuthnChallengeUpsertOne{
-		create: wacc,
+		create: _c,
 	}
 }
 
@@ -209,10 +209,10 @@ func (wacc *WebAuthnChallengeCreate) OnConflict(opts ...sql.ConflictOption) *Web
 //	client.WebAuthnChallenge.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (wacc *WebAuthnChallengeCreate) OnConflictColumns(columns ...string) *WebAuthnChallengeUpsertOne {
-	wacc.conflict = append(wacc.conflict, sql.ConflictColumns(columns...))
+func (_c *WebAuthnChallengeCreate) OnConflictColumns(columns ...string) *WebAuthnChallengeUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &WebAuthnChallengeUpsertOne{
-		create: wacc,
+		create: _c,
 	}
 }
 
@@ -415,16 +415,16 @@ type WebAuthnChallengeCreateBulk struct {
 }
 
 // Save creates the WebAuthnChallenge entities in the database.
-func (waccb *WebAuthnChallengeCreateBulk) Save(ctx context.Context) ([]*WebAuthnChallenge, error) {
-	if waccb.err != nil {
-		return nil, waccb.err
+func (_c *WebAuthnChallengeCreateBulk) Save(ctx context.Context) ([]*WebAuthnChallenge, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(waccb.builders))
-	nodes := make([]*WebAuthnChallenge, len(waccb.builders))
-	mutators := make([]Mutator, len(waccb.builders))
-	for i := range waccb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*WebAuthnChallenge, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := waccb.builders[i]
+			builder := _c.builders[i]
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*WebAuthnChallengeMutation)
 				if !ok {
@@ -437,12 +437,12 @@ func (waccb *WebAuthnChallengeCreateBulk) Save(ctx context.Context) ([]*WebAuthn
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, waccb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = waccb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, waccb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -466,7 +466,7 @@ func (waccb *WebAuthnChallengeCreateBulk) Save(ctx context.Context) ([]*WebAuthn
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, waccb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -474,8 +474,8 @@ func (waccb *WebAuthnChallengeCreateBulk) Save(ctx context.Context) ([]*WebAuthn
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (waccb *WebAuthnChallengeCreateBulk) SaveX(ctx context.Context) []*WebAuthnChallenge {
-	v, err := waccb.Save(ctx)
+func (_c *WebAuthnChallengeCreateBulk) SaveX(ctx context.Context) []*WebAuthnChallenge {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -483,14 +483,14 @@ func (waccb *WebAuthnChallengeCreateBulk) SaveX(ctx context.Context) []*WebAuthn
 }
 
 // Exec executes the query.
-func (waccb *WebAuthnChallengeCreateBulk) Exec(ctx context.Context) error {
-	_, err := waccb.Save(ctx)
+func (_c *WebAuthnChallengeCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (waccb *WebAuthnChallengeCreateBulk) ExecX(ctx context.Context) {
-	if err := waccb.Exec(ctx); err != nil {
+func (_c *WebAuthnChallengeCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -510,10 +510,10 @@ func (waccb *WebAuthnChallengeCreateBulk) ExecX(ctx context.Context) {
 //			SetNonceHash(v+v).
 //		}).
 //		Exec(ctx)
-func (waccb *WebAuthnChallengeCreateBulk) OnConflict(opts ...sql.ConflictOption) *WebAuthnChallengeUpsertBulk {
-	waccb.conflict = opts
+func (_c *WebAuthnChallengeCreateBulk) OnConflict(opts ...sql.ConflictOption) *WebAuthnChallengeUpsertBulk {
+	_c.conflict = opts
 	return &WebAuthnChallengeUpsertBulk{
-		create: waccb,
+		create: _c,
 	}
 }
 
@@ -523,10 +523,10 @@ func (waccb *WebAuthnChallengeCreateBulk) OnConflict(opts ...sql.ConflictOption)
 //	client.WebAuthnChallenge.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (waccb *WebAuthnChallengeCreateBulk) OnConflictColumns(columns ...string) *WebAuthnChallengeUpsertBulk {
-	waccb.conflict = append(waccb.conflict, sql.ConflictColumns(columns...))
+func (_c *WebAuthnChallengeCreateBulk) OnConflictColumns(columns ...string) *WebAuthnChallengeUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &WebAuthnChallengeUpsertBulk{
-		create: waccb,
+		create: _c,
 	}
 }
 

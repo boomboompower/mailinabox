@@ -43,7 +43,7 @@ func (*ZoneSerial) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the ZoneSerial fields.
-func (zs *ZoneSerial) assignValues(columns []string, values []any) error {
+func (_m *ZoneSerial) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -54,27 +54,27 @@ func (zs *ZoneSerial) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			zs.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case zoneserial.FieldZone:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field zone", values[i])
 			} else if value.Valid {
-				zs.Zone = value.String
+				_m.Zone = value.String
 			}
 		case zoneserial.FieldSerial:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field serial", values[i])
 			} else if value.Valid {
-				zs.Serial = value.Int64
+				_m.Serial = value.Int64
 			}
 		case zoneserial.FieldContentHash:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field content_hash", values[i])
 			} else if value.Valid {
-				zs.ContentHash = value.String
+				_m.ContentHash = value.String
 			}
 		default:
-			zs.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -82,41 +82,41 @@ func (zs *ZoneSerial) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the ZoneSerial.
 // This includes values selected through modifiers, order, etc.
-func (zs *ZoneSerial) Value(name string) (ent.Value, error) {
-	return zs.selectValues.Get(name)
+func (_m *ZoneSerial) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this ZoneSerial.
 // Note that you need to call ZoneSerial.Unwrap() before calling this method if this ZoneSerial
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (zs *ZoneSerial) Update() *ZoneSerialUpdateOne {
-	return NewZoneSerialClient(zs.config).UpdateOne(zs)
+func (_m *ZoneSerial) Update() *ZoneSerialUpdateOne {
+	return NewZoneSerialClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the ZoneSerial entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (zs *ZoneSerial) Unwrap() *ZoneSerial {
-	_tx, ok := zs.config.driver.(*txDriver)
+func (_m *ZoneSerial) Unwrap() *ZoneSerial {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: ZoneSerial is not a transactional entity")
 	}
-	zs.config.driver = _tx.drv
-	return zs
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (zs *ZoneSerial) String() string {
+func (_m *ZoneSerial) String() string {
 	var builder strings.Builder
 	builder.WriteString("ZoneSerial(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", zs.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("zone=")
-	builder.WriteString(zs.Zone)
+	builder.WriteString(_m.Zone)
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
-	builder.WriteString(fmt.Sprintf("%v", zs.Serial))
+	builder.WriteString(fmt.Sprintf("%v", _m.Serial))
 	builder.WriteString(", ")
 	builder.WriteString("content_hash=")
-	builder.WriteString(zs.ContentHash)
+	builder.WriteString(_m.ContentHash)
 	builder.WriteByte(')')
 	return builder.String()
 }

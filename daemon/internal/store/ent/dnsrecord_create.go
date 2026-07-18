@@ -24,62 +24,62 @@ type DNSRecordCreate struct {
 }
 
 // SetQname sets the "qname" field.
-func (drc *DNSRecordCreate) SetQname(s string) *DNSRecordCreate {
-	drc.mutation.SetQname(s)
-	return drc
+func (_c *DNSRecordCreate) SetQname(v string) *DNSRecordCreate {
+	_c.mutation.SetQname(v)
+	return _c
 }
 
 // SetRtype sets the "rtype" field.
-func (drc *DNSRecordCreate) SetRtype(d dnsrecord.Rtype) *DNSRecordCreate {
-	drc.mutation.SetRtype(d)
-	return drc
+func (_c *DNSRecordCreate) SetRtype(v dnsrecord.Rtype) *DNSRecordCreate {
+	_c.mutation.SetRtype(v)
+	return _c
 }
 
 // SetValue sets the "value" field.
-func (drc *DNSRecordCreate) SetValue(s string) *DNSRecordCreate {
-	drc.mutation.SetValue(s)
-	return drc
+func (_c *DNSRecordCreate) SetValue(v string) *DNSRecordCreate {
+	_c.mutation.SetValue(v)
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (drc *DNSRecordCreate) SetCreatedAt(t time.Time) *DNSRecordCreate {
-	drc.mutation.SetCreatedAt(t)
-	return drc
+func (_c *DNSRecordCreate) SetCreatedAt(v time.Time) *DNSRecordCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (drc *DNSRecordCreate) SetNillableCreatedAt(t *time.Time) *DNSRecordCreate {
-	if t != nil {
-		drc.SetCreatedAt(*t)
+func (_c *DNSRecordCreate) SetNillableCreatedAt(v *time.Time) *DNSRecordCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return drc
+	return _c
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
-func (drc *DNSRecordCreate) SetTenantID(id int) *DNSRecordCreate {
-	drc.mutation.SetTenantID(id)
-	return drc
+func (_c *DNSRecordCreate) SetTenantID(id int) *DNSRecordCreate {
+	_c.mutation.SetTenantID(id)
+	return _c
 }
 
 // SetTenant sets the "tenant" edge to the Tenant entity.
-func (drc *DNSRecordCreate) SetTenant(t *Tenant) *DNSRecordCreate {
-	return drc.SetTenantID(t.ID)
+func (_c *DNSRecordCreate) SetTenant(v *Tenant) *DNSRecordCreate {
+	return _c.SetTenantID(v.ID)
 }
 
 // Mutation returns the DNSRecordMutation object of the builder.
-func (drc *DNSRecordCreate) Mutation() *DNSRecordMutation {
-	return drc.mutation
+func (_c *DNSRecordCreate) Mutation() *DNSRecordMutation {
+	return _c.mutation
 }
 
 // Save creates the DNSRecord in the database.
-func (drc *DNSRecordCreate) Save(ctx context.Context) (*DNSRecord, error) {
-	drc.defaults()
-	return withHooks(ctx, drc.sqlSave, drc.mutation, drc.hooks)
+func (_c *DNSRecordCreate) Save(ctx context.Context) (*DNSRecord, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (drc *DNSRecordCreate) SaveX(ctx context.Context) *DNSRecord {
-	v, err := drc.Save(ctx)
+func (_c *DNSRecordCreate) SaveX(ctx context.Context) *DNSRecord {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -87,67 +87,67 @@ func (drc *DNSRecordCreate) SaveX(ctx context.Context) *DNSRecord {
 }
 
 // Exec executes the query.
-func (drc *DNSRecordCreate) Exec(ctx context.Context) error {
-	_, err := drc.Save(ctx)
+func (_c *DNSRecordCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (drc *DNSRecordCreate) ExecX(ctx context.Context) {
-	if err := drc.Exec(ctx); err != nil {
+func (_c *DNSRecordCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (drc *DNSRecordCreate) defaults() {
-	if _, ok := drc.mutation.CreatedAt(); !ok {
+func (_c *DNSRecordCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := dnsrecord.DefaultCreatedAt()
-		drc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (drc *DNSRecordCreate) check() error {
-	if _, ok := drc.mutation.Qname(); !ok {
+func (_c *DNSRecordCreate) check() error {
+	if _, ok := _c.mutation.Qname(); !ok {
 		return &ValidationError{Name: "qname", err: errors.New(`ent: missing required field "DNSRecord.qname"`)}
 	}
-	if v, ok := drc.mutation.Qname(); ok {
+	if v, ok := _c.mutation.Qname(); ok {
 		if err := dnsrecord.QnameValidator(v); err != nil {
 			return &ValidationError{Name: "qname", err: fmt.Errorf(`ent: validator failed for field "DNSRecord.qname": %w`, err)}
 		}
 	}
-	if _, ok := drc.mutation.Rtype(); !ok {
+	if _, ok := _c.mutation.Rtype(); !ok {
 		return &ValidationError{Name: "rtype", err: errors.New(`ent: missing required field "DNSRecord.rtype"`)}
 	}
-	if v, ok := drc.mutation.Rtype(); ok {
+	if v, ok := _c.mutation.Rtype(); ok {
 		if err := dnsrecord.RtypeValidator(v); err != nil {
 			return &ValidationError{Name: "rtype", err: fmt.Errorf(`ent: validator failed for field "DNSRecord.rtype": %w`, err)}
 		}
 	}
-	if _, ok := drc.mutation.Value(); !ok {
+	if _, ok := _c.mutation.Value(); !ok {
 		return &ValidationError{Name: "value", err: errors.New(`ent: missing required field "DNSRecord.value"`)}
 	}
-	if v, ok := drc.mutation.Value(); ok {
+	if v, ok := _c.mutation.Value(); ok {
 		if err := dnsrecord.ValueValidator(v); err != nil {
 			return &ValidationError{Name: "value", err: fmt.Errorf(`ent: validator failed for field "DNSRecord.value": %w`, err)}
 		}
 	}
-	if _, ok := drc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "DNSRecord.created_at"`)}
 	}
-	if _, ok := drc.mutation.TenantID(); !ok {
+	if len(_c.mutation.TenantIDs()) == 0 {
 		return &ValidationError{Name: "tenant", err: errors.New(`ent: missing required edge "DNSRecord.tenant"`)}
 	}
 	return nil
 }
 
-func (drc *DNSRecordCreate) sqlSave(ctx context.Context) (*DNSRecord, error) {
-	if err := drc.check(); err != nil {
+func (_c *DNSRecordCreate) sqlSave(ctx context.Context) (*DNSRecord, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := drc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, drc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -155,34 +155,34 @@ func (drc *DNSRecordCreate) sqlSave(ctx context.Context) (*DNSRecord, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	drc.mutation.id = &_node.ID
-	drc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (drc *DNSRecordCreate) createSpec() (*DNSRecord, *sqlgraph.CreateSpec) {
+func (_c *DNSRecordCreate) createSpec() (*DNSRecord, *sqlgraph.CreateSpec) {
 	var (
-		_node = &DNSRecord{config: drc.config}
+		_node = &DNSRecord{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(dnsrecord.Table, sqlgraph.NewFieldSpec(dnsrecord.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = drc.conflict
-	if value, ok := drc.mutation.Qname(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.Qname(); ok {
 		_spec.SetField(dnsrecord.FieldQname, field.TypeString, value)
 		_node.Qname = value
 	}
-	if value, ok := drc.mutation.Rtype(); ok {
+	if value, ok := _c.mutation.Rtype(); ok {
 		_spec.SetField(dnsrecord.FieldRtype, field.TypeEnum, value)
 		_node.Rtype = value
 	}
-	if value, ok := drc.mutation.Value(); ok {
+	if value, ok := _c.mutation.Value(); ok {
 		_spec.SetField(dnsrecord.FieldValue, field.TypeString, value)
 		_node.Value = value
 	}
-	if value, ok := drc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(dnsrecord.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if nodes := drc.mutation.TenantIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.TenantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -218,10 +218,10 @@ func (drc *DNSRecordCreate) createSpec() (*DNSRecord, *sqlgraph.CreateSpec) {
 //			SetQname(v+v).
 //		}).
 //		Exec(ctx)
-func (drc *DNSRecordCreate) OnConflict(opts ...sql.ConflictOption) *DNSRecordUpsertOne {
-	drc.conflict = opts
+func (_c *DNSRecordCreate) OnConflict(opts ...sql.ConflictOption) *DNSRecordUpsertOne {
+	_c.conflict = opts
 	return &DNSRecordUpsertOne{
-		create: drc,
+		create: _c,
 	}
 }
 
@@ -231,10 +231,10 @@ func (drc *DNSRecordCreate) OnConflict(opts ...sql.ConflictOption) *DNSRecordUps
 //	client.DNSRecord.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (drc *DNSRecordCreate) OnConflictColumns(columns ...string) *DNSRecordUpsertOne {
-	drc.conflict = append(drc.conflict, sql.ConflictColumns(columns...))
+func (_c *DNSRecordCreate) OnConflictColumns(columns ...string) *DNSRecordUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &DNSRecordUpsertOne{
-		create: drc,
+		create: _c,
 	}
 }
 
@@ -416,16 +416,16 @@ type DNSRecordCreateBulk struct {
 }
 
 // Save creates the DNSRecord entities in the database.
-func (drcb *DNSRecordCreateBulk) Save(ctx context.Context) ([]*DNSRecord, error) {
-	if drcb.err != nil {
-		return nil, drcb.err
+func (_c *DNSRecordCreateBulk) Save(ctx context.Context) ([]*DNSRecord, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(drcb.builders))
-	nodes := make([]*DNSRecord, len(drcb.builders))
-	mutators := make([]Mutator, len(drcb.builders))
-	for i := range drcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*DNSRecord, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := drcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*DNSRecordMutation)
@@ -439,12 +439,12 @@ func (drcb *DNSRecordCreateBulk) Save(ctx context.Context) ([]*DNSRecord, error)
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, drcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = drcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, drcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -468,7 +468,7 @@ func (drcb *DNSRecordCreateBulk) Save(ctx context.Context) ([]*DNSRecord, error)
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, drcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -476,8 +476,8 @@ func (drcb *DNSRecordCreateBulk) Save(ctx context.Context) ([]*DNSRecord, error)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (drcb *DNSRecordCreateBulk) SaveX(ctx context.Context) []*DNSRecord {
-	v, err := drcb.Save(ctx)
+func (_c *DNSRecordCreateBulk) SaveX(ctx context.Context) []*DNSRecord {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -485,14 +485,14 @@ func (drcb *DNSRecordCreateBulk) SaveX(ctx context.Context) []*DNSRecord {
 }
 
 // Exec executes the query.
-func (drcb *DNSRecordCreateBulk) Exec(ctx context.Context) error {
-	_, err := drcb.Save(ctx)
+func (_c *DNSRecordCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (drcb *DNSRecordCreateBulk) ExecX(ctx context.Context) {
-	if err := drcb.Exec(ctx); err != nil {
+func (_c *DNSRecordCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -512,10 +512,10 @@ func (drcb *DNSRecordCreateBulk) ExecX(ctx context.Context) {
 //			SetQname(v+v).
 //		}).
 //		Exec(ctx)
-func (drcb *DNSRecordCreateBulk) OnConflict(opts ...sql.ConflictOption) *DNSRecordUpsertBulk {
-	drcb.conflict = opts
+func (_c *DNSRecordCreateBulk) OnConflict(opts ...sql.ConflictOption) *DNSRecordUpsertBulk {
+	_c.conflict = opts
 	return &DNSRecordUpsertBulk{
-		create: drcb,
+		create: _c,
 	}
 }
 
@@ -525,10 +525,10 @@ func (drcb *DNSRecordCreateBulk) OnConflict(opts ...sql.ConflictOption) *DNSReco
 //	client.DNSRecord.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (drcb *DNSRecordCreateBulk) OnConflictColumns(columns ...string) *DNSRecordUpsertBulk {
-	drcb.conflict = append(drcb.conflict, sql.ConflictColumns(columns...))
+func (_c *DNSRecordCreateBulk) OnConflictColumns(columns ...string) *DNSRecordUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &DNSRecordUpsertBulk{
-		create: drcb,
+		create: _c,
 	}
 }
 

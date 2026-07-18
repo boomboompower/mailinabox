@@ -12,6 +12,7 @@ import (
 	"naust/daemon/internal/store/ent/webdomain"
 	"naust/daemon/internal/store/ent/webrule"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -33,44 +34,44 @@ type WebDomainQuery struct {
 }
 
 // Where adds a new predicate for the WebDomainQuery builder.
-func (wdq *WebDomainQuery) Where(ps ...predicate.WebDomain) *WebDomainQuery {
-	wdq.predicates = append(wdq.predicates, ps...)
-	return wdq
+func (_q *WebDomainQuery) Where(ps ...predicate.WebDomain) *WebDomainQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (wdq *WebDomainQuery) Limit(limit int) *WebDomainQuery {
-	wdq.ctx.Limit = &limit
-	return wdq
+func (_q *WebDomainQuery) Limit(limit int) *WebDomainQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (wdq *WebDomainQuery) Offset(offset int) *WebDomainQuery {
-	wdq.ctx.Offset = &offset
-	return wdq
+func (_q *WebDomainQuery) Offset(offset int) *WebDomainQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (wdq *WebDomainQuery) Unique(unique bool) *WebDomainQuery {
-	wdq.ctx.Unique = &unique
-	return wdq
+func (_q *WebDomainQuery) Unique(unique bool) *WebDomainQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (wdq *WebDomainQuery) Order(o ...webdomain.OrderOption) *WebDomainQuery {
-	wdq.order = append(wdq.order, o...)
-	return wdq
+func (_q *WebDomainQuery) Order(o ...webdomain.OrderOption) *WebDomainQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryRules chains the current query on the "rules" edge.
-func (wdq *WebDomainQuery) QueryRules() *WebRuleQuery {
-	query := (&WebRuleClient{config: wdq.config}).Query()
+func (_q *WebDomainQuery) QueryRules() *WebRuleQuery {
+	query := (&WebRuleClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := wdq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := wdq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -79,20 +80,20 @@ func (wdq *WebDomainQuery) QueryRules() *WebRuleQuery {
 			sqlgraph.To(webrule.Table, webrule.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, webdomain.RulesTable, webdomain.RulesColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(wdq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryTenant chains the current query on the "tenant" edge.
-func (wdq *WebDomainQuery) QueryTenant() *TenantQuery {
-	query := (&TenantClient{config: wdq.config}).Query()
+func (_q *WebDomainQuery) QueryTenant() *TenantQuery {
+	query := (&TenantClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := wdq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := wdq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -101,7 +102,7 @@ func (wdq *WebDomainQuery) QueryTenant() *TenantQuery {
 			sqlgraph.To(tenant.Table, tenant.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, webdomain.TenantTable, webdomain.TenantColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(wdq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -109,8 +110,8 @@ func (wdq *WebDomainQuery) QueryTenant() *TenantQuery {
 
 // First returns the first WebDomain entity from the query.
 // Returns a *NotFoundError when no WebDomain was found.
-func (wdq *WebDomainQuery) First(ctx context.Context) (*WebDomain, error) {
-	nodes, err := wdq.Limit(1).All(setContextOp(ctx, wdq.ctx, "First"))
+func (_q *WebDomainQuery) First(ctx context.Context) (*WebDomain, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -121,8 +122,8 @@ func (wdq *WebDomainQuery) First(ctx context.Context) (*WebDomain, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (wdq *WebDomainQuery) FirstX(ctx context.Context) *WebDomain {
-	node, err := wdq.First(ctx)
+func (_q *WebDomainQuery) FirstX(ctx context.Context) *WebDomain {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -131,9 +132,9 @@ func (wdq *WebDomainQuery) FirstX(ctx context.Context) *WebDomain {
 
 // FirstID returns the first WebDomain ID from the query.
 // Returns a *NotFoundError when no WebDomain ID was found.
-func (wdq *WebDomainQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *WebDomainQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = wdq.Limit(1).IDs(setContextOp(ctx, wdq.ctx, "FirstID")); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -144,8 +145,8 @@ func (wdq *WebDomainQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (wdq *WebDomainQuery) FirstIDX(ctx context.Context) int {
-	id, err := wdq.FirstID(ctx)
+func (_q *WebDomainQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -155,8 +156,8 @@ func (wdq *WebDomainQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single WebDomain entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one WebDomain entity is found.
 // Returns a *NotFoundError when no WebDomain entities are found.
-func (wdq *WebDomainQuery) Only(ctx context.Context) (*WebDomain, error) {
-	nodes, err := wdq.Limit(2).All(setContextOp(ctx, wdq.ctx, "Only"))
+func (_q *WebDomainQuery) Only(ctx context.Context) (*WebDomain, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -171,8 +172,8 @@ func (wdq *WebDomainQuery) Only(ctx context.Context) (*WebDomain, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (wdq *WebDomainQuery) OnlyX(ctx context.Context) *WebDomain {
-	node, err := wdq.Only(ctx)
+func (_q *WebDomainQuery) OnlyX(ctx context.Context) *WebDomain {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -182,9 +183,9 @@ func (wdq *WebDomainQuery) OnlyX(ctx context.Context) *WebDomain {
 // OnlyID is like Only, but returns the only WebDomain ID in the query.
 // Returns a *NotSingularError when more than one WebDomain ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (wdq *WebDomainQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *WebDomainQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = wdq.Limit(2).IDs(setContextOp(ctx, wdq.ctx, "OnlyID")); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -199,8 +200,8 @@ func (wdq *WebDomainQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (wdq *WebDomainQuery) OnlyIDX(ctx context.Context) int {
-	id, err := wdq.OnlyID(ctx)
+func (_q *WebDomainQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -208,18 +209,18 @@ func (wdq *WebDomainQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of WebDomains.
-func (wdq *WebDomainQuery) All(ctx context.Context) ([]*WebDomain, error) {
-	ctx = setContextOp(ctx, wdq.ctx, "All")
-	if err := wdq.prepareQuery(ctx); err != nil {
+func (_q *WebDomainQuery) All(ctx context.Context) ([]*WebDomain, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*WebDomain, *WebDomainQuery]()
-	return withInterceptors[[]*WebDomain](ctx, wdq, qr, wdq.inters)
+	return withInterceptors[[]*WebDomain](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (wdq *WebDomainQuery) AllX(ctx context.Context) []*WebDomain {
-	nodes, err := wdq.All(ctx)
+func (_q *WebDomainQuery) AllX(ctx context.Context) []*WebDomain {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -227,20 +228,20 @@ func (wdq *WebDomainQuery) AllX(ctx context.Context) []*WebDomain {
 }
 
 // IDs executes the query and returns a list of WebDomain IDs.
-func (wdq *WebDomainQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if wdq.ctx.Unique == nil && wdq.path != nil {
-		wdq.Unique(true)
+func (_q *WebDomainQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, wdq.ctx, "IDs")
-	if err = wdq.Select(webdomain.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(webdomain.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (wdq *WebDomainQuery) IDsX(ctx context.Context) []int {
-	ids, err := wdq.IDs(ctx)
+func (_q *WebDomainQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -248,17 +249,17 @@ func (wdq *WebDomainQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (wdq *WebDomainQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, wdq.ctx, "Count")
-	if err := wdq.prepareQuery(ctx); err != nil {
+func (_q *WebDomainQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, wdq, querierCount[*WebDomainQuery](), wdq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*WebDomainQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (wdq *WebDomainQuery) CountX(ctx context.Context) int {
-	count, err := wdq.Count(ctx)
+func (_q *WebDomainQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -266,9 +267,9 @@ func (wdq *WebDomainQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (wdq *WebDomainQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, wdq.ctx, "Exist")
-	switch _, err := wdq.FirstID(ctx); {
+func (_q *WebDomainQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -279,8 +280,8 @@ func (wdq *WebDomainQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (wdq *WebDomainQuery) ExistX(ctx context.Context) bool {
-	exist, err := wdq.Exist(ctx)
+func (_q *WebDomainQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -289,44 +290,44 @@ func (wdq *WebDomainQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the WebDomainQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (wdq *WebDomainQuery) Clone() *WebDomainQuery {
-	if wdq == nil {
+func (_q *WebDomainQuery) Clone() *WebDomainQuery {
+	if _q == nil {
 		return nil
 	}
 	return &WebDomainQuery{
-		config:     wdq.config,
-		ctx:        wdq.ctx.Clone(),
-		order:      append([]webdomain.OrderOption{}, wdq.order...),
-		inters:     append([]Interceptor{}, wdq.inters...),
-		predicates: append([]predicate.WebDomain{}, wdq.predicates...),
-		withRules:  wdq.withRules.Clone(),
-		withTenant: wdq.withTenant.Clone(),
+		config:     _q.config,
+		ctx:        _q.ctx.Clone(),
+		order:      append([]webdomain.OrderOption{}, _q.order...),
+		inters:     append([]Interceptor{}, _q.inters...),
+		predicates: append([]predicate.WebDomain{}, _q.predicates...),
+		withRules:  _q.withRules.Clone(),
+		withTenant: _q.withTenant.Clone(),
 		// clone intermediate query.
-		sql:  wdq.sql.Clone(),
-		path: wdq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithRules tells the query-builder to eager-load the nodes that are connected to
 // the "rules" edge. The optional arguments are used to configure the query builder of the edge.
-func (wdq *WebDomainQuery) WithRules(opts ...func(*WebRuleQuery)) *WebDomainQuery {
-	query := (&WebRuleClient{config: wdq.config}).Query()
+func (_q *WebDomainQuery) WithRules(opts ...func(*WebRuleQuery)) *WebDomainQuery {
+	query := (&WebRuleClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	wdq.withRules = query
-	return wdq
+	_q.withRules = query
+	return _q
 }
 
 // WithTenant tells the query-builder to eager-load the nodes that are connected to
 // the "tenant" edge. The optional arguments are used to configure the query builder of the edge.
-func (wdq *WebDomainQuery) WithTenant(opts ...func(*TenantQuery)) *WebDomainQuery {
-	query := (&TenantClient{config: wdq.config}).Query()
+func (_q *WebDomainQuery) WithTenant(opts ...func(*TenantQuery)) *WebDomainQuery {
+	query := (&TenantClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	wdq.withTenant = query
-	return wdq
+	_q.withTenant = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -343,10 +344,10 @@ func (wdq *WebDomainQuery) WithTenant(opts ...func(*TenantQuery)) *WebDomainQuer
 //		GroupBy(webdomain.FieldDomain).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (wdq *WebDomainQuery) GroupBy(field string, fields ...string) *WebDomainGroupBy {
-	wdq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &WebDomainGroupBy{build: wdq}
-	grbuild.flds = &wdq.ctx.Fields
+func (_q *WebDomainQuery) GroupBy(field string, fields ...string) *WebDomainGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &WebDomainGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = webdomain.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -364,56 +365,56 @@ func (wdq *WebDomainQuery) GroupBy(field string, fields ...string) *WebDomainGro
 //	client.WebDomain.Query().
 //		Select(webdomain.FieldDomain).
 //		Scan(ctx, &v)
-func (wdq *WebDomainQuery) Select(fields ...string) *WebDomainSelect {
-	wdq.ctx.Fields = append(wdq.ctx.Fields, fields...)
-	sbuild := &WebDomainSelect{WebDomainQuery: wdq}
+func (_q *WebDomainQuery) Select(fields ...string) *WebDomainSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &WebDomainSelect{WebDomainQuery: _q}
 	sbuild.label = webdomain.Label
-	sbuild.flds, sbuild.scan = &wdq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a WebDomainSelect configured with the given aggregations.
-func (wdq *WebDomainQuery) Aggregate(fns ...AggregateFunc) *WebDomainSelect {
-	return wdq.Select().Aggregate(fns...)
+func (_q *WebDomainQuery) Aggregate(fns ...AggregateFunc) *WebDomainSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (wdq *WebDomainQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range wdq.inters {
+func (_q *WebDomainQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, wdq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range wdq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !webdomain.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if wdq.path != nil {
-		prev, err := wdq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		wdq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (wdq *WebDomainQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*WebDomain, error) {
+func (_q *WebDomainQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*WebDomain, error) {
 	var (
 		nodes       = []*WebDomain{}
-		withFKs     = wdq.withFKs
-		_spec       = wdq.querySpec()
+		withFKs     = _q.withFKs
+		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
-			wdq.withRules != nil,
-			wdq.withTenant != nil,
+			_q.withRules != nil,
+			_q.withTenant != nil,
 		}
 	)
-	if wdq.withTenant != nil {
+	if _q.withTenant != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -423,7 +424,7 @@ func (wdq *WebDomainQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*W
 		return (*WebDomain).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &WebDomain{config: wdq.config}
+		node := &WebDomain{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -431,21 +432,21 @@ func (wdq *WebDomainQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*W
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, wdq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := wdq.withRules; query != nil {
-		if err := wdq.loadRules(ctx, query, nodes,
+	if query := _q.withRules; query != nil {
+		if err := _q.loadRules(ctx, query, nodes,
 			func(n *WebDomain) { n.Edges.Rules = []*WebRule{} },
 			func(n *WebDomain, e *WebRule) { n.Edges.Rules = append(n.Edges.Rules, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := wdq.withTenant; query != nil {
-		if err := wdq.loadTenant(ctx, query, nodes, nil,
+	if query := _q.withTenant; query != nil {
+		if err := _q.loadTenant(ctx, query, nodes, nil,
 			func(n *WebDomain, e *Tenant) { n.Edges.Tenant = e }); err != nil {
 			return nil, err
 		}
@@ -453,7 +454,7 @@ func (wdq *WebDomainQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*W
 	return nodes, nil
 }
 
-func (wdq *WebDomainQuery) loadRules(ctx context.Context, query *WebRuleQuery, nodes []*WebDomain, init func(*WebDomain), assign func(*WebDomain, *WebRule)) error {
+func (_q *WebDomainQuery) loadRules(ctx context.Context, query *WebRuleQuery, nodes []*WebDomain, init func(*WebDomain), assign func(*WebDomain, *WebRule)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*WebDomain)
 	for i := range nodes {
@@ -484,7 +485,7 @@ func (wdq *WebDomainQuery) loadRules(ctx context.Context, query *WebRuleQuery, n
 	}
 	return nil
 }
-func (wdq *WebDomainQuery) loadTenant(ctx context.Context, query *TenantQuery, nodes []*WebDomain, init func(*WebDomain), assign func(*WebDomain, *Tenant)) error {
+func (_q *WebDomainQuery) loadTenant(ctx context.Context, query *TenantQuery, nodes []*WebDomain, init func(*WebDomain), assign func(*WebDomain, *Tenant)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*WebDomain)
 	for i := range nodes {
@@ -517,24 +518,24 @@ func (wdq *WebDomainQuery) loadTenant(ctx context.Context, query *TenantQuery, n
 	return nil
 }
 
-func (wdq *WebDomainQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := wdq.querySpec()
-	_spec.Node.Columns = wdq.ctx.Fields
-	if len(wdq.ctx.Fields) > 0 {
-		_spec.Unique = wdq.ctx.Unique != nil && *wdq.ctx.Unique
+func (_q *WebDomainQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, wdq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (wdq *WebDomainQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *WebDomainQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(webdomain.Table, webdomain.Columns, sqlgraph.NewFieldSpec(webdomain.FieldID, field.TypeInt))
-	_spec.From = wdq.sql
-	if unique := wdq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if wdq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := wdq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, webdomain.FieldID)
 		for i := range fields {
@@ -543,20 +544,20 @@ func (wdq *WebDomainQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if ps := wdq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := wdq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := wdq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := wdq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -566,33 +567,33 @@ func (wdq *WebDomainQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (wdq *WebDomainQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(wdq.driver.Dialect())
+func (_q *WebDomainQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(webdomain.Table)
-	columns := wdq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = webdomain.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if wdq.sql != nil {
-		selector = wdq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if wdq.ctx.Unique != nil && *wdq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, p := range wdq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range wdq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := wdq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := wdq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -605,41 +606,41 @@ type WebDomainGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (wdgb *WebDomainGroupBy) Aggregate(fns ...AggregateFunc) *WebDomainGroupBy {
-	wdgb.fns = append(wdgb.fns, fns...)
-	return wdgb
+func (_g *WebDomainGroupBy) Aggregate(fns ...AggregateFunc) *WebDomainGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (wdgb *WebDomainGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, wdgb.build.ctx, "GroupBy")
-	if err := wdgb.build.prepareQuery(ctx); err != nil {
+func (_g *WebDomainGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*WebDomainQuery, *WebDomainGroupBy](ctx, wdgb.build, wdgb, wdgb.build.inters, v)
+	return scanWithInterceptors[*WebDomainQuery, *WebDomainGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (wdgb *WebDomainGroupBy) sqlScan(ctx context.Context, root *WebDomainQuery, v any) error {
+func (_g *WebDomainGroupBy) sqlScan(ctx context.Context, root *WebDomainQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(wdgb.fns))
-	for _, fn := range wdgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*wdgb.flds)+len(wdgb.fns))
-		for _, f := range *wdgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*wdgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := wdgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -653,27 +654,27 @@ type WebDomainSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (wds *WebDomainSelect) Aggregate(fns ...AggregateFunc) *WebDomainSelect {
-	wds.fns = append(wds.fns, fns...)
-	return wds
+func (_s *WebDomainSelect) Aggregate(fns ...AggregateFunc) *WebDomainSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (wds *WebDomainSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, wds.ctx, "Select")
-	if err := wds.prepareQuery(ctx); err != nil {
+func (_s *WebDomainSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*WebDomainQuery, *WebDomainSelect](ctx, wds.WebDomainQuery, wds, wds.inters, v)
+	return scanWithInterceptors[*WebDomainQuery, *WebDomainSelect](ctx, _s.WebDomainQuery, _s, _s.inters, v)
 }
 
-func (wds *WebDomainSelect) sqlScan(ctx context.Context, root *WebDomainQuery, v any) error {
+func (_s *WebDomainSelect) sqlScan(ctx context.Context, root *WebDomainQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(wds.fns))
-	for _, fn := range wds.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*wds.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -681,7 +682,7 @@ func (wds *WebDomainSelect) sqlScan(ctx context.Context, root *WebDomainQuery, v
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := wds.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

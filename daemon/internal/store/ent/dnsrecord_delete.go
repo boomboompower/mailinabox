@@ -20,56 +20,56 @@ type DNSRecordDelete struct {
 }
 
 // Where appends a list predicates to the DNSRecordDelete builder.
-func (drd *DNSRecordDelete) Where(ps ...predicate.DNSRecord) *DNSRecordDelete {
-	drd.mutation.Where(ps...)
-	return drd
+func (_d *DNSRecordDelete) Where(ps ...predicate.DNSRecord) *DNSRecordDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (drd *DNSRecordDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, drd.sqlExec, drd.mutation, drd.hooks)
+func (_d *DNSRecordDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (drd *DNSRecordDelete) ExecX(ctx context.Context) int {
-	n, err := drd.Exec(ctx)
+func (_d *DNSRecordDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (drd *DNSRecordDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *DNSRecordDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(dnsrecord.Table, sqlgraph.NewFieldSpec(dnsrecord.FieldID, field.TypeInt))
-	if ps := drd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, drd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	drd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // DNSRecordDeleteOne is the builder for deleting a single DNSRecord entity.
 type DNSRecordDeleteOne struct {
-	drd *DNSRecordDelete
+	_d *DNSRecordDelete
 }
 
 // Where appends a list predicates to the DNSRecordDelete builder.
-func (drdo *DNSRecordDeleteOne) Where(ps ...predicate.DNSRecord) *DNSRecordDeleteOne {
-	drdo.drd.mutation.Where(ps...)
-	return drdo
+func (_d *DNSRecordDeleteOne) Where(ps ...predicate.DNSRecord) *DNSRecordDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (drdo *DNSRecordDeleteOne) Exec(ctx context.Context) error {
-	n, err := drdo.drd.Exec(ctx)
+func (_d *DNSRecordDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (drdo *DNSRecordDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (drdo *DNSRecordDeleteOne) ExecX(ctx context.Context) {
-	if err := drdo.Exec(ctx); err != nil {
+func (_d *DNSRecordDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

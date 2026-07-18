@@ -22,30 +22,30 @@ type SettingCreate struct {
 }
 
 // SetKey sets the "key" field.
-func (sc *SettingCreate) SetKey(s string) *SettingCreate {
-	sc.mutation.SetKey(s)
-	return sc
+func (_c *SettingCreate) SetKey(v string) *SettingCreate {
+	_c.mutation.SetKey(v)
+	return _c
 }
 
 // SetValue sets the "value" field.
-func (sc *SettingCreate) SetValue(s string) *SettingCreate {
-	sc.mutation.SetValue(s)
-	return sc
+func (_c *SettingCreate) SetValue(v string) *SettingCreate {
+	_c.mutation.SetValue(v)
+	return _c
 }
 
 // Mutation returns the SettingMutation object of the builder.
-func (sc *SettingCreate) Mutation() *SettingMutation {
-	return sc.mutation
+func (_c *SettingCreate) Mutation() *SettingMutation {
+	return _c.mutation
 }
 
 // Save creates the Setting in the database.
-func (sc *SettingCreate) Save(ctx context.Context) (*Setting, error) {
-	return withHooks(ctx, sc.sqlSave, sc.mutation, sc.hooks)
+func (_c *SettingCreate) Save(ctx context.Context) (*Setting, error) {
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (sc *SettingCreate) SaveX(ctx context.Context) *Setting {
-	v, err := sc.Save(ctx)
+func (_c *SettingCreate) SaveX(ctx context.Context) *Setting {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -53,40 +53,40 @@ func (sc *SettingCreate) SaveX(ctx context.Context) *Setting {
 }
 
 // Exec executes the query.
-func (sc *SettingCreate) Exec(ctx context.Context) error {
-	_, err := sc.Save(ctx)
+func (_c *SettingCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (sc *SettingCreate) ExecX(ctx context.Context) {
-	if err := sc.Exec(ctx); err != nil {
+func (_c *SettingCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (sc *SettingCreate) check() error {
-	if _, ok := sc.mutation.Key(); !ok {
+func (_c *SettingCreate) check() error {
+	if _, ok := _c.mutation.Key(); !ok {
 		return &ValidationError{Name: "key", err: errors.New(`ent: missing required field "Setting.key"`)}
 	}
-	if v, ok := sc.mutation.Key(); ok {
+	if v, ok := _c.mutation.Key(); ok {
 		if err := setting.KeyValidator(v); err != nil {
 			return &ValidationError{Name: "key", err: fmt.Errorf(`ent: validator failed for field "Setting.key": %w`, err)}
 		}
 	}
-	if _, ok := sc.mutation.Value(); !ok {
+	if _, ok := _c.mutation.Value(); !ok {
 		return &ValidationError{Name: "value", err: errors.New(`ent: missing required field "Setting.value"`)}
 	}
 	return nil
 }
 
-func (sc *SettingCreate) sqlSave(ctx context.Context) (*Setting, error) {
-	if err := sc.check(); err != nil {
+func (_c *SettingCreate) sqlSave(ctx context.Context) (*Setting, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := sc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, sc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -94,22 +94,22 @@ func (sc *SettingCreate) sqlSave(ctx context.Context) (*Setting, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	sc.mutation.id = &_node.ID
-	sc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (sc *SettingCreate) createSpec() (*Setting, *sqlgraph.CreateSpec) {
+func (_c *SettingCreate) createSpec() (*Setting, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Setting{config: sc.config}
+		_node = &Setting{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(setting.Table, sqlgraph.NewFieldSpec(setting.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = sc.conflict
-	if value, ok := sc.mutation.Key(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.Key(); ok {
 		_spec.SetField(setting.FieldKey, field.TypeString, value)
 		_node.Key = value
 	}
-	if value, ok := sc.mutation.Value(); ok {
+	if value, ok := _c.mutation.Value(); ok {
 		_spec.SetField(setting.FieldValue, field.TypeString, value)
 		_node.Value = value
 	}
@@ -132,10 +132,10 @@ func (sc *SettingCreate) createSpec() (*Setting, *sqlgraph.CreateSpec) {
 //			SetKey(v+v).
 //		}).
 //		Exec(ctx)
-func (sc *SettingCreate) OnConflict(opts ...sql.ConflictOption) *SettingUpsertOne {
-	sc.conflict = opts
+func (_c *SettingCreate) OnConflict(opts ...sql.ConflictOption) *SettingUpsertOne {
+	_c.conflict = opts
 	return &SettingUpsertOne{
-		create: sc,
+		create: _c,
 	}
 }
 
@@ -145,10 +145,10 @@ func (sc *SettingCreate) OnConflict(opts ...sql.ConflictOption) *SettingUpsertOn
 //	client.Setting.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (sc *SettingCreate) OnConflictColumns(columns ...string) *SettingUpsertOne {
-	sc.conflict = append(sc.conflict, sql.ConflictColumns(columns...))
+func (_c *SettingCreate) OnConflictColumns(columns ...string) *SettingUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &SettingUpsertOne{
-		create: sc,
+		create: _c,
 	}
 }
 
@@ -299,16 +299,16 @@ type SettingCreateBulk struct {
 }
 
 // Save creates the Setting entities in the database.
-func (scb *SettingCreateBulk) Save(ctx context.Context) ([]*Setting, error) {
-	if scb.err != nil {
-		return nil, scb.err
+func (_c *SettingCreateBulk) Save(ctx context.Context) ([]*Setting, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(scb.builders))
-	nodes := make([]*Setting, len(scb.builders))
-	mutators := make([]Mutator, len(scb.builders))
-	for i := range scb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Setting, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := scb.builders[i]
+			builder := _c.builders[i]
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*SettingMutation)
 				if !ok {
@@ -321,12 +321,12 @@ func (scb *SettingCreateBulk) Save(ctx context.Context) ([]*Setting, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, scb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = scb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, scb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -350,7 +350,7 @@ func (scb *SettingCreateBulk) Save(ctx context.Context) ([]*Setting, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, scb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -358,8 +358,8 @@ func (scb *SettingCreateBulk) Save(ctx context.Context) ([]*Setting, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (scb *SettingCreateBulk) SaveX(ctx context.Context) []*Setting {
-	v, err := scb.Save(ctx)
+func (_c *SettingCreateBulk) SaveX(ctx context.Context) []*Setting {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -367,14 +367,14 @@ func (scb *SettingCreateBulk) SaveX(ctx context.Context) []*Setting {
 }
 
 // Exec executes the query.
-func (scb *SettingCreateBulk) Exec(ctx context.Context) error {
-	_, err := scb.Save(ctx)
+func (_c *SettingCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (scb *SettingCreateBulk) ExecX(ctx context.Context) {
-	if err := scb.Exec(ctx); err != nil {
+func (_c *SettingCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -394,10 +394,10 @@ func (scb *SettingCreateBulk) ExecX(ctx context.Context) {
 //			SetKey(v+v).
 //		}).
 //		Exec(ctx)
-func (scb *SettingCreateBulk) OnConflict(opts ...sql.ConflictOption) *SettingUpsertBulk {
-	scb.conflict = opts
+func (_c *SettingCreateBulk) OnConflict(opts ...sql.ConflictOption) *SettingUpsertBulk {
+	_c.conflict = opts
 	return &SettingUpsertBulk{
-		create: scb,
+		create: _c,
 	}
 }
 
@@ -407,10 +407,10 @@ func (scb *SettingCreateBulk) OnConflict(opts ...sql.ConflictOption) *SettingUps
 //	client.Setting.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (scb *SettingCreateBulk) OnConflictColumns(columns ...string) *SettingUpsertBulk {
-	scb.conflict = append(scb.conflict, sql.ConflictColumns(columns...))
+func (_c *SettingCreateBulk) OnConflictColumns(columns ...string) *SettingUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &SettingUpsertBulk{
-		create: scb,
+		create: _c,
 	}
 }
 

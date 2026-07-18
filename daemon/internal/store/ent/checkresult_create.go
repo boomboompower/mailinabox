@@ -23,113 +23,113 @@ type CheckResultCreate struct {
 }
 
 // SetCheck sets the "check" field.
-func (crc *CheckResultCreate) SetCheck(s string) *CheckResultCreate {
-	crc.mutation.SetCheck(s)
-	return crc
+func (_c *CheckResultCreate) SetCheck(v string) *CheckResultCreate {
+	_c.mutation.SetCheck(v)
+	return _c
 }
 
 // SetDomain sets the "domain" field.
-func (crc *CheckResultCreate) SetDomain(s string) *CheckResultCreate {
-	crc.mutation.SetDomain(s)
-	return crc
+func (_c *CheckResultCreate) SetDomain(v string) *CheckResultCreate {
+	_c.mutation.SetDomain(v)
+	return _c
 }
 
 // SetNillableDomain sets the "domain" field if the given value is not nil.
-func (crc *CheckResultCreate) SetNillableDomain(s *string) *CheckResultCreate {
-	if s != nil {
-		crc.SetDomain(*s)
+func (_c *CheckResultCreate) SetNillableDomain(v *string) *CheckResultCreate {
+	if v != nil {
+		_c.SetDomain(*v)
 	}
-	return crc
+	return _c
 }
 
 // SetCategory sets the "category" field.
-func (crc *CheckResultCreate) SetCategory(s string) *CheckResultCreate {
-	crc.mutation.SetCategory(s)
-	return crc
+func (_c *CheckResultCreate) SetCategory(v string) *CheckResultCreate {
+	_c.mutation.SetCategory(v)
+	return _c
 }
 
 // SetStatus sets the "status" field.
-func (crc *CheckResultCreate) SetStatus(s string) *CheckResultCreate {
-	crc.mutation.SetStatus(s)
-	return crc
+func (_c *CheckResultCreate) SetStatus(v string) *CheckResultCreate {
+	_c.mutation.SetStatus(v)
+	return _c
 }
 
 // SetMessage sets the "message" field.
-func (crc *CheckResultCreate) SetMessage(s string) *CheckResultCreate {
-	crc.mutation.SetMessage(s)
-	return crc
+func (_c *CheckResultCreate) SetMessage(v string) *CheckResultCreate {
+	_c.mutation.SetMessage(v)
+	return _c
 }
 
 // SetNillableMessage sets the "message" field if the given value is not nil.
-func (crc *CheckResultCreate) SetNillableMessage(s *string) *CheckResultCreate {
-	if s != nil {
-		crc.SetMessage(*s)
+func (_c *CheckResultCreate) SetNillableMessage(v *string) *CheckResultCreate {
+	if v != nil {
+		_c.SetMessage(*v)
 	}
-	return crc
+	return _c
 }
 
 // SetSteps sets the "steps" field.
-func (crc *CheckResultCreate) SetSteps(s string) *CheckResultCreate {
-	crc.mutation.SetSteps(s)
-	return crc
+func (_c *CheckResultCreate) SetSteps(v string) *CheckResultCreate {
+	_c.mutation.SetSteps(v)
+	return _c
 }
 
 // SetNillableSteps sets the "steps" field if the given value is not nil.
-func (crc *CheckResultCreate) SetNillableSteps(s *string) *CheckResultCreate {
-	if s != nil {
-		crc.SetSteps(*s)
+func (_c *CheckResultCreate) SetNillableSteps(v *string) *CheckResultCreate {
+	if v != nil {
+		_c.SetSteps(*v)
 	}
-	return crc
+	return _c
 }
 
 // SetRanAt sets the "ran_at" field.
-func (crc *CheckResultCreate) SetRanAt(t time.Time) *CheckResultCreate {
-	crc.mutation.SetRanAt(t)
-	return crc
+func (_c *CheckResultCreate) SetRanAt(v time.Time) *CheckResultCreate {
+	_c.mutation.SetRanAt(v)
+	return _c
 }
 
 // SetElapsedMs sets the "elapsed_ms" field.
-func (crc *CheckResultCreate) SetElapsedMs(i int64) *CheckResultCreate {
-	crc.mutation.SetElapsedMs(i)
-	return crc
+func (_c *CheckResultCreate) SetElapsedMs(v int64) *CheckResultCreate {
+	_c.mutation.SetElapsedMs(v)
+	return _c
 }
 
 // SetNillableElapsedMs sets the "elapsed_ms" field if the given value is not nil.
-func (crc *CheckResultCreate) SetNillableElapsedMs(i *int64) *CheckResultCreate {
-	if i != nil {
-		crc.SetElapsedMs(*i)
+func (_c *CheckResultCreate) SetNillableElapsedMs(v *int64) *CheckResultCreate {
+	if v != nil {
+		_c.SetElapsedMs(*v)
 	}
-	return crc
+	return _c
 }
 
 // SetFirstFailedAt sets the "first_failed_at" field.
-func (crc *CheckResultCreate) SetFirstFailedAt(t time.Time) *CheckResultCreate {
-	crc.mutation.SetFirstFailedAt(t)
-	return crc
+func (_c *CheckResultCreate) SetFirstFailedAt(v time.Time) *CheckResultCreate {
+	_c.mutation.SetFirstFailedAt(v)
+	return _c
 }
 
 // SetNillableFirstFailedAt sets the "first_failed_at" field if the given value is not nil.
-func (crc *CheckResultCreate) SetNillableFirstFailedAt(t *time.Time) *CheckResultCreate {
-	if t != nil {
-		crc.SetFirstFailedAt(*t)
+func (_c *CheckResultCreate) SetNillableFirstFailedAt(v *time.Time) *CheckResultCreate {
+	if v != nil {
+		_c.SetFirstFailedAt(*v)
 	}
-	return crc
+	return _c
 }
 
 // Mutation returns the CheckResultMutation object of the builder.
-func (crc *CheckResultCreate) Mutation() *CheckResultMutation {
-	return crc.mutation
+func (_c *CheckResultCreate) Mutation() *CheckResultMutation {
+	return _c.mutation
 }
 
 // Save creates the CheckResult in the database.
-func (crc *CheckResultCreate) Save(ctx context.Context) (*CheckResult, error) {
-	crc.defaults()
-	return withHooks(ctx, crc.sqlSave, crc.mutation, crc.hooks)
+func (_c *CheckResultCreate) Save(ctx context.Context) (*CheckResult, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (crc *CheckResultCreate) SaveX(ctx context.Context) *CheckResult {
-	v, err := crc.Save(ctx)
+func (_c *CheckResultCreate) SaveX(ctx context.Context) *CheckResult {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -137,88 +137,88 @@ func (crc *CheckResultCreate) SaveX(ctx context.Context) *CheckResult {
 }
 
 // Exec executes the query.
-func (crc *CheckResultCreate) Exec(ctx context.Context) error {
-	_, err := crc.Save(ctx)
+func (_c *CheckResultCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (crc *CheckResultCreate) ExecX(ctx context.Context) {
-	if err := crc.Exec(ctx); err != nil {
+func (_c *CheckResultCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (crc *CheckResultCreate) defaults() {
-	if _, ok := crc.mutation.Domain(); !ok {
+func (_c *CheckResultCreate) defaults() {
+	if _, ok := _c.mutation.Domain(); !ok {
 		v := checkresult.DefaultDomain
-		crc.mutation.SetDomain(v)
+		_c.mutation.SetDomain(v)
 	}
-	if _, ok := crc.mutation.Message(); !ok {
+	if _, ok := _c.mutation.Message(); !ok {
 		v := checkresult.DefaultMessage
-		crc.mutation.SetMessage(v)
+		_c.mutation.SetMessage(v)
 	}
-	if _, ok := crc.mutation.Steps(); !ok {
+	if _, ok := _c.mutation.Steps(); !ok {
 		v := checkresult.DefaultSteps
-		crc.mutation.SetSteps(v)
+		_c.mutation.SetSteps(v)
 	}
-	if _, ok := crc.mutation.ElapsedMs(); !ok {
+	if _, ok := _c.mutation.ElapsedMs(); !ok {
 		v := checkresult.DefaultElapsedMs
-		crc.mutation.SetElapsedMs(v)
+		_c.mutation.SetElapsedMs(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (crc *CheckResultCreate) check() error {
-	if _, ok := crc.mutation.Check(); !ok {
+func (_c *CheckResultCreate) check() error {
+	if _, ok := _c.mutation.Check(); !ok {
 		return &ValidationError{Name: "check", err: errors.New(`ent: missing required field "CheckResult.check"`)}
 	}
-	if v, ok := crc.mutation.Check(); ok {
+	if v, ok := _c.mutation.Check(); ok {
 		if err := checkresult.CheckValidator(v); err != nil {
 			return &ValidationError{Name: "check", err: fmt.Errorf(`ent: validator failed for field "CheckResult.check": %w`, err)}
 		}
 	}
-	if _, ok := crc.mutation.Domain(); !ok {
+	if _, ok := _c.mutation.Domain(); !ok {
 		return &ValidationError{Name: "domain", err: errors.New(`ent: missing required field "CheckResult.domain"`)}
 	}
-	if _, ok := crc.mutation.Category(); !ok {
+	if _, ok := _c.mutation.Category(); !ok {
 		return &ValidationError{Name: "category", err: errors.New(`ent: missing required field "CheckResult.category"`)}
 	}
-	if v, ok := crc.mutation.Category(); ok {
+	if v, ok := _c.mutation.Category(); ok {
 		if err := checkresult.CategoryValidator(v); err != nil {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "CheckResult.category": %w`, err)}
 		}
 	}
-	if _, ok := crc.mutation.Status(); !ok {
+	if _, ok := _c.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "CheckResult.status"`)}
 	}
-	if v, ok := crc.mutation.Status(); ok {
+	if v, ok := _c.mutation.Status(); ok {
 		if err := checkresult.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "CheckResult.status": %w`, err)}
 		}
 	}
-	if _, ok := crc.mutation.Message(); !ok {
+	if _, ok := _c.mutation.Message(); !ok {
 		return &ValidationError{Name: "message", err: errors.New(`ent: missing required field "CheckResult.message"`)}
 	}
-	if _, ok := crc.mutation.Steps(); !ok {
+	if _, ok := _c.mutation.Steps(); !ok {
 		return &ValidationError{Name: "steps", err: errors.New(`ent: missing required field "CheckResult.steps"`)}
 	}
-	if _, ok := crc.mutation.RanAt(); !ok {
+	if _, ok := _c.mutation.RanAt(); !ok {
 		return &ValidationError{Name: "ran_at", err: errors.New(`ent: missing required field "CheckResult.ran_at"`)}
 	}
-	if _, ok := crc.mutation.ElapsedMs(); !ok {
+	if _, ok := _c.mutation.ElapsedMs(); !ok {
 		return &ValidationError{Name: "elapsed_ms", err: errors.New(`ent: missing required field "CheckResult.elapsed_ms"`)}
 	}
 	return nil
 }
 
-func (crc *CheckResultCreate) sqlSave(ctx context.Context) (*CheckResult, error) {
-	if err := crc.check(); err != nil {
+func (_c *CheckResultCreate) sqlSave(ctx context.Context) (*CheckResult, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := crc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, crc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -226,50 +226,50 @@ func (crc *CheckResultCreate) sqlSave(ctx context.Context) (*CheckResult, error)
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	crc.mutation.id = &_node.ID
-	crc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (crc *CheckResultCreate) createSpec() (*CheckResult, *sqlgraph.CreateSpec) {
+func (_c *CheckResultCreate) createSpec() (*CheckResult, *sqlgraph.CreateSpec) {
 	var (
-		_node = &CheckResult{config: crc.config}
+		_node = &CheckResult{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(checkresult.Table, sqlgraph.NewFieldSpec(checkresult.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = crc.conflict
-	if value, ok := crc.mutation.Check(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.Check(); ok {
 		_spec.SetField(checkresult.FieldCheck, field.TypeString, value)
 		_node.Check = value
 	}
-	if value, ok := crc.mutation.Domain(); ok {
+	if value, ok := _c.mutation.Domain(); ok {
 		_spec.SetField(checkresult.FieldDomain, field.TypeString, value)
 		_node.Domain = value
 	}
-	if value, ok := crc.mutation.Category(); ok {
+	if value, ok := _c.mutation.Category(); ok {
 		_spec.SetField(checkresult.FieldCategory, field.TypeString, value)
 		_node.Category = value
 	}
-	if value, ok := crc.mutation.Status(); ok {
+	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(checkresult.FieldStatus, field.TypeString, value)
 		_node.Status = value
 	}
-	if value, ok := crc.mutation.Message(); ok {
+	if value, ok := _c.mutation.Message(); ok {
 		_spec.SetField(checkresult.FieldMessage, field.TypeString, value)
 		_node.Message = value
 	}
-	if value, ok := crc.mutation.Steps(); ok {
+	if value, ok := _c.mutation.Steps(); ok {
 		_spec.SetField(checkresult.FieldSteps, field.TypeString, value)
 		_node.Steps = value
 	}
-	if value, ok := crc.mutation.RanAt(); ok {
+	if value, ok := _c.mutation.RanAt(); ok {
 		_spec.SetField(checkresult.FieldRanAt, field.TypeTime, value)
 		_node.RanAt = value
 	}
-	if value, ok := crc.mutation.ElapsedMs(); ok {
+	if value, ok := _c.mutation.ElapsedMs(); ok {
 		_spec.SetField(checkresult.FieldElapsedMs, field.TypeInt64, value)
 		_node.ElapsedMs = value
 	}
-	if value, ok := crc.mutation.FirstFailedAt(); ok {
+	if value, ok := _c.mutation.FirstFailedAt(); ok {
 		_spec.SetField(checkresult.FieldFirstFailedAt, field.TypeTime, value)
 		_node.FirstFailedAt = &value
 	}
@@ -292,10 +292,10 @@ func (crc *CheckResultCreate) createSpec() (*CheckResult, *sqlgraph.CreateSpec) 
 //			SetCheck(v+v).
 //		}).
 //		Exec(ctx)
-func (crc *CheckResultCreate) OnConflict(opts ...sql.ConflictOption) *CheckResultUpsertOne {
-	crc.conflict = opts
+func (_c *CheckResultCreate) OnConflict(opts ...sql.ConflictOption) *CheckResultUpsertOne {
+	_c.conflict = opts
 	return &CheckResultUpsertOne{
-		create: crc,
+		create: _c,
 	}
 }
 
@@ -305,10 +305,10 @@ func (crc *CheckResultCreate) OnConflict(opts ...sql.ConflictOption) *CheckResul
 //	client.CheckResult.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (crc *CheckResultCreate) OnConflictColumns(columns ...string) *CheckResultUpsertOne {
-	crc.conflict = append(crc.conflict, sql.ConflictColumns(columns...))
+func (_c *CheckResultCreate) OnConflictColumns(columns ...string) *CheckResultUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &CheckResultUpsertOne{
-		create: crc,
+		create: _c,
 	}
 }
 
@@ -667,16 +667,16 @@ type CheckResultCreateBulk struct {
 }
 
 // Save creates the CheckResult entities in the database.
-func (crcb *CheckResultCreateBulk) Save(ctx context.Context) ([]*CheckResult, error) {
-	if crcb.err != nil {
-		return nil, crcb.err
+func (_c *CheckResultCreateBulk) Save(ctx context.Context) ([]*CheckResult, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(crcb.builders))
-	nodes := make([]*CheckResult, len(crcb.builders))
-	mutators := make([]Mutator, len(crcb.builders))
-	for i := range crcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*CheckResult, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := crcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*CheckResultMutation)
@@ -690,12 +690,12 @@ func (crcb *CheckResultCreateBulk) Save(ctx context.Context) ([]*CheckResult, er
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, crcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = crcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, crcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -719,7 +719,7 @@ func (crcb *CheckResultCreateBulk) Save(ctx context.Context) ([]*CheckResult, er
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, crcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -727,8 +727,8 @@ func (crcb *CheckResultCreateBulk) Save(ctx context.Context) ([]*CheckResult, er
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (crcb *CheckResultCreateBulk) SaveX(ctx context.Context) []*CheckResult {
-	v, err := crcb.Save(ctx)
+func (_c *CheckResultCreateBulk) SaveX(ctx context.Context) []*CheckResult {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -736,14 +736,14 @@ func (crcb *CheckResultCreateBulk) SaveX(ctx context.Context) []*CheckResult {
 }
 
 // Exec executes the query.
-func (crcb *CheckResultCreateBulk) Exec(ctx context.Context) error {
-	_, err := crcb.Save(ctx)
+func (_c *CheckResultCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (crcb *CheckResultCreateBulk) ExecX(ctx context.Context) {
-	if err := crcb.Exec(ctx); err != nil {
+func (_c *CheckResultCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -763,10 +763,10 @@ func (crcb *CheckResultCreateBulk) ExecX(ctx context.Context) {
 //			SetCheck(v+v).
 //		}).
 //		Exec(ctx)
-func (crcb *CheckResultCreateBulk) OnConflict(opts ...sql.ConflictOption) *CheckResultUpsertBulk {
-	crcb.conflict = opts
+func (_c *CheckResultCreateBulk) OnConflict(opts ...sql.ConflictOption) *CheckResultUpsertBulk {
+	_c.conflict = opts
 	return &CheckResultUpsertBulk{
-		create: crcb,
+		create: _c,
 	}
 }
 
@@ -776,10 +776,10 @@ func (crcb *CheckResultCreateBulk) OnConflict(opts ...sql.ConflictOption) *Check
 //	client.CheckResult.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (crcb *CheckResultCreateBulk) OnConflictColumns(columns ...string) *CheckResultUpsertBulk {
-	crcb.conflict = append(crcb.conflict, sql.ConflictColumns(columns...))
+func (_c *CheckResultCreateBulk) OnConflictColumns(columns ...string) *CheckResultUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &CheckResultUpsertBulk{
-		create: crcb,
+		create: _c,
 	}
 }
 

@@ -45,12 +45,10 @@ type DNSRecordEdges struct {
 // TenantOrErr returns the Tenant value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e DNSRecordEdges) TenantOrErr() (*Tenant, error) {
-	if e.loadedTypes[0] {
-		if e.Tenant == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: tenant.Label}
-		}
+	if e.Tenant != nil {
 		return e.Tenant, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: tenant.Label}
 	}
 	return nil, &NotLoadedError{edge: "tenant"}
 }
@@ -77,7 +75,7 @@ func (*DNSRecord) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the DNSRecord fields.
-func (dr *DNSRecord) assignValues(columns []string, values []any) error {
+func (_m *DNSRecord) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -88,40 +86,40 @@ func (dr *DNSRecord) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			dr.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case dnsrecord.FieldQname:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field qname", values[i])
 			} else if value.Valid {
-				dr.Qname = value.String
+				_m.Qname = value.String
 			}
 		case dnsrecord.FieldRtype:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field rtype", values[i])
 			} else if value.Valid {
-				dr.Rtype = dnsrecord.Rtype(value.String)
+				_m.Rtype = dnsrecord.Rtype(value.String)
 			}
 		case dnsrecord.FieldValue:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field value", values[i])
 			} else if value.Valid {
-				dr.Value = value.String
+				_m.Value = value.String
 			}
 		case dnsrecord.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				dr.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case dnsrecord.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field tenant_dns_records", value)
 			} else if value.Valid {
-				dr.tenant_dns_records = new(int)
-				*dr.tenant_dns_records = int(value.Int64)
+				_m.tenant_dns_records = new(int)
+				*_m.tenant_dns_records = int(value.Int64)
 			}
 		default:
-			dr.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -129,49 +127,49 @@ func (dr *DNSRecord) assignValues(columns []string, values []any) error {
 
 // GetValue returns the ent.Value that was dynamically selected and assigned to the DNSRecord.
 // This includes values selected through modifiers, order, etc.
-func (dr *DNSRecord) GetValue(name string) (ent.Value, error) {
-	return dr.selectValues.Get(name)
+func (_m *DNSRecord) GetValue(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryTenant queries the "tenant" edge of the DNSRecord entity.
-func (dr *DNSRecord) QueryTenant() *TenantQuery {
-	return NewDNSRecordClient(dr.config).QueryTenant(dr)
+func (_m *DNSRecord) QueryTenant() *TenantQuery {
+	return NewDNSRecordClient(_m.config).QueryTenant(_m)
 }
 
 // Update returns a builder for updating this DNSRecord.
 // Note that you need to call DNSRecord.Unwrap() before calling this method if this DNSRecord
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (dr *DNSRecord) Update() *DNSRecordUpdateOne {
-	return NewDNSRecordClient(dr.config).UpdateOne(dr)
+func (_m *DNSRecord) Update() *DNSRecordUpdateOne {
+	return NewDNSRecordClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the DNSRecord entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (dr *DNSRecord) Unwrap() *DNSRecord {
-	_tx, ok := dr.config.driver.(*txDriver)
+func (_m *DNSRecord) Unwrap() *DNSRecord {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: DNSRecord is not a transactional entity")
 	}
-	dr.config.driver = _tx.drv
-	return dr
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (dr *DNSRecord) String() string {
+func (_m *DNSRecord) String() string {
 	var builder strings.Builder
 	builder.WriteString("DNSRecord(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", dr.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("qname=")
-	builder.WriteString(dr.Qname)
+	builder.WriteString(_m.Qname)
 	builder.WriteString(", ")
 	builder.WriteString("rtype=")
-	builder.WriteString(fmt.Sprintf("%v", dr.Rtype))
+	builder.WriteString(fmt.Sprintf("%v", _m.Rtype))
 	builder.WriteString(", ")
 	builder.WriteString("value=")
-	builder.WriteString(dr.Value)
+	builder.WriteString(_m.Value)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(dr.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

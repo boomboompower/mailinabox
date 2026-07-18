@@ -48,7 +48,7 @@ func (*MetricSample) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the MetricSample fields.
-func (ms *MetricSample) assignValues(columns []string, values []any) error {
+func (_m *MetricSample) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -59,27 +59,27 @@ func (ms *MetricSample) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			ms.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case metricsample.FieldMetric:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field metric", values[i])
 			} else if value.Valid {
-				ms.Metric = value.String
+				_m.Metric = value.String
 			}
 		case metricsample.FieldSampledAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field sampled_at", values[i])
 			} else if value.Valid {
-				ms.SampledAt = value.Time
+				_m.SampledAt = value.Time
 			}
 		case metricsample.FieldValue:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field value", values[i])
 			} else if value.Valid {
-				ms.Value = value.Float64
+				_m.Value = value.Float64
 			}
 		default:
-			ms.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -87,41 +87,41 @@ func (ms *MetricSample) assignValues(columns []string, values []any) error {
 
 // GetValue returns the ent.Value that was dynamically selected and assigned to the MetricSample.
 // This includes values selected through modifiers, order, etc.
-func (ms *MetricSample) GetValue(name string) (ent.Value, error) {
-	return ms.selectValues.Get(name)
+func (_m *MetricSample) GetValue(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this MetricSample.
 // Note that you need to call MetricSample.Unwrap() before calling this method if this MetricSample
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (ms *MetricSample) Update() *MetricSampleUpdateOne {
-	return NewMetricSampleClient(ms.config).UpdateOne(ms)
+func (_m *MetricSample) Update() *MetricSampleUpdateOne {
+	return NewMetricSampleClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the MetricSample entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (ms *MetricSample) Unwrap() *MetricSample {
-	_tx, ok := ms.config.driver.(*txDriver)
+func (_m *MetricSample) Unwrap() *MetricSample {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: MetricSample is not a transactional entity")
 	}
-	ms.config.driver = _tx.drv
-	return ms
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (ms *MetricSample) String() string {
+func (_m *MetricSample) String() string {
 	var builder strings.Builder
 	builder.WriteString("MetricSample(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", ms.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("metric=")
-	builder.WriteString(ms.Metric)
+	builder.WriteString(_m.Metric)
 	builder.WriteString(", ")
 	builder.WriteString("sampled_at=")
-	builder.WriteString(ms.SampledAt.Format(time.ANSIC))
+	builder.WriteString(_m.SampledAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("value=")
-	builder.WriteString(fmt.Sprintf("%v", ms.Value))
+	builder.WriteString(fmt.Sprintf("%v", _m.Value))
 	builder.WriteByte(')')
 	return builder.String()
 }

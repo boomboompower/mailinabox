@@ -23,83 +23,83 @@ type DNSZoneProviderUpdate struct {
 }
 
 // Where appends a list predicates to the DNSZoneProviderUpdate builder.
-func (dzpu *DNSZoneProviderUpdate) Where(ps ...predicate.DNSZoneProvider) *DNSZoneProviderUpdate {
-	dzpu.mutation.Where(ps...)
-	return dzpu
+func (_u *DNSZoneProviderUpdate) Where(ps ...predicate.DNSZoneProvider) *DNSZoneProviderUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetZone sets the "zone" field.
-func (dzpu *DNSZoneProviderUpdate) SetZone(s string) *DNSZoneProviderUpdate {
-	dzpu.mutation.SetZone(s)
-	return dzpu
+func (_u *DNSZoneProviderUpdate) SetZone(v string) *DNSZoneProviderUpdate {
+	_u.mutation.SetZone(v)
+	return _u
 }
 
 // SetNillableZone sets the "zone" field if the given value is not nil.
-func (dzpu *DNSZoneProviderUpdate) SetNillableZone(s *string) *DNSZoneProviderUpdate {
-	if s != nil {
-		dzpu.SetZone(*s)
+func (_u *DNSZoneProviderUpdate) SetNillableZone(v *string) *DNSZoneProviderUpdate {
+	if v != nil {
+		_u.SetZone(*v)
 	}
-	return dzpu
+	return _u
 }
 
 // SetProvider sets the "provider" field.
-func (dzpu *DNSZoneProviderUpdate) SetProvider(s string) *DNSZoneProviderUpdate {
-	dzpu.mutation.SetProvider(s)
-	return dzpu
+func (_u *DNSZoneProviderUpdate) SetProvider(v string) *DNSZoneProviderUpdate {
+	_u.mutation.SetProvider(v)
+	return _u
 }
 
 // SetNillableProvider sets the "provider" field if the given value is not nil.
-func (dzpu *DNSZoneProviderUpdate) SetNillableProvider(s *string) *DNSZoneProviderUpdate {
-	if s != nil {
-		dzpu.SetProvider(*s)
+func (_u *DNSZoneProviderUpdate) SetNillableProvider(v *string) *DNSZoneProviderUpdate {
+	if v != nil {
+		_u.SetProvider(*v)
 	}
-	return dzpu
+	return _u
 }
 
 // SetToken sets the "token" field.
-func (dzpu *DNSZoneProviderUpdate) SetToken(s string) *DNSZoneProviderUpdate {
-	dzpu.mutation.SetToken(s)
-	return dzpu
+func (_u *DNSZoneProviderUpdate) SetToken(v string) *DNSZoneProviderUpdate {
+	_u.mutation.SetToken(v)
+	return _u
 }
 
 // SetNillableToken sets the "token" field if the given value is not nil.
-func (dzpu *DNSZoneProviderUpdate) SetNillableToken(s *string) *DNSZoneProviderUpdate {
-	if s != nil {
-		dzpu.SetToken(*s)
+func (_u *DNSZoneProviderUpdate) SetNillableToken(v *string) *DNSZoneProviderUpdate {
+	if v != nil {
+		_u.SetToken(*v)
 	}
-	return dzpu
+	return _u
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
-func (dzpu *DNSZoneProviderUpdate) SetTenantID(id int) *DNSZoneProviderUpdate {
-	dzpu.mutation.SetTenantID(id)
-	return dzpu
+func (_u *DNSZoneProviderUpdate) SetTenantID(id int) *DNSZoneProviderUpdate {
+	_u.mutation.SetTenantID(id)
+	return _u
 }
 
 // SetTenant sets the "tenant" edge to the Tenant entity.
-func (dzpu *DNSZoneProviderUpdate) SetTenant(t *Tenant) *DNSZoneProviderUpdate {
-	return dzpu.SetTenantID(t.ID)
+func (_u *DNSZoneProviderUpdate) SetTenant(v *Tenant) *DNSZoneProviderUpdate {
+	return _u.SetTenantID(v.ID)
 }
 
 // Mutation returns the DNSZoneProviderMutation object of the builder.
-func (dzpu *DNSZoneProviderUpdate) Mutation() *DNSZoneProviderMutation {
-	return dzpu.mutation
+func (_u *DNSZoneProviderUpdate) Mutation() *DNSZoneProviderMutation {
+	return _u.mutation
 }
 
 // ClearTenant clears the "tenant" edge to the Tenant entity.
-func (dzpu *DNSZoneProviderUpdate) ClearTenant() *DNSZoneProviderUpdate {
-	dzpu.mutation.ClearTenant()
-	return dzpu
+func (_u *DNSZoneProviderUpdate) ClearTenant() *DNSZoneProviderUpdate {
+	_u.mutation.ClearTenant()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (dzpu *DNSZoneProviderUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, dzpu.sqlSave, dzpu.mutation, dzpu.hooks)
+func (_u *DNSZoneProviderUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (dzpu *DNSZoneProviderUpdate) SaveX(ctx context.Context) int {
-	affected, err := dzpu.Save(ctx)
+func (_u *DNSZoneProviderUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -107,63 +107,63 @@ func (dzpu *DNSZoneProviderUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (dzpu *DNSZoneProviderUpdate) Exec(ctx context.Context) error {
-	_, err := dzpu.Save(ctx)
+func (_u *DNSZoneProviderUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (dzpu *DNSZoneProviderUpdate) ExecX(ctx context.Context) {
-	if err := dzpu.Exec(ctx); err != nil {
+func (_u *DNSZoneProviderUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (dzpu *DNSZoneProviderUpdate) check() error {
-	if v, ok := dzpu.mutation.Zone(); ok {
+func (_u *DNSZoneProviderUpdate) check() error {
+	if v, ok := _u.mutation.Zone(); ok {
 		if err := dnszoneprovider.ZoneValidator(v); err != nil {
 			return &ValidationError{Name: "zone", err: fmt.Errorf(`ent: validator failed for field "DNSZoneProvider.zone": %w`, err)}
 		}
 	}
-	if v, ok := dzpu.mutation.Provider(); ok {
+	if v, ok := _u.mutation.Provider(); ok {
 		if err := dnszoneprovider.ProviderValidator(v); err != nil {
 			return &ValidationError{Name: "provider", err: fmt.Errorf(`ent: validator failed for field "DNSZoneProvider.provider": %w`, err)}
 		}
 	}
-	if v, ok := dzpu.mutation.Token(); ok {
+	if v, ok := _u.mutation.Token(); ok {
 		if err := dnszoneprovider.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "DNSZoneProvider.token": %w`, err)}
 		}
 	}
-	if _, ok := dzpu.mutation.TenantID(); dzpu.mutation.TenantCleared() && !ok {
+	if _u.mutation.TenantCleared() && len(_u.mutation.TenantIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "DNSZoneProvider.tenant"`)
 	}
 	return nil
 }
 
-func (dzpu *DNSZoneProviderUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := dzpu.check(); err != nil {
-		return n, err
+func (_u *DNSZoneProviderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(dnszoneprovider.Table, dnszoneprovider.Columns, sqlgraph.NewFieldSpec(dnszoneprovider.FieldID, field.TypeInt))
-	if ps := dzpu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := dzpu.mutation.Zone(); ok {
+	if value, ok := _u.mutation.Zone(); ok {
 		_spec.SetField(dnszoneprovider.FieldZone, field.TypeString, value)
 	}
-	if value, ok := dzpu.mutation.Provider(); ok {
+	if value, ok := _u.mutation.Provider(); ok {
 		_spec.SetField(dnszoneprovider.FieldProvider, field.TypeString, value)
 	}
-	if value, ok := dzpu.mutation.Token(); ok {
+	if value, ok := _u.mutation.Token(); ok {
 		_spec.SetField(dnszoneprovider.FieldToken, field.TypeString, value)
 	}
-	if dzpu.mutation.TenantCleared() {
+	if _u.mutation.TenantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -176,7 +176,7 @@ func (dzpu *DNSZoneProviderUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := dzpu.mutation.TenantIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TenantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -192,7 +192,7 @@ func (dzpu *DNSZoneProviderUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, dzpu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{dnszoneprovider.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -200,8 +200,8 @@ func (dzpu *DNSZoneProviderUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		return 0, err
 	}
-	dzpu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // DNSZoneProviderUpdateOne is the builder for updating a single DNSZoneProvider entity.
@@ -213,90 +213,90 @@ type DNSZoneProviderUpdateOne struct {
 }
 
 // SetZone sets the "zone" field.
-func (dzpuo *DNSZoneProviderUpdateOne) SetZone(s string) *DNSZoneProviderUpdateOne {
-	dzpuo.mutation.SetZone(s)
-	return dzpuo
+func (_u *DNSZoneProviderUpdateOne) SetZone(v string) *DNSZoneProviderUpdateOne {
+	_u.mutation.SetZone(v)
+	return _u
 }
 
 // SetNillableZone sets the "zone" field if the given value is not nil.
-func (dzpuo *DNSZoneProviderUpdateOne) SetNillableZone(s *string) *DNSZoneProviderUpdateOne {
-	if s != nil {
-		dzpuo.SetZone(*s)
+func (_u *DNSZoneProviderUpdateOne) SetNillableZone(v *string) *DNSZoneProviderUpdateOne {
+	if v != nil {
+		_u.SetZone(*v)
 	}
-	return dzpuo
+	return _u
 }
 
 // SetProvider sets the "provider" field.
-func (dzpuo *DNSZoneProviderUpdateOne) SetProvider(s string) *DNSZoneProviderUpdateOne {
-	dzpuo.mutation.SetProvider(s)
-	return dzpuo
+func (_u *DNSZoneProviderUpdateOne) SetProvider(v string) *DNSZoneProviderUpdateOne {
+	_u.mutation.SetProvider(v)
+	return _u
 }
 
 // SetNillableProvider sets the "provider" field if the given value is not nil.
-func (dzpuo *DNSZoneProviderUpdateOne) SetNillableProvider(s *string) *DNSZoneProviderUpdateOne {
-	if s != nil {
-		dzpuo.SetProvider(*s)
+func (_u *DNSZoneProviderUpdateOne) SetNillableProvider(v *string) *DNSZoneProviderUpdateOne {
+	if v != nil {
+		_u.SetProvider(*v)
 	}
-	return dzpuo
+	return _u
 }
 
 // SetToken sets the "token" field.
-func (dzpuo *DNSZoneProviderUpdateOne) SetToken(s string) *DNSZoneProviderUpdateOne {
-	dzpuo.mutation.SetToken(s)
-	return dzpuo
+func (_u *DNSZoneProviderUpdateOne) SetToken(v string) *DNSZoneProviderUpdateOne {
+	_u.mutation.SetToken(v)
+	return _u
 }
 
 // SetNillableToken sets the "token" field if the given value is not nil.
-func (dzpuo *DNSZoneProviderUpdateOne) SetNillableToken(s *string) *DNSZoneProviderUpdateOne {
-	if s != nil {
-		dzpuo.SetToken(*s)
+func (_u *DNSZoneProviderUpdateOne) SetNillableToken(v *string) *DNSZoneProviderUpdateOne {
+	if v != nil {
+		_u.SetToken(*v)
 	}
-	return dzpuo
+	return _u
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
-func (dzpuo *DNSZoneProviderUpdateOne) SetTenantID(id int) *DNSZoneProviderUpdateOne {
-	dzpuo.mutation.SetTenantID(id)
-	return dzpuo
+func (_u *DNSZoneProviderUpdateOne) SetTenantID(id int) *DNSZoneProviderUpdateOne {
+	_u.mutation.SetTenantID(id)
+	return _u
 }
 
 // SetTenant sets the "tenant" edge to the Tenant entity.
-func (dzpuo *DNSZoneProviderUpdateOne) SetTenant(t *Tenant) *DNSZoneProviderUpdateOne {
-	return dzpuo.SetTenantID(t.ID)
+func (_u *DNSZoneProviderUpdateOne) SetTenant(v *Tenant) *DNSZoneProviderUpdateOne {
+	return _u.SetTenantID(v.ID)
 }
 
 // Mutation returns the DNSZoneProviderMutation object of the builder.
-func (dzpuo *DNSZoneProviderUpdateOne) Mutation() *DNSZoneProviderMutation {
-	return dzpuo.mutation
+func (_u *DNSZoneProviderUpdateOne) Mutation() *DNSZoneProviderMutation {
+	return _u.mutation
 }
 
 // ClearTenant clears the "tenant" edge to the Tenant entity.
-func (dzpuo *DNSZoneProviderUpdateOne) ClearTenant() *DNSZoneProviderUpdateOne {
-	dzpuo.mutation.ClearTenant()
-	return dzpuo
+func (_u *DNSZoneProviderUpdateOne) ClearTenant() *DNSZoneProviderUpdateOne {
+	_u.mutation.ClearTenant()
+	return _u
 }
 
 // Where appends a list predicates to the DNSZoneProviderUpdate builder.
-func (dzpuo *DNSZoneProviderUpdateOne) Where(ps ...predicate.DNSZoneProvider) *DNSZoneProviderUpdateOne {
-	dzpuo.mutation.Where(ps...)
-	return dzpuo
+func (_u *DNSZoneProviderUpdateOne) Where(ps ...predicate.DNSZoneProvider) *DNSZoneProviderUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (dzpuo *DNSZoneProviderUpdateOne) Select(field string, fields ...string) *DNSZoneProviderUpdateOne {
-	dzpuo.fields = append([]string{field}, fields...)
-	return dzpuo
+func (_u *DNSZoneProviderUpdateOne) Select(field string, fields ...string) *DNSZoneProviderUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated DNSZoneProvider entity.
-func (dzpuo *DNSZoneProviderUpdateOne) Save(ctx context.Context) (*DNSZoneProvider, error) {
-	return withHooks(ctx, dzpuo.sqlSave, dzpuo.mutation, dzpuo.hooks)
+func (_u *DNSZoneProviderUpdateOne) Save(ctx context.Context) (*DNSZoneProvider, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (dzpuo *DNSZoneProviderUpdateOne) SaveX(ctx context.Context) *DNSZoneProvider {
-	node, err := dzpuo.Save(ctx)
+func (_u *DNSZoneProviderUpdateOne) SaveX(ctx context.Context) *DNSZoneProvider {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -304,52 +304,52 @@ func (dzpuo *DNSZoneProviderUpdateOne) SaveX(ctx context.Context) *DNSZoneProvid
 }
 
 // Exec executes the query on the entity.
-func (dzpuo *DNSZoneProviderUpdateOne) Exec(ctx context.Context) error {
-	_, err := dzpuo.Save(ctx)
+func (_u *DNSZoneProviderUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (dzpuo *DNSZoneProviderUpdateOne) ExecX(ctx context.Context) {
-	if err := dzpuo.Exec(ctx); err != nil {
+func (_u *DNSZoneProviderUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (dzpuo *DNSZoneProviderUpdateOne) check() error {
-	if v, ok := dzpuo.mutation.Zone(); ok {
+func (_u *DNSZoneProviderUpdateOne) check() error {
+	if v, ok := _u.mutation.Zone(); ok {
 		if err := dnszoneprovider.ZoneValidator(v); err != nil {
 			return &ValidationError{Name: "zone", err: fmt.Errorf(`ent: validator failed for field "DNSZoneProvider.zone": %w`, err)}
 		}
 	}
-	if v, ok := dzpuo.mutation.Provider(); ok {
+	if v, ok := _u.mutation.Provider(); ok {
 		if err := dnszoneprovider.ProviderValidator(v); err != nil {
 			return &ValidationError{Name: "provider", err: fmt.Errorf(`ent: validator failed for field "DNSZoneProvider.provider": %w`, err)}
 		}
 	}
-	if v, ok := dzpuo.mutation.Token(); ok {
+	if v, ok := _u.mutation.Token(); ok {
 		if err := dnszoneprovider.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "DNSZoneProvider.token": %w`, err)}
 		}
 	}
-	if _, ok := dzpuo.mutation.TenantID(); dzpuo.mutation.TenantCleared() && !ok {
+	if _u.mutation.TenantCleared() && len(_u.mutation.TenantIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "DNSZoneProvider.tenant"`)
 	}
 	return nil
 }
 
-func (dzpuo *DNSZoneProviderUpdateOne) sqlSave(ctx context.Context) (_node *DNSZoneProvider, err error) {
-	if err := dzpuo.check(); err != nil {
+func (_u *DNSZoneProviderUpdateOne) sqlSave(ctx context.Context) (_node *DNSZoneProvider, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(dnszoneprovider.Table, dnszoneprovider.Columns, sqlgraph.NewFieldSpec(dnszoneprovider.FieldID, field.TypeInt))
-	id, ok := dzpuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "DNSZoneProvider.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := dzpuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, dnszoneprovider.FieldID)
 		for _, f := range fields {
@@ -361,23 +361,23 @@ func (dzpuo *DNSZoneProviderUpdateOne) sqlSave(ctx context.Context) (_node *DNSZ
 			}
 		}
 	}
-	if ps := dzpuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := dzpuo.mutation.Zone(); ok {
+	if value, ok := _u.mutation.Zone(); ok {
 		_spec.SetField(dnszoneprovider.FieldZone, field.TypeString, value)
 	}
-	if value, ok := dzpuo.mutation.Provider(); ok {
+	if value, ok := _u.mutation.Provider(); ok {
 		_spec.SetField(dnszoneprovider.FieldProvider, field.TypeString, value)
 	}
-	if value, ok := dzpuo.mutation.Token(); ok {
+	if value, ok := _u.mutation.Token(); ok {
 		_spec.SetField(dnszoneprovider.FieldToken, field.TypeString, value)
 	}
-	if dzpuo.mutation.TenantCleared() {
+	if _u.mutation.TenantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -390,7 +390,7 @@ func (dzpuo *DNSZoneProviderUpdateOne) sqlSave(ctx context.Context) (_node *DNSZ
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := dzpuo.mutation.TenantIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TenantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -406,10 +406,10 @@ func (dzpuo *DNSZoneProviderUpdateOne) sqlSave(ctx context.Context) (_node *DNSZ
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &DNSZoneProvider{config: dzpuo.config}
+	_node = &DNSZoneProvider{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, dzpuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{dnszoneprovider.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -417,6 +417,6 @@ func (dzpuo *DNSZoneProviderUpdateOne) sqlSave(ctx context.Context) (_node *DNSZ
 		}
 		return nil, err
 	}
-	dzpuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

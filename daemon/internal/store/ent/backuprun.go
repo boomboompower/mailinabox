@@ -54,7 +54,7 @@ func (*BackupRun) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the BackupRun fields.
-func (br *BackupRun) assignValues(columns []string, values []any) error {
+func (_m *BackupRun) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -65,52 +65,52 @@ func (br *BackupRun) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			br.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case backuprun.FieldStartedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field started_at", values[i])
 			} else if value.Valid {
-				br.StartedAt = value.Time
+				_m.StartedAt = value.Time
 			}
 		case backuprun.FieldFinishedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field finished_at", values[i])
 			} else if value.Valid {
-				br.FinishedAt = new(time.Time)
-				*br.FinishedAt = value.Time
+				_m.FinishedAt = new(time.Time)
+				*_m.FinishedAt = value.Time
 			}
 		case backuprun.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				br.Status = value.String
+				_m.Status = value.String
 			}
 		case backuprun.FieldTool:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field tool", values[i])
 			} else if value.Valid {
-				br.Tool = value.String
+				_m.Tool = value.String
 			}
 		case backuprun.FieldError:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field error", values[i])
 			} else if value.Valid {
-				br.Error = value.String
+				_m.Error = value.String
 			}
 		case backuprun.FieldWarning:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field warning", values[i])
 			} else if value.Valid {
-				br.Warning = value.String
+				_m.Warning = value.String
 			}
 		case backuprun.FieldStats:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field stats", values[i])
 			} else if value.Valid {
-				br.Stats = value.String
+				_m.Stats = value.String
 			}
 		default:
-			br.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -118,55 +118,55 @@ func (br *BackupRun) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the BackupRun.
 // This includes values selected through modifiers, order, etc.
-func (br *BackupRun) Value(name string) (ent.Value, error) {
-	return br.selectValues.Get(name)
+func (_m *BackupRun) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this BackupRun.
 // Note that you need to call BackupRun.Unwrap() before calling this method if this BackupRun
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (br *BackupRun) Update() *BackupRunUpdateOne {
-	return NewBackupRunClient(br.config).UpdateOne(br)
+func (_m *BackupRun) Update() *BackupRunUpdateOne {
+	return NewBackupRunClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the BackupRun entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (br *BackupRun) Unwrap() *BackupRun {
-	_tx, ok := br.config.driver.(*txDriver)
+func (_m *BackupRun) Unwrap() *BackupRun {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: BackupRun is not a transactional entity")
 	}
-	br.config.driver = _tx.drv
-	return br
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (br *BackupRun) String() string {
+func (_m *BackupRun) String() string {
 	var builder strings.Builder
 	builder.WriteString("BackupRun(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", br.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("started_at=")
-	builder.WriteString(br.StartedAt.Format(time.ANSIC))
+	builder.WriteString(_m.StartedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := br.FinishedAt; v != nil {
+	if v := _m.FinishedAt; v != nil {
 		builder.WriteString("finished_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(br.Status)
+	builder.WriteString(_m.Status)
 	builder.WriteString(", ")
 	builder.WriteString("tool=")
-	builder.WriteString(br.Tool)
+	builder.WriteString(_m.Tool)
 	builder.WriteString(", ")
 	builder.WriteString("error=")
-	builder.WriteString(br.Error)
+	builder.WriteString(_m.Error)
 	builder.WriteString(", ")
 	builder.WriteString("warning=")
-	builder.WriteString(br.Warning)
+	builder.WriteString(_m.Warning)
 	builder.WriteString(", ")
 	builder.WriteString("stats=")
-	builder.WriteString(br.Stats)
+	builder.WriteString(_m.Stats)
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -24,119 +24,119 @@ type WebDomainUpdate struct {
 }
 
 // Where appends a list predicates to the WebDomainUpdate builder.
-func (wdu *WebDomainUpdate) Where(ps ...predicate.WebDomain) *WebDomainUpdate {
-	wdu.mutation.Where(ps...)
-	return wdu
+func (_u *WebDomainUpdate) Where(ps ...predicate.WebDomain) *WebDomainUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetDomain sets the "domain" field.
-func (wdu *WebDomainUpdate) SetDomain(s string) *WebDomainUpdate {
-	wdu.mutation.SetDomain(s)
-	return wdu
+func (_u *WebDomainUpdate) SetDomain(v string) *WebDomainUpdate {
+	_u.mutation.SetDomain(v)
+	return _u
 }
 
 // SetNillableDomain sets the "domain" field if the given value is not nil.
-func (wdu *WebDomainUpdate) SetNillableDomain(s *string) *WebDomainUpdate {
-	if s != nil {
-		wdu.SetDomain(*s)
+func (_u *WebDomainUpdate) SetNillableDomain(v *string) *WebDomainUpdate {
+	if v != nil {
+		_u.SetDomain(*v)
 	}
-	return wdu
+	return _u
 }
 
 // SetHsts sets the "hsts" field.
-func (wdu *WebDomainUpdate) SetHsts(w webdomain.Hsts) *WebDomainUpdate {
-	wdu.mutation.SetHsts(w)
-	return wdu
+func (_u *WebDomainUpdate) SetHsts(v webdomain.Hsts) *WebDomainUpdate {
+	_u.mutation.SetHsts(v)
+	return _u
 }
 
 // SetNillableHsts sets the "hsts" field if the given value is not nil.
-func (wdu *WebDomainUpdate) SetNillableHsts(w *webdomain.Hsts) *WebDomainUpdate {
-	if w != nil {
-		wdu.SetHsts(*w)
+func (_u *WebDomainUpdate) SetNillableHsts(v *webdomain.Hsts) *WebDomainUpdate {
+	if v != nil {
+		_u.SetHsts(*v)
 	}
-	return wdu
+	return _u
 }
 
 // SetServeStatic sets the "serve_static" field.
-func (wdu *WebDomainUpdate) SetServeStatic(b bool) *WebDomainUpdate {
-	wdu.mutation.SetServeStatic(b)
-	return wdu
+func (_u *WebDomainUpdate) SetServeStatic(v bool) *WebDomainUpdate {
+	_u.mutation.SetServeStatic(v)
+	return _u
 }
 
 // SetNillableServeStatic sets the "serve_static" field if the given value is not nil.
-func (wdu *WebDomainUpdate) SetNillableServeStatic(b *bool) *WebDomainUpdate {
-	if b != nil {
-		wdu.SetServeStatic(*b)
+func (_u *WebDomainUpdate) SetNillableServeStatic(v *bool) *WebDomainUpdate {
+	if v != nil {
+		_u.SetServeStatic(*v)
 	}
-	return wdu
+	return _u
 }
 
 // AddRuleIDs adds the "rules" edge to the WebRule entity by IDs.
-func (wdu *WebDomainUpdate) AddRuleIDs(ids ...int) *WebDomainUpdate {
-	wdu.mutation.AddRuleIDs(ids...)
-	return wdu
+func (_u *WebDomainUpdate) AddRuleIDs(ids ...int) *WebDomainUpdate {
+	_u.mutation.AddRuleIDs(ids...)
+	return _u
 }
 
 // AddRules adds the "rules" edges to the WebRule entity.
-func (wdu *WebDomainUpdate) AddRules(w ...*WebRule) *WebDomainUpdate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
+func (_u *WebDomainUpdate) AddRules(v ...*WebRule) *WebDomainUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return wdu.AddRuleIDs(ids...)
+	return _u.AddRuleIDs(ids...)
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
-func (wdu *WebDomainUpdate) SetTenantID(id int) *WebDomainUpdate {
-	wdu.mutation.SetTenantID(id)
-	return wdu
+func (_u *WebDomainUpdate) SetTenantID(id int) *WebDomainUpdate {
+	_u.mutation.SetTenantID(id)
+	return _u
 }
 
 // SetTenant sets the "tenant" edge to the Tenant entity.
-func (wdu *WebDomainUpdate) SetTenant(t *Tenant) *WebDomainUpdate {
-	return wdu.SetTenantID(t.ID)
+func (_u *WebDomainUpdate) SetTenant(v *Tenant) *WebDomainUpdate {
+	return _u.SetTenantID(v.ID)
 }
 
 // Mutation returns the WebDomainMutation object of the builder.
-func (wdu *WebDomainUpdate) Mutation() *WebDomainMutation {
-	return wdu.mutation
+func (_u *WebDomainUpdate) Mutation() *WebDomainMutation {
+	return _u.mutation
 }
 
 // ClearRules clears all "rules" edges to the WebRule entity.
-func (wdu *WebDomainUpdate) ClearRules() *WebDomainUpdate {
-	wdu.mutation.ClearRules()
-	return wdu
+func (_u *WebDomainUpdate) ClearRules() *WebDomainUpdate {
+	_u.mutation.ClearRules()
+	return _u
 }
 
 // RemoveRuleIDs removes the "rules" edge to WebRule entities by IDs.
-func (wdu *WebDomainUpdate) RemoveRuleIDs(ids ...int) *WebDomainUpdate {
-	wdu.mutation.RemoveRuleIDs(ids...)
-	return wdu
+func (_u *WebDomainUpdate) RemoveRuleIDs(ids ...int) *WebDomainUpdate {
+	_u.mutation.RemoveRuleIDs(ids...)
+	return _u
 }
 
 // RemoveRules removes "rules" edges to WebRule entities.
-func (wdu *WebDomainUpdate) RemoveRules(w ...*WebRule) *WebDomainUpdate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
+func (_u *WebDomainUpdate) RemoveRules(v ...*WebRule) *WebDomainUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return wdu.RemoveRuleIDs(ids...)
+	return _u.RemoveRuleIDs(ids...)
 }
 
 // ClearTenant clears the "tenant" edge to the Tenant entity.
-func (wdu *WebDomainUpdate) ClearTenant() *WebDomainUpdate {
-	wdu.mutation.ClearTenant()
-	return wdu
+func (_u *WebDomainUpdate) ClearTenant() *WebDomainUpdate {
+	_u.mutation.ClearTenant()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (wdu *WebDomainUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, wdu.sqlSave, wdu.mutation, wdu.hooks)
+func (_u *WebDomainUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (wdu *WebDomainUpdate) SaveX(ctx context.Context) int {
-	affected, err := wdu.Save(ctx)
+func (_u *WebDomainUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -144,58 +144,58 @@ func (wdu *WebDomainUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (wdu *WebDomainUpdate) Exec(ctx context.Context) error {
-	_, err := wdu.Save(ctx)
+func (_u *WebDomainUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wdu *WebDomainUpdate) ExecX(ctx context.Context) {
-	if err := wdu.Exec(ctx); err != nil {
+func (_u *WebDomainUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (wdu *WebDomainUpdate) check() error {
-	if v, ok := wdu.mutation.Domain(); ok {
+func (_u *WebDomainUpdate) check() error {
+	if v, ok := _u.mutation.Domain(); ok {
 		if err := webdomain.DomainValidator(v); err != nil {
 			return &ValidationError{Name: "domain", err: fmt.Errorf(`ent: validator failed for field "WebDomain.domain": %w`, err)}
 		}
 	}
-	if v, ok := wdu.mutation.Hsts(); ok {
+	if v, ok := _u.mutation.Hsts(); ok {
 		if err := webdomain.HstsValidator(v); err != nil {
 			return &ValidationError{Name: "hsts", err: fmt.Errorf(`ent: validator failed for field "WebDomain.hsts": %w`, err)}
 		}
 	}
-	if _, ok := wdu.mutation.TenantID(); wdu.mutation.TenantCleared() && !ok {
+	if _u.mutation.TenantCleared() && len(_u.mutation.TenantIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "WebDomain.tenant"`)
 	}
 	return nil
 }
 
-func (wdu *WebDomainUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := wdu.check(); err != nil {
-		return n, err
+func (_u *WebDomainUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(webdomain.Table, webdomain.Columns, sqlgraph.NewFieldSpec(webdomain.FieldID, field.TypeInt))
-	if ps := wdu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := wdu.mutation.Domain(); ok {
+	if value, ok := _u.mutation.Domain(); ok {
 		_spec.SetField(webdomain.FieldDomain, field.TypeString, value)
 	}
-	if value, ok := wdu.mutation.Hsts(); ok {
+	if value, ok := _u.mutation.Hsts(); ok {
 		_spec.SetField(webdomain.FieldHsts, field.TypeEnum, value)
 	}
-	if value, ok := wdu.mutation.ServeStatic(); ok {
+	if value, ok := _u.mutation.ServeStatic(); ok {
 		_spec.SetField(webdomain.FieldServeStatic, field.TypeBool, value)
 	}
-	if wdu.mutation.RulesCleared() {
+	if _u.mutation.RulesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -208,7 +208,7 @@ func (wdu *WebDomainUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wdu.mutation.RemovedRulesIDs(); len(nodes) > 0 && !wdu.mutation.RulesCleared() {
+	if nodes := _u.mutation.RemovedRulesIDs(); len(nodes) > 0 && !_u.mutation.RulesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -224,7 +224,7 @@ func (wdu *WebDomainUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wdu.mutation.RulesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RulesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -240,7 +240,7 @@ func (wdu *WebDomainUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if wdu.mutation.TenantCleared() {
+	if _u.mutation.TenantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -253,7 +253,7 @@ func (wdu *WebDomainUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wdu.mutation.TenantIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TenantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -269,7 +269,7 @@ func (wdu *WebDomainUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, wdu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{webdomain.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -277,8 +277,8 @@ func (wdu *WebDomainUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	wdu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // WebDomainUpdateOne is the builder for updating a single WebDomain entity.
@@ -290,126 +290,126 @@ type WebDomainUpdateOne struct {
 }
 
 // SetDomain sets the "domain" field.
-func (wduo *WebDomainUpdateOne) SetDomain(s string) *WebDomainUpdateOne {
-	wduo.mutation.SetDomain(s)
-	return wduo
+func (_u *WebDomainUpdateOne) SetDomain(v string) *WebDomainUpdateOne {
+	_u.mutation.SetDomain(v)
+	return _u
 }
 
 // SetNillableDomain sets the "domain" field if the given value is not nil.
-func (wduo *WebDomainUpdateOne) SetNillableDomain(s *string) *WebDomainUpdateOne {
-	if s != nil {
-		wduo.SetDomain(*s)
+func (_u *WebDomainUpdateOne) SetNillableDomain(v *string) *WebDomainUpdateOne {
+	if v != nil {
+		_u.SetDomain(*v)
 	}
-	return wduo
+	return _u
 }
 
 // SetHsts sets the "hsts" field.
-func (wduo *WebDomainUpdateOne) SetHsts(w webdomain.Hsts) *WebDomainUpdateOne {
-	wduo.mutation.SetHsts(w)
-	return wduo
+func (_u *WebDomainUpdateOne) SetHsts(v webdomain.Hsts) *WebDomainUpdateOne {
+	_u.mutation.SetHsts(v)
+	return _u
 }
 
 // SetNillableHsts sets the "hsts" field if the given value is not nil.
-func (wduo *WebDomainUpdateOne) SetNillableHsts(w *webdomain.Hsts) *WebDomainUpdateOne {
-	if w != nil {
-		wduo.SetHsts(*w)
+func (_u *WebDomainUpdateOne) SetNillableHsts(v *webdomain.Hsts) *WebDomainUpdateOne {
+	if v != nil {
+		_u.SetHsts(*v)
 	}
-	return wduo
+	return _u
 }
 
 // SetServeStatic sets the "serve_static" field.
-func (wduo *WebDomainUpdateOne) SetServeStatic(b bool) *WebDomainUpdateOne {
-	wduo.mutation.SetServeStatic(b)
-	return wduo
+func (_u *WebDomainUpdateOne) SetServeStatic(v bool) *WebDomainUpdateOne {
+	_u.mutation.SetServeStatic(v)
+	return _u
 }
 
 // SetNillableServeStatic sets the "serve_static" field if the given value is not nil.
-func (wduo *WebDomainUpdateOne) SetNillableServeStatic(b *bool) *WebDomainUpdateOne {
-	if b != nil {
-		wduo.SetServeStatic(*b)
+func (_u *WebDomainUpdateOne) SetNillableServeStatic(v *bool) *WebDomainUpdateOne {
+	if v != nil {
+		_u.SetServeStatic(*v)
 	}
-	return wduo
+	return _u
 }
 
 // AddRuleIDs adds the "rules" edge to the WebRule entity by IDs.
-func (wduo *WebDomainUpdateOne) AddRuleIDs(ids ...int) *WebDomainUpdateOne {
-	wduo.mutation.AddRuleIDs(ids...)
-	return wduo
+func (_u *WebDomainUpdateOne) AddRuleIDs(ids ...int) *WebDomainUpdateOne {
+	_u.mutation.AddRuleIDs(ids...)
+	return _u
 }
 
 // AddRules adds the "rules" edges to the WebRule entity.
-func (wduo *WebDomainUpdateOne) AddRules(w ...*WebRule) *WebDomainUpdateOne {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
+func (_u *WebDomainUpdateOne) AddRules(v ...*WebRule) *WebDomainUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return wduo.AddRuleIDs(ids...)
+	return _u.AddRuleIDs(ids...)
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
-func (wduo *WebDomainUpdateOne) SetTenantID(id int) *WebDomainUpdateOne {
-	wduo.mutation.SetTenantID(id)
-	return wduo
+func (_u *WebDomainUpdateOne) SetTenantID(id int) *WebDomainUpdateOne {
+	_u.mutation.SetTenantID(id)
+	return _u
 }
 
 // SetTenant sets the "tenant" edge to the Tenant entity.
-func (wduo *WebDomainUpdateOne) SetTenant(t *Tenant) *WebDomainUpdateOne {
-	return wduo.SetTenantID(t.ID)
+func (_u *WebDomainUpdateOne) SetTenant(v *Tenant) *WebDomainUpdateOne {
+	return _u.SetTenantID(v.ID)
 }
 
 // Mutation returns the WebDomainMutation object of the builder.
-func (wduo *WebDomainUpdateOne) Mutation() *WebDomainMutation {
-	return wduo.mutation
+func (_u *WebDomainUpdateOne) Mutation() *WebDomainMutation {
+	return _u.mutation
 }
 
 // ClearRules clears all "rules" edges to the WebRule entity.
-func (wduo *WebDomainUpdateOne) ClearRules() *WebDomainUpdateOne {
-	wduo.mutation.ClearRules()
-	return wduo
+func (_u *WebDomainUpdateOne) ClearRules() *WebDomainUpdateOne {
+	_u.mutation.ClearRules()
+	return _u
 }
 
 // RemoveRuleIDs removes the "rules" edge to WebRule entities by IDs.
-func (wduo *WebDomainUpdateOne) RemoveRuleIDs(ids ...int) *WebDomainUpdateOne {
-	wduo.mutation.RemoveRuleIDs(ids...)
-	return wduo
+func (_u *WebDomainUpdateOne) RemoveRuleIDs(ids ...int) *WebDomainUpdateOne {
+	_u.mutation.RemoveRuleIDs(ids...)
+	return _u
 }
 
 // RemoveRules removes "rules" edges to WebRule entities.
-func (wduo *WebDomainUpdateOne) RemoveRules(w ...*WebRule) *WebDomainUpdateOne {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
+func (_u *WebDomainUpdateOne) RemoveRules(v ...*WebRule) *WebDomainUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return wduo.RemoveRuleIDs(ids...)
+	return _u.RemoveRuleIDs(ids...)
 }
 
 // ClearTenant clears the "tenant" edge to the Tenant entity.
-func (wduo *WebDomainUpdateOne) ClearTenant() *WebDomainUpdateOne {
-	wduo.mutation.ClearTenant()
-	return wduo
+func (_u *WebDomainUpdateOne) ClearTenant() *WebDomainUpdateOne {
+	_u.mutation.ClearTenant()
+	return _u
 }
 
 // Where appends a list predicates to the WebDomainUpdate builder.
-func (wduo *WebDomainUpdateOne) Where(ps ...predicate.WebDomain) *WebDomainUpdateOne {
-	wduo.mutation.Where(ps...)
-	return wduo
+func (_u *WebDomainUpdateOne) Where(ps ...predicate.WebDomain) *WebDomainUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (wduo *WebDomainUpdateOne) Select(field string, fields ...string) *WebDomainUpdateOne {
-	wduo.fields = append([]string{field}, fields...)
-	return wduo
+func (_u *WebDomainUpdateOne) Select(field string, fields ...string) *WebDomainUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated WebDomain entity.
-func (wduo *WebDomainUpdateOne) Save(ctx context.Context) (*WebDomain, error) {
-	return withHooks(ctx, wduo.sqlSave, wduo.mutation, wduo.hooks)
+func (_u *WebDomainUpdateOne) Save(ctx context.Context) (*WebDomain, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (wduo *WebDomainUpdateOne) SaveX(ctx context.Context) *WebDomain {
-	node, err := wduo.Save(ctx)
+func (_u *WebDomainUpdateOne) SaveX(ctx context.Context) *WebDomain {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -417,47 +417,47 @@ func (wduo *WebDomainUpdateOne) SaveX(ctx context.Context) *WebDomain {
 }
 
 // Exec executes the query on the entity.
-func (wduo *WebDomainUpdateOne) Exec(ctx context.Context) error {
-	_, err := wduo.Save(ctx)
+func (_u *WebDomainUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wduo *WebDomainUpdateOne) ExecX(ctx context.Context) {
-	if err := wduo.Exec(ctx); err != nil {
+func (_u *WebDomainUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (wduo *WebDomainUpdateOne) check() error {
-	if v, ok := wduo.mutation.Domain(); ok {
+func (_u *WebDomainUpdateOne) check() error {
+	if v, ok := _u.mutation.Domain(); ok {
 		if err := webdomain.DomainValidator(v); err != nil {
 			return &ValidationError{Name: "domain", err: fmt.Errorf(`ent: validator failed for field "WebDomain.domain": %w`, err)}
 		}
 	}
-	if v, ok := wduo.mutation.Hsts(); ok {
+	if v, ok := _u.mutation.Hsts(); ok {
 		if err := webdomain.HstsValidator(v); err != nil {
 			return &ValidationError{Name: "hsts", err: fmt.Errorf(`ent: validator failed for field "WebDomain.hsts": %w`, err)}
 		}
 	}
-	if _, ok := wduo.mutation.TenantID(); wduo.mutation.TenantCleared() && !ok {
+	if _u.mutation.TenantCleared() && len(_u.mutation.TenantIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "WebDomain.tenant"`)
 	}
 	return nil
 }
 
-func (wduo *WebDomainUpdateOne) sqlSave(ctx context.Context) (_node *WebDomain, err error) {
-	if err := wduo.check(); err != nil {
+func (_u *WebDomainUpdateOne) sqlSave(ctx context.Context) (_node *WebDomain, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(webdomain.Table, webdomain.Columns, sqlgraph.NewFieldSpec(webdomain.FieldID, field.TypeInt))
-	id, ok := wduo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "WebDomain.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := wduo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, webdomain.FieldID)
 		for _, f := range fields {
@@ -469,23 +469,23 @@ func (wduo *WebDomainUpdateOne) sqlSave(ctx context.Context) (_node *WebDomain, 
 			}
 		}
 	}
-	if ps := wduo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := wduo.mutation.Domain(); ok {
+	if value, ok := _u.mutation.Domain(); ok {
 		_spec.SetField(webdomain.FieldDomain, field.TypeString, value)
 	}
-	if value, ok := wduo.mutation.Hsts(); ok {
+	if value, ok := _u.mutation.Hsts(); ok {
 		_spec.SetField(webdomain.FieldHsts, field.TypeEnum, value)
 	}
-	if value, ok := wduo.mutation.ServeStatic(); ok {
+	if value, ok := _u.mutation.ServeStatic(); ok {
 		_spec.SetField(webdomain.FieldServeStatic, field.TypeBool, value)
 	}
-	if wduo.mutation.RulesCleared() {
+	if _u.mutation.RulesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -498,7 +498,7 @@ func (wduo *WebDomainUpdateOne) sqlSave(ctx context.Context) (_node *WebDomain, 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wduo.mutation.RemovedRulesIDs(); len(nodes) > 0 && !wduo.mutation.RulesCleared() {
+	if nodes := _u.mutation.RemovedRulesIDs(); len(nodes) > 0 && !_u.mutation.RulesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -514,7 +514,7 @@ func (wduo *WebDomainUpdateOne) sqlSave(ctx context.Context) (_node *WebDomain, 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wduo.mutation.RulesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RulesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -530,7 +530,7 @@ func (wduo *WebDomainUpdateOne) sqlSave(ctx context.Context) (_node *WebDomain, 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if wduo.mutation.TenantCleared() {
+	if _u.mutation.TenantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -543,7 +543,7 @@ func (wduo *WebDomainUpdateOne) sqlSave(ctx context.Context) (_node *WebDomain, 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wduo.mutation.TenantIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TenantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -559,10 +559,10 @@ func (wduo *WebDomainUpdateOne) sqlSave(ctx context.Context) (_node *WebDomain, 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &WebDomain{config: wduo.config}
+	_node = &WebDomain{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, wduo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{webdomain.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -570,6 +570,6 @@ func (wduo *WebDomainUpdateOne) sqlSave(ctx context.Context) (_node *WebDomain, 
 		}
 		return nil, err
 	}
-	wduo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

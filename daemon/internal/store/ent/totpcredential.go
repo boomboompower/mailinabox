@@ -45,12 +45,10 @@ type TOTPCredentialEdges struct {
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e TOTPCredentialEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[0] {
-		if e.User == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.User != nil {
 		return e.User, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "user"}
 }
@@ -77,7 +75,7 @@ func (*TOTPCredential) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the TOTPCredential fields.
-func (tc *TOTPCredential) assignValues(columns []string, values []any) error {
+func (_m *TOTPCredential) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -88,41 +86,41 @@ func (tc *TOTPCredential) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			tc.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case totpcredential.FieldSecret:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field secret", values[i])
 			} else if value.Valid {
-				tc.Secret = value.String
+				_m.Secret = value.String
 			}
 		case totpcredential.FieldMruToken:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field mru_token", values[i])
 			} else if value.Valid {
-				tc.MruToken = new(string)
-				*tc.MruToken = value.String
+				_m.MruToken = new(string)
+				*_m.MruToken = value.String
 			}
 		case totpcredential.FieldLabel:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field label", values[i])
 			} else if value.Valid {
-				tc.Label = value.String
+				_m.Label = value.String
 			}
 		case totpcredential.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				tc.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case totpcredential.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_totp_credentials", value)
 			} else if value.Valid {
-				tc.user_totp_credentials = new(int)
-				*tc.user_totp_credentials = int(value.Int64)
+				_m.user_totp_credentials = new(int)
+				*_m.user_totp_credentials = int(value.Int64)
 			}
 		default:
-			tc.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -130,47 +128,47 @@ func (tc *TOTPCredential) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the TOTPCredential.
 // This includes values selected through modifiers, order, etc.
-func (tc *TOTPCredential) Value(name string) (ent.Value, error) {
-	return tc.selectValues.Get(name)
+func (_m *TOTPCredential) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryUser queries the "user" edge of the TOTPCredential entity.
-func (tc *TOTPCredential) QueryUser() *UserQuery {
-	return NewTOTPCredentialClient(tc.config).QueryUser(tc)
+func (_m *TOTPCredential) QueryUser() *UserQuery {
+	return NewTOTPCredentialClient(_m.config).QueryUser(_m)
 }
 
 // Update returns a builder for updating this TOTPCredential.
 // Note that you need to call TOTPCredential.Unwrap() before calling this method if this TOTPCredential
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (tc *TOTPCredential) Update() *TOTPCredentialUpdateOne {
-	return NewTOTPCredentialClient(tc.config).UpdateOne(tc)
+func (_m *TOTPCredential) Update() *TOTPCredentialUpdateOne {
+	return NewTOTPCredentialClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the TOTPCredential entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (tc *TOTPCredential) Unwrap() *TOTPCredential {
-	_tx, ok := tc.config.driver.(*txDriver)
+func (_m *TOTPCredential) Unwrap() *TOTPCredential {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: TOTPCredential is not a transactional entity")
 	}
-	tc.config.driver = _tx.drv
-	return tc
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (tc *TOTPCredential) String() string {
+func (_m *TOTPCredential) String() string {
 	var builder strings.Builder
 	builder.WriteString("TOTPCredential(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", tc.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("secret=<sensitive>")
 	builder.WriteString(", ")
 	builder.WriteString("mru_token=<sensitive>")
 	builder.WriteString(", ")
 	builder.WriteString("label=")
-	builder.WriteString(tc.Label)
+	builder.WriteString(_m.Label)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(tc.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

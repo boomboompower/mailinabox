@@ -24,78 +24,78 @@ type TOTPCredentialCreate struct {
 }
 
 // SetSecret sets the "secret" field.
-func (tcc *TOTPCredentialCreate) SetSecret(s string) *TOTPCredentialCreate {
-	tcc.mutation.SetSecret(s)
-	return tcc
+func (_c *TOTPCredentialCreate) SetSecret(v string) *TOTPCredentialCreate {
+	_c.mutation.SetSecret(v)
+	return _c
 }
 
 // SetMruToken sets the "mru_token" field.
-func (tcc *TOTPCredentialCreate) SetMruToken(s string) *TOTPCredentialCreate {
-	tcc.mutation.SetMruToken(s)
-	return tcc
+func (_c *TOTPCredentialCreate) SetMruToken(v string) *TOTPCredentialCreate {
+	_c.mutation.SetMruToken(v)
+	return _c
 }
 
 // SetNillableMruToken sets the "mru_token" field if the given value is not nil.
-func (tcc *TOTPCredentialCreate) SetNillableMruToken(s *string) *TOTPCredentialCreate {
-	if s != nil {
-		tcc.SetMruToken(*s)
+func (_c *TOTPCredentialCreate) SetNillableMruToken(v *string) *TOTPCredentialCreate {
+	if v != nil {
+		_c.SetMruToken(*v)
 	}
-	return tcc
+	return _c
 }
 
 // SetLabel sets the "label" field.
-func (tcc *TOTPCredentialCreate) SetLabel(s string) *TOTPCredentialCreate {
-	tcc.mutation.SetLabel(s)
-	return tcc
+func (_c *TOTPCredentialCreate) SetLabel(v string) *TOTPCredentialCreate {
+	_c.mutation.SetLabel(v)
+	return _c
 }
 
 // SetNillableLabel sets the "label" field if the given value is not nil.
-func (tcc *TOTPCredentialCreate) SetNillableLabel(s *string) *TOTPCredentialCreate {
-	if s != nil {
-		tcc.SetLabel(*s)
+func (_c *TOTPCredentialCreate) SetNillableLabel(v *string) *TOTPCredentialCreate {
+	if v != nil {
+		_c.SetLabel(*v)
 	}
-	return tcc
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (tcc *TOTPCredentialCreate) SetCreatedAt(t time.Time) *TOTPCredentialCreate {
-	tcc.mutation.SetCreatedAt(t)
-	return tcc
+func (_c *TOTPCredentialCreate) SetCreatedAt(v time.Time) *TOTPCredentialCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (tcc *TOTPCredentialCreate) SetNillableCreatedAt(t *time.Time) *TOTPCredentialCreate {
-	if t != nil {
-		tcc.SetCreatedAt(*t)
+func (_c *TOTPCredentialCreate) SetNillableCreatedAt(v *time.Time) *TOTPCredentialCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return tcc
+	return _c
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (tcc *TOTPCredentialCreate) SetUserID(id int) *TOTPCredentialCreate {
-	tcc.mutation.SetUserID(id)
-	return tcc
+func (_c *TOTPCredentialCreate) SetUserID(id int) *TOTPCredentialCreate {
+	_c.mutation.SetUserID(id)
+	return _c
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (tcc *TOTPCredentialCreate) SetUser(u *User) *TOTPCredentialCreate {
-	return tcc.SetUserID(u.ID)
+func (_c *TOTPCredentialCreate) SetUser(v *User) *TOTPCredentialCreate {
+	return _c.SetUserID(v.ID)
 }
 
 // Mutation returns the TOTPCredentialMutation object of the builder.
-func (tcc *TOTPCredentialCreate) Mutation() *TOTPCredentialMutation {
-	return tcc.mutation
+func (_c *TOTPCredentialCreate) Mutation() *TOTPCredentialMutation {
+	return _c.mutation
 }
 
 // Save creates the TOTPCredential in the database.
-func (tcc *TOTPCredentialCreate) Save(ctx context.Context) (*TOTPCredential, error) {
-	tcc.defaults()
-	return withHooks(ctx, tcc.sqlSave, tcc.mutation, tcc.hooks)
+func (_c *TOTPCredentialCreate) Save(ctx context.Context) (*TOTPCredential, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (tcc *TOTPCredentialCreate) SaveX(ctx context.Context) *TOTPCredential {
-	v, err := tcc.Save(ctx)
+func (_c *TOTPCredentialCreate) SaveX(ctx context.Context) *TOTPCredential {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -103,51 +103,51 @@ func (tcc *TOTPCredentialCreate) SaveX(ctx context.Context) *TOTPCredential {
 }
 
 // Exec executes the query.
-func (tcc *TOTPCredentialCreate) Exec(ctx context.Context) error {
-	_, err := tcc.Save(ctx)
+func (_c *TOTPCredentialCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tcc *TOTPCredentialCreate) ExecX(ctx context.Context) {
-	if err := tcc.Exec(ctx); err != nil {
+func (_c *TOTPCredentialCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (tcc *TOTPCredentialCreate) defaults() {
-	if _, ok := tcc.mutation.CreatedAt(); !ok {
+func (_c *TOTPCredentialCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := totpcredential.DefaultCreatedAt()
-		tcc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (tcc *TOTPCredentialCreate) check() error {
-	if _, ok := tcc.mutation.Secret(); !ok {
+func (_c *TOTPCredentialCreate) check() error {
+	if _, ok := _c.mutation.Secret(); !ok {
 		return &ValidationError{Name: "secret", err: errors.New(`ent: missing required field "TOTPCredential.secret"`)}
 	}
-	if v, ok := tcc.mutation.Secret(); ok {
+	if v, ok := _c.mutation.Secret(); ok {
 		if err := totpcredential.SecretValidator(v); err != nil {
 			return &ValidationError{Name: "secret", err: fmt.Errorf(`ent: validator failed for field "TOTPCredential.secret": %w`, err)}
 		}
 	}
-	if _, ok := tcc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "TOTPCredential.created_at"`)}
 	}
-	if _, ok := tcc.mutation.UserID(); !ok {
+	if len(_c.mutation.UserIDs()) == 0 {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "TOTPCredential.user"`)}
 	}
 	return nil
 }
 
-func (tcc *TOTPCredentialCreate) sqlSave(ctx context.Context) (*TOTPCredential, error) {
-	if err := tcc.check(); err != nil {
+func (_c *TOTPCredentialCreate) sqlSave(ctx context.Context) (*TOTPCredential, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := tcc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, tcc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -155,34 +155,34 @@ func (tcc *TOTPCredentialCreate) sqlSave(ctx context.Context) (*TOTPCredential, 
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	tcc.mutation.id = &_node.ID
-	tcc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (tcc *TOTPCredentialCreate) createSpec() (*TOTPCredential, *sqlgraph.CreateSpec) {
+func (_c *TOTPCredentialCreate) createSpec() (*TOTPCredential, *sqlgraph.CreateSpec) {
 	var (
-		_node = &TOTPCredential{config: tcc.config}
+		_node = &TOTPCredential{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(totpcredential.Table, sqlgraph.NewFieldSpec(totpcredential.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = tcc.conflict
-	if value, ok := tcc.mutation.Secret(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.Secret(); ok {
 		_spec.SetField(totpcredential.FieldSecret, field.TypeString, value)
 		_node.Secret = value
 	}
-	if value, ok := tcc.mutation.MruToken(); ok {
+	if value, ok := _c.mutation.MruToken(); ok {
 		_spec.SetField(totpcredential.FieldMruToken, field.TypeString, value)
 		_node.MruToken = &value
 	}
-	if value, ok := tcc.mutation.Label(); ok {
+	if value, ok := _c.mutation.Label(); ok {
 		_spec.SetField(totpcredential.FieldLabel, field.TypeString, value)
 		_node.Label = value
 	}
-	if value, ok := tcc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(totpcredential.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if nodes := tcc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -218,10 +218,10 @@ func (tcc *TOTPCredentialCreate) createSpec() (*TOTPCredential, *sqlgraph.Create
 //			SetSecret(v+v).
 //		}).
 //		Exec(ctx)
-func (tcc *TOTPCredentialCreate) OnConflict(opts ...sql.ConflictOption) *TOTPCredentialUpsertOne {
-	tcc.conflict = opts
+func (_c *TOTPCredentialCreate) OnConflict(opts ...sql.ConflictOption) *TOTPCredentialUpsertOne {
+	_c.conflict = opts
 	return &TOTPCredentialUpsertOne{
-		create: tcc,
+		create: _c,
 	}
 }
 
@@ -231,10 +231,10 @@ func (tcc *TOTPCredentialCreate) OnConflict(opts ...sql.ConflictOption) *TOTPCre
 //	client.TOTPCredential.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (tcc *TOTPCredentialCreate) OnConflictColumns(columns ...string) *TOTPCredentialUpsertOne {
-	tcc.conflict = append(tcc.conflict, sql.ConflictColumns(columns...))
+func (_c *TOTPCredentialCreate) OnConflictColumns(columns ...string) *TOTPCredentialUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &TOTPCredentialUpsertOne{
-		create: tcc,
+		create: _c,
 	}
 }
 
@@ -442,16 +442,16 @@ type TOTPCredentialCreateBulk struct {
 }
 
 // Save creates the TOTPCredential entities in the database.
-func (tccb *TOTPCredentialCreateBulk) Save(ctx context.Context) ([]*TOTPCredential, error) {
-	if tccb.err != nil {
-		return nil, tccb.err
+func (_c *TOTPCredentialCreateBulk) Save(ctx context.Context) ([]*TOTPCredential, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(tccb.builders))
-	nodes := make([]*TOTPCredential, len(tccb.builders))
-	mutators := make([]Mutator, len(tccb.builders))
-	for i := range tccb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*TOTPCredential, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := tccb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*TOTPCredentialMutation)
@@ -465,12 +465,12 @@ func (tccb *TOTPCredentialCreateBulk) Save(ctx context.Context) ([]*TOTPCredenti
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, tccb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = tccb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, tccb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -494,7 +494,7 @@ func (tccb *TOTPCredentialCreateBulk) Save(ctx context.Context) ([]*TOTPCredenti
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, tccb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -502,8 +502,8 @@ func (tccb *TOTPCredentialCreateBulk) Save(ctx context.Context) ([]*TOTPCredenti
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (tccb *TOTPCredentialCreateBulk) SaveX(ctx context.Context) []*TOTPCredential {
-	v, err := tccb.Save(ctx)
+func (_c *TOTPCredentialCreateBulk) SaveX(ctx context.Context) []*TOTPCredential {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -511,14 +511,14 @@ func (tccb *TOTPCredentialCreateBulk) SaveX(ctx context.Context) []*TOTPCredenti
 }
 
 // Exec executes the query.
-func (tccb *TOTPCredentialCreateBulk) Exec(ctx context.Context) error {
-	_, err := tccb.Save(ctx)
+func (_c *TOTPCredentialCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tccb *TOTPCredentialCreateBulk) ExecX(ctx context.Context) {
-	if err := tccb.Exec(ctx); err != nil {
+func (_c *TOTPCredentialCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -538,10 +538,10 @@ func (tccb *TOTPCredentialCreateBulk) ExecX(ctx context.Context) {
 //			SetSecret(v+v).
 //		}).
 //		Exec(ctx)
-func (tccb *TOTPCredentialCreateBulk) OnConflict(opts ...sql.ConflictOption) *TOTPCredentialUpsertBulk {
-	tccb.conflict = opts
+func (_c *TOTPCredentialCreateBulk) OnConflict(opts ...sql.ConflictOption) *TOTPCredentialUpsertBulk {
+	_c.conflict = opts
 	return &TOTPCredentialUpsertBulk{
-		create: tccb,
+		create: _c,
 	}
 }
 
@@ -551,10 +551,10 @@ func (tccb *TOTPCredentialCreateBulk) OnConflict(opts ...sql.ConflictOption) *TO
 //	client.TOTPCredential.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (tccb *TOTPCredentialCreateBulk) OnConflictColumns(columns ...string) *TOTPCredentialUpsertBulk {
-	tccb.conflict = append(tccb.conflict, sql.ConflictColumns(columns...))
+func (_c *TOTPCredentialCreateBulk) OnConflictColumns(columns ...string) *TOTPCredentialUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &TOTPCredentialUpsertBulk{
-		create: tccb,
+		create: _c,
 	}
 }
 

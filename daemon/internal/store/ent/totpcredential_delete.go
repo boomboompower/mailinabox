@@ -20,56 +20,56 @@ type TOTPCredentialDelete struct {
 }
 
 // Where appends a list predicates to the TOTPCredentialDelete builder.
-func (tcd *TOTPCredentialDelete) Where(ps ...predicate.TOTPCredential) *TOTPCredentialDelete {
-	tcd.mutation.Where(ps...)
-	return tcd
+func (_d *TOTPCredentialDelete) Where(ps ...predicate.TOTPCredential) *TOTPCredentialDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (tcd *TOTPCredentialDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, tcd.sqlExec, tcd.mutation, tcd.hooks)
+func (_d *TOTPCredentialDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tcd *TOTPCredentialDelete) ExecX(ctx context.Context) int {
-	n, err := tcd.Exec(ctx)
+func (_d *TOTPCredentialDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (tcd *TOTPCredentialDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *TOTPCredentialDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(totpcredential.Table, sqlgraph.NewFieldSpec(totpcredential.FieldID, field.TypeInt))
-	if ps := tcd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, tcd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	tcd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // TOTPCredentialDeleteOne is the builder for deleting a single TOTPCredential entity.
 type TOTPCredentialDeleteOne struct {
-	tcd *TOTPCredentialDelete
+	_d *TOTPCredentialDelete
 }
 
 // Where appends a list predicates to the TOTPCredentialDelete builder.
-func (tcdo *TOTPCredentialDeleteOne) Where(ps ...predicate.TOTPCredential) *TOTPCredentialDeleteOne {
-	tcdo.tcd.mutation.Where(ps...)
-	return tcdo
+func (_d *TOTPCredentialDeleteOne) Where(ps ...predicate.TOTPCredential) *TOTPCredentialDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (tcdo *TOTPCredentialDeleteOne) Exec(ctx context.Context) error {
-	n, err := tcdo.tcd.Exec(ctx)
+func (_d *TOTPCredentialDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (tcdo *TOTPCredentialDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tcdo *TOTPCredentialDeleteOne) ExecX(ctx context.Context) {
-	if err := tcdo.Exec(ctx); err != nil {
+func (_d *TOTPCredentialDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -90,8 +90,8 @@ var (
 	columnCheck sql.ColumnCheck
 )
 
-// columnChecker checks if the column exists in the given table.
-func checkColumn(table, column string) error {
+// checkColumn checks if the column exists in the given table.
+func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			apitoken.Table:           apitoken.ValidColumn,
@@ -118,7 +118,7 @@ func checkColumn(table, column string) error {
 			zoneserial.Table:         zoneserial.ValidColumn,
 		})
 	})
-	return columnCheck(table, column)
+	return columnCheck(t, c)
 }
 
 // Asc applies the given fields in ASC order.

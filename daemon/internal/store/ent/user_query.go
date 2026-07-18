@@ -18,6 +18,7 @@ import (
 	"naust/daemon/internal/store/ent/webauthnchallenge"
 	"naust/daemon/internal/store/ent/webauthncredential"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -45,44 +46,44 @@ type UserQuery struct {
 }
 
 // Where adds a new predicate for the UserQuery builder.
-func (uq *UserQuery) Where(ps ...predicate.User) *UserQuery {
-	uq.predicates = append(uq.predicates, ps...)
-	return uq
+func (_q *UserQuery) Where(ps ...predicate.User) *UserQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (uq *UserQuery) Limit(limit int) *UserQuery {
-	uq.ctx.Limit = &limit
-	return uq
+func (_q *UserQuery) Limit(limit int) *UserQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (uq *UserQuery) Offset(offset int) *UserQuery {
-	uq.ctx.Offset = &offset
-	return uq
+func (_q *UserQuery) Offset(offset int) *UserQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (uq *UserQuery) Unique(unique bool) *UserQuery {
-	uq.ctx.Unique = &unique
-	return uq
+func (_q *UserQuery) Unique(unique bool) *UserQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (uq *UserQuery) Order(o ...user.OrderOption) *UserQuery {
-	uq.order = append(uq.order, o...)
-	return uq
+func (_q *UserQuery) Order(o ...user.OrderOption) *UserQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QuerySessions chains the current query on the "sessions" edge.
-func (uq *UserQuery) QuerySessions() *SessionQuery {
-	query := (&SessionClient{config: uq.config}).Query()
+func (_q *UserQuery) QuerySessions() *SessionQuery {
+	query := (&SessionClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := uq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -91,20 +92,20 @@ func (uq *UserQuery) QuerySessions() *SessionQuery {
 			sqlgraph.To(session.Table, session.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.SessionsTable, user.SessionsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryAPITokens chains the current query on the "api_tokens" edge.
-func (uq *UserQuery) QueryAPITokens() *APITokenQuery {
-	query := (&APITokenClient{config: uq.config}).Query()
+func (_q *UserQuery) QueryAPITokens() *APITokenQuery {
+	query := (&APITokenClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := uq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -113,20 +114,20 @@ func (uq *UserQuery) QueryAPITokens() *APITokenQuery {
 			sqlgraph.To(apitoken.Table, apitoken.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.APITokensTable, user.APITokensColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryTotpCredentials chains the current query on the "totp_credentials" edge.
-func (uq *UserQuery) QueryTotpCredentials() *TOTPCredentialQuery {
-	query := (&TOTPCredentialClient{config: uq.config}).Query()
+func (_q *UserQuery) QueryTotpCredentials() *TOTPCredentialQuery {
+	query := (&TOTPCredentialClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := uq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -135,20 +136,20 @@ func (uq *UserQuery) QueryTotpCredentials() *TOTPCredentialQuery {
 			sqlgraph.To(totpcredential.Table, totpcredential.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.TotpCredentialsTable, user.TotpCredentialsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryWebauthnCredentials chains the current query on the "webauthn_credentials" edge.
-func (uq *UserQuery) QueryWebauthnCredentials() *WebAuthnCredentialQuery {
-	query := (&WebAuthnCredentialClient{config: uq.config}).Query()
+func (_q *UserQuery) QueryWebauthnCredentials() *WebAuthnCredentialQuery {
+	query := (&WebAuthnCredentialClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := uq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -157,20 +158,20 @@ func (uq *UserQuery) QueryWebauthnCredentials() *WebAuthnCredentialQuery {
 			sqlgraph.To(webauthncredential.Table, webauthncredential.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.WebauthnCredentialsTable, user.WebauthnCredentialsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryWebauthnChallenges chains the current query on the "webauthn_challenges" edge.
-func (uq *UserQuery) QueryWebauthnChallenges() *WebAuthnChallengeQuery {
-	query := (&WebAuthnChallengeClient{config: uq.config}).Query()
+func (_q *UserQuery) QueryWebauthnChallenges() *WebAuthnChallengeQuery {
+	query := (&WebAuthnChallengeClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := uq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -179,20 +180,20 @@ func (uq *UserQuery) QueryWebauthnChallenges() *WebAuthnChallengeQuery {
 			sqlgraph.To(webauthnchallenge.Table, webauthnchallenge.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.WebauthnChallengesTable, user.WebauthnChallengesColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryMailKeySlots chains the current query on the "mail_key_slots" edge.
-func (uq *UserQuery) QueryMailKeySlots() *MailKeySlotQuery {
-	query := (&MailKeySlotClient{config: uq.config}).Query()
+func (_q *UserQuery) QueryMailKeySlots() *MailKeySlotQuery {
+	query := (&MailKeySlotClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := uq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -201,20 +202,20 @@ func (uq *UserQuery) QueryMailKeySlots() *MailKeySlotQuery {
 			sqlgraph.To(mailkeyslot.Table, mailkeyslot.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.MailKeySlotsTable, user.MailKeySlotsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryEncryptionSetups chains the current query on the "encryption_setups" edge.
-func (uq *UserQuery) QueryEncryptionSetups() *EncryptionSetupQuery {
-	query := (&EncryptionSetupClient{config: uq.config}).Query()
+func (_q *UserQuery) QueryEncryptionSetups() *EncryptionSetupQuery {
+	query := (&EncryptionSetupClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := uq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -223,20 +224,20 @@ func (uq *UserQuery) QueryEncryptionSetups() *EncryptionSetupQuery {
 			sqlgraph.To(encryptionsetup.Table, encryptionsetup.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.EncryptionSetupsTable, user.EncryptionSetupsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryTenant chains the current query on the "tenant" edge.
-func (uq *UserQuery) QueryTenant() *TenantQuery {
-	query := (&TenantClient{config: uq.config}).Query()
+func (_q *UserQuery) QueryTenant() *TenantQuery {
+	query := (&TenantClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := uq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -245,7 +246,7 @@ func (uq *UserQuery) QueryTenant() *TenantQuery {
 			sqlgraph.To(tenant.Table, tenant.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, user.TenantTable, user.TenantColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -253,8 +254,8 @@ func (uq *UserQuery) QueryTenant() *TenantQuery {
 
 // First returns the first User entity from the query.
 // Returns a *NotFoundError when no User was found.
-func (uq *UserQuery) First(ctx context.Context) (*User, error) {
-	nodes, err := uq.Limit(1).All(setContextOp(ctx, uq.ctx, "First"))
+func (_q *UserQuery) First(ctx context.Context) (*User, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -265,8 +266,8 @@ func (uq *UserQuery) First(ctx context.Context) (*User, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (uq *UserQuery) FirstX(ctx context.Context) *User {
-	node, err := uq.First(ctx)
+func (_q *UserQuery) FirstX(ctx context.Context) *User {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -275,9 +276,9 @@ func (uq *UserQuery) FirstX(ctx context.Context) *User {
 
 // FirstID returns the first User ID from the query.
 // Returns a *NotFoundError when no User ID was found.
-func (uq *UserQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *UserQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = uq.Limit(1).IDs(setContextOp(ctx, uq.ctx, "FirstID")); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -288,8 +289,8 @@ func (uq *UserQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (uq *UserQuery) FirstIDX(ctx context.Context) int {
-	id, err := uq.FirstID(ctx)
+func (_q *UserQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -299,8 +300,8 @@ func (uq *UserQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single User entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one User entity is found.
 // Returns a *NotFoundError when no User entities are found.
-func (uq *UserQuery) Only(ctx context.Context) (*User, error) {
-	nodes, err := uq.Limit(2).All(setContextOp(ctx, uq.ctx, "Only"))
+func (_q *UserQuery) Only(ctx context.Context) (*User, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -315,8 +316,8 @@ func (uq *UserQuery) Only(ctx context.Context) (*User, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (uq *UserQuery) OnlyX(ctx context.Context) *User {
-	node, err := uq.Only(ctx)
+func (_q *UserQuery) OnlyX(ctx context.Context) *User {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -326,9 +327,9 @@ func (uq *UserQuery) OnlyX(ctx context.Context) *User {
 // OnlyID is like Only, but returns the only User ID in the query.
 // Returns a *NotSingularError when more than one User ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (uq *UserQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *UserQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = uq.Limit(2).IDs(setContextOp(ctx, uq.ctx, "OnlyID")); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -343,8 +344,8 @@ func (uq *UserQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (uq *UserQuery) OnlyIDX(ctx context.Context) int {
-	id, err := uq.OnlyID(ctx)
+func (_q *UserQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -352,18 +353,18 @@ func (uq *UserQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of Users.
-func (uq *UserQuery) All(ctx context.Context) ([]*User, error) {
-	ctx = setContextOp(ctx, uq.ctx, "All")
-	if err := uq.prepareQuery(ctx); err != nil {
+func (_q *UserQuery) All(ctx context.Context) ([]*User, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*User, *UserQuery]()
-	return withInterceptors[[]*User](ctx, uq, qr, uq.inters)
+	return withInterceptors[[]*User](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (uq *UserQuery) AllX(ctx context.Context) []*User {
-	nodes, err := uq.All(ctx)
+func (_q *UserQuery) AllX(ctx context.Context) []*User {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -371,20 +372,20 @@ func (uq *UserQuery) AllX(ctx context.Context) []*User {
 }
 
 // IDs executes the query and returns a list of User IDs.
-func (uq *UserQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if uq.ctx.Unique == nil && uq.path != nil {
-		uq.Unique(true)
+func (_q *UserQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, uq.ctx, "IDs")
-	if err = uq.Select(user.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(user.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (uq *UserQuery) IDsX(ctx context.Context) []int {
-	ids, err := uq.IDs(ctx)
+func (_q *UserQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -392,17 +393,17 @@ func (uq *UserQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (uq *UserQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, uq.ctx, "Count")
-	if err := uq.prepareQuery(ctx); err != nil {
+func (_q *UserQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, uq, querierCount[*UserQuery](), uq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*UserQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (uq *UserQuery) CountX(ctx context.Context) int {
-	count, err := uq.Count(ctx)
+func (_q *UserQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -410,9 +411,9 @@ func (uq *UserQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (uq *UserQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, uq.ctx, "Exist")
-	switch _, err := uq.FirstID(ctx); {
+func (_q *UserQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -423,8 +424,8 @@ func (uq *UserQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (uq *UserQuery) ExistX(ctx context.Context) bool {
-	exist, err := uq.Exist(ctx)
+func (_q *UserQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -433,116 +434,116 @@ func (uq *UserQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the UserQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (uq *UserQuery) Clone() *UserQuery {
-	if uq == nil {
+func (_q *UserQuery) Clone() *UserQuery {
+	if _q == nil {
 		return nil
 	}
 	return &UserQuery{
-		config:                  uq.config,
-		ctx:                     uq.ctx.Clone(),
-		order:                   append([]user.OrderOption{}, uq.order...),
-		inters:                  append([]Interceptor{}, uq.inters...),
-		predicates:              append([]predicate.User{}, uq.predicates...),
-		withSessions:            uq.withSessions.Clone(),
-		withAPITokens:           uq.withAPITokens.Clone(),
-		withTotpCredentials:     uq.withTotpCredentials.Clone(),
-		withWebauthnCredentials: uq.withWebauthnCredentials.Clone(),
-		withWebauthnChallenges:  uq.withWebauthnChallenges.Clone(),
-		withMailKeySlots:        uq.withMailKeySlots.Clone(),
-		withEncryptionSetups:    uq.withEncryptionSetups.Clone(),
-		withTenant:              uq.withTenant.Clone(),
+		config:                  _q.config,
+		ctx:                     _q.ctx.Clone(),
+		order:                   append([]user.OrderOption{}, _q.order...),
+		inters:                  append([]Interceptor{}, _q.inters...),
+		predicates:              append([]predicate.User{}, _q.predicates...),
+		withSessions:            _q.withSessions.Clone(),
+		withAPITokens:           _q.withAPITokens.Clone(),
+		withTotpCredentials:     _q.withTotpCredentials.Clone(),
+		withWebauthnCredentials: _q.withWebauthnCredentials.Clone(),
+		withWebauthnChallenges:  _q.withWebauthnChallenges.Clone(),
+		withMailKeySlots:        _q.withMailKeySlots.Clone(),
+		withEncryptionSetups:    _q.withEncryptionSetups.Clone(),
+		withTenant:              _q.withTenant.Clone(),
 		// clone intermediate query.
-		sql:  uq.sql.Clone(),
-		path: uq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithSessions tells the query-builder to eager-load the nodes that are connected to
 // the "sessions" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithSessions(opts ...func(*SessionQuery)) *UserQuery {
-	query := (&SessionClient{config: uq.config}).Query()
+func (_q *UserQuery) WithSessions(opts ...func(*SessionQuery)) *UserQuery {
+	query := (&SessionClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withSessions = query
-	return uq
+	_q.withSessions = query
+	return _q
 }
 
 // WithAPITokens tells the query-builder to eager-load the nodes that are connected to
 // the "api_tokens" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithAPITokens(opts ...func(*APITokenQuery)) *UserQuery {
-	query := (&APITokenClient{config: uq.config}).Query()
+func (_q *UserQuery) WithAPITokens(opts ...func(*APITokenQuery)) *UserQuery {
+	query := (&APITokenClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withAPITokens = query
-	return uq
+	_q.withAPITokens = query
+	return _q
 }
 
 // WithTotpCredentials tells the query-builder to eager-load the nodes that are connected to
 // the "totp_credentials" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithTotpCredentials(opts ...func(*TOTPCredentialQuery)) *UserQuery {
-	query := (&TOTPCredentialClient{config: uq.config}).Query()
+func (_q *UserQuery) WithTotpCredentials(opts ...func(*TOTPCredentialQuery)) *UserQuery {
+	query := (&TOTPCredentialClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withTotpCredentials = query
-	return uq
+	_q.withTotpCredentials = query
+	return _q
 }
 
 // WithWebauthnCredentials tells the query-builder to eager-load the nodes that are connected to
 // the "webauthn_credentials" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithWebauthnCredentials(opts ...func(*WebAuthnCredentialQuery)) *UserQuery {
-	query := (&WebAuthnCredentialClient{config: uq.config}).Query()
+func (_q *UserQuery) WithWebauthnCredentials(opts ...func(*WebAuthnCredentialQuery)) *UserQuery {
+	query := (&WebAuthnCredentialClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withWebauthnCredentials = query
-	return uq
+	_q.withWebauthnCredentials = query
+	return _q
 }
 
 // WithWebauthnChallenges tells the query-builder to eager-load the nodes that are connected to
 // the "webauthn_challenges" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithWebauthnChallenges(opts ...func(*WebAuthnChallengeQuery)) *UserQuery {
-	query := (&WebAuthnChallengeClient{config: uq.config}).Query()
+func (_q *UserQuery) WithWebauthnChallenges(opts ...func(*WebAuthnChallengeQuery)) *UserQuery {
+	query := (&WebAuthnChallengeClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withWebauthnChallenges = query
-	return uq
+	_q.withWebauthnChallenges = query
+	return _q
 }
 
 // WithMailKeySlots tells the query-builder to eager-load the nodes that are connected to
 // the "mail_key_slots" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithMailKeySlots(opts ...func(*MailKeySlotQuery)) *UserQuery {
-	query := (&MailKeySlotClient{config: uq.config}).Query()
+func (_q *UserQuery) WithMailKeySlots(opts ...func(*MailKeySlotQuery)) *UserQuery {
+	query := (&MailKeySlotClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withMailKeySlots = query
-	return uq
+	_q.withMailKeySlots = query
+	return _q
 }
 
 // WithEncryptionSetups tells the query-builder to eager-load the nodes that are connected to
 // the "encryption_setups" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithEncryptionSetups(opts ...func(*EncryptionSetupQuery)) *UserQuery {
-	query := (&EncryptionSetupClient{config: uq.config}).Query()
+func (_q *UserQuery) WithEncryptionSetups(opts ...func(*EncryptionSetupQuery)) *UserQuery {
+	query := (&EncryptionSetupClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withEncryptionSetups = query
-	return uq
+	_q.withEncryptionSetups = query
+	return _q
 }
 
 // WithTenant tells the query-builder to eager-load the nodes that are connected to
 // the "tenant" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithTenant(opts ...func(*TenantQuery)) *UserQuery {
-	query := (&TenantClient{config: uq.config}).Query()
+func (_q *UserQuery) WithTenant(opts ...func(*TenantQuery)) *UserQuery {
+	query := (&TenantClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	uq.withTenant = query
-	return uq
+	_q.withTenant = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -559,10 +560,10 @@ func (uq *UserQuery) WithTenant(opts ...func(*TenantQuery)) *UserQuery {
 //		GroupBy(user.FieldEmail).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
-	uq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &UserGroupBy{build: uq}
-	grbuild.flds = &uq.ctx.Fields
+func (_q *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &UserGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = user.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -580,62 +581,62 @@ func (uq *UserQuery) GroupBy(field string, fields ...string) *UserGroupBy {
 //	client.User.Query().
 //		Select(user.FieldEmail).
 //		Scan(ctx, &v)
-func (uq *UserQuery) Select(fields ...string) *UserSelect {
-	uq.ctx.Fields = append(uq.ctx.Fields, fields...)
-	sbuild := &UserSelect{UserQuery: uq}
+func (_q *UserQuery) Select(fields ...string) *UserSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &UserSelect{UserQuery: _q}
 	sbuild.label = user.Label
-	sbuild.flds, sbuild.scan = &uq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a UserSelect configured with the given aggregations.
-func (uq *UserQuery) Aggregate(fns ...AggregateFunc) *UserSelect {
-	return uq.Select().Aggregate(fns...)
+func (_q *UserQuery) Aggregate(fns ...AggregateFunc) *UserSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (uq *UserQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range uq.inters {
+func (_q *UserQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, uq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range uq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !user.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if uq.path != nil {
-		prev, err := uq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		uq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, error) {
+func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, error) {
 	var (
 		nodes       = []*User{}
-		withFKs     = uq.withFKs
-		_spec       = uq.querySpec()
+		withFKs     = _q.withFKs
+		_spec       = _q.querySpec()
 		loadedTypes = [8]bool{
-			uq.withSessions != nil,
-			uq.withAPITokens != nil,
-			uq.withTotpCredentials != nil,
-			uq.withWebauthnCredentials != nil,
-			uq.withWebauthnChallenges != nil,
-			uq.withMailKeySlots != nil,
-			uq.withEncryptionSetups != nil,
-			uq.withTenant != nil,
+			_q.withSessions != nil,
+			_q.withAPITokens != nil,
+			_q.withTotpCredentials != nil,
+			_q.withWebauthnCredentials != nil,
+			_q.withWebauthnChallenges != nil,
+			_q.withMailKeySlots != nil,
+			_q.withEncryptionSetups != nil,
+			_q.withTenant != nil,
 		}
 	)
-	if uq.withTenant != nil {
+	if _q.withTenant != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -645,7 +646,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		return (*User).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &User{config: uq.config}
+		node := &User{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -653,35 +654,35 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, uq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := uq.withSessions; query != nil {
-		if err := uq.loadSessions(ctx, query, nodes,
+	if query := _q.withSessions; query != nil {
+		if err := _q.loadSessions(ctx, query, nodes,
 			func(n *User) { n.Edges.Sessions = []*Session{} },
 			func(n *User, e *Session) { n.Edges.Sessions = append(n.Edges.Sessions, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := uq.withAPITokens; query != nil {
-		if err := uq.loadAPITokens(ctx, query, nodes,
+	if query := _q.withAPITokens; query != nil {
+		if err := _q.loadAPITokens(ctx, query, nodes,
 			func(n *User) { n.Edges.APITokens = []*APIToken{} },
 			func(n *User, e *APIToken) { n.Edges.APITokens = append(n.Edges.APITokens, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := uq.withTotpCredentials; query != nil {
-		if err := uq.loadTotpCredentials(ctx, query, nodes,
+	if query := _q.withTotpCredentials; query != nil {
+		if err := _q.loadTotpCredentials(ctx, query, nodes,
 			func(n *User) { n.Edges.TotpCredentials = []*TOTPCredential{} },
 			func(n *User, e *TOTPCredential) { n.Edges.TotpCredentials = append(n.Edges.TotpCredentials, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := uq.withWebauthnCredentials; query != nil {
-		if err := uq.loadWebauthnCredentials(ctx, query, nodes,
+	if query := _q.withWebauthnCredentials; query != nil {
+		if err := _q.loadWebauthnCredentials(ctx, query, nodes,
 			func(n *User) { n.Edges.WebauthnCredentials = []*WebAuthnCredential{} },
 			func(n *User, e *WebAuthnCredential) {
 				n.Edges.WebauthnCredentials = append(n.Edges.WebauthnCredentials, e)
@@ -689,8 +690,8 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
-	if query := uq.withWebauthnChallenges; query != nil {
-		if err := uq.loadWebauthnChallenges(ctx, query, nodes,
+	if query := _q.withWebauthnChallenges; query != nil {
+		if err := _q.loadWebauthnChallenges(ctx, query, nodes,
 			func(n *User) { n.Edges.WebauthnChallenges = []*WebAuthnChallenge{} },
 			func(n *User, e *WebAuthnChallenge) {
 				n.Edges.WebauthnChallenges = append(n.Edges.WebauthnChallenges, e)
@@ -698,22 +699,22 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 			return nil, err
 		}
 	}
-	if query := uq.withMailKeySlots; query != nil {
-		if err := uq.loadMailKeySlots(ctx, query, nodes,
+	if query := _q.withMailKeySlots; query != nil {
+		if err := _q.loadMailKeySlots(ctx, query, nodes,
 			func(n *User) { n.Edges.MailKeySlots = []*MailKeySlot{} },
 			func(n *User, e *MailKeySlot) { n.Edges.MailKeySlots = append(n.Edges.MailKeySlots, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := uq.withEncryptionSetups; query != nil {
-		if err := uq.loadEncryptionSetups(ctx, query, nodes,
+	if query := _q.withEncryptionSetups; query != nil {
+		if err := _q.loadEncryptionSetups(ctx, query, nodes,
 			func(n *User) { n.Edges.EncryptionSetups = []*EncryptionSetup{} },
 			func(n *User, e *EncryptionSetup) { n.Edges.EncryptionSetups = append(n.Edges.EncryptionSetups, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := uq.withTenant; query != nil {
-		if err := uq.loadTenant(ctx, query, nodes, nil,
+	if query := _q.withTenant; query != nil {
+		if err := _q.loadTenant(ctx, query, nodes, nil,
 			func(n *User, e *Tenant) { n.Edges.Tenant = e }); err != nil {
 			return nil, err
 		}
@@ -721,7 +722,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	return nodes, nil
 }
 
-func (uq *UserQuery) loadSessions(ctx context.Context, query *SessionQuery, nodes []*User, init func(*User), assign func(*User, *Session)) error {
+func (_q *UserQuery) loadSessions(ctx context.Context, query *SessionQuery, nodes []*User, init func(*User), assign func(*User, *Session)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -752,7 +753,7 @@ func (uq *UserQuery) loadSessions(ctx context.Context, query *SessionQuery, node
 	}
 	return nil
 }
-func (uq *UserQuery) loadAPITokens(ctx context.Context, query *APITokenQuery, nodes []*User, init func(*User), assign func(*User, *APIToken)) error {
+func (_q *UserQuery) loadAPITokens(ctx context.Context, query *APITokenQuery, nodes []*User, init func(*User), assign func(*User, *APIToken)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -783,7 +784,7 @@ func (uq *UserQuery) loadAPITokens(ctx context.Context, query *APITokenQuery, no
 	}
 	return nil
 }
-func (uq *UserQuery) loadTotpCredentials(ctx context.Context, query *TOTPCredentialQuery, nodes []*User, init func(*User), assign func(*User, *TOTPCredential)) error {
+func (_q *UserQuery) loadTotpCredentials(ctx context.Context, query *TOTPCredentialQuery, nodes []*User, init func(*User), assign func(*User, *TOTPCredential)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -814,7 +815,7 @@ func (uq *UserQuery) loadTotpCredentials(ctx context.Context, query *TOTPCredent
 	}
 	return nil
 }
-func (uq *UserQuery) loadWebauthnCredentials(ctx context.Context, query *WebAuthnCredentialQuery, nodes []*User, init func(*User), assign func(*User, *WebAuthnCredential)) error {
+func (_q *UserQuery) loadWebauthnCredentials(ctx context.Context, query *WebAuthnCredentialQuery, nodes []*User, init func(*User), assign func(*User, *WebAuthnCredential)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -845,7 +846,7 @@ func (uq *UserQuery) loadWebauthnCredentials(ctx context.Context, query *WebAuth
 	}
 	return nil
 }
-func (uq *UserQuery) loadWebauthnChallenges(ctx context.Context, query *WebAuthnChallengeQuery, nodes []*User, init func(*User), assign func(*User, *WebAuthnChallenge)) error {
+func (_q *UserQuery) loadWebauthnChallenges(ctx context.Context, query *WebAuthnChallengeQuery, nodes []*User, init func(*User), assign func(*User, *WebAuthnChallenge)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -876,7 +877,7 @@ func (uq *UserQuery) loadWebauthnChallenges(ctx context.Context, query *WebAuthn
 	}
 	return nil
 }
-func (uq *UserQuery) loadMailKeySlots(ctx context.Context, query *MailKeySlotQuery, nodes []*User, init func(*User), assign func(*User, *MailKeySlot)) error {
+func (_q *UserQuery) loadMailKeySlots(ctx context.Context, query *MailKeySlotQuery, nodes []*User, init func(*User), assign func(*User, *MailKeySlot)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -907,7 +908,7 @@ func (uq *UserQuery) loadMailKeySlots(ctx context.Context, query *MailKeySlotQue
 	}
 	return nil
 }
-func (uq *UserQuery) loadEncryptionSetups(ctx context.Context, query *EncryptionSetupQuery, nodes []*User, init func(*User), assign func(*User, *EncryptionSetup)) error {
+func (_q *UserQuery) loadEncryptionSetups(ctx context.Context, query *EncryptionSetupQuery, nodes []*User, init func(*User), assign func(*User, *EncryptionSetup)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*User)
 	for i := range nodes {
@@ -938,7 +939,7 @@ func (uq *UserQuery) loadEncryptionSetups(ctx context.Context, query *Encryption
 	}
 	return nil
 }
-func (uq *UserQuery) loadTenant(ctx context.Context, query *TenantQuery, nodes []*User, init func(*User), assign func(*User, *Tenant)) error {
+func (_q *UserQuery) loadTenant(ctx context.Context, query *TenantQuery, nodes []*User, init func(*User), assign func(*User, *Tenant)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*User)
 	for i := range nodes {
@@ -971,24 +972,24 @@ func (uq *UserQuery) loadTenant(ctx context.Context, query *TenantQuery, nodes [
 	return nil
 }
 
-func (uq *UserQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := uq.querySpec()
-	_spec.Node.Columns = uq.ctx.Fields
-	if len(uq.ctx.Fields) > 0 {
-		_spec.Unique = uq.ctx.Unique != nil && *uq.ctx.Unique
+func (_q *UserQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, uq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (uq *UserQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *UserQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(user.Table, user.Columns, sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt))
-	_spec.From = uq.sql
-	if unique := uq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if uq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := uq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, user.FieldID)
 		for i := range fields {
@@ -997,20 +998,20 @@ func (uq *UserQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if ps := uq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := uq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := uq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := uq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -1020,33 +1021,33 @@ func (uq *UserQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (uq *UserQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(uq.driver.Dialect())
+func (_q *UserQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(user.Table)
-	columns := uq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = user.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if uq.sql != nil {
-		selector = uq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if uq.ctx.Unique != nil && *uq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, p := range uq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range uq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := uq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := uq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -1059,41 +1060,41 @@ type UserGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (ugb *UserGroupBy) Aggregate(fns ...AggregateFunc) *UserGroupBy {
-	ugb.fns = append(ugb.fns, fns...)
-	return ugb
+func (_g *UserGroupBy) Aggregate(fns ...AggregateFunc) *UserGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (ugb *UserGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ugb.build.ctx, "GroupBy")
-	if err := ugb.build.prepareQuery(ctx); err != nil {
+func (_g *UserGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*UserQuery, *UserGroupBy](ctx, ugb.build, ugb, ugb.build.inters, v)
+	return scanWithInterceptors[*UserQuery, *UserGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (ugb *UserGroupBy) sqlScan(ctx context.Context, root *UserQuery, v any) error {
+func (_g *UserGroupBy) sqlScan(ctx context.Context, root *UserQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(ugb.fns))
-	for _, fn := range ugb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*ugb.flds)+len(ugb.fns))
-		for _, f := range *ugb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*ugb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := ugb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -1107,27 +1108,27 @@ type UserSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (us *UserSelect) Aggregate(fns ...AggregateFunc) *UserSelect {
-	us.fns = append(us.fns, fns...)
-	return us
+func (_s *UserSelect) Aggregate(fns ...AggregateFunc) *UserSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (us *UserSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, us.ctx, "Select")
-	if err := us.prepareQuery(ctx); err != nil {
+func (_s *UserSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*UserQuery, *UserSelect](ctx, us.UserQuery, us, us.inters, v)
+	return scanWithInterceptors[*UserQuery, *UserSelect](ctx, _s.UserQuery, _s, _s.inters, v)
 }
 
-func (us *UserSelect) sqlScan(ctx context.Context, root *UserQuery, v any) error {
+func (_s *UserSelect) sqlScan(ctx context.Context, root *UserQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(us.fns))
-	for _, fn := range us.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*us.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -1135,7 +1136,7 @@ func (us *UserSelect) sqlScan(ctx context.Context, root *UserQuery, v any) error
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := us.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

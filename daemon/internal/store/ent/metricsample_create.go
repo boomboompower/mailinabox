@@ -23,36 +23,36 @@ type MetricSampleCreate struct {
 }
 
 // SetMetric sets the "metric" field.
-func (msc *MetricSampleCreate) SetMetric(s string) *MetricSampleCreate {
-	msc.mutation.SetMetric(s)
-	return msc
+func (_c *MetricSampleCreate) SetMetric(v string) *MetricSampleCreate {
+	_c.mutation.SetMetric(v)
+	return _c
 }
 
 // SetSampledAt sets the "sampled_at" field.
-func (msc *MetricSampleCreate) SetSampledAt(t time.Time) *MetricSampleCreate {
-	msc.mutation.SetSampledAt(t)
-	return msc
+func (_c *MetricSampleCreate) SetSampledAt(v time.Time) *MetricSampleCreate {
+	_c.mutation.SetSampledAt(v)
+	return _c
 }
 
 // SetValue sets the "value" field.
-func (msc *MetricSampleCreate) SetValue(f float64) *MetricSampleCreate {
-	msc.mutation.SetValue(f)
-	return msc
+func (_c *MetricSampleCreate) SetValue(v float64) *MetricSampleCreate {
+	_c.mutation.SetValue(v)
+	return _c
 }
 
 // Mutation returns the MetricSampleMutation object of the builder.
-func (msc *MetricSampleCreate) Mutation() *MetricSampleMutation {
-	return msc.mutation
+func (_c *MetricSampleCreate) Mutation() *MetricSampleMutation {
+	return _c.mutation
 }
 
 // Save creates the MetricSample in the database.
-func (msc *MetricSampleCreate) Save(ctx context.Context) (*MetricSample, error) {
-	return withHooks(ctx, msc.sqlSave, msc.mutation, msc.hooks)
+func (_c *MetricSampleCreate) Save(ctx context.Context) (*MetricSample, error) {
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (msc *MetricSampleCreate) SaveX(ctx context.Context) *MetricSample {
-	v, err := msc.Save(ctx)
+func (_c *MetricSampleCreate) SaveX(ctx context.Context) *MetricSample {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -60,43 +60,43 @@ func (msc *MetricSampleCreate) SaveX(ctx context.Context) *MetricSample {
 }
 
 // Exec executes the query.
-func (msc *MetricSampleCreate) Exec(ctx context.Context) error {
-	_, err := msc.Save(ctx)
+func (_c *MetricSampleCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (msc *MetricSampleCreate) ExecX(ctx context.Context) {
-	if err := msc.Exec(ctx); err != nil {
+func (_c *MetricSampleCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (msc *MetricSampleCreate) check() error {
-	if _, ok := msc.mutation.Metric(); !ok {
+func (_c *MetricSampleCreate) check() error {
+	if _, ok := _c.mutation.Metric(); !ok {
 		return &ValidationError{Name: "metric", err: errors.New(`ent: missing required field "MetricSample.metric"`)}
 	}
-	if v, ok := msc.mutation.Metric(); ok {
+	if v, ok := _c.mutation.Metric(); ok {
 		if err := metricsample.MetricValidator(v); err != nil {
 			return &ValidationError{Name: "metric", err: fmt.Errorf(`ent: validator failed for field "MetricSample.metric": %w`, err)}
 		}
 	}
-	if _, ok := msc.mutation.SampledAt(); !ok {
+	if _, ok := _c.mutation.SampledAt(); !ok {
 		return &ValidationError{Name: "sampled_at", err: errors.New(`ent: missing required field "MetricSample.sampled_at"`)}
 	}
-	if _, ok := msc.mutation.Value(); !ok {
+	if _, ok := _c.mutation.Value(); !ok {
 		return &ValidationError{Name: "value", err: errors.New(`ent: missing required field "MetricSample.value"`)}
 	}
 	return nil
 }
 
-func (msc *MetricSampleCreate) sqlSave(ctx context.Context) (*MetricSample, error) {
-	if err := msc.check(); err != nil {
+func (_c *MetricSampleCreate) sqlSave(ctx context.Context) (*MetricSample, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := msc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, msc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -104,26 +104,26 @@ func (msc *MetricSampleCreate) sqlSave(ctx context.Context) (*MetricSample, erro
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	msc.mutation.id = &_node.ID
-	msc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (msc *MetricSampleCreate) createSpec() (*MetricSample, *sqlgraph.CreateSpec) {
+func (_c *MetricSampleCreate) createSpec() (*MetricSample, *sqlgraph.CreateSpec) {
 	var (
-		_node = &MetricSample{config: msc.config}
+		_node = &MetricSample{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(metricsample.Table, sqlgraph.NewFieldSpec(metricsample.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = msc.conflict
-	if value, ok := msc.mutation.Metric(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.Metric(); ok {
 		_spec.SetField(metricsample.FieldMetric, field.TypeString, value)
 		_node.Metric = value
 	}
-	if value, ok := msc.mutation.SampledAt(); ok {
+	if value, ok := _c.mutation.SampledAt(); ok {
 		_spec.SetField(metricsample.FieldSampledAt, field.TypeTime, value)
 		_node.SampledAt = value
 	}
-	if value, ok := msc.mutation.Value(); ok {
+	if value, ok := _c.mutation.Value(); ok {
 		_spec.SetField(metricsample.FieldValue, field.TypeFloat64, value)
 		_node.Value = value
 	}
@@ -146,10 +146,10 @@ func (msc *MetricSampleCreate) createSpec() (*MetricSample, *sqlgraph.CreateSpec
 //			SetMetric(v+v).
 //		}).
 //		Exec(ctx)
-func (msc *MetricSampleCreate) OnConflict(opts ...sql.ConflictOption) *MetricSampleUpsertOne {
-	msc.conflict = opts
+func (_c *MetricSampleCreate) OnConflict(opts ...sql.ConflictOption) *MetricSampleUpsertOne {
+	_c.conflict = opts
 	return &MetricSampleUpsertOne{
-		create: msc,
+		create: _c,
 	}
 }
 
@@ -159,10 +159,10 @@ func (msc *MetricSampleCreate) OnConflict(opts ...sql.ConflictOption) *MetricSam
 //	client.MetricSample.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (msc *MetricSampleCreate) OnConflictColumns(columns ...string) *MetricSampleUpsertOne {
-	msc.conflict = append(msc.conflict, sql.ConflictColumns(columns...))
+func (_c *MetricSampleCreate) OnConflictColumns(columns ...string) *MetricSampleUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MetricSampleUpsertOne{
-		create: msc,
+		create: _c,
 	}
 }
 
@@ -352,16 +352,16 @@ type MetricSampleCreateBulk struct {
 }
 
 // Save creates the MetricSample entities in the database.
-func (mscb *MetricSampleCreateBulk) Save(ctx context.Context) ([]*MetricSample, error) {
-	if mscb.err != nil {
-		return nil, mscb.err
+func (_c *MetricSampleCreateBulk) Save(ctx context.Context) ([]*MetricSample, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(mscb.builders))
-	nodes := make([]*MetricSample, len(mscb.builders))
-	mutators := make([]Mutator, len(mscb.builders))
-	for i := range mscb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*MetricSample, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := mscb.builders[i]
+			builder := _c.builders[i]
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MetricSampleMutation)
 				if !ok {
@@ -374,12 +374,12 @@ func (mscb *MetricSampleCreateBulk) Save(ctx context.Context) ([]*MetricSample, 
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, mscb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = mscb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, mscb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -403,7 +403,7 @@ func (mscb *MetricSampleCreateBulk) Save(ctx context.Context) ([]*MetricSample, 
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, mscb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -411,8 +411,8 @@ func (mscb *MetricSampleCreateBulk) Save(ctx context.Context) ([]*MetricSample, 
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mscb *MetricSampleCreateBulk) SaveX(ctx context.Context) []*MetricSample {
-	v, err := mscb.Save(ctx)
+func (_c *MetricSampleCreateBulk) SaveX(ctx context.Context) []*MetricSample {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -420,14 +420,14 @@ func (mscb *MetricSampleCreateBulk) SaveX(ctx context.Context) []*MetricSample {
 }
 
 // Exec executes the query.
-func (mscb *MetricSampleCreateBulk) Exec(ctx context.Context) error {
-	_, err := mscb.Save(ctx)
+func (_c *MetricSampleCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mscb *MetricSampleCreateBulk) ExecX(ctx context.Context) {
-	if err := mscb.Exec(ctx); err != nil {
+func (_c *MetricSampleCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -447,10 +447,10 @@ func (mscb *MetricSampleCreateBulk) ExecX(ctx context.Context) {
 //			SetMetric(v+v).
 //		}).
 //		Exec(ctx)
-func (mscb *MetricSampleCreateBulk) OnConflict(opts ...sql.ConflictOption) *MetricSampleUpsertBulk {
-	mscb.conflict = opts
+func (_c *MetricSampleCreateBulk) OnConflict(opts ...sql.ConflictOption) *MetricSampleUpsertBulk {
+	_c.conflict = opts
 	return &MetricSampleUpsertBulk{
-		create: mscb,
+		create: _c,
 	}
 }
 
@@ -460,10 +460,10 @@ func (mscb *MetricSampleCreateBulk) OnConflict(opts ...sql.ConflictOption) *Metr
 //	client.MetricSample.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (mscb *MetricSampleCreateBulk) OnConflictColumns(columns ...string) *MetricSampleUpsertBulk {
-	mscb.conflict = append(mscb.conflict, sql.ConflictColumns(columns...))
+func (_c *MetricSampleCreateBulk) OnConflictColumns(columns ...string) *MetricSampleUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MetricSampleUpsertBulk{
-		create: mscb,
+		create: _c,
 	}
 }
 

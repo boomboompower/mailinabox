@@ -23,93 +23,93 @@ type BackupRunCreate struct {
 }
 
 // SetStartedAt sets the "started_at" field.
-func (brc *BackupRunCreate) SetStartedAt(t time.Time) *BackupRunCreate {
-	brc.mutation.SetStartedAt(t)
-	return brc
+func (_c *BackupRunCreate) SetStartedAt(v time.Time) *BackupRunCreate {
+	_c.mutation.SetStartedAt(v)
+	return _c
 }
 
 // SetFinishedAt sets the "finished_at" field.
-func (brc *BackupRunCreate) SetFinishedAt(t time.Time) *BackupRunCreate {
-	brc.mutation.SetFinishedAt(t)
-	return brc
+func (_c *BackupRunCreate) SetFinishedAt(v time.Time) *BackupRunCreate {
+	_c.mutation.SetFinishedAt(v)
+	return _c
 }
 
 // SetNillableFinishedAt sets the "finished_at" field if the given value is not nil.
-func (brc *BackupRunCreate) SetNillableFinishedAt(t *time.Time) *BackupRunCreate {
-	if t != nil {
-		brc.SetFinishedAt(*t)
+func (_c *BackupRunCreate) SetNillableFinishedAt(v *time.Time) *BackupRunCreate {
+	if v != nil {
+		_c.SetFinishedAt(*v)
 	}
-	return brc
+	return _c
 }
 
 // SetStatus sets the "status" field.
-func (brc *BackupRunCreate) SetStatus(s string) *BackupRunCreate {
-	brc.mutation.SetStatus(s)
-	return brc
+func (_c *BackupRunCreate) SetStatus(v string) *BackupRunCreate {
+	_c.mutation.SetStatus(v)
+	return _c
 }
 
 // SetTool sets the "tool" field.
-func (brc *BackupRunCreate) SetTool(s string) *BackupRunCreate {
-	brc.mutation.SetTool(s)
-	return brc
+func (_c *BackupRunCreate) SetTool(v string) *BackupRunCreate {
+	_c.mutation.SetTool(v)
+	return _c
 }
 
 // SetError sets the "error" field.
-func (brc *BackupRunCreate) SetError(s string) *BackupRunCreate {
-	brc.mutation.SetError(s)
-	return brc
+func (_c *BackupRunCreate) SetError(v string) *BackupRunCreate {
+	_c.mutation.SetError(v)
+	return _c
 }
 
 // SetNillableError sets the "error" field if the given value is not nil.
-func (brc *BackupRunCreate) SetNillableError(s *string) *BackupRunCreate {
-	if s != nil {
-		brc.SetError(*s)
+func (_c *BackupRunCreate) SetNillableError(v *string) *BackupRunCreate {
+	if v != nil {
+		_c.SetError(*v)
 	}
-	return brc
+	return _c
 }
 
 // SetWarning sets the "warning" field.
-func (brc *BackupRunCreate) SetWarning(s string) *BackupRunCreate {
-	brc.mutation.SetWarning(s)
-	return brc
+func (_c *BackupRunCreate) SetWarning(v string) *BackupRunCreate {
+	_c.mutation.SetWarning(v)
+	return _c
 }
 
 // SetNillableWarning sets the "warning" field if the given value is not nil.
-func (brc *BackupRunCreate) SetNillableWarning(s *string) *BackupRunCreate {
-	if s != nil {
-		brc.SetWarning(*s)
+func (_c *BackupRunCreate) SetNillableWarning(v *string) *BackupRunCreate {
+	if v != nil {
+		_c.SetWarning(*v)
 	}
-	return brc
+	return _c
 }
 
 // SetStats sets the "stats" field.
-func (brc *BackupRunCreate) SetStats(s string) *BackupRunCreate {
-	brc.mutation.SetStats(s)
-	return brc
+func (_c *BackupRunCreate) SetStats(v string) *BackupRunCreate {
+	_c.mutation.SetStats(v)
+	return _c
 }
 
 // SetNillableStats sets the "stats" field if the given value is not nil.
-func (brc *BackupRunCreate) SetNillableStats(s *string) *BackupRunCreate {
-	if s != nil {
-		brc.SetStats(*s)
+func (_c *BackupRunCreate) SetNillableStats(v *string) *BackupRunCreate {
+	if v != nil {
+		_c.SetStats(*v)
 	}
-	return brc
+	return _c
 }
 
 // Mutation returns the BackupRunMutation object of the builder.
-func (brc *BackupRunCreate) Mutation() *BackupRunMutation {
-	return brc.mutation
+func (_c *BackupRunCreate) Mutation() *BackupRunMutation {
+	return _c.mutation
 }
 
 // Save creates the BackupRun in the database.
-func (brc *BackupRunCreate) Save(ctx context.Context) (*BackupRun, error) {
-	brc.defaults()
-	return withHooks(ctx, brc.sqlSave, brc.mutation, brc.hooks)
+func (_c *BackupRunCreate) Save(ctx context.Context) (*BackupRun, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (brc *BackupRunCreate) SaveX(ctx context.Context) *BackupRun {
-	v, err := brc.Save(ctx)
+func (_c *BackupRunCreate) SaveX(ctx context.Context) *BackupRun {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -117,73 +117,73 @@ func (brc *BackupRunCreate) SaveX(ctx context.Context) *BackupRun {
 }
 
 // Exec executes the query.
-func (brc *BackupRunCreate) Exec(ctx context.Context) error {
-	_, err := brc.Save(ctx)
+func (_c *BackupRunCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (brc *BackupRunCreate) ExecX(ctx context.Context) {
-	if err := brc.Exec(ctx); err != nil {
+func (_c *BackupRunCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (brc *BackupRunCreate) defaults() {
-	if _, ok := brc.mutation.Error(); !ok {
+func (_c *BackupRunCreate) defaults() {
+	if _, ok := _c.mutation.Error(); !ok {
 		v := backuprun.DefaultError
-		brc.mutation.SetError(v)
+		_c.mutation.SetError(v)
 	}
-	if _, ok := brc.mutation.Warning(); !ok {
+	if _, ok := _c.mutation.Warning(); !ok {
 		v := backuprun.DefaultWarning
-		brc.mutation.SetWarning(v)
+		_c.mutation.SetWarning(v)
 	}
-	if _, ok := brc.mutation.Stats(); !ok {
+	if _, ok := _c.mutation.Stats(); !ok {
 		v := backuprun.DefaultStats
-		brc.mutation.SetStats(v)
+		_c.mutation.SetStats(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (brc *BackupRunCreate) check() error {
-	if _, ok := brc.mutation.StartedAt(); !ok {
+func (_c *BackupRunCreate) check() error {
+	if _, ok := _c.mutation.StartedAt(); !ok {
 		return &ValidationError{Name: "started_at", err: errors.New(`ent: missing required field "BackupRun.started_at"`)}
 	}
-	if _, ok := brc.mutation.Status(); !ok {
+	if _, ok := _c.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "BackupRun.status"`)}
 	}
-	if v, ok := brc.mutation.Status(); ok {
+	if v, ok := _c.mutation.Status(); ok {
 		if err := backuprun.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "BackupRun.status": %w`, err)}
 		}
 	}
-	if _, ok := brc.mutation.Tool(); !ok {
+	if _, ok := _c.mutation.Tool(); !ok {
 		return &ValidationError{Name: "tool", err: errors.New(`ent: missing required field "BackupRun.tool"`)}
 	}
-	if v, ok := brc.mutation.Tool(); ok {
+	if v, ok := _c.mutation.Tool(); ok {
 		if err := backuprun.ToolValidator(v); err != nil {
 			return &ValidationError{Name: "tool", err: fmt.Errorf(`ent: validator failed for field "BackupRun.tool": %w`, err)}
 		}
 	}
-	if _, ok := brc.mutation.Error(); !ok {
+	if _, ok := _c.mutation.Error(); !ok {
 		return &ValidationError{Name: "error", err: errors.New(`ent: missing required field "BackupRun.error"`)}
 	}
-	if _, ok := brc.mutation.Warning(); !ok {
+	if _, ok := _c.mutation.Warning(); !ok {
 		return &ValidationError{Name: "warning", err: errors.New(`ent: missing required field "BackupRun.warning"`)}
 	}
-	if _, ok := brc.mutation.Stats(); !ok {
+	if _, ok := _c.mutation.Stats(); !ok {
 		return &ValidationError{Name: "stats", err: errors.New(`ent: missing required field "BackupRun.stats"`)}
 	}
 	return nil
 }
 
-func (brc *BackupRunCreate) sqlSave(ctx context.Context) (*BackupRun, error) {
-	if err := brc.check(); err != nil {
+func (_c *BackupRunCreate) sqlSave(ctx context.Context) (*BackupRun, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := brc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, brc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -191,42 +191,42 @@ func (brc *BackupRunCreate) sqlSave(ctx context.Context) (*BackupRun, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	brc.mutation.id = &_node.ID
-	brc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (brc *BackupRunCreate) createSpec() (*BackupRun, *sqlgraph.CreateSpec) {
+func (_c *BackupRunCreate) createSpec() (*BackupRun, *sqlgraph.CreateSpec) {
 	var (
-		_node = &BackupRun{config: brc.config}
+		_node = &BackupRun{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(backuprun.Table, sqlgraph.NewFieldSpec(backuprun.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = brc.conflict
-	if value, ok := brc.mutation.StartedAt(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.StartedAt(); ok {
 		_spec.SetField(backuprun.FieldStartedAt, field.TypeTime, value)
 		_node.StartedAt = value
 	}
-	if value, ok := brc.mutation.FinishedAt(); ok {
+	if value, ok := _c.mutation.FinishedAt(); ok {
 		_spec.SetField(backuprun.FieldFinishedAt, field.TypeTime, value)
 		_node.FinishedAt = &value
 	}
-	if value, ok := brc.mutation.Status(); ok {
+	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(backuprun.FieldStatus, field.TypeString, value)
 		_node.Status = value
 	}
-	if value, ok := brc.mutation.Tool(); ok {
+	if value, ok := _c.mutation.Tool(); ok {
 		_spec.SetField(backuprun.FieldTool, field.TypeString, value)
 		_node.Tool = value
 	}
-	if value, ok := brc.mutation.Error(); ok {
+	if value, ok := _c.mutation.Error(); ok {
 		_spec.SetField(backuprun.FieldError, field.TypeString, value)
 		_node.Error = value
 	}
-	if value, ok := brc.mutation.Warning(); ok {
+	if value, ok := _c.mutation.Warning(); ok {
 		_spec.SetField(backuprun.FieldWarning, field.TypeString, value)
 		_node.Warning = value
 	}
-	if value, ok := brc.mutation.Stats(); ok {
+	if value, ok := _c.mutation.Stats(); ok {
 		_spec.SetField(backuprun.FieldStats, field.TypeString, value)
 		_node.Stats = value
 	}
@@ -249,10 +249,10 @@ func (brc *BackupRunCreate) createSpec() (*BackupRun, *sqlgraph.CreateSpec) {
 //			SetStartedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (brc *BackupRunCreate) OnConflict(opts ...sql.ConflictOption) *BackupRunUpsertOne {
-	brc.conflict = opts
+func (_c *BackupRunCreate) OnConflict(opts ...sql.ConflictOption) *BackupRunUpsertOne {
+	_c.conflict = opts
 	return &BackupRunUpsertOne{
-		create: brc,
+		create: _c,
 	}
 }
 
@@ -262,10 +262,10 @@ func (brc *BackupRunCreate) OnConflict(opts ...sql.ConflictOption) *BackupRunUps
 //	client.BackupRun.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (brc *BackupRunCreate) OnConflictColumns(columns ...string) *BackupRunUpsertOne {
-	brc.conflict = append(brc.conflict, sql.ConflictColumns(columns...))
+func (_c *BackupRunCreate) OnConflictColumns(columns ...string) *BackupRunUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &BackupRunUpsertOne{
-		create: brc,
+		create: _c,
 	}
 }
 
@@ -559,16 +559,16 @@ type BackupRunCreateBulk struct {
 }
 
 // Save creates the BackupRun entities in the database.
-func (brcb *BackupRunCreateBulk) Save(ctx context.Context) ([]*BackupRun, error) {
-	if brcb.err != nil {
-		return nil, brcb.err
+func (_c *BackupRunCreateBulk) Save(ctx context.Context) ([]*BackupRun, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(brcb.builders))
-	nodes := make([]*BackupRun, len(brcb.builders))
-	mutators := make([]Mutator, len(brcb.builders))
-	for i := range brcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*BackupRun, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := brcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*BackupRunMutation)
@@ -582,12 +582,12 @@ func (brcb *BackupRunCreateBulk) Save(ctx context.Context) ([]*BackupRun, error)
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, brcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = brcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, brcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -611,7 +611,7 @@ func (brcb *BackupRunCreateBulk) Save(ctx context.Context) ([]*BackupRun, error)
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, brcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -619,8 +619,8 @@ func (brcb *BackupRunCreateBulk) Save(ctx context.Context) ([]*BackupRun, error)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (brcb *BackupRunCreateBulk) SaveX(ctx context.Context) []*BackupRun {
-	v, err := brcb.Save(ctx)
+func (_c *BackupRunCreateBulk) SaveX(ctx context.Context) []*BackupRun {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -628,14 +628,14 @@ func (brcb *BackupRunCreateBulk) SaveX(ctx context.Context) []*BackupRun {
 }
 
 // Exec executes the query.
-func (brcb *BackupRunCreateBulk) Exec(ctx context.Context) error {
-	_, err := brcb.Save(ctx)
+func (_c *BackupRunCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (brcb *BackupRunCreateBulk) ExecX(ctx context.Context) {
-	if err := brcb.Exec(ctx); err != nil {
+func (_c *BackupRunCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -655,10 +655,10 @@ func (brcb *BackupRunCreateBulk) ExecX(ctx context.Context) {
 //			SetStartedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (brcb *BackupRunCreateBulk) OnConflict(opts ...sql.ConflictOption) *BackupRunUpsertBulk {
-	brcb.conflict = opts
+func (_c *BackupRunCreateBulk) OnConflict(opts ...sql.ConflictOption) *BackupRunUpsertBulk {
+	_c.conflict = opts
 	return &BackupRunUpsertBulk{
-		create: brcb,
+		create: _c,
 	}
 }
 
@@ -668,10 +668,10 @@ func (brcb *BackupRunCreateBulk) OnConflict(opts ...sql.ConflictOption) *BackupR
 //	client.BackupRun.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (brcb *BackupRunCreateBulk) OnConflictColumns(columns ...string) *BackupRunUpsertBulk {
-	brcb.conflict = append(brcb.conflict, sql.ConflictColumns(columns...))
+func (_c *BackupRunCreateBulk) OnConflictColumns(columns ...string) *BackupRunUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &BackupRunUpsertBulk{
-		create: brcb,
+		create: _c,
 	}
 }
 

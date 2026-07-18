@@ -10,6 +10,7 @@ import (
 	"naust/daemon/internal/store/ent/user"
 	"naust/daemon/internal/store/ent/webauthncredential"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -30,44 +31,44 @@ type WebAuthnCredentialQuery struct {
 }
 
 // Where adds a new predicate for the WebAuthnCredentialQuery builder.
-func (wacq *WebAuthnCredentialQuery) Where(ps ...predicate.WebAuthnCredential) *WebAuthnCredentialQuery {
-	wacq.predicates = append(wacq.predicates, ps...)
-	return wacq
+func (_q *WebAuthnCredentialQuery) Where(ps ...predicate.WebAuthnCredential) *WebAuthnCredentialQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (wacq *WebAuthnCredentialQuery) Limit(limit int) *WebAuthnCredentialQuery {
-	wacq.ctx.Limit = &limit
-	return wacq
+func (_q *WebAuthnCredentialQuery) Limit(limit int) *WebAuthnCredentialQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (wacq *WebAuthnCredentialQuery) Offset(offset int) *WebAuthnCredentialQuery {
-	wacq.ctx.Offset = &offset
-	return wacq
+func (_q *WebAuthnCredentialQuery) Offset(offset int) *WebAuthnCredentialQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (wacq *WebAuthnCredentialQuery) Unique(unique bool) *WebAuthnCredentialQuery {
-	wacq.ctx.Unique = &unique
-	return wacq
+func (_q *WebAuthnCredentialQuery) Unique(unique bool) *WebAuthnCredentialQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (wacq *WebAuthnCredentialQuery) Order(o ...webauthncredential.OrderOption) *WebAuthnCredentialQuery {
-	wacq.order = append(wacq.order, o...)
-	return wacq
+func (_q *WebAuthnCredentialQuery) Order(o ...webauthncredential.OrderOption) *WebAuthnCredentialQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryUser chains the current query on the "user" edge.
-func (wacq *WebAuthnCredentialQuery) QueryUser() *UserQuery {
-	query := (&UserClient{config: wacq.config}).Query()
+func (_q *WebAuthnCredentialQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := wacq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := wacq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -76,7 +77,7 @@ func (wacq *WebAuthnCredentialQuery) QueryUser() *UserQuery {
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, webauthncredential.UserTable, webauthncredential.UserColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(wacq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -84,8 +85,8 @@ func (wacq *WebAuthnCredentialQuery) QueryUser() *UserQuery {
 
 // First returns the first WebAuthnCredential entity from the query.
 // Returns a *NotFoundError when no WebAuthnCredential was found.
-func (wacq *WebAuthnCredentialQuery) First(ctx context.Context) (*WebAuthnCredential, error) {
-	nodes, err := wacq.Limit(1).All(setContextOp(ctx, wacq.ctx, "First"))
+func (_q *WebAuthnCredentialQuery) First(ctx context.Context) (*WebAuthnCredential, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -96,8 +97,8 @@ func (wacq *WebAuthnCredentialQuery) First(ctx context.Context) (*WebAuthnCreden
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (wacq *WebAuthnCredentialQuery) FirstX(ctx context.Context) *WebAuthnCredential {
-	node, err := wacq.First(ctx)
+func (_q *WebAuthnCredentialQuery) FirstX(ctx context.Context) *WebAuthnCredential {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -106,9 +107,9 @@ func (wacq *WebAuthnCredentialQuery) FirstX(ctx context.Context) *WebAuthnCreden
 
 // FirstID returns the first WebAuthnCredential ID from the query.
 // Returns a *NotFoundError when no WebAuthnCredential ID was found.
-func (wacq *WebAuthnCredentialQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *WebAuthnCredentialQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = wacq.Limit(1).IDs(setContextOp(ctx, wacq.ctx, "FirstID")); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -119,8 +120,8 @@ func (wacq *WebAuthnCredentialQuery) FirstID(ctx context.Context) (id int, err e
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (wacq *WebAuthnCredentialQuery) FirstIDX(ctx context.Context) int {
-	id, err := wacq.FirstID(ctx)
+func (_q *WebAuthnCredentialQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -130,8 +131,8 @@ func (wacq *WebAuthnCredentialQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single WebAuthnCredential entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one WebAuthnCredential entity is found.
 // Returns a *NotFoundError when no WebAuthnCredential entities are found.
-func (wacq *WebAuthnCredentialQuery) Only(ctx context.Context) (*WebAuthnCredential, error) {
-	nodes, err := wacq.Limit(2).All(setContextOp(ctx, wacq.ctx, "Only"))
+func (_q *WebAuthnCredentialQuery) Only(ctx context.Context) (*WebAuthnCredential, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -146,8 +147,8 @@ func (wacq *WebAuthnCredentialQuery) Only(ctx context.Context) (*WebAuthnCredent
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (wacq *WebAuthnCredentialQuery) OnlyX(ctx context.Context) *WebAuthnCredential {
-	node, err := wacq.Only(ctx)
+func (_q *WebAuthnCredentialQuery) OnlyX(ctx context.Context) *WebAuthnCredential {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -157,9 +158,9 @@ func (wacq *WebAuthnCredentialQuery) OnlyX(ctx context.Context) *WebAuthnCredent
 // OnlyID is like Only, but returns the only WebAuthnCredential ID in the query.
 // Returns a *NotSingularError when more than one WebAuthnCredential ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (wacq *WebAuthnCredentialQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *WebAuthnCredentialQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = wacq.Limit(2).IDs(setContextOp(ctx, wacq.ctx, "OnlyID")); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -174,8 +175,8 @@ func (wacq *WebAuthnCredentialQuery) OnlyID(ctx context.Context) (id int, err er
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (wacq *WebAuthnCredentialQuery) OnlyIDX(ctx context.Context) int {
-	id, err := wacq.OnlyID(ctx)
+func (_q *WebAuthnCredentialQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -183,18 +184,18 @@ func (wacq *WebAuthnCredentialQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of WebAuthnCredentials.
-func (wacq *WebAuthnCredentialQuery) All(ctx context.Context) ([]*WebAuthnCredential, error) {
-	ctx = setContextOp(ctx, wacq.ctx, "All")
-	if err := wacq.prepareQuery(ctx); err != nil {
+func (_q *WebAuthnCredentialQuery) All(ctx context.Context) ([]*WebAuthnCredential, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*WebAuthnCredential, *WebAuthnCredentialQuery]()
-	return withInterceptors[[]*WebAuthnCredential](ctx, wacq, qr, wacq.inters)
+	return withInterceptors[[]*WebAuthnCredential](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (wacq *WebAuthnCredentialQuery) AllX(ctx context.Context) []*WebAuthnCredential {
-	nodes, err := wacq.All(ctx)
+func (_q *WebAuthnCredentialQuery) AllX(ctx context.Context) []*WebAuthnCredential {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -202,20 +203,20 @@ func (wacq *WebAuthnCredentialQuery) AllX(ctx context.Context) []*WebAuthnCreden
 }
 
 // IDs executes the query and returns a list of WebAuthnCredential IDs.
-func (wacq *WebAuthnCredentialQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if wacq.ctx.Unique == nil && wacq.path != nil {
-		wacq.Unique(true)
+func (_q *WebAuthnCredentialQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, wacq.ctx, "IDs")
-	if err = wacq.Select(webauthncredential.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(webauthncredential.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (wacq *WebAuthnCredentialQuery) IDsX(ctx context.Context) []int {
-	ids, err := wacq.IDs(ctx)
+func (_q *WebAuthnCredentialQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -223,17 +224,17 @@ func (wacq *WebAuthnCredentialQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (wacq *WebAuthnCredentialQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, wacq.ctx, "Count")
-	if err := wacq.prepareQuery(ctx); err != nil {
+func (_q *WebAuthnCredentialQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, wacq, querierCount[*WebAuthnCredentialQuery](), wacq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*WebAuthnCredentialQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (wacq *WebAuthnCredentialQuery) CountX(ctx context.Context) int {
-	count, err := wacq.Count(ctx)
+func (_q *WebAuthnCredentialQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -241,9 +242,9 @@ func (wacq *WebAuthnCredentialQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (wacq *WebAuthnCredentialQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, wacq.ctx, "Exist")
-	switch _, err := wacq.FirstID(ctx); {
+func (_q *WebAuthnCredentialQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -254,8 +255,8 @@ func (wacq *WebAuthnCredentialQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (wacq *WebAuthnCredentialQuery) ExistX(ctx context.Context) bool {
-	exist, err := wacq.Exist(ctx)
+func (_q *WebAuthnCredentialQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -264,32 +265,32 @@ func (wacq *WebAuthnCredentialQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the WebAuthnCredentialQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (wacq *WebAuthnCredentialQuery) Clone() *WebAuthnCredentialQuery {
-	if wacq == nil {
+func (_q *WebAuthnCredentialQuery) Clone() *WebAuthnCredentialQuery {
+	if _q == nil {
 		return nil
 	}
 	return &WebAuthnCredentialQuery{
-		config:     wacq.config,
-		ctx:        wacq.ctx.Clone(),
-		order:      append([]webauthncredential.OrderOption{}, wacq.order...),
-		inters:     append([]Interceptor{}, wacq.inters...),
-		predicates: append([]predicate.WebAuthnCredential{}, wacq.predicates...),
-		withUser:   wacq.withUser.Clone(),
+		config:     _q.config,
+		ctx:        _q.ctx.Clone(),
+		order:      append([]webauthncredential.OrderOption{}, _q.order...),
+		inters:     append([]Interceptor{}, _q.inters...),
+		predicates: append([]predicate.WebAuthnCredential{}, _q.predicates...),
+		withUser:   _q.withUser.Clone(),
 		// clone intermediate query.
-		sql:  wacq.sql.Clone(),
-		path: wacq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithUser tells the query-builder to eager-load the nodes that are connected to
 // the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (wacq *WebAuthnCredentialQuery) WithUser(opts ...func(*UserQuery)) *WebAuthnCredentialQuery {
-	query := (&UserClient{config: wacq.config}).Query()
+func (_q *WebAuthnCredentialQuery) WithUser(opts ...func(*UserQuery)) *WebAuthnCredentialQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	wacq.withUser = query
-	return wacq
+	_q.withUser = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -306,10 +307,10 @@ func (wacq *WebAuthnCredentialQuery) WithUser(opts ...func(*UserQuery)) *WebAuth
 //		GroupBy(webauthncredential.FieldCredentialID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (wacq *WebAuthnCredentialQuery) GroupBy(field string, fields ...string) *WebAuthnCredentialGroupBy {
-	wacq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &WebAuthnCredentialGroupBy{build: wacq}
-	grbuild.flds = &wacq.ctx.Fields
+func (_q *WebAuthnCredentialQuery) GroupBy(field string, fields ...string) *WebAuthnCredentialGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &WebAuthnCredentialGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = webauthncredential.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -327,55 +328,55 @@ func (wacq *WebAuthnCredentialQuery) GroupBy(field string, fields ...string) *We
 //	client.WebAuthnCredential.Query().
 //		Select(webauthncredential.FieldCredentialID).
 //		Scan(ctx, &v)
-func (wacq *WebAuthnCredentialQuery) Select(fields ...string) *WebAuthnCredentialSelect {
-	wacq.ctx.Fields = append(wacq.ctx.Fields, fields...)
-	sbuild := &WebAuthnCredentialSelect{WebAuthnCredentialQuery: wacq}
+func (_q *WebAuthnCredentialQuery) Select(fields ...string) *WebAuthnCredentialSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &WebAuthnCredentialSelect{WebAuthnCredentialQuery: _q}
 	sbuild.label = webauthncredential.Label
-	sbuild.flds, sbuild.scan = &wacq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a WebAuthnCredentialSelect configured with the given aggregations.
-func (wacq *WebAuthnCredentialQuery) Aggregate(fns ...AggregateFunc) *WebAuthnCredentialSelect {
-	return wacq.Select().Aggregate(fns...)
+func (_q *WebAuthnCredentialQuery) Aggregate(fns ...AggregateFunc) *WebAuthnCredentialSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (wacq *WebAuthnCredentialQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range wacq.inters {
+func (_q *WebAuthnCredentialQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, wacq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range wacq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !webauthncredential.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if wacq.path != nil {
-		prev, err := wacq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		wacq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (wacq *WebAuthnCredentialQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*WebAuthnCredential, error) {
+func (_q *WebAuthnCredentialQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*WebAuthnCredential, error) {
 	var (
 		nodes       = []*WebAuthnCredential{}
-		withFKs     = wacq.withFKs
-		_spec       = wacq.querySpec()
+		withFKs     = _q.withFKs
+		_spec       = _q.querySpec()
 		loadedTypes = [1]bool{
-			wacq.withUser != nil,
+			_q.withUser != nil,
 		}
 	)
-	if wacq.withUser != nil {
+	if _q.withUser != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -385,7 +386,7 @@ func (wacq *WebAuthnCredentialQuery) sqlAll(ctx context.Context, hooks ...queryH
 		return (*WebAuthnCredential).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &WebAuthnCredential{config: wacq.config}
+		node := &WebAuthnCredential{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -393,14 +394,14 @@ func (wacq *WebAuthnCredentialQuery) sqlAll(ctx context.Context, hooks ...queryH
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, wacq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := wacq.withUser; query != nil {
-		if err := wacq.loadUser(ctx, query, nodes, nil,
+	if query := _q.withUser; query != nil {
+		if err := _q.loadUser(ctx, query, nodes, nil,
 			func(n *WebAuthnCredential, e *User) { n.Edges.User = e }); err != nil {
 			return nil, err
 		}
@@ -408,7 +409,7 @@ func (wacq *WebAuthnCredentialQuery) sqlAll(ctx context.Context, hooks ...queryH
 	return nodes, nil
 }
 
-func (wacq *WebAuthnCredentialQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*WebAuthnCredential, init func(*WebAuthnCredential), assign func(*WebAuthnCredential, *User)) error {
+func (_q *WebAuthnCredentialQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*WebAuthnCredential, init func(*WebAuthnCredential), assign func(*WebAuthnCredential, *User)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*WebAuthnCredential)
 	for i := range nodes {
@@ -441,24 +442,24 @@ func (wacq *WebAuthnCredentialQuery) loadUser(ctx context.Context, query *UserQu
 	return nil
 }
 
-func (wacq *WebAuthnCredentialQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := wacq.querySpec()
-	_spec.Node.Columns = wacq.ctx.Fields
-	if len(wacq.ctx.Fields) > 0 {
-		_spec.Unique = wacq.ctx.Unique != nil && *wacq.ctx.Unique
+func (_q *WebAuthnCredentialQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, wacq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (wacq *WebAuthnCredentialQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *WebAuthnCredentialQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(webauthncredential.Table, webauthncredential.Columns, sqlgraph.NewFieldSpec(webauthncredential.FieldID, field.TypeInt))
-	_spec.From = wacq.sql
-	if unique := wacq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if wacq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := wacq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, webauthncredential.FieldID)
 		for i := range fields {
@@ -467,20 +468,20 @@ func (wacq *WebAuthnCredentialQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if ps := wacq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := wacq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := wacq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := wacq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -490,33 +491,33 @@ func (wacq *WebAuthnCredentialQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (wacq *WebAuthnCredentialQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(wacq.driver.Dialect())
+func (_q *WebAuthnCredentialQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(webauthncredential.Table)
-	columns := wacq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = webauthncredential.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if wacq.sql != nil {
-		selector = wacq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if wacq.ctx.Unique != nil && *wacq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, p := range wacq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range wacq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := wacq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := wacq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -529,41 +530,41 @@ type WebAuthnCredentialGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (wacgb *WebAuthnCredentialGroupBy) Aggregate(fns ...AggregateFunc) *WebAuthnCredentialGroupBy {
-	wacgb.fns = append(wacgb.fns, fns...)
-	return wacgb
+func (_g *WebAuthnCredentialGroupBy) Aggregate(fns ...AggregateFunc) *WebAuthnCredentialGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (wacgb *WebAuthnCredentialGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, wacgb.build.ctx, "GroupBy")
-	if err := wacgb.build.prepareQuery(ctx); err != nil {
+func (_g *WebAuthnCredentialGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*WebAuthnCredentialQuery, *WebAuthnCredentialGroupBy](ctx, wacgb.build, wacgb, wacgb.build.inters, v)
+	return scanWithInterceptors[*WebAuthnCredentialQuery, *WebAuthnCredentialGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (wacgb *WebAuthnCredentialGroupBy) sqlScan(ctx context.Context, root *WebAuthnCredentialQuery, v any) error {
+func (_g *WebAuthnCredentialGroupBy) sqlScan(ctx context.Context, root *WebAuthnCredentialQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(wacgb.fns))
-	for _, fn := range wacgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*wacgb.flds)+len(wacgb.fns))
-		for _, f := range *wacgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*wacgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := wacgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -577,27 +578,27 @@ type WebAuthnCredentialSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (wacs *WebAuthnCredentialSelect) Aggregate(fns ...AggregateFunc) *WebAuthnCredentialSelect {
-	wacs.fns = append(wacs.fns, fns...)
-	return wacs
+func (_s *WebAuthnCredentialSelect) Aggregate(fns ...AggregateFunc) *WebAuthnCredentialSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (wacs *WebAuthnCredentialSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, wacs.ctx, "Select")
-	if err := wacs.prepareQuery(ctx); err != nil {
+func (_s *WebAuthnCredentialSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*WebAuthnCredentialQuery, *WebAuthnCredentialSelect](ctx, wacs.WebAuthnCredentialQuery, wacs, wacs.inters, v)
+	return scanWithInterceptors[*WebAuthnCredentialQuery, *WebAuthnCredentialSelect](ctx, _s.WebAuthnCredentialQuery, _s, _s.inters, v)
 }
 
-func (wacs *WebAuthnCredentialSelect) sqlScan(ctx context.Context, root *WebAuthnCredentialQuery, v any) error {
+func (_s *WebAuthnCredentialSelect) sqlScan(ctx context.Context, root *WebAuthnCredentialQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(wacs.fns))
-	for _, fn := range wacs.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*wacs.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -605,7 +606,7 @@ func (wacs *WebAuthnCredentialSelect) sqlScan(ctx context.Context, root *WebAuth
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := wacs.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

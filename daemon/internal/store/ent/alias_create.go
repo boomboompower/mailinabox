@@ -24,76 +24,76 @@ type AliasCreate struct {
 }
 
 // SetSource sets the "source" field.
-func (ac *AliasCreate) SetSource(s string) *AliasCreate {
-	ac.mutation.SetSource(s)
-	return ac
+func (_c *AliasCreate) SetSource(v string) *AliasCreate {
+	_c.mutation.SetSource(v)
+	return _c
 }
 
 // SetDestinations sets the "destinations" field.
-func (ac *AliasCreate) SetDestinations(s []string) *AliasCreate {
-	ac.mutation.SetDestinations(s)
-	return ac
+func (_c *AliasCreate) SetDestinations(v []string) *AliasCreate {
+	_c.mutation.SetDestinations(v)
+	return _c
 }
 
 // SetPermittedSenders sets the "permitted_senders" field.
-func (ac *AliasCreate) SetPermittedSenders(s []string) *AliasCreate {
-	ac.mutation.SetPermittedSenders(s)
-	return ac
+func (_c *AliasCreate) SetPermittedSenders(v []string) *AliasCreate {
+	_c.mutation.SetPermittedSenders(v)
+	return _c
 }
 
 // SetAuto sets the "auto" field.
-func (ac *AliasCreate) SetAuto(b bool) *AliasCreate {
-	ac.mutation.SetAuto(b)
-	return ac
+func (_c *AliasCreate) SetAuto(v bool) *AliasCreate {
+	_c.mutation.SetAuto(v)
+	return _c
 }
 
 // SetNillableAuto sets the "auto" field if the given value is not nil.
-func (ac *AliasCreate) SetNillableAuto(b *bool) *AliasCreate {
-	if b != nil {
-		ac.SetAuto(*b)
+func (_c *AliasCreate) SetNillableAuto(v *bool) *AliasCreate {
+	if v != nil {
+		_c.SetAuto(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (ac *AliasCreate) SetCreatedAt(t time.Time) *AliasCreate {
-	ac.mutation.SetCreatedAt(t)
-	return ac
+func (_c *AliasCreate) SetCreatedAt(v time.Time) *AliasCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ac *AliasCreate) SetNillableCreatedAt(t *time.Time) *AliasCreate {
-	if t != nil {
-		ac.SetCreatedAt(*t)
+func (_c *AliasCreate) SetNillableCreatedAt(v *time.Time) *AliasCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
-func (ac *AliasCreate) SetTenantID(id int) *AliasCreate {
-	ac.mutation.SetTenantID(id)
-	return ac
+func (_c *AliasCreate) SetTenantID(id int) *AliasCreate {
+	_c.mutation.SetTenantID(id)
+	return _c
 }
 
 // SetTenant sets the "tenant" edge to the Tenant entity.
-func (ac *AliasCreate) SetTenant(t *Tenant) *AliasCreate {
-	return ac.SetTenantID(t.ID)
+func (_c *AliasCreate) SetTenant(v *Tenant) *AliasCreate {
+	return _c.SetTenantID(v.ID)
 }
 
 // Mutation returns the AliasMutation object of the builder.
-func (ac *AliasCreate) Mutation() *AliasMutation {
-	return ac.mutation
+func (_c *AliasCreate) Mutation() *AliasMutation {
+	return _c.mutation
 }
 
 // Save creates the Alias in the database.
-func (ac *AliasCreate) Save(ctx context.Context) (*Alias, error) {
-	ac.defaults()
-	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
+func (_c *AliasCreate) Save(ctx context.Context) (*Alias, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (ac *AliasCreate) SaveX(ctx context.Context) *Alias {
-	v, err := ac.Save(ctx)
+func (_c *AliasCreate) SaveX(ctx context.Context) *Alias {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -101,61 +101,61 @@ func (ac *AliasCreate) SaveX(ctx context.Context) *Alias {
 }
 
 // Exec executes the query.
-func (ac *AliasCreate) Exec(ctx context.Context) error {
-	_, err := ac.Save(ctx)
+func (_c *AliasCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ac *AliasCreate) ExecX(ctx context.Context) {
-	if err := ac.Exec(ctx); err != nil {
+func (_c *AliasCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (ac *AliasCreate) defaults() {
-	if _, ok := ac.mutation.Auto(); !ok {
+func (_c *AliasCreate) defaults() {
+	if _, ok := _c.mutation.Auto(); !ok {
 		v := alias.DefaultAuto
-		ac.mutation.SetAuto(v)
+		_c.mutation.SetAuto(v)
 	}
-	if _, ok := ac.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := alias.DefaultCreatedAt()
-		ac.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (ac *AliasCreate) check() error {
-	if _, ok := ac.mutation.Source(); !ok {
+func (_c *AliasCreate) check() error {
+	if _, ok := _c.mutation.Source(); !ok {
 		return &ValidationError{Name: "source", err: errors.New(`ent: missing required field "Alias.source"`)}
 	}
-	if v, ok := ac.mutation.Source(); ok {
+	if v, ok := _c.mutation.Source(); ok {
 		if err := alias.SourceValidator(v); err != nil {
 			return &ValidationError{Name: "source", err: fmt.Errorf(`ent: validator failed for field "Alias.source": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.Destinations(); !ok {
+	if _, ok := _c.mutation.Destinations(); !ok {
 		return &ValidationError{Name: "destinations", err: errors.New(`ent: missing required field "Alias.destinations"`)}
 	}
-	if _, ok := ac.mutation.Auto(); !ok {
+	if _, ok := _c.mutation.Auto(); !ok {
 		return &ValidationError{Name: "auto", err: errors.New(`ent: missing required field "Alias.auto"`)}
 	}
-	if _, ok := ac.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Alias.created_at"`)}
 	}
-	if _, ok := ac.mutation.TenantID(); !ok {
+	if len(_c.mutation.TenantIDs()) == 0 {
 		return &ValidationError{Name: "tenant", err: errors.New(`ent: missing required edge "Alias.tenant"`)}
 	}
 	return nil
 }
 
-func (ac *AliasCreate) sqlSave(ctx context.Context) (*Alias, error) {
-	if err := ac.check(); err != nil {
+func (_c *AliasCreate) sqlSave(ctx context.Context) (*Alias, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := ac.createSpec()
-	if err := sqlgraph.CreateNode(ctx, ac.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -163,38 +163,38 @@ func (ac *AliasCreate) sqlSave(ctx context.Context) (*Alias, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	ac.mutation.id = &_node.ID
-	ac.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (ac *AliasCreate) createSpec() (*Alias, *sqlgraph.CreateSpec) {
+func (_c *AliasCreate) createSpec() (*Alias, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Alias{config: ac.config}
+		_node = &Alias{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(alias.Table, sqlgraph.NewFieldSpec(alias.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = ac.conflict
-	if value, ok := ac.mutation.Source(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.Source(); ok {
 		_spec.SetField(alias.FieldSource, field.TypeString, value)
 		_node.Source = value
 	}
-	if value, ok := ac.mutation.Destinations(); ok {
+	if value, ok := _c.mutation.Destinations(); ok {
 		_spec.SetField(alias.FieldDestinations, field.TypeJSON, value)
 		_node.Destinations = value
 	}
-	if value, ok := ac.mutation.PermittedSenders(); ok {
+	if value, ok := _c.mutation.PermittedSenders(); ok {
 		_spec.SetField(alias.FieldPermittedSenders, field.TypeJSON, value)
 		_node.PermittedSenders = value
 	}
-	if value, ok := ac.mutation.Auto(); ok {
+	if value, ok := _c.mutation.Auto(); ok {
 		_spec.SetField(alias.FieldAuto, field.TypeBool, value)
 		_node.Auto = value
 	}
-	if value, ok := ac.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(alias.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if nodes := ac.mutation.TenantIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.TenantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -230,10 +230,10 @@ func (ac *AliasCreate) createSpec() (*Alias, *sqlgraph.CreateSpec) {
 //			SetSource(v+v).
 //		}).
 //		Exec(ctx)
-func (ac *AliasCreate) OnConflict(opts ...sql.ConflictOption) *AliasUpsertOne {
-	ac.conflict = opts
+func (_c *AliasCreate) OnConflict(opts ...sql.ConflictOption) *AliasUpsertOne {
+	_c.conflict = opts
 	return &AliasUpsertOne{
-		create: ac,
+		create: _c,
 	}
 }
 
@@ -243,10 +243,10 @@ func (ac *AliasCreate) OnConflict(opts ...sql.ConflictOption) *AliasUpsertOne {
 //	client.Alias.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (ac *AliasCreate) OnConflictColumns(columns ...string) *AliasUpsertOne {
-	ac.conflict = append(ac.conflict, sql.ConflictColumns(columns...))
+func (_c *AliasCreate) OnConflictColumns(columns ...string) *AliasUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &AliasUpsertOne{
-		create: ac,
+		create: _c,
 	}
 }
 
@@ -467,16 +467,16 @@ type AliasCreateBulk struct {
 }
 
 // Save creates the Alias entities in the database.
-func (acb *AliasCreateBulk) Save(ctx context.Context) ([]*Alias, error) {
-	if acb.err != nil {
-		return nil, acb.err
+func (_c *AliasCreateBulk) Save(ctx context.Context) ([]*Alias, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(acb.builders))
-	nodes := make([]*Alias, len(acb.builders))
-	mutators := make([]Mutator, len(acb.builders))
-	for i := range acb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Alias, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := acb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*AliasMutation)
@@ -490,12 +490,12 @@ func (acb *AliasCreateBulk) Save(ctx context.Context) ([]*Alias, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, acb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = acb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, acb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -519,7 +519,7 @@ func (acb *AliasCreateBulk) Save(ctx context.Context) ([]*Alias, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, acb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -527,8 +527,8 @@ func (acb *AliasCreateBulk) Save(ctx context.Context) ([]*Alias, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (acb *AliasCreateBulk) SaveX(ctx context.Context) []*Alias {
-	v, err := acb.Save(ctx)
+func (_c *AliasCreateBulk) SaveX(ctx context.Context) []*Alias {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -536,14 +536,14 @@ func (acb *AliasCreateBulk) SaveX(ctx context.Context) []*Alias {
 }
 
 // Exec executes the query.
-func (acb *AliasCreateBulk) Exec(ctx context.Context) error {
-	_, err := acb.Save(ctx)
+func (_c *AliasCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (acb *AliasCreateBulk) ExecX(ctx context.Context) {
-	if err := acb.Exec(ctx); err != nil {
+func (_c *AliasCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -563,10 +563,10 @@ func (acb *AliasCreateBulk) ExecX(ctx context.Context) {
 //			SetSource(v+v).
 //		}).
 //		Exec(ctx)
-func (acb *AliasCreateBulk) OnConflict(opts ...sql.ConflictOption) *AliasUpsertBulk {
-	acb.conflict = opts
+func (_c *AliasCreateBulk) OnConflict(opts ...sql.ConflictOption) *AliasUpsertBulk {
+	_c.conflict = opts
 	return &AliasUpsertBulk{
-		create: acb,
+		create: _c,
 	}
 }
 
@@ -576,10 +576,10 @@ func (acb *AliasCreateBulk) OnConflict(opts ...sql.ConflictOption) *AliasUpsertB
 //	client.Alias.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (acb *AliasCreateBulk) OnConflictColumns(columns ...string) *AliasUpsertBulk {
-	acb.conflict = append(acb.conflict, sql.ConflictColumns(columns...))
+func (_c *AliasCreateBulk) OnConflictColumns(columns ...string) *AliasUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &AliasUpsertBulk{
-		create: acb,
+		create: _c,
 	}
 }
 

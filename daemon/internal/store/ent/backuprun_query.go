@@ -9,6 +9,7 @@ import (
 	"naust/daemon/internal/store/ent/backuprun"
 	"naust/daemon/internal/store/ent/predicate"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -27,40 +28,40 @@ type BackupRunQuery struct {
 }
 
 // Where adds a new predicate for the BackupRunQuery builder.
-func (brq *BackupRunQuery) Where(ps ...predicate.BackupRun) *BackupRunQuery {
-	brq.predicates = append(brq.predicates, ps...)
-	return brq
+func (_q *BackupRunQuery) Where(ps ...predicate.BackupRun) *BackupRunQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (brq *BackupRunQuery) Limit(limit int) *BackupRunQuery {
-	brq.ctx.Limit = &limit
-	return brq
+func (_q *BackupRunQuery) Limit(limit int) *BackupRunQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (brq *BackupRunQuery) Offset(offset int) *BackupRunQuery {
-	brq.ctx.Offset = &offset
-	return brq
+func (_q *BackupRunQuery) Offset(offset int) *BackupRunQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (brq *BackupRunQuery) Unique(unique bool) *BackupRunQuery {
-	brq.ctx.Unique = &unique
-	return brq
+func (_q *BackupRunQuery) Unique(unique bool) *BackupRunQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (brq *BackupRunQuery) Order(o ...backuprun.OrderOption) *BackupRunQuery {
-	brq.order = append(brq.order, o...)
-	return brq
+func (_q *BackupRunQuery) Order(o ...backuprun.OrderOption) *BackupRunQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // First returns the first BackupRun entity from the query.
 // Returns a *NotFoundError when no BackupRun was found.
-func (brq *BackupRunQuery) First(ctx context.Context) (*BackupRun, error) {
-	nodes, err := brq.Limit(1).All(setContextOp(ctx, brq.ctx, "First"))
+func (_q *BackupRunQuery) First(ctx context.Context) (*BackupRun, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +72,8 @@ func (brq *BackupRunQuery) First(ctx context.Context) (*BackupRun, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (brq *BackupRunQuery) FirstX(ctx context.Context) *BackupRun {
-	node, err := brq.First(ctx)
+func (_q *BackupRunQuery) FirstX(ctx context.Context) *BackupRun {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -81,9 +82,9 @@ func (brq *BackupRunQuery) FirstX(ctx context.Context) *BackupRun {
 
 // FirstID returns the first BackupRun ID from the query.
 // Returns a *NotFoundError when no BackupRun ID was found.
-func (brq *BackupRunQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *BackupRunQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = brq.Limit(1).IDs(setContextOp(ctx, brq.ctx, "FirstID")); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -94,8 +95,8 @@ func (brq *BackupRunQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (brq *BackupRunQuery) FirstIDX(ctx context.Context) int {
-	id, err := brq.FirstID(ctx)
+func (_q *BackupRunQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -105,8 +106,8 @@ func (brq *BackupRunQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single BackupRun entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one BackupRun entity is found.
 // Returns a *NotFoundError when no BackupRun entities are found.
-func (brq *BackupRunQuery) Only(ctx context.Context) (*BackupRun, error) {
-	nodes, err := brq.Limit(2).All(setContextOp(ctx, brq.ctx, "Only"))
+func (_q *BackupRunQuery) Only(ctx context.Context) (*BackupRun, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -121,8 +122,8 @@ func (brq *BackupRunQuery) Only(ctx context.Context) (*BackupRun, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (brq *BackupRunQuery) OnlyX(ctx context.Context) *BackupRun {
-	node, err := brq.Only(ctx)
+func (_q *BackupRunQuery) OnlyX(ctx context.Context) *BackupRun {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -132,9 +133,9 @@ func (brq *BackupRunQuery) OnlyX(ctx context.Context) *BackupRun {
 // OnlyID is like Only, but returns the only BackupRun ID in the query.
 // Returns a *NotSingularError when more than one BackupRun ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (brq *BackupRunQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *BackupRunQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = brq.Limit(2).IDs(setContextOp(ctx, brq.ctx, "OnlyID")); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -149,8 +150,8 @@ func (brq *BackupRunQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (brq *BackupRunQuery) OnlyIDX(ctx context.Context) int {
-	id, err := brq.OnlyID(ctx)
+func (_q *BackupRunQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -158,18 +159,18 @@ func (brq *BackupRunQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of BackupRuns.
-func (brq *BackupRunQuery) All(ctx context.Context) ([]*BackupRun, error) {
-	ctx = setContextOp(ctx, brq.ctx, "All")
-	if err := brq.prepareQuery(ctx); err != nil {
+func (_q *BackupRunQuery) All(ctx context.Context) ([]*BackupRun, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*BackupRun, *BackupRunQuery]()
-	return withInterceptors[[]*BackupRun](ctx, brq, qr, brq.inters)
+	return withInterceptors[[]*BackupRun](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (brq *BackupRunQuery) AllX(ctx context.Context) []*BackupRun {
-	nodes, err := brq.All(ctx)
+func (_q *BackupRunQuery) AllX(ctx context.Context) []*BackupRun {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -177,20 +178,20 @@ func (brq *BackupRunQuery) AllX(ctx context.Context) []*BackupRun {
 }
 
 // IDs executes the query and returns a list of BackupRun IDs.
-func (brq *BackupRunQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if brq.ctx.Unique == nil && brq.path != nil {
-		brq.Unique(true)
+func (_q *BackupRunQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, brq.ctx, "IDs")
-	if err = brq.Select(backuprun.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(backuprun.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (brq *BackupRunQuery) IDsX(ctx context.Context) []int {
-	ids, err := brq.IDs(ctx)
+func (_q *BackupRunQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -198,17 +199,17 @@ func (brq *BackupRunQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (brq *BackupRunQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, brq.ctx, "Count")
-	if err := brq.prepareQuery(ctx); err != nil {
+func (_q *BackupRunQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, brq, querierCount[*BackupRunQuery](), brq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*BackupRunQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (brq *BackupRunQuery) CountX(ctx context.Context) int {
-	count, err := brq.Count(ctx)
+func (_q *BackupRunQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -216,9 +217,9 @@ func (brq *BackupRunQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (brq *BackupRunQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, brq.ctx, "Exist")
-	switch _, err := brq.FirstID(ctx); {
+func (_q *BackupRunQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -229,8 +230,8 @@ func (brq *BackupRunQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (brq *BackupRunQuery) ExistX(ctx context.Context) bool {
-	exist, err := brq.Exist(ctx)
+func (_q *BackupRunQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -239,19 +240,19 @@ func (brq *BackupRunQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the BackupRunQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (brq *BackupRunQuery) Clone() *BackupRunQuery {
-	if brq == nil {
+func (_q *BackupRunQuery) Clone() *BackupRunQuery {
+	if _q == nil {
 		return nil
 	}
 	return &BackupRunQuery{
-		config:     brq.config,
-		ctx:        brq.ctx.Clone(),
-		order:      append([]backuprun.OrderOption{}, brq.order...),
-		inters:     append([]Interceptor{}, brq.inters...),
-		predicates: append([]predicate.BackupRun{}, brq.predicates...),
+		config:     _q.config,
+		ctx:        _q.ctx.Clone(),
+		order:      append([]backuprun.OrderOption{}, _q.order...),
+		inters:     append([]Interceptor{}, _q.inters...),
+		predicates: append([]predicate.BackupRun{}, _q.predicates...),
 		// clone intermediate query.
-		sql:  brq.sql.Clone(),
-		path: brq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
@@ -269,10 +270,10 @@ func (brq *BackupRunQuery) Clone() *BackupRunQuery {
 //		GroupBy(backuprun.FieldStartedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (brq *BackupRunQuery) GroupBy(field string, fields ...string) *BackupRunGroupBy {
-	brq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &BackupRunGroupBy{build: brq}
-	grbuild.flds = &brq.ctx.Fields
+func (_q *BackupRunQuery) GroupBy(field string, fields ...string) *BackupRunGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &BackupRunGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = backuprun.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -290,62 +291,62 @@ func (brq *BackupRunQuery) GroupBy(field string, fields ...string) *BackupRunGro
 //	client.BackupRun.Query().
 //		Select(backuprun.FieldStartedAt).
 //		Scan(ctx, &v)
-func (brq *BackupRunQuery) Select(fields ...string) *BackupRunSelect {
-	brq.ctx.Fields = append(brq.ctx.Fields, fields...)
-	sbuild := &BackupRunSelect{BackupRunQuery: brq}
+func (_q *BackupRunQuery) Select(fields ...string) *BackupRunSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &BackupRunSelect{BackupRunQuery: _q}
 	sbuild.label = backuprun.Label
-	sbuild.flds, sbuild.scan = &brq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a BackupRunSelect configured with the given aggregations.
-func (brq *BackupRunQuery) Aggregate(fns ...AggregateFunc) *BackupRunSelect {
-	return brq.Select().Aggregate(fns...)
+func (_q *BackupRunQuery) Aggregate(fns ...AggregateFunc) *BackupRunSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (brq *BackupRunQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range brq.inters {
+func (_q *BackupRunQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, brq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range brq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !backuprun.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if brq.path != nil {
-		prev, err := brq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		brq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (brq *BackupRunQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*BackupRun, error) {
+func (_q *BackupRunQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*BackupRun, error) {
 	var (
 		nodes = []*BackupRun{}
-		_spec = brq.querySpec()
+		_spec = _q.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*BackupRun).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &BackupRun{config: brq.config}
+		node := &BackupRun{config: _q.config}
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, brq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
@@ -354,24 +355,24 @@ func (brq *BackupRunQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*B
 	return nodes, nil
 }
 
-func (brq *BackupRunQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := brq.querySpec()
-	_spec.Node.Columns = brq.ctx.Fields
-	if len(brq.ctx.Fields) > 0 {
-		_spec.Unique = brq.ctx.Unique != nil && *brq.ctx.Unique
+func (_q *BackupRunQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, brq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (brq *BackupRunQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *BackupRunQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(backuprun.Table, backuprun.Columns, sqlgraph.NewFieldSpec(backuprun.FieldID, field.TypeInt))
-	_spec.From = brq.sql
-	if unique := brq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if brq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := brq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, backuprun.FieldID)
 		for i := range fields {
@@ -380,20 +381,20 @@ func (brq *BackupRunQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if ps := brq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := brq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := brq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := brq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -403,33 +404,33 @@ func (brq *BackupRunQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (brq *BackupRunQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(brq.driver.Dialect())
+func (_q *BackupRunQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(backuprun.Table)
-	columns := brq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = backuprun.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if brq.sql != nil {
-		selector = brq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if brq.ctx.Unique != nil && *brq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, p := range brq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range brq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := brq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := brq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -442,41 +443,41 @@ type BackupRunGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (brgb *BackupRunGroupBy) Aggregate(fns ...AggregateFunc) *BackupRunGroupBy {
-	brgb.fns = append(brgb.fns, fns...)
-	return brgb
+func (_g *BackupRunGroupBy) Aggregate(fns ...AggregateFunc) *BackupRunGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (brgb *BackupRunGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, brgb.build.ctx, "GroupBy")
-	if err := brgb.build.prepareQuery(ctx); err != nil {
+func (_g *BackupRunGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*BackupRunQuery, *BackupRunGroupBy](ctx, brgb.build, brgb, brgb.build.inters, v)
+	return scanWithInterceptors[*BackupRunQuery, *BackupRunGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (brgb *BackupRunGroupBy) sqlScan(ctx context.Context, root *BackupRunQuery, v any) error {
+func (_g *BackupRunGroupBy) sqlScan(ctx context.Context, root *BackupRunQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(brgb.fns))
-	for _, fn := range brgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*brgb.flds)+len(brgb.fns))
-		for _, f := range *brgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*brgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := brgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -490,27 +491,27 @@ type BackupRunSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (brs *BackupRunSelect) Aggregate(fns ...AggregateFunc) *BackupRunSelect {
-	brs.fns = append(brs.fns, fns...)
-	return brs
+func (_s *BackupRunSelect) Aggregate(fns ...AggregateFunc) *BackupRunSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (brs *BackupRunSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, brs.ctx, "Select")
-	if err := brs.prepareQuery(ctx); err != nil {
+func (_s *BackupRunSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*BackupRunQuery, *BackupRunSelect](ctx, brs.BackupRunQuery, brs, brs.inters, v)
+	return scanWithInterceptors[*BackupRunQuery, *BackupRunSelect](ctx, _s.BackupRunQuery, _s, _s.inters, v)
 }
 
-func (brs *BackupRunSelect) sqlScan(ctx context.Context, root *BackupRunQuery, v any) error {
+func (_s *BackupRunSelect) sqlScan(ctx context.Context, root *BackupRunQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(brs.fns))
-	for _, fn := range brs.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*brs.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -518,7 +519,7 @@ func (brs *BackupRunSelect) sqlScan(ctx context.Context, root *BackupRunQuery, v
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := brs.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

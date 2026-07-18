@@ -24,103 +24,103 @@ type APITokenUpdate struct {
 }
 
 // Where appends a list predicates to the APITokenUpdate builder.
-func (atu *APITokenUpdate) Where(ps ...predicate.APIToken) *APITokenUpdate {
-	atu.mutation.Where(ps...)
-	return atu
+func (_u *APITokenUpdate) Where(ps ...predicate.APIToken) *APITokenUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetName sets the "name" field.
-func (atu *APITokenUpdate) SetName(s string) *APITokenUpdate {
-	atu.mutation.SetName(s)
-	return atu
+func (_u *APITokenUpdate) SetName(v string) *APITokenUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (atu *APITokenUpdate) SetNillableName(s *string) *APITokenUpdate {
-	if s != nil {
-		atu.SetName(*s)
+func (_u *APITokenUpdate) SetNillableName(v *string) *APITokenUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return atu
+	return _u
 }
 
 // SetTokenHash sets the "token_hash" field.
-func (atu *APITokenUpdate) SetTokenHash(s string) *APITokenUpdate {
-	atu.mutation.SetTokenHash(s)
-	return atu
+func (_u *APITokenUpdate) SetTokenHash(v string) *APITokenUpdate {
+	_u.mutation.SetTokenHash(v)
+	return _u
 }
 
 // SetNillableTokenHash sets the "token_hash" field if the given value is not nil.
-func (atu *APITokenUpdate) SetNillableTokenHash(s *string) *APITokenUpdate {
-	if s != nil {
-		atu.SetTokenHash(*s)
+func (_u *APITokenUpdate) SetNillableTokenHash(v *string) *APITokenUpdate {
+	if v != nil {
+		_u.SetTokenHash(*v)
 	}
-	return atu
+	return _u
 }
 
 // SetScope sets the "scope" field.
-func (atu *APITokenUpdate) SetScope(a apitoken.Scope) *APITokenUpdate {
-	atu.mutation.SetScope(a)
-	return atu
+func (_u *APITokenUpdate) SetScope(v apitoken.Scope) *APITokenUpdate {
+	_u.mutation.SetScope(v)
+	return _u
 }
 
 // SetNillableScope sets the "scope" field if the given value is not nil.
-func (atu *APITokenUpdate) SetNillableScope(a *apitoken.Scope) *APITokenUpdate {
-	if a != nil {
-		atu.SetScope(*a)
+func (_u *APITokenUpdate) SetNillableScope(v *apitoken.Scope) *APITokenUpdate {
+	if v != nil {
+		_u.SetScope(*v)
 	}
-	return atu
+	return _u
 }
 
 // SetLastUsed sets the "last_used" field.
-func (atu *APITokenUpdate) SetLastUsed(t time.Time) *APITokenUpdate {
-	atu.mutation.SetLastUsed(t)
-	return atu
+func (_u *APITokenUpdate) SetLastUsed(v time.Time) *APITokenUpdate {
+	_u.mutation.SetLastUsed(v)
+	return _u
 }
 
 // SetNillableLastUsed sets the "last_used" field if the given value is not nil.
-func (atu *APITokenUpdate) SetNillableLastUsed(t *time.Time) *APITokenUpdate {
-	if t != nil {
-		atu.SetLastUsed(*t)
+func (_u *APITokenUpdate) SetNillableLastUsed(v *time.Time) *APITokenUpdate {
+	if v != nil {
+		_u.SetLastUsed(*v)
 	}
-	return atu
+	return _u
 }
 
 // ClearLastUsed clears the value of the "last_used" field.
-func (atu *APITokenUpdate) ClearLastUsed() *APITokenUpdate {
-	atu.mutation.ClearLastUsed()
-	return atu
+func (_u *APITokenUpdate) ClearLastUsed() *APITokenUpdate {
+	_u.mutation.ClearLastUsed()
+	return _u
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (atu *APITokenUpdate) SetUserID(id int) *APITokenUpdate {
-	atu.mutation.SetUserID(id)
-	return atu
+func (_u *APITokenUpdate) SetUserID(id int) *APITokenUpdate {
+	_u.mutation.SetUserID(id)
+	return _u
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (atu *APITokenUpdate) SetUser(u *User) *APITokenUpdate {
-	return atu.SetUserID(u.ID)
+func (_u *APITokenUpdate) SetUser(v *User) *APITokenUpdate {
+	return _u.SetUserID(v.ID)
 }
 
 // Mutation returns the APITokenMutation object of the builder.
-func (atu *APITokenUpdate) Mutation() *APITokenMutation {
-	return atu.mutation
+func (_u *APITokenUpdate) Mutation() *APITokenMutation {
+	return _u.mutation
 }
 
 // ClearUser clears the "user" edge to the User entity.
-func (atu *APITokenUpdate) ClearUser() *APITokenUpdate {
-	atu.mutation.ClearUser()
-	return atu
+func (_u *APITokenUpdate) ClearUser() *APITokenUpdate {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (atu *APITokenUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, atu.sqlSave, atu.mutation, atu.hooks)
+func (_u *APITokenUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (atu *APITokenUpdate) SaveX(ctx context.Context) int {
-	affected, err := atu.Save(ctx)
+func (_u *APITokenUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -128,69 +128,69 @@ func (atu *APITokenUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (atu *APITokenUpdate) Exec(ctx context.Context) error {
-	_, err := atu.Save(ctx)
+func (_u *APITokenUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (atu *APITokenUpdate) ExecX(ctx context.Context) {
-	if err := atu.Exec(ctx); err != nil {
+func (_u *APITokenUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (atu *APITokenUpdate) check() error {
-	if v, ok := atu.mutation.Name(); ok {
+func (_u *APITokenUpdate) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := apitoken.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "APIToken.name": %w`, err)}
 		}
 	}
-	if v, ok := atu.mutation.TokenHash(); ok {
+	if v, ok := _u.mutation.TokenHash(); ok {
 		if err := apitoken.TokenHashValidator(v); err != nil {
 			return &ValidationError{Name: "token_hash", err: fmt.Errorf(`ent: validator failed for field "APIToken.token_hash": %w`, err)}
 		}
 	}
-	if v, ok := atu.mutation.Scope(); ok {
+	if v, ok := _u.mutation.Scope(); ok {
 		if err := apitoken.ScopeValidator(v); err != nil {
 			return &ValidationError{Name: "scope", err: fmt.Errorf(`ent: validator failed for field "APIToken.scope": %w`, err)}
 		}
 	}
-	if _, ok := atu.mutation.UserID(); atu.mutation.UserCleared() && !ok {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "APIToken.user"`)
 	}
 	return nil
 }
 
-func (atu *APITokenUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := atu.check(); err != nil {
-		return n, err
+func (_u *APITokenUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(apitoken.Table, apitoken.Columns, sqlgraph.NewFieldSpec(apitoken.FieldID, field.TypeInt))
-	if ps := atu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := atu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(apitoken.FieldName, field.TypeString, value)
 	}
-	if value, ok := atu.mutation.TokenHash(); ok {
+	if value, ok := _u.mutation.TokenHash(); ok {
 		_spec.SetField(apitoken.FieldTokenHash, field.TypeString, value)
 	}
-	if value, ok := atu.mutation.Scope(); ok {
+	if value, ok := _u.mutation.Scope(); ok {
 		_spec.SetField(apitoken.FieldScope, field.TypeEnum, value)
 	}
-	if value, ok := atu.mutation.LastUsed(); ok {
+	if value, ok := _u.mutation.LastUsed(); ok {
 		_spec.SetField(apitoken.FieldLastUsed, field.TypeTime, value)
 	}
-	if atu.mutation.LastUsedCleared() {
+	if _u.mutation.LastUsedCleared() {
 		_spec.ClearField(apitoken.FieldLastUsed, field.TypeTime)
 	}
-	if atu.mutation.UserCleared() {
+	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -203,7 +203,7 @@ func (atu *APITokenUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := atu.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -219,7 +219,7 @@ func (atu *APITokenUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, atu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{apitoken.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -227,8 +227,8 @@ func (atu *APITokenUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	atu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // APITokenUpdateOne is the builder for updating a single APIToken entity.
@@ -240,110 +240,110 @@ type APITokenUpdateOne struct {
 }
 
 // SetName sets the "name" field.
-func (atuo *APITokenUpdateOne) SetName(s string) *APITokenUpdateOne {
-	atuo.mutation.SetName(s)
-	return atuo
+func (_u *APITokenUpdateOne) SetName(v string) *APITokenUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (atuo *APITokenUpdateOne) SetNillableName(s *string) *APITokenUpdateOne {
-	if s != nil {
-		atuo.SetName(*s)
+func (_u *APITokenUpdateOne) SetNillableName(v *string) *APITokenUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return atuo
+	return _u
 }
 
 // SetTokenHash sets the "token_hash" field.
-func (atuo *APITokenUpdateOne) SetTokenHash(s string) *APITokenUpdateOne {
-	atuo.mutation.SetTokenHash(s)
-	return atuo
+func (_u *APITokenUpdateOne) SetTokenHash(v string) *APITokenUpdateOne {
+	_u.mutation.SetTokenHash(v)
+	return _u
 }
 
 // SetNillableTokenHash sets the "token_hash" field if the given value is not nil.
-func (atuo *APITokenUpdateOne) SetNillableTokenHash(s *string) *APITokenUpdateOne {
-	if s != nil {
-		atuo.SetTokenHash(*s)
+func (_u *APITokenUpdateOne) SetNillableTokenHash(v *string) *APITokenUpdateOne {
+	if v != nil {
+		_u.SetTokenHash(*v)
 	}
-	return atuo
+	return _u
 }
 
 // SetScope sets the "scope" field.
-func (atuo *APITokenUpdateOne) SetScope(a apitoken.Scope) *APITokenUpdateOne {
-	atuo.mutation.SetScope(a)
-	return atuo
+func (_u *APITokenUpdateOne) SetScope(v apitoken.Scope) *APITokenUpdateOne {
+	_u.mutation.SetScope(v)
+	return _u
 }
 
 // SetNillableScope sets the "scope" field if the given value is not nil.
-func (atuo *APITokenUpdateOne) SetNillableScope(a *apitoken.Scope) *APITokenUpdateOne {
-	if a != nil {
-		atuo.SetScope(*a)
+func (_u *APITokenUpdateOne) SetNillableScope(v *apitoken.Scope) *APITokenUpdateOne {
+	if v != nil {
+		_u.SetScope(*v)
 	}
-	return atuo
+	return _u
 }
 
 // SetLastUsed sets the "last_used" field.
-func (atuo *APITokenUpdateOne) SetLastUsed(t time.Time) *APITokenUpdateOne {
-	atuo.mutation.SetLastUsed(t)
-	return atuo
+func (_u *APITokenUpdateOne) SetLastUsed(v time.Time) *APITokenUpdateOne {
+	_u.mutation.SetLastUsed(v)
+	return _u
 }
 
 // SetNillableLastUsed sets the "last_used" field if the given value is not nil.
-func (atuo *APITokenUpdateOne) SetNillableLastUsed(t *time.Time) *APITokenUpdateOne {
-	if t != nil {
-		atuo.SetLastUsed(*t)
+func (_u *APITokenUpdateOne) SetNillableLastUsed(v *time.Time) *APITokenUpdateOne {
+	if v != nil {
+		_u.SetLastUsed(*v)
 	}
-	return atuo
+	return _u
 }
 
 // ClearLastUsed clears the value of the "last_used" field.
-func (atuo *APITokenUpdateOne) ClearLastUsed() *APITokenUpdateOne {
-	atuo.mutation.ClearLastUsed()
-	return atuo
+func (_u *APITokenUpdateOne) ClearLastUsed() *APITokenUpdateOne {
+	_u.mutation.ClearLastUsed()
+	return _u
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (atuo *APITokenUpdateOne) SetUserID(id int) *APITokenUpdateOne {
-	atuo.mutation.SetUserID(id)
-	return atuo
+func (_u *APITokenUpdateOne) SetUserID(id int) *APITokenUpdateOne {
+	_u.mutation.SetUserID(id)
+	return _u
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (atuo *APITokenUpdateOne) SetUser(u *User) *APITokenUpdateOne {
-	return atuo.SetUserID(u.ID)
+func (_u *APITokenUpdateOne) SetUser(v *User) *APITokenUpdateOne {
+	return _u.SetUserID(v.ID)
 }
 
 // Mutation returns the APITokenMutation object of the builder.
-func (atuo *APITokenUpdateOne) Mutation() *APITokenMutation {
-	return atuo.mutation
+func (_u *APITokenUpdateOne) Mutation() *APITokenMutation {
+	return _u.mutation
 }
 
 // ClearUser clears the "user" edge to the User entity.
-func (atuo *APITokenUpdateOne) ClearUser() *APITokenUpdateOne {
-	atuo.mutation.ClearUser()
-	return atuo
+func (_u *APITokenUpdateOne) ClearUser() *APITokenUpdateOne {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Where appends a list predicates to the APITokenUpdate builder.
-func (atuo *APITokenUpdateOne) Where(ps ...predicate.APIToken) *APITokenUpdateOne {
-	atuo.mutation.Where(ps...)
-	return atuo
+func (_u *APITokenUpdateOne) Where(ps ...predicate.APIToken) *APITokenUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (atuo *APITokenUpdateOne) Select(field string, fields ...string) *APITokenUpdateOne {
-	atuo.fields = append([]string{field}, fields...)
-	return atuo
+func (_u *APITokenUpdateOne) Select(field string, fields ...string) *APITokenUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated APIToken entity.
-func (atuo *APITokenUpdateOne) Save(ctx context.Context) (*APIToken, error) {
-	return withHooks(ctx, atuo.sqlSave, atuo.mutation, atuo.hooks)
+func (_u *APITokenUpdateOne) Save(ctx context.Context) (*APIToken, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (atuo *APITokenUpdateOne) SaveX(ctx context.Context) *APIToken {
-	node, err := atuo.Save(ctx)
+func (_u *APITokenUpdateOne) SaveX(ctx context.Context) *APIToken {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -351,52 +351,52 @@ func (atuo *APITokenUpdateOne) SaveX(ctx context.Context) *APIToken {
 }
 
 // Exec executes the query on the entity.
-func (atuo *APITokenUpdateOne) Exec(ctx context.Context) error {
-	_, err := atuo.Save(ctx)
+func (_u *APITokenUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (atuo *APITokenUpdateOne) ExecX(ctx context.Context) {
-	if err := atuo.Exec(ctx); err != nil {
+func (_u *APITokenUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (atuo *APITokenUpdateOne) check() error {
-	if v, ok := atuo.mutation.Name(); ok {
+func (_u *APITokenUpdateOne) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := apitoken.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "APIToken.name": %w`, err)}
 		}
 	}
-	if v, ok := atuo.mutation.TokenHash(); ok {
+	if v, ok := _u.mutation.TokenHash(); ok {
 		if err := apitoken.TokenHashValidator(v); err != nil {
 			return &ValidationError{Name: "token_hash", err: fmt.Errorf(`ent: validator failed for field "APIToken.token_hash": %w`, err)}
 		}
 	}
-	if v, ok := atuo.mutation.Scope(); ok {
+	if v, ok := _u.mutation.Scope(); ok {
 		if err := apitoken.ScopeValidator(v); err != nil {
 			return &ValidationError{Name: "scope", err: fmt.Errorf(`ent: validator failed for field "APIToken.scope": %w`, err)}
 		}
 	}
-	if _, ok := atuo.mutation.UserID(); atuo.mutation.UserCleared() && !ok {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "APIToken.user"`)
 	}
 	return nil
 }
 
-func (atuo *APITokenUpdateOne) sqlSave(ctx context.Context) (_node *APIToken, err error) {
-	if err := atuo.check(); err != nil {
+func (_u *APITokenUpdateOne) sqlSave(ctx context.Context) (_node *APIToken, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(apitoken.Table, apitoken.Columns, sqlgraph.NewFieldSpec(apitoken.FieldID, field.TypeInt))
-	id, ok := atuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "APIToken.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := atuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, apitoken.FieldID)
 		for _, f := range fields {
@@ -408,29 +408,29 @@ func (atuo *APITokenUpdateOne) sqlSave(ctx context.Context) (_node *APIToken, er
 			}
 		}
 	}
-	if ps := atuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := atuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(apitoken.FieldName, field.TypeString, value)
 	}
-	if value, ok := atuo.mutation.TokenHash(); ok {
+	if value, ok := _u.mutation.TokenHash(); ok {
 		_spec.SetField(apitoken.FieldTokenHash, field.TypeString, value)
 	}
-	if value, ok := atuo.mutation.Scope(); ok {
+	if value, ok := _u.mutation.Scope(); ok {
 		_spec.SetField(apitoken.FieldScope, field.TypeEnum, value)
 	}
-	if value, ok := atuo.mutation.LastUsed(); ok {
+	if value, ok := _u.mutation.LastUsed(); ok {
 		_spec.SetField(apitoken.FieldLastUsed, field.TypeTime, value)
 	}
-	if atuo.mutation.LastUsedCleared() {
+	if _u.mutation.LastUsedCleared() {
 		_spec.ClearField(apitoken.FieldLastUsed, field.TypeTime)
 	}
-	if atuo.mutation.UserCleared() {
+	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -443,7 +443,7 @@ func (atuo *APITokenUpdateOne) sqlSave(ctx context.Context) (_node *APIToken, er
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := atuo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -459,10 +459,10 @@ func (atuo *APITokenUpdateOne) sqlSave(ctx context.Context) (_node *APIToken, er
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &APIToken{config: atuo.config}
+	_node = &APIToken{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, atuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{apitoken.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -470,6 +470,6 @@ func (atuo *APITokenUpdateOne) sqlSave(ctx context.Context) (_node *APIToken, er
 		}
 		return nil, err
 	}
-	atuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

@@ -24,97 +24,97 @@ type WebAuthnChallengeUpdate struct {
 }
 
 // Where appends a list predicates to the WebAuthnChallengeUpdate builder.
-func (wacu *WebAuthnChallengeUpdate) Where(ps ...predicate.WebAuthnChallenge) *WebAuthnChallengeUpdate {
-	wacu.mutation.Where(ps...)
-	return wacu
+func (_u *WebAuthnChallengeUpdate) Where(ps ...predicate.WebAuthnChallenge) *WebAuthnChallengeUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetNonceHash sets the "nonce_hash" field.
-func (wacu *WebAuthnChallengeUpdate) SetNonceHash(s string) *WebAuthnChallengeUpdate {
-	wacu.mutation.SetNonceHash(s)
-	return wacu
+func (_u *WebAuthnChallengeUpdate) SetNonceHash(v string) *WebAuthnChallengeUpdate {
+	_u.mutation.SetNonceHash(v)
+	return _u
 }
 
 // SetNillableNonceHash sets the "nonce_hash" field if the given value is not nil.
-func (wacu *WebAuthnChallengeUpdate) SetNillableNonceHash(s *string) *WebAuthnChallengeUpdate {
-	if s != nil {
-		wacu.SetNonceHash(*s)
+func (_u *WebAuthnChallengeUpdate) SetNillableNonceHash(v *string) *WebAuthnChallengeUpdate {
+	if v != nil {
+		_u.SetNonceHash(*v)
 	}
-	return wacu
+	return _u
 }
 
 // SetSessionData sets the "session_data" field.
-func (wacu *WebAuthnChallengeUpdate) SetSessionData(s string) *WebAuthnChallengeUpdate {
-	wacu.mutation.SetSessionData(s)
-	return wacu
+func (_u *WebAuthnChallengeUpdate) SetSessionData(v string) *WebAuthnChallengeUpdate {
+	_u.mutation.SetSessionData(v)
+	return _u
 }
 
 // SetNillableSessionData sets the "session_data" field if the given value is not nil.
-func (wacu *WebAuthnChallengeUpdate) SetNillableSessionData(s *string) *WebAuthnChallengeUpdate {
-	if s != nil {
-		wacu.SetSessionData(*s)
+func (_u *WebAuthnChallengeUpdate) SetNillableSessionData(v *string) *WebAuthnChallengeUpdate {
+	if v != nil {
+		_u.SetSessionData(*v)
 	}
-	return wacu
+	return _u
 }
 
 // SetKind sets the "kind" field.
-func (wacu *WebAuthnChallengeUpdate) SetKind(w webauthnchallenge.Kind) *WebAuthnChallengeUpdate {
-	wacu.mutation.SetKind(w)
-	return wacu
+func (_u *WebAuthnChallengeUpdate) SetKind(v webauthnchallenge.Kind) *WebAuthnChallengeUpdate {
+	_u.mutation.SetKind(v)
+	return _u
 }
 
 // SetNillableKind sets the "kind" field if the given value is not nil.
-func (wacu *WebAuthnChallengeUpdate) SetNillableKind(w *webauthnchallenge.Kind) *WebAuthnChallengeUpdate {
-	if w != nil {
-		wacu.SetKind(*w)
+func (_u *WebAuthnChallengeUpdate) SetNillableKind(v *webauthnchallenge.Kind) *WebAuthnChallengeUpdate {
+	if v != nil {
+		_u.SetKind(*v)
 	}
-	return wacu
+	return _u
 }
 
 // SetExpiresAt sets the "expires_at" field.
-func (wacu *WebAuthnChallengeUpdate) SetExpiresAt(t time.Time) *WebAuthnChallengeUpdate {
-	wacu.mutation.SetExpiresAt(t)
-	return wacu
+func (_u *WebAuthnChallengeUpdate) SetExpiresAt(v time.Time) *WebAuthnChallengeUpdate {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
-func (wacu *WebAuthnChallengeUpdate) SetNillableExpiresAt(t *time.Time) *WebAuthnChallengeUpdate {
-	if t != nil {
-		wacu.SetExpiresAt(*t)
+func (_u *WebAuthnChallengeUpdate) SetNillableExpiresAt(v *time.Time) *WebAuthnChallengeUpdate {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return wacu
+	return _u
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (wacu *WebAuthnChallengeUpdate) SetUserID(id int) *WebAuthnChallengeUpdate {
-	wacu.mutation.SetUserID(id)
-	return wacu
+func (_u *WebAuthnChallengeUpdate) SetUserID(id int) *WebAuthnChallengeUpdate {
+	_u.mutation.SetUserID(id)
+	return _u
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (wacu *WebAuthnChallengeUpdate) SetUser(u *User) *WebAuthnChallengeUpdate {
-	return wacu.SetUserID(u.ID)
+func (_u *WebAuthnChallengeUpdate) SetUser(v *User) *WebAuthnChallengeUpdate {
+	return _u.SetUserID(v.ID)
 }
 
 // Mutation returns the WebAuthnChallengeMutation object of the builder.
-func (wacu *WebAuthnChallengeUpdate) Mutation() *WebAuthnChallengeMutation {
-	return wacu.mutation
+func (_u *WebAuthnChallengeUpdate) Mutation() *WebAuthnChallengeMutation {
+	return _u.mutation
 }
 
 // ClearUser clears the "user" edge to the User entity.
-func (wacu *WebAuthnChallengeUpdate) ClearUser() *WebAuthnChallengeUpdate {
-	wacu.mutation.ClearUser()
-	return wacu
+func (_u *WebAuthnChallengeUpdate) ClearUser() *WebAuthnChallengeUpdate {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (wacu *WebAuthnChallengeUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, wacu.sqlSave, wacu.mutation, wacu.hooks)
+func (_u *WebAuthnChallengeUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (wacu *WebAuthnChallengeUpdate) SaveX(ctx context.Context) int {
-	affected, err := wacu.Save(ctx)
+func (_u *WebAuthnChallengeUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -122,61 +122,61 @@ func (wacu *WebAuthnChallengeUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (wacu *WebAuthnChallengeUpdate) Exec(ctx context.Context) error {
-	_, err := wacu.Save(ctx)
+func (_u *WebAuthnChallengeUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wacu *WebAuthnChallengeUpdate) ExecX(ctx context.Context) {
-	if err := wacu.Exec(ctx); err != nil {
+func (_u *WebAuthnChallengeUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (wacu *WebAuthnChallengeUpdate) check() error {
-	if v, ok := wacu.mutation.SessionData(); ok {
+func (_u *WebAuthnChallengeUpdate) check() error {
+	if v, ok := _u.mutation.SessionData(); ok {
 		if err := webauthnchallenge.SessionDataValidator(v); err != nil {
 			return &ValidationError{Name: "session_data", err: fmt.Errorf(`ent: validator failed for field "WebAuthnChallenge.session_data": %w`, err)}
 		}
 	}
-	if v, ok := wacu.mutation.Kind(); ok {
+	if v, ok := _u.mutation.Kind(); ok {
 		if err := webauthnchallenge.KindValidator(v); err != nil {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "WebAuthnChallenge.kind": %w`, err)}
 		}
 	}
-	if _, ok := wacu.mutation.UserID(); wacu.mutation.UserCleared() && !ok {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "WebAuthnChallenge.user"`)
 	}
 	return nil
 }
 
-func (wacu *WebAuthnChallengeUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := wacu.check(); err != nil {
-		return n, err
+func (_u *WebAuthnChallengeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(webauthnchallenge.Table, webauthnchallenge.Columns, sqlgraph.NewFieldSpec(webauthnchallenge.FieldID, field.TypeInt))
-	if ps := wacu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := wacu.mutation.NonceHash(); ok {
+	if value, ok := _u.mutation.NonceHash(); ok {
 		_spec.SetField(webauthnchallenge.FieldNonceHash, field.TypeString, value)
 	}
-	if value, ok := wacu.mutation.SessionData(); ok {
+	if value, ok := _u.mutation.SessionData(); ok {
 		_spec.SetField(webauthnchallenge.FieldSessionData, field.TypeString, value)
 	}
-	if value, ok := wacu.mutation.Kind(); ok {
+	if value, ok := _u.mutation.Kind(); ok {
 		_spec.SetField(webauthnchallenge.FieldKind, field.TypeEnum, value)
 	}
-	if value, ok := wacu.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(webauthnchallenge.FieldExpiresAt, field.TypeTime, value)
 	}
-	if wacu.mutation.UserCleared() {
+	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -189,7 +189,7 @@ func (wacu *WebAuthnChallengeUpdate) sqlSave(ctx context.Context) (n int, err er
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wacu.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -205,7 +205,7 @@ func (wacu *WebAuthnChallengeUpdate) sqlSave(ctx context.Context) (n int, err er
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, wacu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{webauthnchallenge.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -213,8 +213,8 @@ func (wacu *WebAuthnChallengeUpdate) sqlSave(ctx context.Context) (n int, err er
 		}
 		return 0, err
 	}
-	wacu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // WebAuthnChallengeUpdateOne is the builder for updating a single WebAuthnChallenge entity.
@@ -226,104 +226,104 @@ type WebAuthnChallengeUpdateOne struct {
 }
 
 // SetNonceHash sets the "nonce_hash" field.
-func (wacuo *WebAuthnChallengeUpdateOne) SetNonceHash(s string) *WebAuthnChallengeUpdateOne {
-	wacuo.mutation.SetNonceHash(s)
-	return wacuo
+func (_u *WebAuthnChallengeUpdateOne) SetNonceHash(v string) *WebAuthnChallengeUpdateOne {
+	_u.mutation.SetNonceHash(v)
+	return _u
 }
 
 // SetNillableNonceHash sets the "nonce_hash" field if the given value is not nil.
-func (wacuo *WebAuthnChallengeUpdateOne) SetNillableNonceHash(s *string) *WebAuthnChallengeUpdateOne {
-	if s != nil {
-		wacuo.SetNonceHash(*s)
+func (_u *WebAuthnChallengeUpdateOne) SetNillableNonceHash(v *string) *WebAuthnChallengeUpdateOne {
+	if v != nil {
+		_u.SetNonceHash(*v)
 	}
-	return wacuo
+	return _u
 }
 
 // SetSessionData sets the "session_data" field.
-func (wacuo *WebAuthnChallengeUpdateOne) SetSessionData(s string) *WebAuthnChallengeUpdateOne {
-	wacuo.mutation.SetSessionData(s)
-	return wacuo
+func (_u *WebAuthnChallengeUpdateOne) SetSessionData(v string) *WebAuthnChallengeUpdateOne {
+	_u.mutation.SetSessionData(v)
+	return _u
 }
 
 // SetNillableSessionData sets the "session_data" field if the given value is not nil.
-func (wacuo *WebAuthnChallengeUpdateOne) SetNillableSessionData(s *string) *WebAuthnChallengeUpdateOne {
-	if s != nil {
-		wacuo.SetSessionData(*s)
+func (_u *WebAuthnChallengeUpdateOne) SetNillableSessionData(v *string) *WebAuthnChallengeUpdateOne {
+	if v != nil {
+		_u.SetSessionData(*v)
 	}
-	return wacuo
+	return _u
 }
 
 // SetKind sets the "kind" field.
-func (wacuo *WebAuthnChallengeUpdateOne) SetKind(w webauthnchallenge.Kind) *WebAuthnChallengeUpdateOne {
-	wacuo.mutation.SetKind(w)
-	return wacuo
+func (_u *WebAuthnChallengeUpdateOne) SetKind(v webauthnchallenge.Kind) *WebAuthnChallengeUpdateOne {
+	_u.mutation.SetKind(v)
+	return _u
 }
 
 // SetNillableKind sets the "kind" field if the given value is not nil.
-func (wacuo *WebAuthnChallengeUpdateOne) SetNillableKind(w *webauthnchallenge.Kind) *WebAuthnChallengeUpdateOne {
-	if w != nil {
-		wacuo.SetKind(*w)
+func (_u *WebAuthnChallengeUpdateOne) SetNillableKind(v *webauthnchallenge.Kind) *WebAuthnChallengeUpdateOne {
+	if v != nil {
+		_u.SetKind(*v)
 	}
-	return wacuo
+	return _u
 }
 
 // SetExpiresAt sets the "expires_at" field.
-func (wacuo *WebAuthnChallengeUpdateOne) SetExpiresAt(t time.Time) *WebAuthnChallengeUpdateOne {
-	wacuo.mutation.SetExpiresAt(t)
-	return wacuo
+func (_u *WebAuthnChallengeUpdateOne) SetExpiresAt(v time.Time) *WebAuthnChallengeUpdateOne {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
-func (wacuo *WebAuthnChallengeUpdateOne) SetNillableExpiresAt(t *time.Time) *WebAuthnChallengeUpdateOne {
-	if t != nil {
-		wacuo.SetExpiresAt(*t)
+func (_u *WebAuthnChallengeUpdateOne) SetNillableExpiresAt(v *time.Time) *WebAuthnChallengeUpdateOne {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return wacuo
+	return _u
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (wacuo *WebAuthnChallengeUpdateOne) SetUserID(id int) *WebAuthnChallengeUpdateOne {
-	wacuo.mutation.SetUserID(id)
-	return wacuo
+func (_u *WebAuthnChallengeUpdateOne) SetUserID(id int) *WebAuthnChallengeUpdateOne {
+	_u.mutation.SetUserID(id)
+	return _u
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (wacuo *WebAuthnChallengeUpdateOne) SetUser(u *User) *WebAuthnChallengeUpdateOne {
-	return wacuo.SetUserID(u.ID)
+func (_u *WebAuthnChallengeUpdateOne) SetUser(v *User) *WebAuthnChallengeUpdateOne {
+	return _u.SetUserID(v.ID)
 }
 
 // Mutation returns the WebAuthnChallengeMutation object of the builder.
-func (wacuo *WebAuthnChallengeUpdateOne) Mutation() *WebAuthnChallengeMutation {
-	return wacuo.mutation
+func (_u *WebAuthnChallengeUpdateOne) Mutation() *WebAuthnChallengeMutation {
+	return _u.mutation
 }
 
 // ClearUser clears the "user" edge to the User entity.
-func (wacuo *WebAuthnChallengeUpdateOne) ClearUser() *WebAuthnChallengeUpdateOne {
-	wacuo.mutation.ClearUser()
-	return wacuo
+func (_u *WebAuthnChallengeUpdateOne) ClearUser() *WebAuthnChallengeUpdateOne {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Where appends a list predicates to the WebAuthnChallengeUpdate builder.
-func (wacuo *WebAuthnChallengeUpdateOne) Where(ps ...predicate.WebAuthnChallenge) *WebAuthnChallengeUpdateOne {
-	wacuo.mutation.Where(ps...)
-	return wacuo
+func (_u *WebAuthnChallengeUpdateOne) Where(ps ...predicate.WebAuthnChallenge) *WebAuthnChallengeUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (wacuo *WebAuthnChallengeUpdateOne) Select(field string, fields ...string) *WebAuthnChallengeUpdateOne {
-	wacuo.fields = append([]string{field}, fields...)
-	return wacuo
+func (_u *WebAuthnChallengeUpdateOne) Select(field string, fields ...string) *WebAuthnChallengeUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated WebAuthnChallenge entity.
-func (wacuo *WebAuthnChallengeUpdateOne) Save(ctx context.Context) (*WebAuthnChallenge, error) {
-	return withHooks(ctx, wacuo.sqlSave, wacuo.mutation, wacuo.hooks)
+func (_u *WebAuthnChallengeUpdateOne) Save(ctx context.Context) (*WebAuthnChallenge, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (wacuo *WebAuthnChallengeUpdateOne) SaveX(ctx context.Context) *WebAuthnChallenge {
-	node, err := wacuo.Save(ctx)
+func (_u *WebAuthnChallengeUpdateOne) SaveX(ctx context.Context) *WebAuthnChallenge {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -331,47 +331,47 @@ func (wacuo *WebAuthnChallengeUpdateOne) SaveX(ctx context.Context) *WebAuthnCha
 }
 
 // Exec executes the query on the entity.
-func (wacuo *WebAuthnChallengeUpdateOne) Exec(ctx context.Context) error {
-	_, err := wacuo.Save(ctx)
+func (_u *WebAuthnChallengeUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wacuo *WebAuthnChallengeUpdateOne) ExecX(ctx context.Context) {
-	if err := wacuo.Exec(ctx); err != nil {
+func (_u *WebAuthnChallengeUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (wacuo *WebAuthnChallengeUpdateOne) check() error {
-	if v, ok := wacuo.mutation.SessionData(); ok {
+func (_u *WebAuthnChallengeUpdateOne) check() error {
+	if v, ok := _u.mutation.SessionData(); ok {
 		if err := webauthnchallenge.SessionDataValidator(v); err != nil {
 			return &ValidationError{Name: "session_data", err: fmt.Errorf(`ent: validator failed for field "WebAuthnChallenge.session_data": %w`, err)}
 		}
 	}
-	if v, ok := wacuo.mutation.Kind(); ok {
+	if v, ok := _u.mutation.Kind(); ok {
 		if err := webauthnchallenge.KindValidator(v); err != nil {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "WebAuthnChallenge.kind": %w`, err)}
 		}
 	}
-	if _, ok := wacuo.mutation.UserID(); wacuo.mutation.UserCleared() && !ok {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "WebAuthnChallenge.user"`)
 	}
 	return nil
 }
 
-func (wacuo *WebAuthnChallengeUpdateOne) sqlSave(ctx context.Context) (_node *WebAuthnChallenge, err error) {
-	if err := wacuo.check(); err != nil {
+func (_u *WebAuthnChallengeUpdateOne) sqlSave(ctx context.Context) (_node *WebAuthnChallenge, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(webauthnchallenge.Table, webauthnchallenge.Columns, sqlgraph.NewFieldSpec(webauthnchallenge.FieldID, field.TypeInt))
-	id, ok := wacuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "WebAuthnChallenge.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := wacuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, webauthnchallenge.FieldID)
 		for _, f := range fields {
@@ -383,26 +383,26 @@ func (wacuo *WebAuthnChallengeUpdateOne) sqlSave(ctx context.Context) (_node *We
 			}
 		}
 	}
-	if ps := wacuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := wacuo.mutation.NonceHash(); ok {
+	if value, ok := _u.mutation.NonceHash(); ok {
 		_spec.SetField(webauthnchallenge.FieldNonceHash, field.TypeString, value)
 	}
-	if value, ok := wacuo.mutation.SessionData(); ok {
+	if value, ok := _u.mutation.SessionData(); ok {
 		_spec.SetField(webauthnchallenge.FieldSessionData, field.TypeString, value)
 	}
-	if value, ok := wacuo.mutation.Kind(); ok {
+	if value, ok := _u.mutation.Kind(); ok {
 		_spec.SetField(webauthnchallenge.FieldKind, field.TypeEnum, value)
 	}
-	if value, ok := wacuo.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(webauthnchallenge.FieldExpiresAt, field.TypeTime, value)
 	}
-	if wacuo.mutation.UserCleared() {
+	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -415,7 +415,7 @@ func (wacuo *WebAuthnChallengeUpdateOne) sqlSave(ctx context.Context) (_node *We
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wacuo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -431,10 +431,10 @@ func (wacuo *WebAuthnChallengeUpdateOne) sqlSave(ctx context.Context) (_node *We
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &WebAuthnChallenge{config: wacuo.config}
+	_node = &WebAuthnChallenge{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, wacuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{webauthnchallenge.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -442,6 +442,6 @@ func (wacuo *WebAuthnChallengeUpdateOne) sqlSave(ctx context.Context) (_node *We
 		}
 		return nil, err
 	}
-	wacuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

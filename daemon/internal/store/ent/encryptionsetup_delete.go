@@ -20,56 +20,56 @@ type EncryptionSetupDelete struct {
 }
 
 // Where appends a list predicates to the EncryptionSetupDelete builder.
-func (esd *EncryptionSetupDelete) Where(ps ...predicate.EncryptionSetup) *EncryptionSetupDelete {
-	esd.mutation.Where(ps...)
-	return esd
+func (_d *EncryptionSetupDelete) Where(ps ...predicate.EncryptionSetup) *EncryptionSetupDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (esd *EncryptionSetupDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, esd.sqlExec, esd.mutation, esd.hooks)
+func (_d *EncryptionSetupDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (esd *EncryptionSetupDelete) ExecX(ctx context.Context) int {
-	n, err := esd.Exec(ctx)
+func (_d *EncryptionSetupDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (esd *EncryptionSetupDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *EncryptionSetupDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(encryptionsetup.Table, sqlgraph.NewFieldSpec(encryptionsetup.FieldID, field.TypeInt))
-	if ps := esd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, esd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	esd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // EncryptionSetupDeleteOne is the builder for deleting a single EncryptionSetup entity.
 type EncryptionSetupDeleteOne struct {
-	esd *EncryptionSetupDelete
+	_d *EncryptionSetupDelete
 }
 
 // Where appends a list predicates to the EncryptionSetupDelete builder.
-func (esdo *EncryptionSetupDeleteOne) Where(ps ...predicate.EncryptionSetup) *EncryptionSetupDeleteOne {
-	esdo.esd.mutation.Where(ps...)
-	return esdo
+func (_d *EncryptionSetupDeleteOne) Where(ps ...predicate.EncryptionSetup) *EncryptionSetupDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (esdo *EncryptionSetupDeleteOne) Exec(ctx context.Context) error {
-	n, err := esdo.esd.Exec(ctx)
+func (_d *EncryptionSetupDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (esdo *EncryptionSetupDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (esdo *EncryptionSetupDeleteOne) ExecX(ctx context.Context) {
-	if err := esdo.Exec(ctx); err != nil {
+func (_d *EncryptionSetupDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

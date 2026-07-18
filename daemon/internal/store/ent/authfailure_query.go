@@ -9,6 +9,7 @@ import (
 	"naust/daemon/internal/store/ent/authfailure"
 	"naust/daemon/internal/store/ent/predicate"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -27,40 +28,40 @@ type AuthFailureQuery struct {
 }
 
 // Where adds a new predicate for the AuthFailureQuery builder.
-func (afq *AuthFailureQuery) Where(ps ...predicate.AuthFailure) *AuthFailureQuery {
-	afq.predicates = append(afq.predicates, ps...)
-	return afq
+func (_q *AuthFailureQuery) Where(ps ...predicate.AuthFailure) *AuthFailureQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (afq *AuthFailureQuery) Limit(limit int) *AuthFailureQuery {
-	afq.ctx.Limit = &limit
-	return afq
+func (_q *AuthFailureQuery) Limit(limit int) *AuthFailureQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (afq *AuthFailureQuery) Offset(offset int) *AuthFailureQuery {
-	afq.ctx.Offset = &offset
-	return afq
+func (_q *AuthFailureQuery) Offset(offset int) *AuthFailureQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (afq *AuthFailureQuery) Unique(unique bool) *AuthFailureQuery {
-	afq.ctx.Unique = &unique
-	return afq
+func (_q *AuthFailureQuery) Unique(unique bool) *AuthFailureQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (afq *AuthFailureQuery) Order(o ...authfailure.OrderOption) *AuthFailureQuery {
-	afq.order = append(afq.order, o...)
-	return afq
+func (_q *AuthFailureQuery) Order(o ...authfailure.OrderOption) *AuthFailureQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // First returns the first AuthFailure entity from the query.
 // Returns a *NotFoundError when no AuthFailure was found.
-func (afq *AuthFailureQuery) First(ctx context.Context) (*AuthFailure, error) {
-	nodes, err := afq.Limit(1).All(setContextOp(ctx, afq.ctx, "First"))
+func (_q *AuthFailureQuery) First(ctx context.Context) (*AuthFailure, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +72,8 @@ func (afq *AuthFailureQuery) First(ctx context.Context) (*AuthFailure, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (afq *AuthFailureQuery) FirstX(ctx context.Context) *AuthFailure {
-	node, err := afq.First(ctx)
+func (_q *AuthFailureQuery) FirstX(ctx context.Context) *AuthFailure {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -81,9 +82,9 @@ func (afq *AuthFailureQuery) FirstX(ctx context.Context) *AuthFailure {
 
 // FirstID returns the first AuthFailure ID from the query.
 // Returns a *NotFoundError when no AuthFailure ID was found.
-func (afq *AuthFailureQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *AuthFailureQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = afq.Limit(1).IDs(setContextOp(ctx, afq.ctx, "FirstID")); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -94,8 +95,8 @@ func (afq *AuthFailureQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (afq *AuthFailureQuery) FirstIDX(ctx context.Context) int {
-	id, err := afq.FirstID(ctx)
+func (_q *AuthFailureQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -105,8 +106,8 @@ func (afq *AuthFailureQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single AuthFailure entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one AuthFailure entity is found.
 // Returns a *NotFoundError when no AuthFailure entities are found.
-func (afq *AuthFailureQuery) Only(ctx context.Context) (*AuthFailure, error) {
-	nodes, err := afq.Limit(2).All(setContextOp(ctx, afq.ctx, "Only"))
+func (_q *AuthFailureQuery) Only(ctx context.Context) (*AuthFailure, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -121,8 +122,8 @@ func (afq *AuthFailureQuery) Only(ctx context.Context) (*AuthFailure, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (afq *AuthFailureQuery) OnlyX(ctx context.Context) *AuthFailure {
-	node, err := afq.Only(ctx)
+func (_q *AuthFailureQuery) OnlyX(ctx context.Context) *AuthFailure {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -132,9 +133,9 @@ func (afq *AuthFailureQuery) OnlyX(ctx context.Context) *AuthFailure {
 // OnlyID is like Only, but returns the only AuthFailure ID in the query.
 // Returns a *NotSingularError when more than one AuthFailure ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (afq *AuthFailureQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *AuthFailureQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = afq.Limit(2).IDs(setContextOp(ctx, afq.ctx, "OnlyID")); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -149,8 +150,8 @@ func (afq *AuthFailureQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (afq *AuthFailureQuery) OnlyIDX(ctx context.Context) int {
-	id, err := afq.OnlyID(ctx)
+func (_q *AuthFailureQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -158,18 +159,18 @@ func (afq *AuthFailureQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of AuthFailures.
-func (afq *AuthFailureQuery) All(ctx context.Context) ([]*AuthFailure, error) {
-	ctx = setContextOp(ctx, afq.ctx, "All")
-	if err := afq.prepareQuery(ctx); err != nil {
+func (_q *AuthFailureQuery) All(ctx context.Context) ([]*AuthFailure, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*AuthFailure, *AuthFailureQuery]()
-	return withInterceptors[[]*AuthFailure](ctx, afq, qr, afq.inters)
+	return withInterceptors[[]*AuthFailure](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (afq *AuthFailureQuery) AllX(ctx context.Context) []*AuthFailure {
-	nodes, err := afq.All(ctx)
+func (_q *AuthFailureQuery) AllX(ctx context.Context) []*AuthFailure {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -177,20 +178,20 @@ func (afq *AuthFailureQuery) AllX(ctx context.Context) []*AuthFailure {
 }
 
 // IDs executes the query and returns a list of AuthFailure IDs.
-func (afq *AuthFailureQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if afq.ctx.Unique == nil && afq.path != nil {
-		afq.Unique(true)
+func (_q *AuthFailureQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, afq.ctx, "IDs")
-	if err = afq.Select(authfailure.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(authfailure.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (afq *AuthFailureQuery) IDsX(ctx context.Context) []int {
-	ids, err := afq.IDs(ctx)
+func (_q *AuthFailureQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -198,17 +199,17 @@ func (afq *AuthFailureQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (afq *AuthFailureQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, afq.ctx, "Count")
-	if err := afq.prepareQuery(ctx); err != nil {
+func (_q *AuthFailureQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, afq, querierCount[*AuthFailureQuery](), afq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*AuthFailureQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (afq *AuthFailureQuery) CountX(ctx context.Context) int {
-	count, err := afq.Count(ctx)
+func (_q *AuthFailureQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -216,9 +217,9 @@ func (afq *AuthFailureQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (afq *AuthFailureQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, afq.ctx, "Exist")
-	switch _, err := afq.FirstID(ctx); {
+func (_q *AuthFailureQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -229,8 +230,8 @@ func (afq *AuthFailureQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (afq *AuthFailureQuery) ExistX(ctx context.Context) bool {
-	exist, err := afq.Exist(ctx)
+func (_q *AuthFailureQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -239,19 +240,19 @@ func (afq *AuthFailureQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the AuthFailureQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (afq *AuthFailureQuery) Clone() *AuthFailureQuery {
-	if afq == nil {
+func (_q *AuthFailureQuery) Clone() *AuthFailureQuery {
+	if _q == nil {
 		return nil
 	}
 	return &AuthFailureQuery{
-		config:     afq.config,
-		ctx:        afq.ctx.Clone(),
-		order:      append([]authfailure.OrderOption{}, afq.order...),
-		inters:     append([]Interceptor{}, afq.inters...),
-		predicates: append([]predicate.AuthFailure{}, afq.predicates...),
+		config:     _q.config,
+		ctx:        _q.ctx.Clone(),
+		order:      append([]authfailure.OrderOption{}, _q.order...),
+		inters:     append([]Interceptor{}, _q.inters...),
+		predicates: append([]predicate.AuthFailure{}, _q.predicates...),
 		// clone intermediate query.
-		sql:  afq.sql.Clone(),
-		path: afq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
@@ -269,10 +270,10 @@ func (afq *AuthFailureQuery) Clone() *AuthFailureQuery {
 //		GroupBy(authfailure.FieldKind).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (afq *AuthFailureQuery) GroupBy(field string, fields ...string) *AuthFailureGroupBy {
-	afq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &AuthFailureGroupBy{build: afq}
-	grbuild.flds = &afq.ctx.Fields
+func (_q *AuthFailureQuery) GroupBy(field string, fields ...string) *AuthFailureGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &AuthFailureGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = authfailure.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -290,62 +291,62 @@ func (afq *AuthFailureQuery) GroupBy(field string, fields ...string) *AuthFailur
 //	client.AuthFailure.Query().
 //		Select(authfailure.FieldKind).
 //		Scan(ctx, &v)
-func (afq *AuthFailureQuery) Select(fields ...string) *AuthFailureSelect {
-	afq.ctx.Fields = append(afq.ctx.Fields, fields...)
-	sbuild := &AuthFailureSelect{AuthFailureQuery: afq}
+func (_q *AuthFailureQuery) Select(fields ...string) *AuthFailureSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &AuthFailureSelect{AuthFailureQuery: _q}
 	sbuild.label = authfailure.Label
-	sbuild.flds, sbuild.scan = &afq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a AuthFailureSelect configured with the given aggregations.
-func (afq *AuthFailureQuery) Aggregate(fns ...AggregateFunc) *AuthFailureSelect {
-	return afq.Select().Aggregate(fns...)
+func (_q *AuthFailureQuery) Aggregate(fns ...AggregateFunc) *AuthFailureSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (afq *AuthFailureQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range afq.inters {
+func (_q *AuthFailureQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, afq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range afq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !authfailure.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if afq.path != nil {
-		prev, err := afq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		afq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (afq *AuthFailureQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AuthFailure, error) {
+func (_q *AuthFailureQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AuthFailure, error) {
 	var (
 		nodes = []*AuthFailure{}
-		_spec = afq.querySpec()
+		_spec = _q.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*AuthFailure).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &AuthFailure{config: afq.config}
+		node := &AuthFailure{config: _q.config}
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, afq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
@@ -354,24 +355,24 @@ func (afq *AuthFailureQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	return nodes, nil
 }
 
-func (afq *AuthFailureQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := afq.querySpec()
-	_spec.Node.Columns = afq.ctx.Fields
-	if len(afq.ctx.Fields) > 0 {
-		_spec.Unique = afq.ctx.Unique != nil && *afq.ctx.Unique
+func (_q *AuthFailureQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, afq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (afq *AuthFailureQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *AuthFailureQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(authfailure.Table, authfailure.Columns, sqlgraph.NewFieldSpec(authfailure.FieldID, field.TypeInt))
-	_spec.From = afq.sql
-	if unique := afq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if afq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := afq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, authfailure.FieldID)
 		for i := range fields {
@@ -380,20 +381,20 @@ func (afq *AuthFailureQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if ps := afq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := afq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := afq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := afq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -403,33 +404,33 @@ func (afq *AuthFailureQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (afq *AuthFailureQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(afq.driver.Dialect())
+func (_q *AuthFailureQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(authfailure.Table)
-	columns := afq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = authfailure.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if afq.sql != nil {
-		selector = afq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if afq.ctx.Unique != nil && *afq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, p := range afq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range afq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := afq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := afq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -442,41 +443,41 @@ type AuthFailureGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (afgb *AuthFailureGroupBy) Aggregate(fns ...AggregateFunc) *AuthFailureGroupBy {
-	afgb.fns = append(afgb.fns, fns...)
-	return afgb
+func (_g *AuthFailureGroupBy) Aggregate(fns ...AggregateFunc) *AuthFailureGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (afgb *AuthFailureGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, afgb.build.ctx, "GroupBy")
-	if err := afgb.build.prepareQuery(ctx); err != nil {
+func (_g *AuthFailureGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*AuthFailureQuery, *AuthFailureGroupBy](ctx, afgb.build, afgb, afgb.build.inters, v)
+	return scanWithInterceptors[*AuthFailureQuery, *AuthFailureGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (afgb *AuthFailureGroupBy) sqlScan(ctx context.Context, root *AuthFailureQuery, v any) error {
+func (_g *AuthFailureGroupBy) sqlScan(ctx context.Context, root *AuthFailureQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(afgb.fns))
-	for _, fn := range afgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*afgb.flds)+len(afgb.fns))
-		for _, f := range *afgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*afgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := afgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -490,27 +491,27 @@ type AuthFailureSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (afs *AuthFailureSelect) Aggregate(fns ...AggregateFunc) *AuthFailureSelect {
-	afs.fns = append(afs.fns, fns...)
-	return afs
+func (_s *AuthFailureSelect) Aggregate(fns ...AggregateFunc) *AuthFailureSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (afs *AuthFailureSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, afs.ctx, "Select")
-	if err := afs.prepareQuery(ctx); err != nil {
+func (_s *AuthFailureSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*AuthFailureQuery, *AuthFailureSelect](ctx, afs.AuthFailureQuery, afs, afs.inters, v)
+	return scanWithInterceptors[*AuthFailureQuery, *AuthFailureSelect](ctx, _s.AuthFailureQuery, _s, _s.inters, v)
 }
 
-func (afs *AuthFailureSelect) sqlScan(ctx context.Context, root *AuthFailureQuery, v any) error {
+func (_s *AuthFailureSelect) sqlScan(ctx context.Context, root *AuthFailureQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(afs.fns))
-	for _, fn := range afs.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*afs.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -518,7 +519,7 @@ func (afs *AuthFailureSelect) sqlScan(ctx context.Context, root *AuthFailureQuer
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := afs.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

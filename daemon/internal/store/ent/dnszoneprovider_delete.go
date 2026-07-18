@@ -20,56 +20,56 @@ type DNSZoneProviderDelete struct {
 }
 
 // Where appends a list predicates to the DNSZoneProviderDelete builder.
-func (dzpd *DNSZoneProviderDelete) Where(ps ...predicate.DNSZoneProvider) *DNSZoneProviderDelete {
-	dzpd.mutation.Where(ps...)
-	return dzpd
+func (_d *DNSZoneProviderDelete) Where(ps ...predicate.DNSZoneProvider) *DNSZoneProviderDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (dzpd *DNSZoneProviderDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, dzpd.sqlExec, dzpd.mutation, dzpd.hooks)
+func (_d *DNSZoneProviderDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (dzpd *DNSZoneProviderDelete) ExecX(ctx context.Context) int {
-	n, err := dzpd.Exec(ctx)
+func (_d *DNSZoneProviderDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (dzpd *DNSZoneProviderDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *DNSZoneProviderDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(dnszoneprovider.Table, sqlgraph.NewFieldSpec(dnszoneprovider.FieldID, field.TypeInt))
-	if ps := dzpd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, dzpd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	dzpd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // DNSZoneProviderDeleteOne is the builder for deleting a single DNSZoneProvider entity.
 type DNSZoneProviderDeleteOne struct {
-	dzpd *DNSZoneProviderDelete
+	_d *DNSZoneProviderDelete
 }
 
 // Where appends a list predicates to the DNSZoneProviderDelete builder.
-func (dzpdo *DNSZoneProviderDeleteOne) Where(ps ...predicate.DNSZoneProvider) *DNSZoneProviderDeleteOne {
-	dzpdo.dzpd.mutation.Where(ps...)
-	return dzpdo
+func (_d *DNSZoneProviderDeleteOne) Where(ps ...predicate.DNSZoneProvider) *DNSZoneProviderDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (dzpdo *DNSZoneProviderDeleteOne) Exec(ctx context.Context) error {
-	n, err := dzpdo.dzpd.Exec(ctx)
+func (_d *DNSZoneProviderDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (dzpdo *DNSZoneProviderDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (dzpdo *DNSZoneProviderDeleteOne) ExecX(ctx context.Context) {
-	if err := dzpdo.Exec(ctx); err != nil {
+func (_d *DNSZoneProviderDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

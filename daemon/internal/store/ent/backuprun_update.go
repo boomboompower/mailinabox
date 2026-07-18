@@ -23,128 +23,128 @@ type BackupRunUpdate struct {
 }
 
 // Where appends a list predicates to the BackupRunUpdate builder.
-func (bru *BackupRunUpdate) Where(ps ...predicate.BackupRun) *BackupRunUpdate {
-	bru.mutation.Where(ps...)
-	return bru
+func (_u *BackupRunUpdate) Where(ps ...predicate.BackupRun) *BackupRunUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetStartedAt sets the "started_at" field.
-func (bru *BackupRunUpdate) SetStartedAt(t time.Time) *BackupRunUpdate {
-	bru.mutation.SetStartedAt(t)
-	return bru
+func (_u *BackupRunUpdate) SetStartedAt(v time.Time) *BackupRunUpdate {
+	_u.mutation.SetStartedAt(v)
+	return _u
 }
 
 // SetNillableStartedAt sets the "started_at" field if the given value is not nil.
-func (bru *BackupRunUpdate) SetNillableStartedAt(t *time.Time) *BackupRunUpdate {
-	if t != nil {
-		bru.SetStartedAt(*t)
+func (_u *BackupRunUpdate) SetNillableStartedAt(v *time.Time) *BackupRunUpdate {
+	if v != nil {
+		_u.SetStartedAt(*v)
 	}
-	return bru
+	return _u
 }
 
 // SetFinishedAt sets the "finished_at" field.
-func (bru *BackupRunUpdate) SetFinishedAt(t time.Time) *BackupRunUpdate {
-	bru.mutation.SetFinishedAt(t)
-	return bru
+func (_u *BackupRunUpdate) SetFinishedAt(v time.Time) *BackupRunUpdate {
+	_u.mutation.SetFinishedAt(v)
+	return _u
 }
 
 // SetNillableFinishedAt sets the "finished_at" field if the given value is not nil.
-func (bru *BackupRunUpdate) SetNillableFinishedAt(t *time.Time) *BackupRunUpdate {
-	if t != nil {
-		bru.SetFinishedAt(*t)
+func (_u *BackupRunUpdate) SetNillableFinishedAt(v *time.Time) *BackupRunUpdate {
+	if v != nil {
+		_u.SetFinishedAt(*v)
 	}
-	return bru
+	return _u
 }
 
 // ClearFinishedAt clears the value of the "finished_at" field.
-func (bru *BackupRunUpdate) ClearFinishedAt() *BackupRunUpdate {
-	bru.mutation.ClearFinishedAt()
-	return bru
+func (_u *BackupRunUpdate) ClearFinishedAt() *BackupRunUpdate {
+	_u.mutation.ClearFinishedAt()
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (bru *BackupRunUpdate) SetStatus(s string) *BackupRunUpdate {
-	bru.mutation.SetStatus(s)
-	return bru
+func (_u *BackupRunUpdate) SetStatus(v string) *BackupRunUpdate {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (bru *BackupRunUpdate) SetNillableStatus(s *string) *BackupRunUpdate {
-	if s != nil {
-		bru.SetStatus(*s)
+func (_u *BackupRunUpdate) SetNillableStatus(v *string) *BackupRunUpdate {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return bru
+	return _u
 }
 
 // SetTool sets the "tool" field.
-func (bru *BackupRunUpdate) SetTool(s string) *BackupRunUpdate {
-	bru.mutation.SetTool(s)
-	return bru
+func (_u *BackupRunUpdate) SetTool(v string) *BackupRunUpdate {
+	_u.mutation.SetTool(v)
+	return _u
 }
 
 // SetNillableTool sets the "tool" field if the given value is not nil.
-func (bru *BackupRunUpdate) SetNillableTool(s *string) *BackupRunUpdate {
-	if s != nil {
-		bru.SetTool(*s)
+func (_u *BackupRunUpdate) SetNillableTool(v *string) *BackupRunUpdate {
+	if v != nil {
+		_u.SetTool(*v)
 	}
-	return bru
+	return _u
 }
 
 // SetError sets the "error" field.
-func (bru *BackupRunUpdate) SetError(s string) *BackupRunUpdate {
-	bru.mutation.SetError(s)
-	return bru
+func (_u *BackupRunUpdate) SetError(v string) *BackupRunUpdate {
+	_u.mutation.SetError(v)
+	return _u
 }
 
 // SetNillableError sets the "error" field if the given value is not nil.
-func (bru *BackupRunUpdate) SetNillableError(s *string) *BackupRunUpdate {
-	if s != nil {
-		bru.SetError(*s)
+func (_u *BackupRunUpdate) SetNillableError(v *string) *BackupRunUpdate {
+	if v != nil {
+		_u.SetError(*v)
 	}
-	return bru
+	return _u
 }
 
 // SetWarning sets the "warning" field.
-func (bru *BackupRunUpdate) SetWarning(s string) *BackupRunUpdate {
-	bru.mutation.SetWarning(s)
-	return bru
+func (_u *BackupRunUpdate) SetWarning(v string) *BackupRunUpdate {
+	_u.mutation.SetWarning(v)
+	return _u
 }
 
 // SetNillableWarning sets the "warning" field if the given value is not nil.
-func (bru *BackupRunUpdate) SetNillableWarning(s *string) *BackupRunUpdate {
-	if s != nil {
-		bru.SetWarning(*s)
+func (_u *BackupRunUpdate) SetNillableWarning(v *string) *BackupRunUpdate {
+	if v != nil {
+		_u.SetWarning(*v)
 	}
-	return bru
+	return _u
 }
 
 // SetStats sets the "stats" field.
-func (bru *BackupRunUpdate) SetStats(s string) *BackupRunUpdate {
-	bru.mutation.SetStats(s)
-	return bru
+func (_u *BackupRunUpdate) SetStats(v string) *BackupRunUpdate {
+	_u.mutation.SetStats(v)
+	return _u
 }
 
 // SetNillableStats sets the "stats" field if the given value is not nil.
-func (bru *BackupRunUpdate) SetNillableStats(s *string) *BackupRunUpdate {
-	if s != nil {
-		bru.SetStats(*s)
+func (_u *BackupRunUpdate) SetNillableStats(v *string) *BackupRunUpdate {
+	if v != nil {
+		_u.SetStats(*v)
 	}
-	return bru
+	return _u
 }
 
 // Mutation returns the BackupRunMutation object of the builder.
-func (bru *BackupRunUpdate) Mutation() *BackupRunMutation {
-	return bru.mutation
+func (_u *BackupRunUpdate) Mutation() *BackupRunMutation {
+	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (bru *BackupRunUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, bru.sqlSave, bru.mutation, bru.hooks)
+func (_u *BackupRunUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (bru *BackupRunUpdate) SaveX(ctx context.Context) int {
-	affected, err := bru.Save(ctx)
+func (_u *BackupRunUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -152,26 +152,26 @@ func (bru *BackupRunUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (bru *BackupRunUpdate) Exec(ctx context.Context) error {
-	_, err := bru.Save(ctx)
+func (_u *BackupRunUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (bru *BackupRunUpdate) ExecX(ctx context.Context) {
-	if err := bru.Exec(ctx); err != nil {
+func (_u *BackupRunUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (bru *BackupRunUpdate) check() error {
-	if v, ok := bru.mutation.Status(); ok {
+func (_u *BackupRunUpdate) check() error {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := backuprun.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "BackupRun.status": %w`, err)}
 		}
 	}
-	if v, ok := bru.mutation.Tool(); ok {
+	if v, ok := _u.mutation.Tool(); ok {
 		if err := backuprun.ToolValidator(v); err != nil {
 			return &ValidationError{Name: "tool", err: fmt.Errorf(`ent: validator failed for field "BackupRun.tool": %w`, err)}
 		}
@@ -179,43 +179,43 @@ func (bru *BackupRunUpdate) check() error {
 	return nil
 }
 
-func (bru *BackupRunUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := bru.check(); err != nil {
-		return n, err
+func (_u *BackupRunUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(backuprun.Table, backuprun.Columns, sqlgraph.NewFieldSpec(backuprun.FieldID, field.TypeInt))
-	if ps := bru.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := bru.mutation.StartedAt(); ok {
+	if value, ok := _u.mutation.StartedAt(); ok {
 		_spec.SetField(backuprun.FieldStartedAt, field.TypeTime, value)
 	}
-	if value, ok := bru.mutation.FinishedAt(); ok {
+	if value, ok := _u.mutation.FinishedAt(); ok {
 		_spec.SetField(backuprun.FieldFinishedAt, field.TypeTime, value)
 	}
-	if bru.mutation.FinishedAtCleared() {
+	if _u.mutation.FinishedAtCleared() {
 		_spec.ClearField(backuprun.FieldFinishedAt, field.TypeTime)
 	}
-	if value, ok := bru.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(backuprun.FieldStatus, field.TypeString, value)
 	}
-	if value, ok := bru.mutation.Tool(); ok {
+	if value, ok := _u.mutation.Tool(); ok {
 		_spec.SetField(backuprun.FieldTool, field.TypeString, value)
 	}
-	if value, ok := bru.mutation.Error(); ok {
+	if value, ok := _u.mutation.Error(); ok {
 		_spec.SetField(backuprun.FieldError, field.TypeString, value)
 	}
-	if value, ok := bru.mutation.Warning(); ok {
+	if value, ok := _u.mutation.Warning(); ok {
 		_spec.SetField(backuprun.FieldWarning, field.TypeString, value)
 	}
-	if value, ok := bru.mutation.Stats(); ok {
+	if value, ok := _u.mutation.Stats(); ok {
 		_spec.SetField(backuprun.FieldStats, field.TypeString, value)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, bru.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{backuprun.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -223,8 +223,8 @@ func (bru *BackupRunUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	bru.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // BackupRunUpdateOne is the builder for updating a single BackupRun entity.
@@ -236,135 +236,135 @@ type BackupRunUpdateOne struct {
 }
 
 // SetStartedAt sets the "started_at" field.
-func (bruo *BackupRunUpdateOne) SetStartedAt(t time.Time) *BackupRunUpdateOne {
-	bruo.mutation.SetStartedAt(t)
-	return bruo
+func (_u *BackupRunUpdateOne) SetStartedAt(v time.Time) *BackupRunUpdateOne {
+	_u.mutation.SetStartedAt(v)
+	return _u
 }
 
 // SetNillableStartedAt sets the "started_at" field if the given value is not nil.
-func (bruo *BackupRunUpdateOne) SetNillableStartedAt(t *time.Time) *BackupRunUpdateOne {
-	if t != nil {
-		bruo.SetStartedAt(*t)
+func (_u *BackupRunUpdateOne) SetNillableStartedAt(v *time.Time) *BackupRunUpdateOne {
+	if v != nil {
+		_u.SetStartedAt(*v)
 	}
-	return bruo
+	return _u
 }
 
 // SetFinishedAt sets the "finished_at" field.
-func (bruo *BackupRunUpdateOne) SetFinishedAt(t time.Time) *BackupRunUpdateOne {
-	bruo.mutation.SetFinishedAt(t)
-	return bruo
+func (_u *BackupRunUpdateOne) SetFinishedAt(v time.Time) *BackupRunUpdateOne {
+	_u.mutation.SetFinishedAt(v)
+	return _u
 }
 
 // SetNillableFinishedAt sets the "finished_at" field if the given value is not nil.
-func (bruo *BackupRunUpdateOne) SetNillableFinishedAt(t *time.Time) *BackupRunUpdateOne {
-	if t != nil {
-		bruo.SetFinishedAt(*t)
+func (_u *BackupRunUpdateOne) SetNillableFinishedAt(v *time.Time) *BackupRunUpdateOne {
+	if v != nil {
+		_u.SetFinishedAt(*v)
 	}
-	return bruo
+	return _u
 }
 
 // ClearFinishedAt clears the value of the "finished_at" field.
-func (bruo *BackupRunUpdateOne) ClearFinishedAt() *BackupRunUpdateOne {
-	bruo.mutation.ClearFinishedAt()
-	return bruo
+func (_u *BackupRunUpdateOne) ClearFinishedAt() *BackupRunUpdateOne {
+	_u.mutation.ClearFinishedAt()
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (bruo *BackupRunUpdateOne) SetStatus(s string) *BackupRunUpdateOne {
-	bruo.mutation.SetStatus(s)
-	return bruo
+func (_u *BackupRunUpdateOne) SetStatus(v string) *BackupRunUpdateOne {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (bruo *BackupRunUpdateOne) SetNillableStatus(s *string) *BackupRunUpdateOne {
-	if s != nil {
-		bruo.SetStatus(*s)
+func (_u *BackupRunUpdateOne) SetNillableStatus(v *string) *BackupRunUpdateOne {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return bruo
+	return _u
 }
 
 // SetTool sets the "tool" field.
-func (bruo *BackupRunUpdateOne) SetTool(s string) *BackupRunUpdateOne {
-	bruo.mutation.SetTool(s)
-	return bruo
+func (_u *BackupRunUpdateOne) SetTool(v string) *BackupRunUpdateOne {
+	_u.mutation.SetTool(v)
+	return _u
 }
 
 // SetNillableTool sets the "tool" field if the given value is not nil.
-func (bruo *BackupRunUpdateOne) SetNillableTool(s *string) *BackupRunUpdateOne {
-	if s != nil {
-		bruo.SetTool(*s)
+func (_u *BackupRunUpdateOne) SetNillableTool(v *string) *BackupRunUpdateOne {
+	if v != nil {
+		_u.SetTool(*v)
 	}
-	return bruo
+	return _u
 }
 
 // SetError sets the "error" field.
-func (bruo *BackupRunUpdateOne) SetError(s string) *BackupRunUpdateOne {
-	bruo.mutation.SetError(s)
-	return bruo
+func (_u *BackupRunUpdateOne) SetError(v string) *BackupRunUpdateOne {
+	_u.mutation.SetError(v)
+	return _u
 }
 
 // SetNillableError sets the "error" field if the given value is not nil.
-func (bruo *BackupRunUpdateOne) SetNillableError(s *string) *BackupRunUpdateOne {
-	if s != nil {
-		bruo.SetError(*s)
+func (_u *BackupRunUpdateOne) SetNillableError(v *string) *BackupRunUpdateOne {
+	if v != nil {
+		_u.SetError(*v)
 	}
-	return bruo
+	return _u
 }
 
 // SetWarning sets the "warning" field.
-func (bruo *BackupRunUpdateOne) SetWarning(s string) *BackupRunUpdateOne {
-	bruo.mutation.SetWarning(s)
-	return bruo
+func (_u *BackupRunUpdateOne) SetWarning(v string) *BackupRunUpdateOne {
+	_u.mutation.SetWarning(v)
+	return _u
 }
 
 // SetNillableWarning sets the "warning" field if the given value is not nil.
-func (bruo *BackupRunUpdateOne) SetNillableWarning(s *string) *BackupRunUpdateOne {
-	if s != nil {
-		bruo.SetWarning(*s)
+func (_u *BackupRunUpdateOne) SetNillableWarning(v *string) *BackupRunUpdateOne {
+	if v != nil {
+		_u.SetWarning(*v)
 	}
-	return bruo
+	return _u
 }
 
 // SetStats sets the "stats" field.
-func (bruo *BackupRunUpdateOne) SetStats(s string) *BackupRunUpdateOne {
-	bruo.mutation.SetStats(s)
-	return bruo
+func (_u *BackupRunUpdateOne) SetStats(v string) *BackupRunUpdateOne {
+	_u.mutation.SetStats(v)
+	return _u
 }
 
 // SetNillableStats sets the "stats" field if the given value is not nil.
-func (bruo *BackupRunUpdateOne) SetNillableStats(s *string) *BackupRunUpdateOne {
-	if s != nil {
-		bruo.SetStats(*s)
+func (_u *BackupRunUpdateOne) SetNillableStats(v *string) *BackupRunUpdateOne {
+	if v != nil {
+		_u.SetStats(*v)
 	}
-	return bruo
+	return _u
 }
 
 // Mutation returns the BackupRunMutation object of the builder.
-func (bruo *BackupRunUpdateOne) Mutation() *BackupRunMutation {
-	return bruo.mutation
+func (_u *BackupRunUpdateOne) Mutation() *BackupRunMutation {
+	return _u.mutation
 }
 
 // Where appends a list predicates to the BackupRunUpdate builder.
-func (bruo *BackupRunUpdateOne) Where(ps ...predicate.BackupRun) *BackupRunUpdateOne {
-	bruo.mutation.Where(ps...)
-	return bruo
+func (_u *BackupRunUpdateOne) Where(ps ...predicate.BackupRun) *BackupRunUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (bruo *BackupRunUpdateOne) Select(field string, fields ...string) *BackupRunUpdateOne {
-	bruo.fields = append([]string{field}, fields...)
-	return bruo
+func (_u *BackupRunUpdateOne) Select(field string, fields ...string) *BackupRunUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated BackupRun entity.
-func (bruo *BackupRunUpdateOne) Save(ctx context.Context) (*BackupRun, error) {
-	return withHooks(ctx, bruo.sqlSave, bruo.mutation, bruo.hooks)
+func (_u *BackupRunUpdateOne) Save(ctx context.Context) (*BackupRun, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (bruo *BackupRunUpdateOne) SaveX(ctx context.Context) *BackupRun {
-	node, err := bruo.Save(ctx)
+func (_u *BackupRunUpdateOne) SaveX(ctx context.Context) *BackupRun {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -372,26 +372,26 @@ func (bruo *BackupRunUpdateOne) SaveX(ctx context.Context) *BackupRun {
 }
 
 // Exec executes the query on the entity.
-func (bruo *BackupRunUpdateOne) Exec(ctx context.Context) error {
-	_, err := bruo.Save(ctx)
+func (_u *BackupRunUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (bruo *BackupRunUpdateOne) ExecX(ctx context.Context) {
-	if err := bruo.Exec(ctx); err != nil {
+func (_u *BackupRunUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (bruo *BackupRunUpdateOne) check() error {
-	if v, ok := bruo.mutation.Status(); ok {
+func (_u *BackupRunUpdateOne) check() error {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := backuprun.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "BackupRun.status": %w`, err)}
 		}
 	}
-	if v, ok := bruo.mutation.Tool(); ok {
+	if v, ok := _u.mutation.Tool(); ok {
 		if err := backuprun.ToolValidator(v); err != nil {
 			return &ValidationError{Name: "tool", err: fmt.Errorf(`ent: validator failed for field "BackupRun.tool": %w`, err)}
 		}
@@ -399,17 +399,17 @@ func (bruo *BackupRunUpdateOne) check() error {
 	return nil
 }
 
-func (bruo *BackupRunUpdateOne) sqlSave(ctx context.Context) (_node *BackupRun, err error) {
-	if err := bruo.check(); err != nil {
+func (_u *BackupRunUpdateOne) sqlSave(ctx context.Context) (_node *BackupRun, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(backuprun.Table, backuprun.Columns, sqlgraph.NewFieldSpec(backuprun.FieldID, field.TypeInt))
-	id, ok := bruo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "BackupRun.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := bruo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, backuprun.FieldID)
 		for _, f := range fields {
@@ -421,41 +421,41 @@ func (bruo *BackupRunUpdateOne) sqlSave(ctx context.Context) (_node *BackupRun, 
 			}
 		}
 	}
-	if ps := bruo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := bruo.mutation.StartedAt(); ok {
+	if value, ok := _u.mutation.StartedAt(); ok {
 		_spec.SetField(backuprun.FieldStartedAt, field.TypeTime, value)
 	}
-	if value, ok := bruo.mutation.FinishedAt(); ok {
+	if value, ok := _u.mutation.FinishedAt(); ok {
 		_spec.SetField(backuprun.FieldFinishedAt, field.TypeTime, value)
 	}
-	if bruo.mutation.FinishedAtCleared() {
+	if _u.mutation.FinishedAtCleared() {
 		_spec.ClearField(backuprun.FieldFinishedAt, field.TypeTime)
 	}
-	if value, ok := bruo.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(backuprun.FieldStatus, field.TypeString, value)
 	}
-	if value, ok := bruo.mutation.Tool(); ok {
+	if value, ok := _u.mutation.Tool(); ok {
 		_spec.SetField(backuprun.FieldTool, field.TypeString, value)
 	}
-	if value, ok := bruo.mutation.Error(); ok {
+	if value, ok := _u.mutation.Error(); ok {
 		_spec.SetField(backuprun.FieldError, field.TypeString, value)
 	}
-	if value, ok := bruo.mutation.Warning(); ok {
+	if value, ok := _u.mutation.Warning(); ok {
 		_spec.SetField(backuprun.FieldWarning, field.TypeString, value)
 	}
-	if value, ok := bruo.mutation.Stats(); ok {
+	if value, ok := _u.mutation.Stats(); ok {
 		_spec.SetField(backuprun.FieldStats, field.TypeString, value)
 	}
-	_node = &BackupRun{config: bruo.config}
+	_node = &BackupRun{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, bruo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{backuprun.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -463,6 +463,6 @@ func (bruo *BackupRunUpdateOne) sqlSave(ctx context.Context) (_node *BackupRun, 
 		}
 		return nil, err
 	}
-	bruo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

@@ -46,7 +46,7 @@ func (*AuthFailure) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the AuthFailure fields.
-func (af *AuthFailure) assignValues(columns []string, values []any) error {
+func (_m *AuthFailure) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -57,27 +57,27 @@ func (af *AuthFailure) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			af.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case authfailure.FieldKind:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field kind", values[i])
 			} else if value.Valid {
-				af.Kind = value.String
+				_m.Kind = value.String
 			}
 		case authfailure.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
-				af.Email = value.String
+				_m.Email = value.String
 			}
 		case authfailure.FieldAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field at", values[i])
 			} else if value.Valid {
-				af.At = value.Time
+				_m.At = value.Time
 			}
 		default:
-			af.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -85,41 +85,41 @@ func (af *AuthFailure) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the AuthFailure.
 // This includes values selected through modifiers, order, etc.
-func (af *AuthFailure) Value(name string) (ent.Value, error) {
-	return af.selectValues.Get(name)
+func (_m *AuthFailure) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this AuthFailure.
 // Note that you need to call AuthFailure.Unwrap() before calling this method if this AuthFailure
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (af *AuthFailure) Update() *AuthFailureUpdateOne {
-	return NewAuthFailureClient(af.config).UpdateOne(af)
+func (_m *AuthFailure) Update() *AuthFailureUpdateOne {
+	return NewAuthFailureClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the AuthFailure entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (af *AuthFailure) Unwrap() *AuthFailure {
-	_tx, ok := af.config.driver.(*txDriver)
+func (_m *AuthFailure) Unwrap() *AuthFailure {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: AuthFailure is not a transactional entity")
 	}
-	af.config.driver = _tx.drv
-	return af
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (af *AuthFailure) String() string {
+func (_m *AuthFailure) String() string {
 	var builder strings.Builder
 	builder.WriteString("AuthFailure(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", af.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("kind=")
-	builder.WriteString(af.Kind)
+	builder.WriteString(_m.Kind)
 	builder.WriteString(", ")
 	builder.WriteString("email=")
-	builder.WriteString(af.Email)
+	builder.WriteString(_m.Email)
 	builder.WriteString(", ")
 	builder.WriteString("at=")
-	builder.WriteString(af.At.Format(time.ANSIC))
+	builder.WriteString(_m.At.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

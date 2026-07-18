@@ -22,52 +22,52 @@ type AuthFailureUpdate struct {
 }
 
 // Where appends a list predicates to the AuthFailureUpdate builder.
-func (afu *AuthFailureUpdate) Where(ps ...predicate.AuthFailure) *AuthFailureUpdate {
-	afu.mutation.Where(ps...)
-	return afu
+func (_u *AuthFailureUpdate) Where(ps ...predicate.AuthFailure) *AuthFailureUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetKind sets the "kind" field.
-func (afu *AuthFailureUpdate) SetKind(s string) *AuthFailureUpdate {
-	afu.mutation.SetKind(s)
-	return afu
+func (_u *AuthFailureUpdate) SetKind(v string) *AuthFailureUpdate {
+	_u.mutation.SetKind(v)
+	return _u
 }
 
 // SetNillableKind sets the "kind" field if the given value is not nil.
-func (afu *AuthFailureUpdate) SetNillableKind(s *string) *AuthFailureUpdate {
-	if s != nil {
-		afu.SetKind(*s)
+func (_u *AuthFailureUpdate) SetNillableKind(v *string) *AuthFailureUpdate {
+	if v != nil {
+		_u.SetKind(*v)
 	}
-	return afu
+	return _u
 }
 
 // SetEmail sets the "email" field.
-func (afu *AuthFailureUpdate) SetEmail(s string) *AuthFailureUpdate {
-	afu.mutation.SetEmail(s)
-	return afu
+func (_u *AuthFailureUpdate) SetEmail(v string) *AuthFailureUpdate {
+	_u.mutation.SetEmail(v)
+	return _u
 }
 
 // SetNillableEmail sets the "email" field if the given value is not nil.
-func (afu *AuthFailureUpdate) SetNillableEmail(s *string) *AuthFailureUpdate {
-	if s != nil {
-		afu.SetEmail(*s)
+func (_u *AuthFailureUpdate) SetNillableEmail(v *string) *AuthFailureUpdate {
+	if v != nil {
+		_u.SetEmail(*v)
 	}
-	return afu
+	return _u
 }
 
 // Mutation returns the AuthFailureMutation object of the builder.
-func (afu *AuthFailureUpdate) Mutation() *AuthFailureMutation {
-	return afu.mutation
+func (_u *AuthFailureUpdate) Mutation() *AuthFailureMutation {
+	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (afu *AuthFailureUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, afu.sqlSave, afu.mutation, afu.hooks)
+func (_u *AuthFailureUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (afu *AuthFailureUpdate) SaveX(ctx context.Context) int {
-	affected, err := afu.Save(ctx)
+func (_u *AuthFailureUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -75,26 +75,26 @@ func (afu *AuthFailureUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (afu *AuthFailureUpdate) Exec(ctx context.Context) error {
-	_, err := afu.Save(ctx)
+func (_u *AuthFailureUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (afu *AuthFailureUpdate) ExecX(ctx context.Context) {
-	if err := afu.Exec(ctx); err != nil {
+func (_u *AuthFailureUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (afu *AuthFailureUpdate) check() error {
-	if v, ok := afu.mutation.Kind(); ok {
+func (_u *AuthFailureUpdate) check() error {
+	if v, ok := _u.mutation.Kind(); ok {
 		if err := authfailure.KindValidator(v); err != nil {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "AuthFailure.kind": %w`, err)}
 		}
 	}
-	if v, ok := afu.mutation.Email(); ok {
+	if v, ok := _u.mutation.Email(); ok {
 		if err := authfailure.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "AuthFailure.email": %w`, err)}
 		}
@@ -102,25 +102,25 @@ func (afu *AuthFailureUpdate) check() error {
 	return nil
 }
 
-func (afu *AuthFailureUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := afu.check(); err != nil {
-		return n, err
+func (_u *AuthFailureUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(authfailure.Table, authfailure.Columns, sqlgraph.NewFieldSpec(authfailure.FieldID, field.TypeInt))
-	if ps := afu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := afu.mutation.Kind(); ok {
+	if value, ok := _u.mutation.Kind(); ok {
 		_spec.SetField(authfailure.FieldKind, field.TypeString, value)
 	}
-	if value, ok := afu.mutation.Email(); ok {
+	if value, ok := _u.mutation.Email(); ok {
 		_spec.SetField(authfailure.FieldEmail, field.TypeString, value)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, afu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{authfailure.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -128,8 +128,8 @@ func (afu *AuthFailureUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	afu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // AuthFailureUpdateOne is the builder for updating a single AuthFailure entity.
@@ -141,59 +141,59 @@ type AuthFailureUpdateOne struct {
 }
 
 // SetKind sets the "kind" field.
-func (afuo *AuthFailureUpdateOne) SetKind(s string) *AuthFailureUpdateOne {
-	afuo.mutation.SetKind(s)
-	return afuo
+func (_u *AuthFailureUpdateOne) SetKind(v string) *AuthFailureUpdateOne {
+	_u.mutation.SetKind(v)
+	return _u
 }
 
 // SetNillableKind sets the "kind" field if the given value is not nil.
-func (afuo *AuthFailureUpdateOne) SetNillableKind(s *string) *AuthFailureUpdateOne {
-	if s != nil {
-		afuo.SetKind(*s)
+func (_u *AuthFailureUpdateOne) SetNillableKind(v *string) *AuthFailureUpdateOne {
+	if v != nil {
+		_u.SetKind(*v)
 	}
-	return afuo
+	return _u
 }
 
 // SetEmail sets the "email" field.
-func (afuo *AuthFailureUpdateOne) SetEmail(s string) *AuthFailureUpdateOne {
-	afuo.mutation.SetEmail(s)
-	return afuo
+func (_u *AuthFailureUpdateOne) SetEmail(v string) *AuthFailureUpdateOne {
+	_u.mutation.SetEmail(v)
+	return _u
 }
 
 // SetNillableEmail sets the "email" field if the given value is not nil.
-func (afuo *AuthFailureUpdateOne) SetNillableEmail(s *string) *AuthFailureUpdateOne {
-	if s != nil {
-		afuo.SetEmail(*s)
+func (_u *AuthFailureUpdateOne) SetNillableEmail(v *string) *AuthFailureUpdateOne {
+	if v != nil {
+		_u.SetEmail(*v)
 	}
-	return afuo
+	return _u
 }
 
 // Mutation returns the AuthFailureMutation object of the builder.
-func (afuo *AuthFailureUpdateOne) Mutation() *AuthFailureMutation {
-	return afuo.mutation
+func (_u *AuthFailureUpdateOne) Mutation() *AuthFailureMutation {
+	return _u.mutation
 }
 
 // Where appends a list predicates to the AuthFailureUpdate builder.
-func (afuo *AuthFailureUpdateOne) Where(ps ...predicate.AuthFailure) *AuthFailureUpdateOne {
-	afuo.mutation.Where(ps...)
-	return afuo
+func (_u *AuthFailureUpdateOne) Where(ps ...predicate.AuthFailure) *AuthFailureUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (afuo *AuthFailureUpdateOne) Select(field string, fields ...string) *AuthFailureUpdateOne {
-	afuo.fields = append([]string{field}, fields...)
-	return afuo
+func (_u *AuthFailureUpdateOne) Select(field string, fields ...string) *AuthFailureUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated AuthFailure entity.
-func (afuo *AuthFailureUpdateOne) Save(ctx context.Context) (*AuthFailure, error) {
-	return withHooks(ctx, afuo.sqlSave, afuo.mutation, afuo.hooks)
+func (_u *AuthFailureUpdateOne) Save(ctx context.Context) (*AuthFailure, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (afuo *AuthFailureUpdateOne) SaveX(ctx context.Context) *AuthFailure {
-	node, err := afuo.Save(ctx)
+func (_u *AuthFailureUpdateOne) SaveX(ctx context.Context) *AuthFailure {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -201,26 +201,26 @@ func (afuo *AuthFailureUpdateOne) SaveX(ctx context.Context) *AuthFailure {
 }
 
 // Exec executes the query on the entity.
-func (afuo *AuthFailureUpdateOne) Exec(ctx context.Context) error {
-	_, err := afuo.Save(ctx)
+func (_u *AuthFailureUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (afuo *AuthFailureUpdateOne) ExecX(ctx context.Context) {
-	if err := afuo.Exec(ctx); err != nil {
+func (_u *AuthFailureUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (afuo *AuthFailureUpdateOne) check() error {
-	if v, ok := afuo.mutation.Kind(); ok {
+func (_u *AuthFailureUpdateOne) check() error {
+	if v, ok := _u.mutation.Kind(); ok {
 		if err := authfailure.KindValidator(v); err != nil {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "AuthFailure.kind": %w`, err)}
 		}
 	}
-	if v, ok := afuo.mutation.Email(); ok {
+	if v, ok := _u.mutation.Email(); ok {
 		if err := authfailure.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "AuthFailure.email": %w`, err)}
 		}
@@ -228,17 +228,17 @@ func (afuo *AuthFailureUpdateOne) check() error {
 	return nil
 }
 
-func (afuo *AuthFailureUpdateOne) sqlSave(ctx context.Context) (_node *AuthFailure, err error) {
-	if err := afuo.check(); err != nil {
+func (_u *AuthFailureUpdateOne) sqlSave(ctx context.Context) (_node *AuthFailure, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(authfailure.Table, authfailure.Columns, sqlgraph.NewFieldSpec(authfailure.FieldID, field.TypeInt))
-	id, ok := afuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "AuthFailure.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := afuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, authfailure.FieldID)
 		for _, f := range fields {
@@ -250,23 +250,23 @@ func (afuo *AuthFailureUpdateOne) sqlSave(ctx context.Context) (_node *AuthFailu
 			}
 		}
 	}
-	if ps := afuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := afuo.mutation.Kind(); ok {
+	if value, ok := _u.mutation.Kind(); ok {
 		_spec.SetField(authfailure.FieldKind, field.TypeString, value)
 	}
-	if value, ok := afuo.mutation.Email(); ok {
+	if value, ok := _u.mutation.Email(); ok {
 		_spec.SetField(authfailure.FieldEmail, field.TypeString, value)
 	}
-	_node = &AuthFailure{config: afuo.config}
+	_node = &AuthFailure{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, afuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{authfailure.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -274,6 +274,6 @@ func (afuo *AuthFailureUpdateOne) sqlSave(ctx context.Context) (_node *AuthFailu
 		}
 		return nil, err
 	}
-	afuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

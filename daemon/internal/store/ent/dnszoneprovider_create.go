@@ -24,62 +24,62 @@ type DNSZoneProviderCreate struct {
 }
 
 // SetZone sets the "zone" field.
-func (dzpc *DNSZoneProviderCreate) SetZone(s string) *DNSZoneProviderCreate {
-	dzpc.mutation.SetZone(s)
-	return dzpc
+func (_c *DNSZoneProviderCreate) SetZone(v string) *DNSZoneProviderCreate {
+	_c.mutation.SetZone(v)
+	return _c
 }
 
 // SetProvider sets the "provider" field.
-func (dzpc *DNSZoneProviderCreate) SetProvider(s string) *DNSZoneProviderCreate {
-	dzpc.mutation.SetProvider(s)
-	return dzpc
+func (_c *DNSZoneProviderCreate) SetProvider(v string) *DNSZoneProviderCreate {
+	_c.mutation.SetProvider(v)
+	return _c
 }
 
 // SetToken sets the "token" field.
-func (dzpc *DNSZoneProviderCreate) SetToken(s string) *DNSZoneProviderCreate {
-	dzpc.mutation.SetToken(s)
-	return dzpc
+func (_c *DNSZoneProviderCreate) SetToken(v string) *DNSZoneProviderCreate {
+	_c.mutation.SetToken(v)
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (dzpc *DNSZoneProviderCreate) SetCreatedAt(t time.Time) *DNSZoneProviderCreate {
-	dzpc.mutation.SetCreatedAt(t)
-	return dzpc
+func (_c *DNSZoneProviderCreate) SetCreatedAt(v time.Time) *DNSZoneProviderCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (dzpc *DNSZoneProviderCreate) SetNillableCreatedAt(t *time.Time) *DNSZoneProviderCreate {
-	if t != nil {
-		dzpc.SetCreatedAt(*t)
+func (_c *DNSZoneProviderCreate) SetNillableCreatedAt(v *time.Time) *DNSZoneProviderCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return dzpc
+	return _c
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
-func (dzpc *DNSZoneProviderCreate) SetTenantID(id int) *DNSZoneProviderCreate {
-	dzpc.mutation.SetTenantID(id)
-	return dzpc
+func (_c *DNSZoneProviderCreate) SetTenantID(id int) *DNSZoneProviderCreate {
+	_c.mutation.SetTenantID(id)
+	return _c
 }
 
 // SetTenant sets the "tenant" edge to the Tenant entity.
-func (dzpc *DNSZoneProviderCreate) SetTenant(t *Tenant) *DNSZoneProviderCreate {
-	return dzpc.SetTenantID(t.ID)
+func (_c *DNSZoneProviderCreate) SetTenant(v *Tenant) *DNSZoneProviderCreate {
+	return _c.SetTenantID(v.ID)
 }
 
 // Mutation returns the DNSZoneProviderMutation object of the builder.
-func (dzpc *DNSZoneProviderCreate) Mutation() *DNSZoneProviderMutation {
-	return dzpc.mutation
+func (_c *DNSZoneProviderCreate) Mutation() *DNSZoneProviderMutation {
+	return _c.mutation
 }
 
 // Save creates the DNSZoneProvider in the database.
-func (dzpc *DNSZoneProviderCreate) Save(ctx context.Context) (*DNSZoneProvider, error) {
-	dzpc.defaults()
-	return withHooks(ctx, dzpc.sqlSave, dzpc.mutation, dzpc.hooks)
+func (_c *DNSZoneProviderCreate) Save(ctx context.Context) (*DNSZoneProvider, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (dzpc *DNSZoneProviderCreate) SaveX(ctx context.Context) *DNSZoneProvider {
-	v, err := dzpc.Save(ctx)
+func (_c *DNSZoneProviderCreate) SaveX(ctx context.Context) *DNSZoneProvider {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -87,67 +87,67 @@ func (dzpc *DNSZoneProviderCreate) SaveX(ctx context.Context) *DNSZoneProvider {
 }
 
 // Exec executes the query.
-func (dzpc *DNSZoneProviderCreate) Exec(ctx context.Context) error {
-	_, err := dzpc.Save(ctx)
+func (_c *DNSZoneProviderCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (dzpc *DNSZoneProviderCreate) ExecX(ctx context.Context) {
-	if err := dzpc.Exec(ctx); err != nil {
+func (_c *DNSZoneProviderCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (dzpc *DNSZoneProviderCreate) defaults() {
-	if _, ok := dzpc.mutation.CreatedAt(); !ok {
+func (_c *DNSZoneProviderCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := dnszoneprovider.DefaultCreatedAt()
-		dzpc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (dzpc *DNSZoneProviderCreate) check() error {
-	if _, ok := dzpc.mutation.Zone(); !ok {
+func (_c *DNSZoneProviderCreate) check() error {
+	if _, ok := _c.mutation.Zone(); !ok {
 		return &ValidationError{Name: "zone", err: errors.New(`ent: missing required field "DNSZoneProvider.zone"`)}
 	}
-	if v, ok := dzpc.mutation.Zone(); ok {
+	if v, ok := _c.mutation.Zone(); ok {
 		if err := dnszoneprovider.ZoneValidator(v); err != nil {
 			return &ValidationError{Name: "zone", err: fmt.Errorf(`ent: validator failed for field "DNSZoneProvider.zone": %w`, err)}
 		}
 	}
-	if _, ok := dzpc.mutation.Provider(); !ok {
+	if _, ok := _c.mutation.Provider(); !ok {
 		return &ValidationError{Name: "provider", err: errors.New(`ent: missing required field "DNSZoneProvider.provider"`)}
 	}
-	if v, ok := dzpc.mutation.Provider(); ok {
+	if v, ok := _c.mutation.Provider(); ok {
 		if err := dnszoneprovider.ProviderValidator(v); err != nil {
 			return &ValidationError{Name: "provider", err: fmt.Errorf(`ent: validator failed for field "DNSZoneProvider.provider": %w`, err)}
 		}
 	}
-	if _, ok := dzpc.mutation.Token(); !ok {
+	if _, ok := _c.mutation.Token(); !ok {
 		return &ValidationError{Name: "token", err: errors.New(`ent: missing required field "DNSZoneProvider.token"`)}
 	}
-	if v, ok := dzpc.mutation.Token(); ok {
+	if v, ok := _c.mutation.Token(); ok {
 		if err := dnszoneprovider.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "DNSZoneProvider.token": %w`, err)}
 		}
 	}
-	if _, ok := dzpc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "DNSZoneProvider.created_at"`)}
 	}
-	if _, ok := dzpc.mutation.TenantID(); !ok {
+	if len(_c.mutation.TenantIDs()) == 0 {
 		return &ValidationError{Name: "tenant", err: errors.New(`ent: missing required edge "DNSZoneProvider.tenant"`)}
 	}
 	return nil
 }
 
-func (dzpc *DNSZoneProviderCreate) sqlSave(ctx context.Context) (*DNSZoneProvider, error) {
-	if err := dzpc.check(); err != nil {
+func (_c *DNSZoneProviderCreate) sqlSave(ctx context.Context) (*DNSZoneProvider, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := dzpc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, dzpc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -155,34 +155,34 @@ func (dzpc *DNSZoneProviderCreate) sqlSave(ctx context.Context) (*DNSZoneProvide
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	dzpc.mutation.id = &_node.ID
-	dzpc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (dzpc *DNSZoneProviderCreate) createSpec() (*DNSZoneProvider, *sqlgraph.CreateSpec) {
+func (_c *DNSZoneProviderCreate) createSpec() (*DNSZoneProvider, *sqlgraph.CreateSpec) {
 	var (
-		_node = &DNSZoneProvider{config: dzpc.config}
+		_node = &DNSZoneProvider{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(dnszoneprovider.Table, sqlgraph.NewFieldSpec(dnszoneprovider.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = dzpc.conflict
-	if value, ok := dzpc.mutation.Zone(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.Zone(); ok {
 		_spec.SetField(dnszoneprovider.FieldZone, field.TypeString, value)
 		_node.Zone = value
 	}
-	if value, ok := dzpc.mutation.Provider(); ok {
+	if value, ok := _c.mutation.Provider(); ok {
 		_spec.SetField(dnszoneprovider.FieldProvider, field.TypeString, value)
 		_node.Provider = value
 	}
-	if value, ok := dzpc.mutation.Token(); ok {
+	if value, ok := _c.mutation.Token(); ok {
 		_spec.SetField(dnszoneprovider.FieldToken, field.TypeString, value)
 		_node.Token = value
 	}
-	if value, ok := dzpc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(dnszoneprovider.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if nodes := dzpc.mutation.TenantIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.TenantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -218,10 +218,10 @@ func (dzpc *DNSZoneProviderCreate) createSpec() (*DNSZoneProvider, *sqlgraph.Cre
 //			SetZone(v+v).
 //		}).
 //		Exec(ctx)
-func (dzpc *DNSZoneProviderCreate) OnConflict(opts ...sql.ConflictOption) *DNSZoneProviderUpsertOne {
-	dzpc.conflict = opts
+func (_c *DNSZoneProviderCreate) OnConflict(opts ...sql.ConflictOption) *DNSZoneProviderUpsertOne {
+	_c.conflict = opts
 	return &DNSZoneProviderUpsertOne{
-		create: dzpc,
+		create: _c,
 	}
 }
 
@@ -231,10 +231,10 @@ func (dzpc *DNSZoneProviderCreate) OnConflict(opts ...sql.ConflictOption) *DNSZo
 //	client.DNSZoneProvider.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (dzpc *DNSZoneProviderCreate) OnConflictColumns(columns ...string) *DNSZoneProviderUpsertOne {
-	dzpc.conflict = append(dzpc.conflict, sql.ConflictColumns(columns...))
+func (_c *DNSZoneProviderCreate) OnConflictColumns(columns ...string) *DNSZoneProviderUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &DNSZoneProviderUpsertOne{
-		create: dzpc,
+		create: _c,
 	}
 }
 
@@ -416,16 +416,16 @@ type DNSZoneProviderCreateBulk struct {
 }
 
 // Save creates the DNSZoneProvider entities in the database.
-func (dzpcb *DNSZoneProviderCreateBulk) Save(ctx context.Context) ([]*DNSZoneProvider, error) {
-	if dzpcb.err != nil {
-		return nil, dzpcb.err
+func (_c *DNSZoneProviderCreateBulk) Save(ctx context.Context) ([]*DNSZoneProvider, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(dzpcb.builders))
-	nodes := make([]*DNSZoneProvider, len(dzpcb.builders))
-	mutators := make([]Mutator, len(dzpcb.builders))
-	for i := range dzpcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*DNSZoneProvider, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := dzpcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*DNSZoneProviderMutation)
@@ -439,12 +439,12 @@ func (dzpcb *DNSZoneProviderCreateBulk) Save(ctx context.Context) ([]*DNSZonePro
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, dzpcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = dzpcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, dzpcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -468,7 +468,7 @@ func (dzpcb *DNSZoneProviderCreateBulk) Save(ctx context.Context) ([]*DNSZonePro
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, dzpcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -476,8 +476,8 @@ func (dzpcb *DNSZoneProviderCreateBulk) Save(ctx context.Context) ([]*DNSZonePro
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (dzpcb *DNSZoneProviderCreateBulk) SaveX(ctx context.Context) []*DNSZoneProvider {
-	v, err := dzpcb.Save(ctx)
+func (_c *DNSZoneProviderCreateBulk) SaveX(ctx context.Context) []*DNSZoneProvider {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -485,14 +485,14 @@ func (dzpcb *DNSZoneProviderCreateBulk) SaveX(ctx context.Context) []*DNSZonePro
 }
 
 // Exec executes the query.
-func (dzpcb *DNSZoneProviderCreateBulk) Exec(ctx context.Context) error {
-	_, err := dzpcb.Save(ctx)
+func (_c *DNSZoneProviderCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (dzpcb *DNSZoneProviderCreateBulk) ExecX(ctx context.Context) {
-	if err := dzpcb.Exec(ctx); err != nil {
+func (_c *DNSZoneProviderCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -512,10 +512,10 @@ func (dzpcb *DNSZoneProviderCreateBulk) ExecX(ctx context.Context) {
 //			SetZone(v+v).
 //		}).
 //		Exec(ctx)
-func (dzpcb *DNSZoneProviderCreateBulk) OnConflict(opts ...sql.ConflictOption) *DNSZoneProviderUpsertBulk {
-	dzpcb.conflict = opts
+func (_c *DNSZoneProviderCreateBulk) OnConflict(opts ...sql.ConflictOption) *DNSZoneProviderUpsertBulk {
+	_c.conflict = opts
 	return &DNSZoneProviderUpsertBulk{
-		create: dzpcb,
+		create: _c,
 	}
 }
 
@@ -525,10 +525,10 @@ func (dzpcb *DNSZoneProviderCreateBulk) OnConflict(opts ...sql.ConflictOption) *
 //	client.DNSZoneProvider.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (dzpcb *DNSZoneProviderCreateBulk) OnConflictColumns(columns ...string) *DNSZoneProviderUpsertBulk {
-	dzpcb.conflict = append(dzpcb.conflict, sql.ConflictColumns(columns...))
+func (_c *DNSZoneProviderCreateBulk) OnConflictColumns(columns ...string) *DNSZoneProviderUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &DNSZoneProviderUpsertBulk{
-		create: dzpcb,
+		create: _c,
 	}
 }
 

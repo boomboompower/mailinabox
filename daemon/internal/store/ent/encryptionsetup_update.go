@@ -24,104 +24,104 @@ type EncryptionSetupUpdate struct {
 }
 
 // Where appends a list predicates to the EncryptionSetupUpdate builder.
-func (esu *EncryptionSetupUpdate) Where(ps ...predicate.EncryptionSetup) *EncryptionSetupUpdate {
-	esu.mutation.Where(ps...)
-	return esu
+func (_u *EncryptionSetupUpdate) Where(ps ...predicate.EncryptionSetup) *EncryptionSetupUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetMode sets the "mode" field.
-func (esu *EncryptionSetupUpdate) SetMode(e encryptionsetup.Mode) *EncryptionSetupUpdate {
-	esu.mutation.SetMode(e)
-	return esu
+func (_u *EncryptionSetupUpdate) SetMode(v encryptionsetup.Mode) *EncryptionSetupUpdate {
+	_u.mutation.SetMode(v)
+	return _u
 }
 
 // SetNillableMode sets the "mode" field if the given value is not nil.
-func (esu *EncryptionSetupUpdate) SetNillableMode(e *encryptionsetup.Mode) *EncryptionSetupUpdate {
-	if e != nil {
-		esu.SetMode(*e)
+func (_u *EncryptionSetupUpdate) SetNillableMode(v *encryptionsetup.Mode) *EncryptionSetupUpdate {
+	if v != nil {
+		_u.SetMode(*v)
 	}
-	return esu
+	return _u
 }
 
 // SetPrepared sets the "prepared" field.
-func (esu *EncryptionSetupUpdate) SetPrepared(s string) *EncryptionSetupUpdate {
-	esu.mutation.SetPrepared(s)
-	return esu
+func (_u *EncryptionSetupUpdate) SetPrepared(v string) *EncryptionSetupUpdate {
+	_u.mutation.SetPrepared(v)
+	return _u
 }
 
 // SetNillablePrepared sets the "prepared" field if the given value is not nil.
-func (esu *EncryptionSetupUpdate) SetNillablePrepared(s *string) *EncryptionSetupUpdate {
-	if s != nil {
-		esu.SetPrepared(*s)
+func (_u *EncryptionSetupUpdate) SetNillablePrepared(v *string) *EncryptionSetupUpdate {
+	if v != nil {
+		_u.SetPrepared(*v)
 	}
-	return esu
+	return _u
 }
 
 // SetAttempts sets the "attempts" field.
-func (esu *EncryptionSetupUpdate) SetAttempts(i int) *EncryptionSetupUpdate {
-	esu.mutation.ResetAttempts()
-	esu.mutation.SetAttempts(i)
-	return esu
+func (_u *EncryptionSetupUpdate) SetAttempts(v int) *EncryptionSetupUpdate {
+	_u.mutation.ResetAttempts()
+	_u.mutation.SetAttempts(v)
+	return _u
 }
 
 // SetNillableAttempts sets the "attempts" field if the given value is not nil.
-func (esu *EncryptionSetupUpdate) SetNillableAttempts(i *int) *EncryptionSetupUpdate {
-	if i != nil {
-		esu.SetAttempts(*i)
+func (_u *EncryptionSetupUpdate) SetNillableAttempts(v *int) *EncryptionSetupUpdate {
+	if v != nil {
+		_u.SetAttempts(*v)
 	}
-	return esu
+	return _u
 }
 
-// AddAttempts adds i to the "attempts" field.
-func (esu *EncryptionSetupUpdate) AddAttempts(i int) *EncryptionSetupUpdate {
-	esu.mutation.AddAttempts(i)
-	return esu
+// AddAttempts adds value to the "attempts" field.
+func (_u *EncryptionSetupUpdate) AddAttempts(v int) *EncryptionSetupUpdate {
+	_u.mutation.AddAttempts(v)
+	return _u
 }
 
 // SetExpiresAt sets the "expires_at" field.
-func (esu *EncryptionSetupUpdate) SetExpiresAt(t time.Time) *EncryptionSetupUpdate {
-	esu.mutation.SetExpiresAt(t)
-	return esu
+func (_u *EncryptionSetupUpdate) SetExpiresAt(v time.Time) *EncryptionSetupUpdate {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
-func (esu *EncryptionSetupUpdate) SetNillableExpiresAt(t *time.Time) *EncryptionSetupUpdate {
-	if t != nil {
-		esu.SetExpiresAt(*t)
+func (_u *EncryptionSetupUpdate) SetNillableExpiresAt(v *time.Time) *EncryptionSetupUpdate {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return esu
+	return _u
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (esu *EncryptionSetupUpdate) SetUserID(id int) *EncryptionSetupUpdate {
-	esu.mutation.SetUserID(id)
-	return esu
+func (_u *EncryptionSetupUpdate) SetUserID(id int) *EncryptionSetupUpdate {
+	_u.mutation.SetUserID(id)
+	return _u
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (esu *EncryptionSetupUpdate) SetUser(u *User) *EncryptionSetupUpdate {
-	return esu.SetUserID(u.ID)
+func (_u *EncryptionSetupUpdate) SetUser(v *User) *EncryptionSetupUpdate {
+	return _u.SetUserID(v.ID)
 }
 
 // Mutation returns the EncryptionSetupMutation object of the builder.
-func (esu *EncryptionSetupUpdate) Mutation() *EncryptionSetupMutation {
-	return esu.mutation
+func (_u *EncryptionSetupUpdate) Mutation() *EncryptionSetupMutation {
+	return _u.mutation
 }
 
 // ClearUser clears the "user" edge to the User entity.
-func (esu *EncryptionSetupUpdate) ClearUser() *EncryptionSetupUpdate {
-	esu.mutation.ClearUser()
-	return esu
+func (_u *EncryptionSetupUpdate) ClearUser() *EncryptionSetupUpdate {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (esu *EncryptionSetupUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, esu.sqlSave, esu.mutation, esu.hooks)
+func (_u *EncryptionSetupUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (esu *EncryptionSetupUpdate) SaveX(ctx context.Context) int {
-	affected, err := esu.Save(ctx)
+func (_u *EncryptionSetupUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -129,64 +129,64 @@ func (esu *EncryptionSetupUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (esu *EncryptionSetupUpdate) Exec(ctx context.Context) error {
-	_, err := esu.Save(ctx)
+func (_u *EncryptionSetupUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (esu *EncryptionSetupUpdate) ExecX(ctx context.Context) {
-	if err := esu.Exec(ctx); err != nil {
+func (_u *EncryptionSetupUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (esu *EncryptionSetupUpdate) check() error {
-	if v, ok := esu.mutation.Mode(); ok {
+func (_u *EncryptionSetupUpdate) check() error {
+	if v, ok := _u.mutation.Mode(); ok {
 		if err := encryptionsetup.ModeValidator(v); err != nil {
 			return &ValidationError{Name: "mode", err: fmt.Errorf(`ent: validator failed for field "EncryptionSetup.mode": %w`, err)}
 		}
 	}
-	if v, ok := esu.mutation.Prepared(); ok {
+	if v, ok := _u.mutation.Prepared(); ok {
 		if err := encryptionsetup.PreparedValidator(v); err != nil {
 			return &ValidationError{Name: "prepared", err: fmt.Errorf(`ent: validator failed for field "EncryptionSetup.prepared": %w`, err)}
 		}
 	}
-	if _, ok := esu.mutation.UserID(); esu.mutation.UserCleared() && !ok {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "EncryptionSetup.user"`)
 	}
 	return nil
 }
 
-func (esu *EncryptionSetupUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := esu.check(); err != nil {
-		return n, err
+func (_u *EncryptionSetupUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(encryptionsetup.Table, encryptionsetup.Columns, sqlgraph.NewFieldSpec(encryptionsetup.FieldID, field.TypeInt))
-	if ps := esu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := esu.mutation.Mode(); ok {
+	if value, ok := _u.mutation.Mode(); ok {
 		_spec.SetField(encryptionsetup.FieldMode, field.TypeEnum, value)
 	}
-	if value, ok := esu.mutation.Prepared(); ok {
+	if value, ok := _u.mutation.Prepared(); ok {
 		_spec.SetField(encryptionsetup.FieldPrepared, field.TypeString, value)
 	}
-	if value, ok := esu.mutation.Attempts(); ok {
+	if value, ok := _u.mutation.Attempts(); ok {
 		_spec.SetField(encryptionsetup.FieldAttempts, field.TypeInt, value)
 	}
-	if value, ok := esu.mutation.AddedAttempts(); ok {
+	if value, ok := _u.mutation.AddedAttempts(); ok {
 		_spec.AddField(encryptionsetup.FieldAttempts, field.TypeInt, value)
 	}
-	if value, ok := esu.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(encryptionsetup.FieldExpiresAt, field.TypeTime, value)
 	}
-	if esu.mutation.UserCleared() {
+	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -199,7 +199,7 @@ func (esu *EncryptionSetupUpdate) sqlSave(ctx context.Context) (n int, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := esu.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -215,7 +215,7 @@ func (esu *EncryptionSetupUpdate) sqlSave(ctx context.Context) (n int, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, esu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{encryptionsetup.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -223,8 +223,8 @@ func (esu *EncryptionSetupUpdate) sqlSave(ctx context.Context) (n int, err error
 		}
 		return 0, err
 	}
-	esu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // EncryptionSetupUpdateOne is the builder for updating a single EncryptionSetup entity.
@@ -236,111 +236,111 @@ type EncryptionSetupUpdateOne struct {
 }
 
 // SetMode sets the "mode" field.
-func (esuo *EncryptionSetupUpdateOne) SetMode(e encryptionsetup.Mode) *EncryptionSetupUpdateOne {
-	esuo.mutation.SetMode(e)
-	return esuo
+func (_u *EncryptionSetupUpdateOne) SetMode(v encryptionsetup.Mode) *EncryptionSetupUpdateOne {
+	_u.mutation.SetMode(v)
+	return _u
 }
 
 // SetNillableMode sets the "mode" field if the given value is not nil.
-func (esuo *EncryptionSetupUpdateOne) SetNillableMode(e *encryptionsetup.Mode) *EncryptionSetupUpdateOne {
-	if e != nil {
-		esuo.SetMode(*e)
+func (_u *EncryptionSetupUpdateOne) SetNillableMode(v *encryptionsetup.Mode) *EncryptionSetupUpdateOne {
+	if v != nil {
+		_u.SetMode(*v)
 	}
-	return esuo
+	return _u
 }
 
 // SetPrepared sets the "prepared" field.
-func (esuo *EncryptionSetupUpdateOne) SetPrepared(s string) *EncryptionSetupUpdateOne {
-	esuo.mutation.SetPrepared(s)
-	return esuo
+func (_u *EncryptionSetupUpdateOne) SetPrepared(v string) *EncryptionSetupUpdateOne {
+	_u.mutation.SetPrepared(v)
+	return _u
 }
 
 // SetNillablePrepared sets the "prepared" field if the given value is not nil.
-func (esuo *EncryptionSetupUpdateOne) SetNillablePrepared(s *string) *EncryptionSetupUpdateOne {
-	if s != nil {
-		esuo.SetPrepared(*s)
+func (_u *EncryptionSetupUpdateOne) SetNillablePrepared(v *string) *EncryptionSetupUpdateOne {
+	if v != nil {
+		_u.SetPrepared(*v)
 	}
-	return esuo
+	return _u
 }
 
 // SetAttempts sets the "attempts" field.
-func (esuo *EncryptionSetupUpdateOne) SetAttempts(i int) *EncryptionSetupUpdateOne {
-	esuo.mutation.ResetAttempts()
-	esuo.mutation.SetAttempts(i)
-	return esuo
+func (_u *EncryptionSetupUpdateOne) SetAttempts(v int) *EncryptionSetupUpdateOne {
+	_u.mutation.ResetAttempts()
+	_u.mutation.SetAttempts(v)
+	return _u
 }
 
 // SetNillableAttempts sets the "attempts" field if the given value is not nil.
-func (esuo *EncryptionSetupUpdateOne) SetNillableAttempts(i *int) *EncryptionSetupUpdateOne {
-	if i != nil {
-		esuo.SetAttempts(*i)
+func (_u *EncryptionSetupUpdateOne) SetNillableAttempts(v *int) *EncryptionSetupUpdateOne {
+	if v != nil {
+		_u.SetAttempts(*v)
 	}
-	return esuo
+	return _u
 }
 
-// AddAttempts adds i to the "attempts" field.
-func (esuo *EncryptionSetupUpdateOne) AddAttempts(i int) *EncryptionSetupUpdateOne {
-	esuo.mutation.AddAttempts(i)
-	return esuo
+// AddAttempts adds value to the "attempts" field.
+func (_u *EncryptionSetupUpdateOne) AddAttempts(v int) *EncryptionSetupUpdateOne {
+	_u.mutation.AddAttempts(v)
+	return _u
 }
 
 // SetExpiresAt sets the "expires_at" field.
-func (esuo *EncryptionSetupUpdateOne) SetExpiresAt(t time.Time) *EncryptionSetupUpdateOne {
-	esuo.mutation.SetExpiresAt(t)
-	return esuo
+func (_u *EncryptionSetupUpdateOne) SetExpiresAt(v time.Time) *EncryptionSetupUpdateOne {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
-func (esuo *EncryptionSetupUpdateOne) SetNillableExpiresAt(t *time.Time) *EncryptionSetupUpdateOne {
-	if t != nil {
-		esuo.SetExpiresAt(*t)
+func (_u *EncryptionSetupUpdateOne) SetNillableExpiresAt(v *time.Time) *EncryptionSetupUpdateOne {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return esuo
+	return _u
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (esuo *EncryptionSetupUpdateOne) SetUserID(id int) *EncryptionSetupUpdateOne {
-	esuo.mutation.SetUserID(id)
-	return esuo
+func (_u *EncryptionSetupUpdateOne) SetUserID(id int) *EncryptionSetupUpdateOne {
+	_u.mutation.SetUserID(id)
+	return _u
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (esuo *EncryptionSetupUpdateOne) SetUser(u *User) *EncryptionSetupUpdateOne {
-	return esuo.SetUserID(u.ID)
+func (_u *EncryptionSetupUpdateOne) SetUser(v *User) *EncryptionSetupUpdateOne {
+	return _u.SetUserID(v.ID)
 }
 
 // Mutation returns the EncryptionSetupMutation object of the builder.
-func (esuo *EncryptionSetupUpdateOne) Mutation() *EncryptionSetupMutation {
-	return esuo.mutation
+func (_u *EncryptionSetupUpdateOne) Mutation() *EncryptionSetupMutation {
+	return _u.mutation
 }
 
 // ClearUser clears the "user" edge to the User entity.
-func (esuo *EncryptionSetupUpdateOne) ClearUser() *EncryptionSetupUpdateOne {
-	esuo.mutation.ClearUser()
-	return esuo
+func (_u *EncryptionSetupUpdateOne) ClearUser() *EncryptionSetupUpdateOne {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Where appends a list predicates to the EncryptionSetupUpdate builder.
-func (esuo *EncryptionSetupUpdateOne) Where(ps ...predicate.EncryptionSetup) *EncryptionSetupUpdateOne {
-	esuo.mutation.Where(ps...)
-	return esuo
+func (_u *EncryptionSetupUpdateOne) Where(ps ...predicate.EncryptionSetup) *EncryptionSetupUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (esuo *EncryptionSetupUpdateOne) Select(field string, fields ...string) *EncryptionSetupUpdateOne {
-	esuo.fields = append([]string{field}, fields...)
-	return esuo
+func (_u *EncryptionSetupUpdateOne) Select(field string, fields ...string) *EncryptionSetupUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated EncryptionSetup entity.
-func (esuo *EncryptionSetupUpdateOne) Save(ctx context.Context) (*EncryptionSetup, error) {
-	return withHooks(ctx, esuo.sqlSave, esuo.mutation, esuo.hooks)
+func (_u *EncryptionSetupUpdateOne) Save(ctx context.Context) (*EncryptionSetup, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (esuo *EncryptionSetupUpdateOne) SaveX(ctx context.Context) *EncryptionSetup {
-	node, err := esuo.Save(ctx)
+func (_u *EncryptionSetupUpdateOne) SaveX(ctx context.Context) *EncryptionSetup {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -348,47 +348,47 @@ func (esuo *EncryptionSetupUpdateOne) SaveX(ctx context.Context) *EncryptionSetu
 }
 
 // Exec executes the query on the entity.
-func (esuo *EncryptionSetupUpdateOne) Exec(ctx context.Context) error {
-	_, err := esuo.Save(ctx)
+func (_u *EncryptionSetupUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (esuo *EncryptionSetupUpdateOne) ExecX(ctx context.Context) {
-	if err := esuo.Exec(ctx); err != nil {
+func (_u *EncryptionSetupUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (esuo *EncryptionSetupUpdateOne) check() error {
-	if v, ok := esuo.mutation.Mode(); ok {
+func (_u *EncryptionSetupUpdateOne) check() error {
+	if v, ok := _u.mutation.Mode(); ok {
 		if err := encryptionsetup.ModeValidator(v); err != nil {
 			return &ValidationError{Name: "mode", err: fmt.Errorf(`ent: validator failed for field "EncryptionSetup.mode": %w`, err)}
 		}
 	}
-	if v, ok := esuo.mutation.Prepared(); ok {
+	if v, ok := _u.mutation.Prepared(); ok {
 		if err := encryptionsetup.PreparedValidator(v); err != nil {
 			return &ValidationError{Name: "prepared", err: fmt.Errorf(`ent: validator failed for field "EncryptionSetup.prepared": %w`, err)}
 		}
 	}
-	if _, ok := esuo.mutation.UserID(); esuo.mutation.UserCleared() && !ok {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "EncryptionSetup.user"`)
 	}
 	return nil
 }
 
-func (esuo *EncryptionSetupUpdateOne) sqlSave(ctx context.Context) (_node *EncryptionSetup, err error) {
-	if err := esuo.check(); err != nil {
+func (_u *EncryptionSetupUpdateOne) sqlSave(ctx context.Context) (_node *EncryptionSetup, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(encryptionsetup.Table, encryptionsetup.Columns, sqlgraph.NewFieldSpec(encryptionsetup.FieldID, field.TypeInt))
-	id, ok := esuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "EncryptionSetup.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := esuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, encryptionsetup.FieldID)
 		for _, f := range fields {
@@ -400,29 +400,29 @@ func (esuo *EncryptionSetupUpdateOne) sqlSave(ctx context.Context) (_node *Encry
 			}
 		}
 	}
-	if ps := esuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := esuo.mutation.Mode(); ok {
+	if value, ok := _u.mutation.Mode(); ok {
 		_spec.SetField(encryptionsetup.FieldMode, field.TypeEnum, value)
 	}
-	if value, ok := esuo.mutation.Prepared(); ok {
+	if value, ok := _u.mutation.Prepared(); ok {
 		_spec.SetField(encryptionsetup.FieldPrepared, field.TypeString, value)
 	}
-	if value, ok := esuo.mutation.Attempts(); ok {
+	if value, ok := _u.mutation.Attempts(); ok {
 		_spec.SetField(encryptionsetup.FieldAttempts, field.TypeInt, value)
 	}
-	if value, ok := esuo.mutation.AddedAttempts(); ok {
+	if value, ok := _u.mutation.AddedAttempts(); ok {
 		_spec.AddField(encryptionsetup.FieldAttempts, field.TypeInt, value)
 	}
-	if value, ok := esuo.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(encryptionsetup.FieldExpiresAt, field.TypeTime, value)
 	}
-	if esuo.mutation.UserCleared() {
+	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -435,7 +435,7 @@ func (esuo *EncryptionSetupUpdateOne) sqlSave(ctx context.Context) (_node *Encry
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := esuo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -451,10 +451,10 @@ func (esuo *EncryptionSetupUpdateOne) sqlSave(ctx context.Context) (_node *Encry
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &EncryptionSetup{config: esuo.config}
+	_node = &EncryptionSetup{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, esuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{encryptionsetup.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -462,6 +462,6 @@ func (esuo *EncryptionSetupUpdateOne) sqlSave(ctx context.Context) (_node *Encry
 		}
 		return nil, err
 	}
-	esuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

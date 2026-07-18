@@ -24,101 +24,101 @@ type WebAuthnCredentialUpdate struct {
 }
 
 // Where appends a list predicates to the WebAuthnCredentialUpdate builder.
-func (wacu *WebAuthnCredentialUpdate) Where(ps ...predicate.WebAuthnCredential) *WebAuthnCredentialUpdate {
-	wacu.mutation.Where(ps...)
-	return wacu
+func (_u *WebAuthnCredentialUpdate) Where(ps ...predicate.WebAuthnCredential) *WebAuthnCredentialUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetCredentialID sets the "credential_id" field.
-func (wacu *WebAuthnCredentialUpdate) SetCredentialID(b []byte) *WebAuthnCredentialUpdate {
-	wacu.mutation.SetCredentialID(b)
-	return wacu
+func (_u *WebAuthnCredentialUpdate) SetCredentialID(v []byte) *WebAuthnCredentialUpdate {
+	_u.mutation.SetCredentialID(v)
+	return _u
 }
 
 // SetData sets the "data" field.
-func (wacu *WebAuthnCredentialUpdate) SetData(s string) *WebAuthnCredentialUpdate {
-	wacu.mutation.SetData(s)
-	return wacu
+func (_u *WebAuthnCredentialUpdate) SetData(v string) *WebAuthnCredentialUpdate {
+	_u.mutation.SetData(v)
+	return _u
 }
 
 // SetNillableData sets the "data" field if the given value is not nil.
-func (wacu *WebAuthnCredentialUpdate) SetNillableData(s *string) *WebAuthnCredentialUpdate {
-	if s != nil {
-		wacu.SetData(*s)
+func (_u *WebAuthnCredentialUpdate) SetNillableData(v *string) *WebAuthnCredentialUpdate {
+	if v != nil {
+		_u.SetData(*v)
 	}
-	return wacu
+	return _u
 }
 
 // SetName sets the "name" field.
-func (wacu *WebAuthnCredentialUpdate) SetName(s string) *WebAuthnCredentialUpdate {
-	wacu.mutation.SetName(s)
-	return wacu
+func (_u *WebAuthnCredentialUpdate) SetName(v string) *WebAuthnCredentialUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (wacu *WebAuthnCredentialUpdate) SetNillableName(s *string) *WebAuthnCredentialUpdate {
-	if s != nil {
-		wacu.SetName(*s)
+func (_u *WebAuthnCredentialUpdate) SetNillableName(v *string) *WebAuthnCredentialUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return wacu
+	return _u
 }
 
 // ClearName clears the value of the "name" field.
-func (wacu *WebAuthnCredentialUpdate) ClearName() *WebAuthnCredentialUpdate {
-	wacu.mutation.ClearName()
-	return wacu
+func (_u *WebAuthnCredentialUpdate) ClearName() *WebAuthnCredentialUpdate {
+	_u.mutation.ClearName()
+	return _u
 }
 
 // SetLastUsed sets the "last_used" field.
-func (wacu *WebAuthnCredentialUpdate) SetLastUsed(t time.Time) *WebAuthnCredentialUpdate {
-	wacu.mutation.SetLastUsed(t)
-	return wacu
+func (_u *WebAuthnCredentialUpdate) SetLastUsed(v time.Time) *WebAuthnCredentialUpdate {
+	_u.mutation.SetLastUsed(v)
+	return _u
 }
 
 // SetNillableLastUsed sets the "last_used" field if the given value is not nil.
-func (wacu *WebAuthnCredentialUpdate) SetNillableLastUsed(t *time.Time) *WebAuthnCredentialUpdate {
-	if t != nil {
-		wacu.SetLastUsed(*t)
+func (_u *WebAuthnCredentialUpdate) SetNillableLastUsed(v *time.Time) *WebAuthnCredentialUpdate {
+	if v != nil {
+		_u.SetLastUsed(*v)
 	}
-	return wacu
+	return _u
 }
 
 // ClearLastUsed clears the value of the "last_used" field.
-func (wacu *WebAuthnCredentialUpdate) ClearLastUsed() *WebAuthnCredentialUpdate {
-	wacu.mutation.ClearLastUsed()
-	return wacu
+func (_u *WebAuthnCredentialUpdate) ClearLastUsed() *WebAuthnCredentialUpdate {
+	_u.mutation.ClearLastUsed()
+	return _u
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (wacu *WebAuthnCredentialUpdate) SetUserID(id int) *WebAuthnCredentialUpdate {
-	wacu.mutation.SetUserID(id)
-	return wacu
+func (_u *WebAuthnCredentialUpdate) SetUserID(id int) *WebAuthnCredentialUpdate {
+	_u.mutation.SetUserID(id)
+	return _u
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (wacu *WebAuthnCredentialUpdate) SetUser(u *User) *WebAuthnCredentialUpdate {
-	return wacu.SetUserID(u.ID)
+func (_u *WebAuthnCredentialUpdate) SetUser(v *User) *WebAuthnCredentialUpdate {
+	return _u.SetUserID(v.ID)
 }
 
 // Mutation returns the WebAuthnCredentialMutation object of the builder.
-func (wacu *WebAuthnCredentialUpdate) Mutation() *WebAuthnCredentialMutation {
-	return wacu.mutation
+func (_u *WebAuthnCredentialUpdate) Mutation() *WebAuthnCredentialMutation {
+	return _u.mutation
 }
 
 // ClearUser clears the "user" edge to the User entity.
-func (wacu *WebAuthnCredentialUpdate) ClearUser() *WebAuthnCredentialUpdate {
-	wacu.mutation.ClearUser()
-	return wacu
+func (_u *WebAuthnCredentialUpdate) ClearUser() *WebAuthnCredentialUpdate {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (wacu *WebAuthnCredentialUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, wacu.sqlSave, wacu.mutation, wacu.hooks)
+func (_u *WebAuthnCredentialUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (wacu *WebAuthnCredentialUpdate) SaveX(ctx context.Context) int {
-	affected, err := wacu.Save(ctx)
+func (_u *WebAuthnCredentialUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -126,67 +126,67 @@ func (wacu *WebAuthnCredentialUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (wacu *WebAuthnCredentialUpdate) Exec(ctx context.Context) error {
-	_, err := wacu.Save(ctx)
+func (_u *WebAuthnCredentialUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wacu *WebAuthnCredentialUpdate) ExecX(ctx context.Context) {
-	if err := wacu.Exec(ctx); err != nil {
+func (_u *WebAuthnCredentialUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (wacu *WebAuthnCredentialUpdate) check() error {
-	if v, ok := wacu.mutation.CredentialID(); ok {
+func (_u *WebAuthnCredentialUpdate) check() error {
+	if v, ok := _u.mutation.CredentialID(); ok {
 		if err := webauthncredential.CredentialIDValidator(v); err != nil {
 			return &ValidationError{Name: "credential_id", err: fmt.Errorf(`ent: validator failed for field "WebAuthnCredential.credential_id": %w`, err)}
 		}
 	}
-	if v, ok := wacu.mutation.Data(); ok {
+	if v, ok := _u.mutation.Data(); ok {
 		if err := webauthncredential.DataValidator(v); err != nil {
 			return &ValidationError{Name: "data", err: fmt.Errorf(`ent: validator failed for field "WebAuthnCredential.data": %w`, err)}
 		}
 	}
-	if _, ok := wacu.mutation.UserID(); wacu.mutation.UserCleared() && !ok {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "WebAuthnCredential.user"`)
 	}
 	return nil
 }
 
-func (wacu *WebAuthnCredentialUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := wacu.check(); err != nil {
-		return n, err
+func (_u *WebAuthnCredentialUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(webauthncredential.Table, webauthncredential.Columns, sqlgraph.NewFieldSpec(webauthncredential.FieldID, field.TypeInt))
-	if ps := wacu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := wacu.mutation.CredentialID(); ok {
+	if value, ok := _u.mutation.CredentialID(); ok {
 		_spec.SetField(webauthncredential.FieldCredentialID, field.TypeBytes, value)
 	}
-	if value, ok := wacu.mutation.Data(); ok {
+	if value, ok := _u.mutation.Data(); ok {
 		_spec.SetField(webauthncredential.FieldData, field.TypeString, value)
 	}
-	if value, ok := wacu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(webauthncredential.FieldName, field.TypeString, value)
 	}
-	if wacu.mutation.NameCleared() {
+	if _u.mutation.NameCleared() {
 		_spec.ClearField(webauthncredential.FieldName, field.TypeString)
 	}
-	if value, ok := wacu.mutation.LastUsed(); ok {
+	if value, ok := _u.mutation.LastUsed(); ok {
 		_spec.SetField(webauthncredential.FieldLastUsed, field.TypeTime, value)
 	}
-	if wacu.mutation.LastUsedCleared() {
+	if _u.mutation.LastUsedCleared() {
 		_spec.ClearField(webauthncredential.FieldLastUsed, field.TypeTime)
 	}
-	if wacu.mutation.UserCleared() {
+	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -199,7 +199,7 @@ func (wacu *WebAuthnCredentialUpdate) sqlSave(ctx context.Context) (n int, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wacu.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -215,7 +215,7 @@ func (wacu *WebAuthnCredentialUpdate) sqlSave(ctx context.Context) (n int, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, wacu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{webauthncredential.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -223,8 +223,8 @@ func (wacu *WebAuthnCredentialUpdate) sqlSave(ctx context.Context) (n int, err e
 		}
 		return 0, err
 	}
-	wacu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // WebAuthnCredentialUpdateOne is the builder for updating a single WebAuthnCredential entity.
@@ -236,108 +236,108 @@ type WebAuthnCredentialUpdateOne struct {
 }
 
 // SetCredentialID sets the "credential_id" field.
-func (wacuo *WebAuthnCredentialUpdateOne) SetCredentialID(b []byte) *WebAuthnCredentialUpdateOne {
-	wacuo.mutation.SetCredentialID(b)
-	return wacuo
+func (_u *WebAuthnCredentialUpdateOne) SetCredentialID(v []byte) *WebAuthnCredentialUpdateOne {
+	_u.mutation.SetCredentialID(v)
+	return _u
 }
 
 // SetData sets the "data" field.
-func (wacuo *WebAuthnCredentialUpdateOne) SetData(s string) *WebAuthnCredentialUpdateOne {
-	wacuo.mutation.SetData(s)
-	return wacuo
+func (_u *WebAuthnCredentialUpdateOne) SetData(v string) *WebAuthnCredentialUpdateOne {
+	_u.mutation.SetData(v)
+	return _u
 }
 
 // SetNillableData sets the "data" field if the given value is not nil.
-func (wacuo *WebAuthnCredentialUpdateOne) SetNillableData(s *string) *WebAuthnCredentialUpdateOne {
-	if s != nil {
-		wacuo.SetData(*s)
+func (_u *WebAuthnCredentialUpdateOne) SetNillableData(v *string) *WebAuthnCredentialUpdateOne {
+	if v != nil {
+		_u.SetData(*v)
 	}
-	return wacuo
+	return _u
 }
 
 // SetName sets the "name" field.
-func (wacuo *WebAuthnCredentialUpdateOne) SetName(s string) *WebAuthnCredentialUpdateOne {
-	wacuo.mutation.SetName(s)
-	return wacuo
+func (_u *WebAuthnCredentialUpdateOne) SetName(v string) *WebAuthnCredentialUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (wacuo *WebAuthnCredentialUpdateOne) SetNillableName(s *string) *WebAuthnCredentialUpdateOne {
-	if s != nil {
-		wacuo.SetName(*s)
+func (_u *WebAuthnCredentialUpdateOne) SetNillableName(v *string) *WebAuthnCredentialUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return wacuo
+	return _u
 }
 
 // ClearName clears the value of the "name" field.
-func (wacuo *WebAuthnCredentialUpdateOne) ClearName() *WebAuthnCredentialUpdateOne {
-	wacuo.mutation.ClearName()
-	return wacuo
+func (_u *WebAuthnCredentialUpdateOne) ClearName() *WebAuthnCredentialUpdateOne {
+	_u.mutation.ClearName()
+	return _u
 }
 
 // SetLastUsed sets the "last_used" field.
-func (wacuo *WebAuthnCredentialUpdateOne) SetLastUsed(t time.Time) *WebAuthnCredentialUpdateOne {
-	wacuo.mutation.SetLastUsed(t)
-	return wacuo
+func (_u *WebAuthnCredentialUpdateOne) SetLastUsed(v time.Time) *WebAuthnCredentialUpdateOne {
+	_u.mutation.SetLastUsed(v)
+	return _u
 }
 
 // SetNillableLastUsed sets the "last_used" field if the given value is not nil.
-func (wacuo *WebAuthnCredentialUpdateOne) SetNillableLastUsed(t *time.Time) *WebAuthnCredentialUpdateOne {
-	if t != nil {
-		wacuo.SetLastUsed(*t)
+func (_u *WebAuthnCredentialUpdateOne) SetNillableLastUsed(v *time.Time) *WebAuthnCredentialUpdateOne {
+	if v != nil {
+		_u.SetLastUsed(*v)
 	}
-	return wacuo
+	return _u
 }
 
 // ClearLastUsed clears the value of the "last_used" field.
-func (wacuo *WebAuthnCredentialUpdateOne) ClearLastUsed() *WebAuthnCredentialUpdateOne {
-	wacuo.mutation.ClearLastUsed()
-	return wacuo
+func (_u *WebAuthnCredentialUpdateOne) ClearLastUsed() *WebAuthnCredentialUpdateOne {
+	_u.mutation.ClearLastUsed()
+	return _u
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (wacuo *WebAuthnCredentialUpdateOne) SetUserID(id int) *WebAuthnCredentialUpdateOne {
-	wacuo.mutation.SetUserID(id)
-	return wacuo
+func (_u *WebAuthnCredentialUpdateOne) SetUserID(id int) *WebAuthnCredentialUpdateOne {
+	_u.mutation.SetUserID(id)
+	return _u
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (wacuo *WebAuthnCredentialUpdateOne) SetUser(u *User) *WebAuthnCredentialUpdateOne {
-	return wacuo.SetUserID(u.ID)
+func (_u *WebAuthnCredentialUpdateOne) SetUser(v *User) *WebAuthnCredentialUpdateOne {
+	return _u.SetUserID(v.ID)
 }
 
 // Mutation returns the WebAuthnCredentialMutation object of the builder.
-func (wacuo *WebAuthnCredentialUpdateOne) Mutation() *WebAuthnCredentialMutation {
-	return wacuo.mutation
+func (_u *WebAuthnCredentialUpdateOne) Mutation() *WebAuthnCredentialMutation {
+	return _u.mutation
 }
 
 // ClearUser clears the "user" edge to the User entity.
-func (wacuo *WebAuthnCredentialUpdateOne) ClearUser() *WebAuthnCredentialUpdateOne {
-	wacuo.mutation.ClearUser()
-	return wacuo
+func (_u *WebAuthnCredentialUpdateOne) ClearUser() *WebAuthnCredentialUpdateOne {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Where appends a list predicates to the WebAuthnCredentialUpdate builder.
-func (wacuo *WebAuthnCredentialUpdateOne) Where(ps ...predicate.WebAuthnCredential) *WebAuthnCredentialUpdateOne {
-	wacuo.mutation.Where(ps...)
-	return wacuo
+func (_u *WebAuthnCredentialUpdateOne) Where(ps ...predicate.WebAuthnCredential) *WebAuthnCredentialUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (wacuo *WebAuthnCredentialUpdateOne) Select(field string, fields ...string) *WebAuthnCredentialUpdateOne {
-	wacuo.fields = append([]string{field}, fields...)
-	return wacuo
+func (_u *WebAuthnCredentialUpdateOne) Select(field string, fields ...string) *WebAuthnCredentialUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated WebAuthnCredential entity.
-func (wacuo *WebAuthnCredentialUpdateOne) Save(ctx context.Context) (*WebAuthnCredential, error) {
-	return withHooks(ctx, wacuo.sqlSave, wacuo.mutation, wacuo.hooks)
+func (_u *WebAuthnCredentialUpdateOne) Save(ctx context.Context) (*WebAuthnCredential, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (wacuo *WebAuthnCredentialUpdateOne) SaveX(ctx context.Context) *WebAuthnCredential {
-	node, err := wacuo.Save(ctx)
+func (_u *WebAuthnCredentialUpdateOne) SaveX(ctx context.Context) *WebAuthnCredential {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -345,47 +345,47 @@ func (wacuo *WebAuthnCredentialUpdateOne) SaveX(ctx context.Context) *WebAuthnCr
 }
 
 // Exec executes the query on the entity.
-func (wacuo *WebAuthnCredentialUpdateOne) Exec(ctx context.Context) error {
-	_, err := wacuo.Save(ctx)
+func (_u *WebAuthnCredentialUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wacuo *WebAuthnCredentialUpdateOne) ExecX(ctx context.Context) {
-	if err := wacuo.Exec(ctx); err != nil {
+func (_u *WebAuthnCredentialUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (wacuo *WebAuthnCredentialUpdateOne) check() error {
-	if v, ok := wacuo.mutation.CredentialID(); ok {
+func (_u *WebAuthnCredentialUpdateOne) check() error {
+	if v, ok := _u.mutation.CredentialID(); ok {
 		if err := webauthncredential.CredentialIDValidator(v); err != nil {
 			return &ValidationError{Name: "credential_id", err: fmt.Errorf(`ent: validator failed for field "WebAuthnCredential.credential_id": %w`, err)}
 		}
 	}
-	if v, ok := wacuo.mutation.Data(); ok {
+	if v, ok := _u.mutation.Data(); ok {
 		if err := webauthncredential.DataValidator(v); err != nil {
 			return &ValidationError{Name: "data", err: fmt.Errorf(`ent: validator failed for field "WebAuthnCredential.data": %w`, err)}
 		}
 	}
-	if _, ok := wacuo.mutation.UserID(); wacuo.mutation.UserCleared() && !ok {
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "WebAuthnCredential.user"`)
 	}
 	return nil
 }
 
-func (wacuo *WebAuthnCredentialUpdateOne) sqlSave(ctx context.Context) (_node *WebAuthnCredential, err error) {
-	if err := wacuo.check(); err != nil {
+func (_u *WebAuthnCredentialUpdateOne) sqlSave(ctx context.Context) (_node *WebAuthnCredential, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(webauthncredential.Table, webauthncredential.Columns, sqlgraph.NewFieldSpec(webauthncredential.FieldID, field.TypeInt))
-	id, ok := wacuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "WebAuthnCredential.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := wacuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, webauthncredential.FieldID)
 		for _, f := range fields {
@@ -397,32 +397,32 @@ func (wacuo *WebAuthnCredentialUpdateOne) sqlSave(ctx context.Context) (_node *W
 			}
 		}
 	}
-	if ps := wacuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := wacuo.mutation.CredentialID(); ok {
+	if value, ok := _u.mutation.CredentialID(); ok {
 		_spec.SetField(webauthncredential.FieldCredentialID, field.TypeBytes, value)
 	}
-	if value, ok := wacuo.mutation.Data(); ok {
+	if value, ok := _u.mutation.Data(); ok {
 		_spec.SetField(webauthncredential.FieldData, field.TypeString, value)
 	}
-	if value, ok := wacuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(webauthncredential.FieldName, field.TypeString, value)
 	}
-	if wacuo.mutation.NameCleared() {
+	if _u.mutation.NameCleared() {
 		_spec.ClearField(webauthncredential.FieldName, field.TypeString)
 	}
-	if value, ok := wacuo.mutation.LastUsed(); ok {
+	if value, ok := _u.mutation.LastUsed(); ok {
 		_spec.SetField(webauthncredential.FieldLastUsed, field.TypeTime, value)
 	}
-	if wacuo.mutation.LastUsedCleared() {
+	if _u.mutation.LastUsedCleared() {
 		_spec.ClearField(webauthncredential.FieldLastUsed, field.TypeTime)
 	}
-	if wacuo.mutation.UserCleared() {
+	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -435,7 +435,7 @@ func (wacuo *WebAuthnCredentialUpdateOne) sqlSave(ctx context.Context) (_node *W
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wacuo.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -451,10 +451,10 @@ func (wacuo *WebAuthnCredentialUpdateOne) sqlSave(ctx context.Context) (_node *W
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &WebAuthnCredential{config: wacuo.config}
+	_node = &WebAuthnCredential{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, wacuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{webauthncredential.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -462,6 +462,6 @@ func (wacuo *WebAuthnCredentialUpdateOne) sqlSave(ctx context.Context) (_node *W
 		}
 		return nil, err
 	}
-	wacuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

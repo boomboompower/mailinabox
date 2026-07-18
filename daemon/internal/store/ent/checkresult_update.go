@@ -23,163 +23,163 @@ type CheckResultUpdate struct {
 }
 
 // Where appends a list predicates to the CheckResultUpdate builder.
-func (cru *CheckResultUpdate) Where(ps ...predicate.CheckResult) *CheckResultUpdate {
-	cru.mutation.Where(ps...)
-	return cru
+func (_u *CheckResultUpdate) Where(ps ...predicate.CheckResult) *CheckResultUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetCheck sets the "check" field.
-func (cru *CheckResultUpdate) SetCheck(s string) *CheckResultUpdate {
-	cru.mutation.SetCheck(s)
-	return cru
+func (_u *CheckResultUpdate) SetCheck(v string) *CheckResultUpdate {
+	_u.mutation.SetCheck(v)
+	return _u
 }
 
 // SetNillableCheck sets the "check" field if the given value is not nil.
-func (cru *CheckResultUpdate) SetNillableCheck(s *string) *CheckResultUpdate {
-	if s != nil {
-		cru.SetCheck(*s)
+func (_u *CheckResultUpdate) SetNillableCheck(v *string) *CheckResultUpdate {
+	if v != nil {
+		_u.SetCheck(*v)
 	}
-	return cru
+	return _u
 }
 
 // SetDomain sets the "domain" field.
-func (cru *CheckResultUpdate) SetDomain(s string) *CheckResultUpdate {
-	cru.mutation.SetDomain(s)
-	return cru
+func (_u *CheckResultUpdate) SetDomain(v string) *CheckResultUpdate {
+	_u.mutation.SetDomain(v)
+	return _u
 }
 
 // SetNillableDomain sets the "domain" field if the given value is not nil.
-func (cru *CheckResultUpdate) SetNillableDomain(s *string) *CheckResultUpdate {
-	if s != nil {
-		cru.SetDomain(*s)
+func (_u *CheckResultUpdate) SetNillableDomain(v *string) *CheckResultUpdate {
+	if v != nil {
+		_u.SetDomain(*v)
 	}
-	return cru
+	return _u
 }
 
 // SetCategory sets the "category" field.
-func (cru *CheckResultUpdate) SetCategory(s string) *CheckResultUpdate {
-	cru.mutation.SetCategory(s)
-	return cru
+func (_u *CheckResultUpdate) SetCategory(v string) *CheckResultUpdate {
+	_u.mutation.SetCategory(v)
+	return _u
 }
 
 // SetNillableCategory sets the "category" field if the given value is not nil.
-func (cru *CheckResultUpdate) SetNillableCategory(s *string) *CheckResultUpdate {
-	if s != nil {
-		cru.SetCategory(*s)
+func (_u *CheckResultUpdate) SetNillableCategory(v *string) *CheckResultUpdate {
+	if v != nil {
+		_u.SetCategory(*v)
 	}
-	return cru
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (cru *CheckResultUpdate) SetStatus(s string) *CheckResultUpdate {
-	cru.mutation.SetStatus(s)
-	return cru
+func (_u *CheckResultUpdate) SetStatus(v string) *CheckResultUpdate {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (cru *CheckResultUpdate) SetNillableStatus(s *string) *CheckResultUpdate {
-	if s != nil {
-		cru.SetStatus(*s)
+func (_u *CheckResultUpdate) SetNillableStatus(v *string) *CheckResultUpdate {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return cru
+	return _u
 }
 
 // SetMessage sets the "message" field.
-func (cru *CheckResultUpdate) SetMessage(s string) *CheckResultUpdate {
-	cru.mutation.SetMessage(s)
-	return cru
+func (_u *CheckResultUpdate) SetMessage(v string) *CheckResultUpdate {
+	_u.mutation.SetMessage(v)
+	return _u
 }
 
 // SetNillableMessage sets the "message" field if the given value is not nil.
-func (cru *CheckResultUpdate) SetNillableMessage(s *string) *CheckResultUpdate {
-	if s != nil {
-		cru.SetMessage(*s)
+func (_u *CheckResultUpdate) SetNillableMessage(v *string) *CheckResultUpdate {
+	if v != nil {
+		_u.SetMessage(*v)
 	}
-	return cru
+	return _u
 }
 
 // SetSteps sets the "steps" field.
-func (cru *CheckResultUpdate) SetSteps(s string) *CheckResultUpdate {
-	cru.mutation.SetSteps(s)
-	return cru
+func (_u *CheckResultUpdate) SetSteps(v string) *CheckResultUpdate {
+	_u.mutation.SetSteps(v)
+	return _u
 }
 
 // SetNillableSteps sets the "steps" field if the given value is not nil.
-func (cru *CheckResultUpdate) SetNillableSteps(s *string) *CheckResultUpdate {
-	if s != nil {
-		cru.SetSteps(*s)
+func (_u *CheckResultUpdate) SetNillableSteps(v *string) *CheckResultUpdate {
+	if v != nil {
+		_u.SetSteps(*v)
 	}
-	return cru
+	return _u
 }
 
 // SetRanAt sets the "ran_at" field.
-func (cru *CheckResultUpdate) SetRanAt(t time.Time) *CheckResultUpdate {
-	cru.mutation.SetRanAt(t)
-	return cru
+func (_u *CheckResultUpdate) SetRanAt(v time.Time) *CheckResultUpdate {
+	_u.mutation.SetRanAt(v)
+	return _u
 }
 
 // SetNillableRanAt sets the "ran_at" field if the given value is not nil.
-func (cru *CheckResultUpdate) SetNillableRanAt(t *time.Time) *CheckResultUpdate {
-	if t != nil {
-		cru.SetRanAt(*t)
+func (_u *CheckResultUpdate) SetNillableRanAt(v *time.Time) *CheckResultUpdate {
+	if v != nil {
+		_u.SetRanAt(*v)
 	}
-	return cru
+	return _u
 }
 
 // SetElapsedMs sets the "elapsed_ms" field.
-func (cru *CheckResultUpdate) SetElapsedMs(i int64) *CheckResultUpdate {
-	cru.mutation.ResetElapsedMs()
-	cru.mutation.SetElapsedMs(i)
-	return cru
+func (_u *CheckResultUpdate) SetElapsedMs(v int64) *CheckResultUpdate {
+	_u.mutation.ResetElapsedMs()
+	_u.mutation.SetElapsedMs(v)
+	return _u
 }
 
 // SetNillableElapsedMs sets the "elapsed_ms" field if the given value is not nil.
-func (cru *CheckResultUpdate) SetNillableElapsedMs(i *int64) *CheckResultUpdate {
-	if i != nil {
-		cru.SetElapsedMs(*i)
+func (_u *CheckResultUpdate) SetNillableElapsedMs(v *int64) *CheckResultUpdate {
+	if v != nil {
+		_u.SetElapsedMs(*v)
 	}
-	return cru
+	return _u
 }
 
-// AddElapsedMs adds i to the "elapsed_ms" field.
-func (cru *CheckResultUpdate) AddElapsedMs(i int64) *CheckResultUpdate {
-	cru.mutation.AddElapsedMs(i)
-	return cru
+// AddElapsedMs adds value to the "elapsed_ms" field.
+func (_u *CheckResultUpdate) AddElapsedMs(v int64) *CheckResultUpdate {
+	_u.mutation.AddElapsedMs(v)
+	return _u
 }
 
 // SetFirstFailedAt sets the "first_failed_at" field.
-func (cru *CheckResultUpdate) SetFirstFailedAt(t time.Time) *CheckResultUpdate {
-	cru.mutation.SetFirstFailedAt(t)
-	return cru
+func (_u *CheckResultUpdate) SetFirstFailedAt(v time.Time) *CheckResultUpdate {
+	_u.mutation.SetFirstFailedAt(v)
+	return _u
 }
 
 // SetNillableFirstFailedAt sets the "first_failed_at" field if the given value is not nil.
-func (cru *CheckResultUpdate) SetNillableFirstFailedAt(t *time.Time) *CheckResultUpdate {
-	if t != nil {
-		cru.SetFirstFailedAt(*t)
+func (_u *CheckResultUpdate) SetNillableFirstFailedAt(v *time.Time) *CheckResultUpdate {
+	if v != nil {
+		_u.SetFirstFailedAt(*v)
 	}
-	return cru
+	return _u
 }
 
 // ClearFirstFailedAt clears the value of the "first_failed_at" field.
-func (cru *CheckResultUpdate) ClearFirstFailedAt() *CheckResultUpdate {
-	cru.mutation.ClearFirstFailedAt()
-	return cru
+func (_u *CheckResultUpdate) ClearFirstFailedAt() *CheckResultUpdate {
+	_u.mutation.ClearFirstFailedAt()
+	return _u
 }
 
 // Mutation returns the CheckResultMutation object of the builder.
-func (cru *CheckResultUpdate) Mutation() *CheckResultMutation {
-	return cru.mutation
+func (_u *CheckResultUpdate) Mutation() *CheckResultMutation {
+	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (cru *CheckResultUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, cru.sqlSave, cru.mutation, cru.hooks)
+func (_u *CheckResultUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cru *CheckResultUpdate) SaveX(ctx context.Context) int {
-	affected, err := cru.Save(ctx)
+func (_u *CheckResultUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -187,31 +187,31 @@ func (cru *CheckResultUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (cru *CheckResultUpdate) Exec(ctx context.Context) error {
-	_, err := cru.Save(ctx)
+func (_u *CheckResultUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cru *CheckResultUpdate) ExecX(ctx context.Context) {
-	if err := cru.Exec(ctx); err != nil {
+func (_u *CheckResultUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cru *CheckResultUpdate) check() error {
-	if v, ok := cru.mutation.Check(); ok {
+func (_u *CheckResultUpdate) check() error {
+	if v, ok := _u.mutation.Check(); ok {
 		if err := checkresult.CheckValidator(v); err != nil {
 			return &ValidationError{Name: "check", err: fmt.Errorf(`ent: validator failed for field "CheckResult.check": %w`, err)}
 		}
 	}
-	if v, ok := cru.mutation.Category(); ok {
+	if v, ok := _u.mutation.Category(); ok {
 		if err := checkresult.CategoryValidator(v); err != nil {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "CheckResult.category": %w`, err)}
 		}
 	}
-	if v, ok := cru.mutation.Status(); ok {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := checkresult.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "CheckResult.status": %w`, err)}
 		}
@@ -219,52 +219,52 @@ func (cru *CheckResultUpdate) check() error {
 	return nil
 }
 
-func (cru *CheckResultUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := cru.check(); err != nil {
-		return n, err
+func (_u *CheckResultUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(checkresult.Table, checkresult.Columns, sqlgraph.NewFieldSpec(checkresult.FieldID, field.TypeInt))
-	if ps := cru.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cru.mutation.Check(); ok {
+	if value, ok := _u.mutation.Check(); ok {
 		_spec.SetField(checkresult.FieldCheck, field.TypeString, value)
 	}
-	if value, ok := cru.mutation.Domain(); ok {
+	if value, ok := _u.mutation.Domain(); ok {
 		_spec.SetField(checkresult.FieldDomain, field.TypeString, value)
 	}
-	if value, ok := cru.mutation.Category(); ok {
+	if value, ok := _u.mutation.Category(); ok {
 		_spec.SetField(checkresult.FieldCategory, field.TypeString, value)
 	}
-	if value, ok := cru.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(checkresult.FieldStatus, field.TypeString, value)
 	}
-	if value, ok := cru.mutation.Message(); ok {
+	if value, ok := _u.mutation.Message(); ok {
 		_spec.SetField(checkresult.FieldMessage, field.TypeString, value)
 	}
-	if value, ok := cru.mutation.Steps(); ok {
+	if value, ok := _u.mutation.Steps(); ok {
 		_spec.SetField(checkresult.FieldSteps, field.TypeString, value)
 	}
-	if value, ok := cru.mutation.RanAt(); ok {
+	if value, ok := _u.mutation.RanAt(); ok {
 		_spec.SetField(checkresult.FieldRanAt, field.TypeTime, value)
 	}
-	if value, ok := cru.mutation.ElapsedMs(); ok {
+	if value, ok := _u.mutation.ElapsedMs(); ok {
 		_spec.SetField(checkresult.FieldElapsedMs, field.TypeInt64, value)
 	}
-	if value, ok := cru.mutation.AddedElapsedMs(); ok {
+	if value, ok := _u.mutation.AddedElapsedMs(); ok {
 		_spec.AddField(checkresult.FieldElapsedMs, field.TypeInt64, value)
 	}
-	if value, ok := cru.mutation.FirstFailedAt(); ok {
+	if value, ok := _u.mutation.FirstFailedAt(); ok {
 		_spec.SetField(checkresult.FieldFirstFailedAt, field.TypeTime, value)
 	}
-	if cru.mutation.FirstFailedAtCleared() {
+	if _u.mutation.FirstFailedAtCleared() {
 		_spec.ClearField(checkresult.FieldFirstFailedAt, field.TypeTime)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, cru.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{checkresult.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -272,8 +272,8 @@ func (cru *CheckResultUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	cru.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // CheckResultUpdateOne is the builder for updating a single CheckResult entity.
@@ -285,170 +285,170 @@ type CheckResultUpdateOne struct {
 }
 
 // SetCheck sets the "check" field.
-func (cruo *CheckResultUpdateOne) SetCheck(s string) *CheckResultUpdateOne {
-	cruo.mutation.SetCheck(s)
-	return cruo
+func (_u *CheckResultUpdateOne) SetCheck(v string) *CheckResultUpdateOne {
+	_u.mutation.SetCheck(v)
+	return _u
 }
 
 // SetNillableCheck sets the "check" field if the given value is not nil.
-func (cruo *CheckResultUpdateOne) SetNillableCheck(s *string) *CheckResultUpdateOne {
-	if s != nil {
-		cruo.SetCheck(*s)
+func (_u *CheckResultUpdateOne) SetNillableCheck(v *string) *CheckResultUpdateOne {
+	if v != nil {
+		_u.SetCheck(*v)
 	}
-	return cruo
+	return _u
 }
 
 // SetDomain sets the "domain" field.
-func (cruo *CheckResultUpdateOne) SetDomain(s string) *CheckResultUpdateOne {
-	cruo.mutation.SetDomain(s)
-	return cruo
+func (_u *CheckResultUpdateOne) SetDomain(v string) *CheckResultUpdateOne {
+	_u.mutation.SetDomain(v)
+	return _u
 }
 
 // SetNillableDomain sets the "domain" field if the given value is not nil.
-func (cruo *CheckResultUpdateOne) SetNillableDomain(s *string) *CheckResultUpdateOne {
-	if s != nil {
-		cruo.SetDomain(*s)
+func (_u *CheckResultUpdateOne) SetNillableDomain(v *string) *CheckResultUpdateOne {
+	if v != nil {
+		_u.SetDomain(*v)
 	}
-	return cruo
+	return _u
 }
 
 // SetCategory sets the "category" field.
-func (cruo *CheckResultUpdateOne) SetCategory(s string) *CheckResultUpdateOne {
-	cruo.mutation.SetCategory(s)
-	return cruo
+func (_u *CheckResultUpdateOne) SetCategory(v string) *CheckResultUpdateOne {
+	_u.mutation.SetCategory(v)
+	return _u
 }
 
 // SetNillableCategory sets the "category" field if the given value is not nil.
-func (cruo *CheckResultUpdateOne) SetNillableCategory(s *string) *CheckResultUpdateOne {
-	if s != nil {
-		cruo.SetCategory(*s)
+func (_u *CheckResultUpdateOne) SetNillableCategory(v *string) *CheckResultUpdateOne {
+	if v != nil {
+		_u.SetCategory(*v)
 	}
-	return cruo
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (cruo *CheckResultUpdateOne) SetStatus(s string) *CheckResultUpdateOne {
-	cruo.mutation.SetStatus(s)
-	return cruo
+func (_u *CheckResultUpdateOne) SetStatus(v string) *CheckResultUpdateOne {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (cruo *CheckResultUpdateOne) SetNillableStatus(s *string) *CheckResultUpdateOne {
-	if s != nil {
-		cruo.SetStatus(*s)
+func (_u *CheckResultUpdateOne) SetNillableStatus(v *string) *CheckResultUpdateOne {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return cruo
+	return _u
 }
 
 // SetMessage sets the "message" field.
-func (cruo *CheckResultUpdateOne) SetMessage(s string) *CheckResultUpdateOne {
-	cruo.mutation.SetMessage(s)
-	return cruo
+func (_u *CheckResultUpdateOne) SetMessage(v string) *CheckResultUpdateOne {
+	_u.mutation.SetMessage(v)
+	return _u
 }
 
 // SetNillableMessage sets the "message" field if the given value is not nil.
-func (cruo *CheckResultUpdateOne) SetNillableMessage(s *string) *CheckResultUpdateOne {
-	if s != nil {
-		cruo.SetMessage(*s)
+func (_u *CheckResultUpdateOne) SetNillableMessage(v *string) *CheckResultUpdateOne {
+	if v != nil {
+		_u.SetMessage(*v)
 	}
-	return cruo
+	return _u
 }
 
 // SetSteps sets the "steps" field.
-func (cruo *CheckResultUpdateOne) SetSteps(s string) *CheckResultUpdateOne {
-	cruo.mutation.SetSteps(s)
-	return cruo
+func (_u *CheckResultUpdateOne) SetSteps(v string) *CheckResultUpdateOne {
+	_u.mutation.SetSteps(v)
+	return _u
 }
 
 // SetNillableSteps sets the "steps" field if the given value is not nil.
-func (cruo *CheckResultUpdateOne) SetNillableSteps(s *string) *CheckResultUpdateOne {
-	if s != nil {
-		cruo.SetSteps(*s)
+func (_u *CheckResultUpdateOne) SetNillableSteps(v *string) *CheckResultUpdateOne {
+	if v != nil {
+		_u.SetSteps(*v)
 	}
-	return cruo
+	return _u
 }
 
 // SetRanAt sets the "ran_at" field.
-func (cruo *CheckResultUpdateOne) SetRanAt(t time.Time) *CheckResultUpdateOne {
-	cruo.mutation.SetRanAt(t)
-	return cruo
+func (_u *CheckResultUpdateOne) SetRanAt(v time.Time) *CheckResultUpdateOne {
+	_u.mutation.SetRanAt(v)
+	return _u
 }
 
 // SetNillableRanAt sets the "ran_at" field if the given value is not nil.
-func (cruo *CheckResultUpdateOne) SetNillableRanAt(t *time.Time) *CheckResultUpdateOne {
-	if t != nil {
-		cruo.SetRanAt(*t)
+func (_u *CheckResultUpdateOne) SetNillableRanAt(v *time.Time) *CheckResultUpdateOne {
+	if v != nil {
+		_u.SetRanAt(*v)
 	}
-	return cruo
+	return _u
 }
 
 // SetElapsedMs sets the "elapsed_ms" field.
-func (cruo *CheckResultUpdateOne) SetElapsedMs(i int64) *CheckResultUpdateOne {
-	cruo.mutation.ResetElapsedMs()
-	cruo.mutation.SetElapsedMs(i)
-	return cruo
+func (_u *CheckResultUpdateOne) SetElapsedMs(v int64) *CheckResultUpdateOne {
+	_u.mutation.ResetElapsedMs()
+	_u.mutation.SetElapsedMs(v)
+	return _u
 }
 
 // SetNillableElapsedMs sets the "elapsed_ms" field if the given value is not nil.
-func (cruo *CheckResultUpdateOne) SetNillableElapsedMs(i *int64) *CheckResultUpdateOne {
-	if i != nil {
-		cruo.SetElapsedMs(*i)
+func (_u *CheckResultUpdateOne) SetNillableElapsedMs(v *int64) *CheckResultUpdateOne {
+	if v != nil {
+		_u.SetElapsedMs(*v)
 	}
-	return cruo
+	return _u
 }
 
-// AddElapsedMs adds i to the "elapsed_ms" field.
-func (cruo *CheckResultUpdateOne) AddElapsedMs(i int64) *CheckResultUpdateOne {
-	cruo.mutation.AddElapsedMs(i)
-	return cruo
+// AddElapsedMs adds value to the "elapsed_ms" field.
+func (_u *CheckResultUpdateOne) AddElapsedMs(v int64) *CheckResultUpdateOne {
+	_u.mutation.AddElapsedMs(v)
+	return _u
 }
 
 // SetFirstFailedAt sets the "first_failed_at" field.
-func (cruo *CheckResultUpdateOne) SetFirstFailedAt(t time.Time) *CheckResultUpdateOne {
-	cruo.mutation.SetFirstFailedAt(t)
-	return cruo
+func (_u *CheckResultUpdateOne) SetFirstFailedAt(v time.Time) *CheckResultUpdateOne {
+	_u.mutation.SetFirstFailedAt(v)
+	return _u
 }
 
 // SetNillableFirstFailedAt sets the "first_failed_at" field if the given value is not nil.
-func (cruo *CheckResultUpdateOne) SetNillableFirstFailedAt(t *time.Time) *CheckResultUpdateOne {
-	if t != nil {
-		cruo.SetFirstFailedAt(*t)
+func (_u *CheckResultUpdateOne) SetNillableFirstFailedAt(v *time.Time) *CheckResultUpdateOne {
+	if v != nil {
+		_u.SetFirstFailedAt(*v)
 	}
-	return cruo
+	return _u
 }
 
 // ClearFirstFailedAt clears the value of the "first_failed_at" field.
-func (cruo *CheckResultUpdateOne) ClearFirstFailedAt() *CheckResultUpdateOne {
-	cruo.mutation.ClearFirstFailedAt()
-	return cruo
+func (_u *CheckResultUpdateOne) ClearFirstFailedAt() *CheckResultUpdateOne {
+	_u.mutation.ClearFirstFailedAt()
+	return _u
 }
 
 // Mutation returns the CheckResultMutation object of the builder.
-func (cruo *CheckResultUpdateOne) Mutation() *CheckResultMutation {
-	return cruo.mutation
+func (_u *CheckResultUpdateOne) Mutation() *CheckResultMutation {
+	return _u.mutation
 }
 
 // Where appends a list predicates to the CheckResultUpdate builder.
-func (cruo *CheckResultUpdateOne) Where(ps ...predicate.CheckResult) *CheckResultUpdateOne {
-	cruo.mutation.Where(ps...)
-	return cruo
+func (_u *CheckResultUpdateOne) Where(ps ...predicate.CheckResult) *CheckResultUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (cruo *CheckResultUpdateOne) Select(field string, fields ...string) *CheckResultUpdateOne {
-	cruo.fields = append([]string{field}, fields...)
-	return cruo
+func (_u *CheckResultUpdateOne) Select(field string, fields ...string) *CheckResultUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated CheckResult entity.
-func (cruo *CheckResultUpdateOne) Save(ctx context.Context) (*CheckResult, error) {
-	return withHooks(ctx, cruo.sqlSave, cruo.mutation, cruo.hooks)
+func (_u *CheckResultUpdateOne) Save(ctx context.Context) (*CheckResult, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cruo *CheckResultUpdateOne) SaveX(ctx context.Context) *CheckResult {
-	node, err := cruo.Save(ctx)
+func (_u *CheckResultUpdateOne) SaveX(ctx context.Context) *CheckResult {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -456,31 +456,31 @@ func (cruo *CheckResultUpdateOne) SaveX(ctx context.Context) *CheckResult {
 }
 
 // Exec executes the query on the entity.
-func (cruo *CheckResultUpdateOne) Exec(ctx context.Context) error {
-	_, err := cruo.Save(ctx)
+func (_u *CheckResultUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cruo *CheckResultUpdateOne) ExecX(ctx context.Context) {
-	if err := cruo.Exec(ctx); err != nil {
+func (_u *CheckResultUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cruo *CheckResultUpdateOne) check() error {
-	if v, ok := cruo.mutation.Check(); ok {
+func (_u *CheckResultUpdateOne) check() error {
+	if v, ok := _u.mutation.Check(); ok {
 		if err := checkresult.CheckValidator(v); err != nil {
 			return &ValidationError{Name: "check", err: fmt.Errorf(`ent: validator failed for field "CheckResult.check": %w`, err)}
 		}
 	}
-	if v, ok := cruo.mutation.Category(); ok {
+	if v, ok := _u.mutation.Category(); ok {
 		if err := checkresult.CategoryValidator(v); err != nil {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "CheckResult.category": %w`, err)}
 		}
 	}
-	if v, ok := cruo.mutation.Status(); ok {
+	if v, ok := _u.mutation.Status(); ok {
 		if err := checkresult.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "CheckResult.status": %w`, err)}
 		}
@@ -488,17 +488,17 @@ func (cruo *CheckResultUpdateOne) check() error {
 	return nil
 }
 
-func (cruo *CheckResultUpdateOne) sqlSave(ctx context.Context) (_node *CheckResult, err error) {
-	if err := cruo.check(); err != nil {
+func (_u *CheckResultUpdateOne) sqlSave(ctx context.Context) (_node *CheckResult, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(checkresult.Table, checkresult.Columns, sqlgraph.NewFieldSpec(checkresult.FieldID, field.TypeInt))
-	id, ok := cruo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "CheckResult.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := cruo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, checkresult.FieldID)
 		for _, f := range fields {
@@ -510,50 +510,50 @@ func (cruo *CheckResultUpdateOne) sqlSave(ctx context.Context) (_node *CheckResu
 			}
 		}
 	}
-	if ps := cruo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cruo.mutation.Check(); ok {
+	if value, ok := _u.mutation.Check(); ok {
 		_spec.SetField(checkresult.FieldCheck, field.TypeString, value)
 	}
-	if value, ok := cruo.mutation.Domain(); ok {
+	if value, ok := _u.mutation.Domain(); ok {
 		_spec.SetField(checkresult.FieldDomain, field.TypeString, value)
 	}
-	if value, ok := cruo.mutation.Category(); ok {
+	if value, ok := _u.mutation.Category(); ok {
 		_spec.SetField(checkresult.FieldCategory, field.TypeString, value)
 	}
-	if value, ok := cruo.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(checkresult.FieldStatus, field.TypeString, value)
 	}
-	if value, ok := cruo.mutation.Message(); ok {
+	if value, ok := _u.mutation.Message(); ok {
 		_spec.SetField(checkresult.FieldMessage, field.TypeString, value)
 	}
-	if value, ok := cruo.mutation.Steps(); ok {
+	if value, ok := _u.mutation.Steps(); ok {
 		_spec.SetField(checkresult.FieldSteps, field.TypeString, value)
 	}
-	if value, ok := cruo.mutation.RanAt(); ok {
+	if value, ok := _u.mutation.RanAt(); ok {
 		_spec.SetField(checkresult.FieldRanAt, field.TypeTime, value)
 	}
-	if value, ok := cruo.mutation.ElapsedMs(); ok {
+	if value, ok := _u.mutation.ElapsedMs(); ok {
 		_spec.SetField(checkresult.FieldElapsedMs, field.TypeInt64, value)
 	}
-	if value, ok := cruo.mutation.AddedElapsedMs(); ok {
+	if value, ok := _u.mutation.AddedElapsedMs(); ok {
 		_spec.AddField(checkresult.FieldElapsedMs, field.TypeInt64, value)
 	}
-	if value, ok := cruo.mutation.FirstFailedAt(); ok {
+	if value, ok := _u.mutation.FirstFailedAt(); ok {
 		_spec.SetField(checkresult.FieldFirstFailedAt, field.TypeTime, value)
 	}
-	if cruo.mutation.FirstFailedAtCleared() {
+	if _u.mutation.FirstFailedAtCleared() {
 		_spec.ClearField(checkresult.FieldFirstFailedAt, field.TypeTime)
 	}
-	_node = &CheckResult{config: cruo.config}
+	_node = &CheckResult{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, cruo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{checkresult.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -561,6 +561,6 @@ func (cruo *CheckResultUpdateOne) sqlSave(ctx context.Context) (_node *CheckResu
 		}
 		return nil, err
 	}
-	cruo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

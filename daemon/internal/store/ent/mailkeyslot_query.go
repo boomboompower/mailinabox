@@ -10,6 +10,7 @@ import (
 	"naust/daemon/internal/store/ent/predicate"
 	"naust/daemon/internal/store/ent/user"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -30,44 +31,44 @@ type MailKeySlotQuery struct {
 }
 
 // Where adds a new predicate for the MailKeySlotQuery builder.
-func (mksq *MailKeySlotQuery) Where(ps ...predicate.MailKeySlot) *MailKeySlotQuery {
-	mksq.predicates = append(mksq.predicates, ps...)
-	return mksq
+func (_q *MailKeySlotQuery) Where(ps ...predicate.MailKeySlot) *MailKeySlotQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (mksq *MailKeySlotQuery) Limit(limit int) *MailKeySlotQuery {
-	mksq.ctx.Limit = &limit
-	return mksq
+func (_q *MailKeySlotQuery) Limit(limit int) *MailKeySlotQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (mksq *MailKeySlotQuery) Offset(offset int) *MailKeySlotQuery {
-	mksq.ctx.Offset = &offset
-	return mksq
+func (_q *MailKeySlotQuery) Offset(offset int) *MailKeySlotQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (mksq *MailKeySlotQuery) Unique(unique bool) *MailKeySlotQuery {
-	mksq.ctx.Unique = &unique
-	return mksq
+func (_q *MailKeySlotQuery) Unique(unique bool) *MailKeySlotQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (mksq *MailKeySlotQuery) Order(o ...mailkeyslot.OrderOption) *MailKeySlotQuery {
-	mksq.order = append(mksq.order, o...)
-	return mksq
+func (_q *MailKeySlotQuery) Order(o ...mailkeyslot.OrderOption) *MailKeySlotQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryUser chains the current query on the "user" edge.
-func (mksq *MailKeySlotQuery) QueryUser() *UserQuery {
-	query := (&UserClient{config: mksq.config}).Query()
+func (_q *MailKeySlotQuery) QueryUser() *UserQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := mksq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := mksq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -76,7 +77,7 @@ func (mksq *MailKeySlotQuery) QueryUser() *UserQuery {
 			sqlgraph.To(user.Table, user.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, mailkeyslot.UserTable, mailkeyslot.UserColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(mksq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -84,8 +85,8 @@ func (mksq *MailKeySlotQuery) QueryUser() *UserQuery {
 
 // First returns the first MailKeySlot entity from the query.
 // Returns a *NotFoundError when no MailKeySlot was found.
-func (mksq *MailKeySlotQuery) First(ctx context.Context) (*MailKeySlot, error) {
-	nodes, err := mksq.Limit(1).All(setContextOp(ctx, mksq.ctx, "First"))
+func (_q *MailKeySlotQuery) First(ctx context.Context) (*MailKeySlot, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -96,8 +97,8 @@ func (mksq *MailKeySlotQuery) First(ctx context.Context) (*MailKeySlot, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (mksq *MailKeySlotQuery) FirstX(ctx context.Context) *MailKeySlot {
-	node, err := mksq.First(ctx)
+func (_q *MailKeySlotQuery) FirstX(ctx context.Context) *MailKeySlot {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -106,9 +107,9 @@ func (mksq *MailKeySlotQuery) FirstX(ctx context.Context) *MailKeySlot {
 
 // FirstID returns the first MailKeySlot ID from the query.
 // Returns a *NotFoundError when no MailKeySlot ID was found.
-func (mksq *MailKeySlotQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *MailKeySlotQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = mksq.Limit(1).IDs(setContextOp(ctx, mksq.ctx, "FirstID")); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -119,8 +120,8 @@ func (mksq *MailKeySlotQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (mksq *MailKeySlotQuery) FirstIDX(ctx context.Context) int {
-	id, err := mksq.FirstID(ctx)
+func (_q *MailKeySlotQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -130,8 +131,8 @@ func (mksq *MailKeySlotQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single MailKeySlot entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one MailKeySlot entity is found.
 // Returns a *NotFoundError when no MailKeySlot entities are found.
-func (mksq *MailKeySlotQuery) Only(ctx context.Context) (*MailKeySlot, error) {
-	nodes, err := mksq.Limit(2).All(setContextOp(ctx, mksq.ctx, "Only"))
+func (_q *MailKeySlotQuery) Only(ctx context.Context) (*MailKeySlot, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -146,8 +147,8 @@ func (mksq *MailKeySlotQuery) Only(ctx context.Context) (*MailKeySlot, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (mksq *MailKeySlotQuery) OnlyX(ctx context.Context) *MailKeySlot {
-	node, err := mksq.Only(ctx)
+func (_q *MailKeySlotQuery) OnlyX(ctx context.Context) *MailKeySlot {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -157,9 +158,9 @@ func (mksq *MailKeySlotQuery) OnlyX(ctx context.Context) *MailKeySlot {
 // OnlyID is like Only, but returns the only MailKeySlot ID in the query.
 // Returns a *NotSingularError when more than one MailKeySlot ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (mksq *MailKeySlotQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *MailKeySlotQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = mksq.Limit(2).IDs(setContextOp(ctx, mksq.ctx, "OnlyID")); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -174,8 +175,8 @@ func (mksq *MailKeySlotQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (mksq *MailKeySlotQuery) OnlyIDX(ctx context.Context) int {
-	id, err := mksq.OnlyID(ctx)
+func (_q *MailKeySlotQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -183,18 +184,18 @@ func (mksq *MailKeySlotQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of MailKeySlots.
-func (mksq *MailKeySlotQuery) All(ctx context.Context) ([]*MailKeySlot, error) {
-	ctx = setContextOp(ctx, mksq.ctx, "All")
-	if err := mksq.prepareQuery(ctx); err != nil {
+func (_q *MailKeySlotQuery) All(ctx context.Context) ([]*MailKeySlot, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*MailKeySlot, *MailKeySlotQuery]()
-	return withInterceptors[[]*MailKeySlot](ctx, mksq, qr, mksq.inters)
+	return withInterceptors[[]*MailKeySlot](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (mksq *MailKeySlotQuery) AllX(ctx context.Context) []*MailKeySlot {
-	nodes, err := mksq.All(ctx)
+func (_q *MailKeySlotQuery) AllX(ctx context.Context) []*MailKeySlot {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -202,20 +203,20 @@ func (mksq *MailKeySlotQuery) AllX(ctx context.Context) []*MailKeySlot {
 }
 
 // IDs executes the query and returns a list of MailKeySlot IDs.
-func (mksq *MailKeySlotQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if mksq.ctx.Unique == nil && mksq.path != nil {
-		mksq.Unique(true)
+func (_q *MailKeySlotQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, mksq.ctx, "IDs")
-	if err = mksq.Select(mailkeyslot.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(mailkeyslot.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (mksq *MailKeySlotQuery) IDsX(ctx context.Context) []int {
-	ids, err := mksq.IDs(ctx)
+func (_q *MailKeySlotQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -223,17 +224,17 @@ func (mksq *MailKeySlotQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (mksq *MailKeySlotQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, mksq.ctx, "Count")
-	if err := mksq.prepareQuery(ctx); err != nil {
+func (_q *MailKeySlotQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, mksq, querierCount[*MailKeySlotQuery](), mksq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*MailKeySlotQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (mksq *MailKeySlotQuery) CountX(ctx context.Context) int {
-	count, err := mksq.Count(ctx)
+func (_q *MailKeySlotQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -241,9 +242,9 @@ func (mksq *MailKeySlotQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (mksq *MailKeySlotQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, mksq.ctx, "Exist")
-	switch _, err := mksq.FirstID(ctx); {
+func (_q *MailKeySlotQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -254,8 +255,8 @@ func (mksq *MailKeySlotQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (mksq *MailKeySlotQuery) ExistX(ctx context.Context) bool {
-	exist, err := mksq.Exist(ctx)
+func (_q *MailKeySlotQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -264,32 +265,32 @@ func (mksq *MailKeySlotQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the MailKeySlotQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (mksq *MailKeySlotQuery) Clone() *MailKeySlotQuery {
-	if mksq == nil {
+func (_q *MailKeySlotQuery) Clone() *MailKeySlotQuery {
+	if _q == nil {
 		return nil
 	}
 	return &MailKeySlotQuery{
-		config:     mksq.config,
-		ctx:        mksq.ctx.Clone(),
-		order:      append([]mailkeyslot.OrderOption{}, mksq.order...),
-		inters:     append([]Interceptor{}, mksq.inters...),
-		predicates: append([]predicate.MailKeySlot{}, mksq.predicates...),
-		withUser:   mksq.withUser.Clone(),
+		config:     _q.config,
+		ctx:        _q.ctx.Clone(),
+		order:      append([]mailkeyslot.OrderOption{}, _q.order...),
+		inters:     append([]Interceptor{}, _q.inters...),
+		predicates: append([]predicate.MailKeySlot{}, _q.predicates...),
+		withUser:   _q.withUser.Clone(),
 		// clone intermediate query.
-		sql:  mksq.sql.Clone(),
-		path: mksq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
 // WithUser tells the query-builder to eager-load the nodes that are connected to
 // the "user" edge. The optional arguments are used to configure the query builder of the edge.
-func (mksq *MailKeySlotQuery) WithUser(opts ...func(*UserQuery)) *MailKeySlotQuery {
-	query := (&UserClient{config: mksq.config}).Query()
+func (_q *MailKeySlotQuery) WithUser(opts ...func(*UserQuery)) *MailKeySlotQuery {
+	query := (&UserClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	mksq.withUser = query
-	return mksq
+	_q.withUser = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -306,10 +307,10 @@ func (mksq *MailKeySlotQuery) WithUser(opts ...func(*UserQuery)) *MailKeySlotQue
 //		GroupBy(mailkeyslot.FieldSlotType).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (mksq *MailKeySlotQuery) GroupBy(field string, fields ...string) *MailKeySlotGroupBy {
-	mksq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &MailKeySlotGroupBy{build: mksq}
-	grbuild.flds = &mksq.ctx.Fields
+func (_q *MailKeySlotQuery) GroupBy(field string, fields ...string) *MailKeySlotGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &MailKeySlotGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = mailkeyslot.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -327,55 +328,55 @@ func (mksq *MailKeySlotQuery) GroupBy(field string, fields ...string) *MailKeySl
 //	client.MailKeySlot.Query().
 //		Select(mailkeyslot.FieldSlotType).
 //		Scan(ctx, &v)
-func (mksq *MailKeySlotQuery) Select(fields ...string) *MailKeySlotSelect {
-	mksq.ctx.Fields = append(mksq.ctx.Fields, fields...)
-	sbuild := &MailKeySlotSelect{MailKeySlotQuery: mksq}
+func (_q *MailKeySlotQuery) Select(fields ...string) *MailKeySlotSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &MailKeySlotSelect{MailKeySlotQuery: _q}
 	sbuild.label = mailkeyslot.Label
-	sbuild.flds, sbuild.scan = &mksq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a MailKeySlotSelect configured with the given aggregations.
-func (mksq *MailKeySlotQuery) Aggregate(fns ...AggregateFunc) *MailKeySlotSelect {
-	return mksq.Select().Aggregate(fns...)
+func (_q *MailKeySlotQuery) Aggregate(fns ...AggregateFunc) *MailKeySlotSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (mksq *MailKeySlotQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range mksq.inters {
+func (_q *MailKeySlotQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, mksq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range mksq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !mailkeyslot.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if mksq.path != nil {
-		prev, err := mksq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		mksq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (mksq *MailKeySlotQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MailKeySlot, error) {
+func (_q *MailKeySlotQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MailKeySlot, error) {
 	var (
 		nodes       = []*MailKeySlot{}
-		withFKs     = mksq.withFKs
-		_spec       = mksq.querySpec()
+		withFKs     = _q.withFKs
+		_spec       = _q.querySpec()
 		loadedTypes = [1]bool{
-			mksq.withUser != nil,
+			_q.withUser != nil,
 		}
 	)
-	if mksq.withUser != nil {
+	if _q.withUser != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -385,7 +386,7 @@ func (mksq *MailKeySlotQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 		return (*MailKeySlot).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &MailKeySlot{config: mksq.config}
+		node := &MailKeySlot{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
@@ -393,14 +394,14 @@ func (mksq *MailKeySlotQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, mksq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := mksq.withUser; query != nil {
-		if err := mksq.loadUser(ctx, query, nodes, nil,
+	if query := _q.withUser; query != nil {
+		if err := _q.loadUser(ctx, query, nodes, nil,
 			func(n *MailKeySlot, e *User) { n.Edges.User = e }); err != nil {
 			return nil, err
 		}
@@ -408,7 +409,7 @@ func (mksq *MailKeySlotQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	return nodes, nil
 }
 
-func (mksq *MailKeySlotQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*MailKeySlot, init func(*MailKeySlot), assign func(*MailKeySlot, *User)) error {
+func (_q *MailKeySlotQuery) loadUser(ctx context.Context, query *UserQuery, nodes []*MailKeySlot, init func(*MailKeySlot), assign func(*MailKeySlot, *User)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*MailKeySlot)
 	for i := range nodes {
@@ -441,24 +442,24 @@ func (mksq *MailKeySlotQuery) loadUser(ctx context.Context, query *UserQuery, no
 	return nil
 }
 
-func (mksq *MailKeySlotQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := mksq.querySpec()
-	_spec.Node.Columns = mksq.ctx.Fields
-	if len(mksq.ctx.Fields) > 0 {
-		_spec.Unique = mksq.ctx.Unique != nil && *mksq.ctx.Unique
+func (_q *MailKeySlotQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, mksq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (mksq *MailKeySlotQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *MailKeySlotQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(mailkeyslot.Table, mailkeyslot.Columns, sqlgraph.NewFieldSpec(mailkeyslot.FieldID, field.TypeInt))
-	_spec.From = mksq.sql
-	if unique := mksq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if mksq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := mksq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, mailkeyslot.FieldID)
 		for i := range fields {
@@ -467,20 +468,20 @@ func (mksq *MailKeySlotQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if ps := mksq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := mksq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := mksq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := mksq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -490,33 +491,33 @@ func (mksq *MailKeySlotQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (mksq *MailKeySlotQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(mksq.driver.Dialect())
+func (_q *MailKeySlotQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(mailkeyslot.Table)
-	columns := mksq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = mailkeyslot.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if mksq.sql != nil {
-		selector = mksq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if mksq.ctx.Unique != nil && *mksq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, p := range mksq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range mksq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := mksq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := mksq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -529,41 +530,41 @@ type MailKeySlotGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (mksgb *MailKeySlotGroupBy) Aggregate(fns ...AggregateFunc) *MailKeySlotGroupBy {
-	mksgb.fns = append(mksgb.fns, fns...)
-	return mksgb
+func (_g *MailKeySlotGroupBy) Aggregate(fns ...AggregateFunc) *MailKeySlotGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (mksgb *MailKeySlotGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mksgb.build.ctx, "GroupBy")
-	if err := mksgb.build.prepareQuery(ctx); err != nil {
+func (_g *MailKeySlotGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MailKeySlotQuery, *MailKeySlotGroupBy](ctx, mksgb.build, mksgb, mksgb.build.inters, v)
+	return scanWithInterceptors[*MailKeySlotQuery, *MailKeySlotGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (mksgb *MailKeySlotGroupBy) sqlScan(ctx context.Context, root *MailKeySlotQuery, v any) error {
+func (_g *MailKeySlotGroupBy) sqlScan(ctx context.Context, root *MailKeySlotQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(mksgb.fns))
-	for _, fn := range mksgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*mksgb.flds)+len(mksgb.fns))
-		for _, f := range *mksgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*mksgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := mksgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -577,27 +578,27 @@ type MailKeySlotSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (mkss *MailKeySlotSelect) Aggregate(fns ...AggregateFunc) *MailKeySlotSelect {
-	mkss.fns = append(mkss.fns, fns...)
-	return mkss
+func (_s *MailKeySlotSelect) Aggregate(fns ...AggregateFunc) *MailKeySlotSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (mkss *MailKeySlotSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mkss.ctx, "Select")
-	if err := mkss.prepareQuery(ctx); err != nil {
+func (_s *MailKeySlotSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MailKeySlotQuery, *MailKeySlotSelect](ctx, mkss.MailKeySlotQuery, mkss, mkss.inters, v)
+	return scanWithInterceptors[*MailKeySlotQuery, *MailKeySlotSelect](ctx, _s.MailKeySlotQuery, _s, _s.inters, v)
 }
 
-func (mkss *MailKeySlotSelect) sqlScan(ctx context.Context, root *MailKeySlotQuery, v any) error {
+func (_s *MailKeySlotSelect) sqlScan(ctx context.Context, root *MailKeySlotQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(mkss.fns))
-	for _, fn := range mkss.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*mkss.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -605,7 +606,7 @@ func (mkss *MailKeySlotSelect) sqlScan(ctx context.Context, root *MailKeySlotQue
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := mkss.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

@@ -20,56 +20,56 @@ type BackupRunDelete struct {
 }
 
 // Where appends a list predicates to the BackupRunDelete builder.
-func (brd *BackupRunDelete) Where(ps ...predicate.BackupRun) *BackupRunDelete {
-	brd.mutation.Where(ps...)
-	return brd
+func (_d *BackupRunDelete) Where(ps ...predicate.BackupRun) *BackupRunDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (brd *BackupRunDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, brd.sqlExec, brd.mutation, brd.hooks)
+func (_d *BackupRunDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (brd *BackupRunDelete) ExecX(ctx context.Context) int {
-	n, err := brd.Exec(ctx)
+func (_d *BackupRunDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (brd *BackupRunDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *BackupRunDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(backuprun.Table, sqlgraph.NewFieldSpec(backuprun.FieldID, field.TypeInt))
-	if ps := brd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, brd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	brd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // BackupRunDeleteOne is the builder for deleting a single BackupRun entity.
 type BackupRunDeleteOne struct {
-	brd *BackupRunDelete
+	_d *BackupRunDelete
 }
 
 // Where appends a list predicates to the BackupRunDelete builder.
-func (brdo *BackupRunDeleteOne) Where(ps ...predicate.BackupRun) *BackupRunDeleteOne {
-	brdo.brd.mutation.Where(ps...)
-	return brdo
+func (_d *BackupRunDeleteOne) Where(ps ...predicate.BackupRun) *BackupRunDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (brdo *BackupRunDeleteOne) Exec(ctx context.Context) error {
-	n, err := brdo.brd.Exec(ctx)
+func (_d *BackupRunDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (brdo *BackupRunDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (brdo *BackupRunDeleteOne) ExecX(ctx context.Context) {
-	if err := brdo.Exec(ctx); err != nil {
+func (_d *BackupRunDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -126,12 +126,10 @@ func (e UserEdges) EncryptionSetupsOrErr() ([]*EncryptionSetup, error) {
 // TenantOrErr returns the Tenant value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e UserEdges) TenantOrErr() (*Tenant, error) {
-	if e.loadedTypes[7] {
-		if e.Tenant == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: tenant.Label}
-		}
+	if e.Tenant != nil {
 		return e.Tenant, nil
+	} else if e.loadedTypes[7] {
+		return nil, &NotFoundError{label: tenant.Label}
 	}
 	return nil, &NotLoadedError{edge: "tenant"}
 }
@@ -158,7 +156,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the User fields.
-func (u *User) assignValues(columns []string, values []any) error {
+func (_m *User) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -169,52 +167,52 @@ func (u *User) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			u.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case user.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
-				u.Email = value.String
+				_m.Email = value.String
 			}
 		case user.FieldPasswordHash:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field password_hash", values[i])
 			} else if value.Valid {
-				u.PasswordHash = value.String
+				_m.PasswordHash = value.String
 			}
 		case user.FieldRole:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field role", values[i])
 			} else if value.Valid {
-				u.Role = user.Role(value.String)
+				_m.Role = user.Role(value.String)
 			}
 		case user.FieldQuotaBytes:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field quota_bytes", values[i])
 			} else if value.Valid {
-				u.QuotaBytes = value.Int64
+				_m.QuotaBytes = value.Int64
 			}
 		case user.FieldHomeNode:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field home_node", values[i])
 			} else if value.Valid {
-				u.HomeNode = value.String
+				_m.HomeNode = value.String
 			}
 		case user.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				u.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case user.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field tenant_users", value)
 			} else if value.Valid {
-				u.tenant_users = new(int)
-				*u.tenant_users = int(value.Int64)
+				_m.tenant_users = new(int)
+				*_m.tenant_users = int(value.Int64)
 			}
 		default:
-			u.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -222,89 +220,89 @@ func (u *User) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the User.
 // This includes values selected through modifiers, order, etc.
-func (u *User) Value(name string) (ent.Value, error) {
-	return u.selectValues.Get(name)
+func (_m *User) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QuerySessions queries the "sessions" edge of the User entity.
-func (u *User) QuerySessions() *SessionQuery {
-	return NewUserClient(u.config).QuerySessions(u)
+func (_m *User) QuerySessions() *SessionQuery {
+	return NewUserClient(_m.config).QuerySessions(_m)
 }
 
 // QueryAPITokens queries the "api_tokens" edge of the User entity.
-func (u *User) QueryAPITokens() *APITokenQuery {
-	return NewUserClient(u.config).QueryAPITokens(u)
+func (_m *User) QueryAPITokens() *APITokenQuery {
+	return NewUserClient(_m.config).QueryAPITokens(_m)
 }
 
 // QueryTotpCredentials queries the "totp_credentials" edge of the User entity.
-func (u *User) QueryTotpCredentials() *TOTPCredentialQuery {
-	return NewUserClient(u.config).QueryTotpCredentials(u)
+func (_m *User) QueryTotpCredentials() *TOTPCredentialQuery {
+	return NewUserClient(_m.config).QueryTotpCredentials(_m)
 }
 
 // QueryWebauthnCredentials queries the "webauthn_credentials" edge of the User entity.
-func (u *User) QueryWebauthnCredentials() *WebAuthnCredentialQuery {
-	return NewUserClient(u.config).QueryWebauthnCredentials(u)
+func (_m *User) QueryWebauthnCredentials() *WebAuthnCredentialQuery {
+	return NewUserClient(_m.config).QueryWebauthnCredentials(_m)
 }
 
 // QueryWebauthnChallenges queries the "webauthn_challenges" edge of the User entity.
-func (u *User) QueryWebauthnChallenges() *WebAuthnChallengeQuery {
-	return NewUserClient(u.config).QueryWebauthnChallenges(u)
+func (_m *User) QueryWebauthnChallenges() *WebAuthnChallengeQuery {
+	return NewUserClient(_m.config).QueryWebauthnChallenges(_m)
 }
 
 // QueryMailKeySlots queries the "mail_key_slots" edge of the User entity.
-func (u *User) QueryMailKeySlots() *MailKeySlotQuery {
-	return NewUserClient(u.config).QueryMailKeySlots(u)
+func (_m *User) QueryMailKeySlots() *MailKeySlotQuery {
+	return NewUserClient(_m.config).QueryMailKeySlots(_m)
 }
 
 // QueryEncryptionSetups queries the "encryption_setups" edge of the User entity.
-func (u *User) QueryEncryptionSetups() *EncryptionSetupQuery {
-	return NewUserClient(u.config).QueryEncryptionSetups(u)
+func (_m *User) QueryEncryptionSetups() *EncryptionSetupQuery {
+	return NewUserClient(_m.config).QueryEncryptionSetups(_m)
 }
 
 // QueryTenant queries the "tenant" edge of the User entity.
-func (u *User) QueryTenant() *TenantQuery {
-	return NewUserClient(u.config).QueryTenant(u)
+func (_m *User) QueryTenant() *TenantQuery {
+	return NewUserClient(_m.config).QueryTenant(_m)
 }
 
 // Update returns a builder for updating this User.
 // Note that you need to call User.Unwrap() before calling this method if this User
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (u *User) Update() *UserUpdateOne {
-	return NewUserClient(u.config).UpdateOne(u)
+func (_m *User) Update() *UserUpdateOne {
+	return NewUserClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the User entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (u *User) Unwrap() *User {
-	_tx, ok := u.config.driver.(*txDriver)
+func (_m *User) Unwrap() *User {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: User is not a transactional entity")
 	}
-	u.config.driver = _tx.drv
-	return u
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (u *User) String() string {
+func (_m *User) String() string {
 	var builder strings.Builder
 	builder.WriteString("User(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", u.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("email=")
-	builder.WriteString(u.Email)
+	builder.WriteString(_m.Email)
 	builder.WriteString(", ")
 	builder.WriteString("password_hash=<sensitive>")
 	builder.WriteString(", ")
 	builder.WriteString("role=")
-	builder.WriteString(fmt.Sprintf("%v", u.Role))
+	builder.WriteString(fmt.Sprintf("%v", _m.Role))
 	builder.WriteString(", ")
 	builder.WriteString("quota_bytes=")
-	builder.WriteString(fmt.Sprintf("%v", u.QuotaBytes))
+	builder.WriteString(fmt.Sprintf("%v", _m.QuotaBytes))
 	builder.WriteString(", ")
 	builder.WriteString("home_node=")
-	builder.WriteString(u.HomeNode)
+	builder.WriteString(_m.HomeNode)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(u.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

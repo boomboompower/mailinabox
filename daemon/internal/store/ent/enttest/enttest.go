@@ -4,6 +4,7 @@ package enttest
 
 import (
 	"context"
+
 	"naust/daemon/internal/store/ent"
 	// required by schema hooks.
 	_ "naust/daemon/internal/store/ent/runtime"

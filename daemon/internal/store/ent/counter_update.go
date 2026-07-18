@@ -22,59 +22,59 @@ type CounterUpdate struct {
 }
 
 // Where appends a list predicates to the CounterUpdate builder.
-func (cu *CounterUpdate) Where(ps ...predicate.Counter) *CounterUpdate {
-	cu.mutation.Where(ps...)
-	return cu
+func (_u *CounterUpdate) Where(ps ...predicate.Counter) *CounterUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetName sets the "name" field.
-func (cu *CounterUpdate) SetName(s string) *CounterUpdate {
-	cu.mutation.SetName(s)
-	return cu
+func (_u *CounterUpdate) SetName(v string) *CounterUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (cu *CounterUpdate) SetNillableName(s *string) *CounterUpdate {
-	if s != nil {
-		cu.SetName(*s)
+func (_u *CounterUpdate) SetNillableName(v *string) *CounterUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return cu
+	return _u
 }
 
 // SetValue sets the "value" field.
-func (cu *CounterUpdate) SetValue(i int64) *CounterUpdate {
-	cu.mutation.ResetValue()
-	cu.mutation.SetValue(i)
-	return cu
+func (_u *CounterUpdate) SetValue(v int64) *CounterUpdate {
+	_u.mutation.ResetValue()
+	_u.mutation.SetValue(v)
+	return _u
 }
 
 // SetNillableValue sets the "value" field if the given value is not nil.
-func (cu *CounterUpdate) SetNillableValue(i *int64) *CounterUpdate {
-	if i != nil {
-		cu.SetValue(*i)
+func (_u *CounterUpdate) SetNillableValue(v *int64) *CounterUpdate {
+	if v != nil {
+		_u.SetValue(*v)
 	}
-	return cu
+	return _u
 }
 
-// AddValue adds i to the "value" field.
-func (cu *CounterUpdate) AddValue(i int64) *CounterUpdate {
-	cu.mutation.AddValue(i)
-	return cu
+// AddValue adds value to the "value" field.
+func (_u *CounterUpdate) AddValue(v int64) *CounterUpdate {
+	_u.mutation.AddValue(v)
+	return _u
 }
 
 // Mutation returns the CounterMutation object of the builder.
-func (cu *CounterUpdate) Mutation() *CounterMutation {
-	return cu.mutation
+func (_u *CounterUpdate) Mutation() *CounterMutation {
+	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (cu *CounterUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
+func (_u *CounterUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cu *CounterUpdate) SaveX(ctx context.Context) int {
-	affected, err := cu.Save(ctx)
+func (_u *CounterUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -82,21 +82,21 @@ func (cu *CounterUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (cu *CounterUpdate) Exec(ctx context.Context) error {
-	_, err := cu.Save(ctx)
+func (_u *CounterUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cu *CounterUpdate) ExecX(ctx context.Context) {
-	if err := cu.Exec(ctx); err != nil {
+func (_u *CounterUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cu *CounterUpdate) check() error {
-	if v, ok := cu.mutation.Name(); ok {
+func (_u *CounterUpdate) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := counter.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Counter.name": %w`, err)}
 		}
@@ -104,28 +104,28 @@ func (cu *CounterUpdate) check() error {
 	return nil
 }
 
-func (cu *CounterUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := cu.check(); err != nil {
-		return n, err
+func (_u *CounterUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(counter.Table, counter.Columns, sqlgraph.NewFieldSpec(counter.FieldID, field.TypeInt))
-	if ps := cu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(counter.FieldName, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.Value(); ok {
+	if value, ok := _u.mutation.Value(); ok {
 		_spec.SetField(counter.FieldValue, field.TypeInt64, value)
 	}
-	if value, ok := cu.mutation.AddedValue(); ok {
+	if value, ok := _u.mutation.AddedValue(); ok {
 		_spec.AddField(counter.FieldValue, field.TypeInt64, value)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{counter.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -133,8 +133,8 @@ func (cu *CounterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	cu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // CounterUpdateOne is the builder for updating a single Counter entity.
@@ -146,66 +146,66 @@ type CounterUpdateOne struct {
 }
 
 // SetName sets the "name" field.
-func (cuo *CounterUpdateOne) SetName(s string) *CounterUpdateOne {
-	cuo.mutation.SetName(s)
-	return cuo
+func (_u *CounterUpdateOne) SetName(v string) *CounterUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (cuo *CounterUpdateOne) SetNillableName(s *string) *CounterUpdateOne {
-	if s != nil {
-		cuo.SetName(*s)
+func (_u *CounterUpdateOne) SetNillableName(v *string) *CounterUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return cuo
+	return _u
 }
 
 // SetValue sets the "value" field.
-func (cuo *CounterUpdateOne) SetValue(i int64) *CounterUpdateOne {
-	cuo.mutation.ResetValue()
-	cuo.mutation.SetValue(i)
-	return cuo
+func (_u *CounterUpdateOne) SetValue(v int64) *CounterUpdateOne {
+	_u.mutation.ResetValue()
+	_u.mutation.SetValue(v)
+	return _u
 }
 
 // SetNillableValue sets the "value" field if the given value is not nil.
-func (cuo *CounterUpdateOne) SetNillableValue(i *int64) *CounterUpdateOne {
-	if i != nil {
-		cuo.SetValue(*i)
+func (_u *CounterUpdateOne) SetNillableValue(v *int64) *CounterUpdateOne {
+	if v != nil {
+		_u.SetValue(*v)
 	}
-	return cuo
+	return _u
 }
 
-// AddValue adds i to the "value" field.
-func (cuo *CounterUpdateOne) AddValue(i int64) *CounterUpdateOne {
-	cuo.mutation.AddValue(i)
-	return cuo
+// AddValue adds value to the "value" field.
+func (_u *CounterUpdateOne) AddValue(v int64) *CounterUpdateOne {
+	_u.mutation.AddValue(v)
+	return _u
 }
 
 // Mutation returns the CounterMutation object of the builder.
-func (cuo *CounterUpdateOne) Mutation() *CounterMutation {
-	return cuo.mutation
+func (_u *CounterUpdateOne) Mutation() *CounterMutation {
+	return _u.mutation
 }
 
 // Where appends a list predicates to the CounterUpdate builder.
-func (cuo *CounterUpdateOne) Where(ps ...predicate.Counter) *CounterUpdateOne {
-	cuo.mutation.Where(ps...)
-	return cuo
+func (_u *CounterUpdateOne) Where(ps ...predicate.Counter) *CounterUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (cuo *CounterUpdateOne) Select(field string, fields ...string) *CounterUpdateOne {
-	cuo.fields = append([]string{field}, fields...)
-	return cuo
+func (_u *CounterUpdateOne) Select(field string, fields ...string) *CounterUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Counter entity.
-func (cuo *CounterUpdateOne) Save(ctx context.Context) (*Counter, error) {
-	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+func (_u *CounterUpdateOne) Save(ctx context.Context) (*Counter, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cuo *CounterUpdateOne) SaveX(ctx context.Context) *Counter {
-	node, err := cuo.Save(ctx)
+func (_u *CounterUpdateOne) SaveX(ctx context.Context) *Counter {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -213,21 +213,21 @@ func (cuo *CounterUpdateOne) SaveX(ctx context.Context) *Counter {
 }
 
 // Exec executes the query on the entity.
-func (cuo *CounterUpdateOne) Exec(ctx context.Context) error {
-	_, err := cuo.Save(ctx)
+func (_u *CounterUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cuo *CounterUpdateOne) ExecX(ctx context.Context) {
-	if err := cuo.Exec(ctx); err != nil {
+func (_u *CounterUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cuo *CounterUpdateOne) check() error {
-	if v, ok := cuo.mutation.Name(); ok {
+func (_u *CounterUpdateOne) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := counter.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Counter.name": %w`, err)}
 		}
@@ -235,17 +235,17 @@ func (cuo *CounterUpdateOne) check() error {
 	return nil
 }
 
-func (cuo *CounterUpdateOne) sqlSave(ctx context.Context) (_node *Counter, err error) {
-	if err := cuo.check(); err != nil {
+func (_u *CounterUpdateOne) sqlSave(ctx context.Context) (_node *Counter, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(counter.Table, counter.Columns, sqlgraph.NewFieldSpec(counter.FieldID, field.TypeInt))
-	id, ok := cuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Counter.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := cuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, counter.FieldID)
 		for _, f := range fields {
@@ -257,26 +257,26 @@ func (cuo *CounterUpdateOne) sqlSave(ctx context.Context) (_node *Counter, err e
 			}
 		}
 	}
-	if ps := cuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(counter.FieldName, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.Value(); ok {
+	if value, ok := _u.mutation.Value(); ok {
 		_spec.SetField(counter.FieldValue, field.TypeInt64, value)
 	}
-	if value, ok := cuo.mutation.AddedValue(); ok {
+	if value, ok := _u.mutation.AddedValue(); ok {
 		_spec.AddField(counter.FieldValue, field.TypeInt64, value)
 	}
-	_node = &Counter{config: cuo.config}
+	_node = &Counter{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, cuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{counter.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -284,6 +284,6 @@ func (cuo *CounterUpdateOne) sqlSave(ctx context.Context) (_node *Counter, err e
 		}
 		return nil, err
 	}
-	cuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

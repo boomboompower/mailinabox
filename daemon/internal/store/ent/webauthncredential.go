@@ -47,12 +47,10 @@ type WebAuthnCredentialEdges struct {
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e WebAuthnCredentialEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[0] {
-		if e.User == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.User != nil {
 		return e.User, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "user"}
 }
@@ -81,7 +79,7 @@ func (*WebAuthnCredential) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the WebAuthnCredential fields.
-func (wac *WebAuthnCredential) assignValues(columns []string, values []any) error {
+func (_m *WebAuthnCredential) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -92,47 +90,47 @@ func (wac *WebAuthnCredential) assignValues(columns []string, values []any) erro
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			wac.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case webauthncredential.FieldCredentialID:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field credential_id", values[i])
 			} else if value != nil {
-				wac.CredentialID = *value
+				_m.CredentialID = *value
 			}
 		case webauthncredential.FieldData:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field data", values[i])
 			} else if value.Valid {
-				wac.Data = value.String
+				_m.Data = value.String
 			}
 		case webauthncredential.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				wac.Name = value.String
+				_m.Name = value.String
 			}
 		case webauthncredential.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				wac.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case webauthncredential.FieldLastUsed:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field last_used", values[i])
 			} else if value.Valid {
-				wac.LastUsed = new(time.Time)
-				*wac.LastUsed = value.Time
+				_m.LastUsed = new(time.Time)
+				*_m.LastUsed = value.Time
 			}
 		case webauthncredential.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_webauthn_credentials", value)
 			} else if value.Valid {
-				wac.user_webauthn_credentials = new(int)
-				*wac.user_webauthn_credentials = int(value.Int64)
+				_m.user_webauthn_credentials = new(int)
+				*_m.user_webauthn_credentials = int(value.Int64)
 			}
 		default:
-			wac.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -140,50 +138,50 @@ func (wac *WebAuthnCredential) assignValues(columns []string, values []any) erro
 
 // Value returns the ent.Value that was dynamically selected and assigned to the WebAuthnCredential.
 // This includes values selected through modifiers, order, etc.
-func (wac *WebAuthnCredential) Value(name string) (ent.Value, error) {
-	return wac.selectValues.Get(name)
+func (_m *WebAuthnCredential) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryUser queries the "user" edge of the WebAuthnCredential entity.
-func (wac *WebAuthnCredential) QueryUser() *UserQuery {
-	return NewWebAuthnCredentialClient(wac.config).QueryUser(wac)
+func (_m *WebAuthnCredential) QueryUser() *UserQuery {
+	return NewWebAuthnCredentialClient(_m.config).QueryUser(_m)
 }
 
 // Update returns a builder for updating this WebAuthnCredential.
 // Note that you need to call WebAuthnCredential.Unwrap() before calling this method if this WebAuthnCredential
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (wac *WebAuthnCredential) Update() *WebAuthnCredentialUpdateOne {
-	return NewWebAuthnCredentialClient(wac.config).UpdateOne(wac)
+func (_m *WebAuthnCredential) Update() *WebAuthnCredentialUpdateOne {
+	return NewWebAuthnCredentialClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the WebAuthnCredential entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (wac *WebAuthnCredential) Unwrap() *WebAuthnCredential {
-	_tx, ok := wac.config.driver.(*txDriver)
+func (_m *WebAuthnCredential) Unwrap() *WebAuthnCredential {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: WebAuthnCredential is not a transactional entity")
 	}
-	wac.config.driver = _tx.drv
-	return wac
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (wac *WebAuthnCredential) String() string {
+func (_m *WebAuthnCredential) String() string {
 	var builder strings.Builder
 	builder.WriteString("WebAuthnCredential(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", wac.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("credential_id=")
-	builder.WriteString(fmt.Sprintf("%v", wac.CredentialID))
+	builder.WriteString(fmt.Sprintf("%v", _m.CredentialID))
 	builder.WriteString(", ")
 	builder.WriteString("data=<sensitive>")
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(wac.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(wac.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := wac.LastUsed; v != nil {
+	if v := _m.LastUsed; v != nil {
 		builder.WriteString("last_used=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}

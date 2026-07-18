@@ -25,93 +25,93 @@ type WebDomainCreate struct {
 }
 
 // SetDomain sets the "domain" field.
-func (wdc *WebDomainCreate) SetDomain(s string) *WebDomainCreate {
-	wdc.mutation.SetDomain(s)
-	return wdc
+func (_c *WebDomainCreate) SetDomain(v string) *WebDomainCreate {
+	_c.mutation.SetDomain(v)
+	return _c
 }
 
 // SetHsts sets the "hsts" field.
-func (wdc *WebDomainCreate) SetHsts(w webdomain.Hsts) *WebDomainCreate {
-	wdc.mutation.SetHsts(w)
-	return wdc
+func (_c *WebDomainCreate) SetHsts(v webdomain.Hsts) *WebDomainCreate {
+	_c.mutation.SetHsts(v)
+	return _c
 }
 
 // SetNillableHsts sets the "hsts" field if the given value is not nil.
-func (wdc *WebDomainCreate) SetNillableHsts(w *webdomain.Hsts) *WebDomainCreate {
-	if w != nil {
-		wdc.SetHsts(*w)
+func (_c *WebDomainCreate) SetNillableHsts(v *webdomain.Hsts) *WebDomainCreate {
+	if v != nil {
+		_c.SetHsts(*v)
 	}
-	return wdc
+	return _c
 }
 
 // SetServeStatic sets the "serve_static" field.
-func (wdc *WebDomainCreate) SetServeStatic(b bool) *WebDomainCreate {
-	wdc.mutation.SetServeStatic(b)
-	return wdc
+func (_c *WebDomainCreate) SetServeStatic(v bool) *WebDomainCreate {
+	_c.mutation.SetServeStatic(v)
+	return _c
 }
 
 // SetNillableServeStatic sets the "serve_static" field if the given value is not nil.
-func (wdc *WebDomainCreate) SetNillableServeStatic(b *bool) *WebDomainCreate {
-	if b != nil {
-		wdc.SetServeStatic(*b)
+func (_c *WebDomainCreate) SetNillableServeStatic(v *bool) *WebDomainCreate {
+	if v != nil {
+		_c.SetServeStatic(*v)
 	}
-	return wdc
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (wdc *WebDomainCreate) SetCreatedAt(t time.Time) *WebDomainCreate {
-	wdc.mutation.SetCreatedAt(t)
-	return wdc
+func (_c *WebDomainCreate) SetCreatedAt(v time.Time) *WebDomainCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (wdc *WebDomainCreate) SetNillableCreatedAt(t *time.Time) *WebDomainCreate {
-	if t != nil {
-		wdc.SetCreatedAt(*t)
+func (_c *WebDomainCreate) SetNillableCreatedAt(v *time.Time) *WebDomainCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return wdc
+	return _c
 }
 
 // AddRuleIDs adds the "rules" edge to the WebRule entity by IDs.
-func (wdc *WebDomainCreate) AddRuleIDs(ids ...int) *WebDomainCreate {
-	wdc.mutation.AddRuleIDs(ids...)
-	return wdc
+func (_c *WebDomainCreate) AddRuleIDs(ids ...int) *WebDomainCreate {
+	_c.mutation.AddRuleIDs(ids...)
+	return _c
 }
 
 // AddRules adds the "rules" edges to the WebRule entity.
-func (wdc *WebDomainCreate) AddRules(w ...*WebRule) *WebDomainCreate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
+func (_c *WebDomainCreate) AddRules(v ...*WebRule) *WebDomainCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return wdc.AddRuleIDs(ids...)
+	return _c.AddRuleIDs(ids...)
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
-func (wdc *WebDomainCreate) SetTenantID(id int) *WebDomainCreate {
-	wdc.mutation.SetTenantID(id)
-	return wdc
+func (_c *WebDomainCreate) SetTenantID(id int) *WebDomainCreate {
+	_c.mutation.SetTenantID(id)
+	return _c
 }
 
 // SetTenant sets the "tenant" edge to the Tenant entity.
-func (wdc *WebDomainCreate) SetTenant(t *Tenant) *WebDomainCreate {
-	return wdc.SetTenantID(t.ID)
+func (_c *WebDomainCreate) SetTenant(v *Tenant) *WebDomainCreate {
+	return _c.SetTenantID(v.ID)
 }
 
 // Mutation returns the WebDomainMutation object of the builder.
-func (wdc *WebDomainCreate) Mutation() *WebDomainMutation {
-	return wdc.mutation
+func (_c *WebDomainCreate) Mutation() *WebDomainMutation {
+	return _c.mutation
 }
 
 // Save creates the WebDomain in the database.
-func (wdc *WebDomainCreate) Save(ctx context.Context) (*WebDomain, error) {
-	wdc.defaults()
-	return withHooks(ctx, wdc.sqlSave, wdc.mutation, wdc.hooks)
+func (_c *WebDomainCreate) Save(ctx context.Context) (*WebDomain, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (wdc *WebDomainCreate) SaveX(ctx context.Context) *WebDomain {
-	v, err := wdc.Save(ctx)
+func (_c *WebDomainCreate) SaveX(ctx context.Context) *WebDomain {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -119,70 +119,70 @@ func (wdc *WebDomainCreate) SaveX(ctx context.Context) *WebDomain {
 }
 
 // Exec executes the query.
-func (wdc *WebDomainCreate) Exec(ctx context.Context) error {
-	_, err := wdc.Save(ctx)
+func (_c *WebDomainCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wdc *WebDomainCreate) ExecX(ctx context.Context) {
-	if err := wdc.Exec(ctx); err != nil {
+func (_c *WebDomainCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (wdc *WebDomainCreate) defaults() {
-	if _, ok := wdc.mutation.Hsts(); !ok {
+func (_c *WebDomainCreate) defaults() {
+	if _, ok := _c.mutation.Hsts(); !ok {
 		v := webdomain.DefaultHsts
-		wdc.mutation.SetHsts(v)
+		_c.mutation.SetHsts(v)
 	}
-	if _, ok := wdc.mutation.ServeStatic(); !ok {
+	if _, ok := _c.mutation.ServeStatic(); !ok {
 		v := webdomain.DefaultServeStatic
-		wdc.mutation.SetServeStatic(v)
+		_c.mutation.SetServeStatic(v)
 	}
-	if _, ok := wdc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := webdomain.DefaultCreatedAt()
-		wdc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (wdc *WebDomainCreate) check() error {
-	if _, ok := wdc.mutation.Domain(); !ok {
+func (_c *WebDomainCreate) check() error {
+	if _, ok := _c.mutation.Domain(); !ok {
 		return &ValidationError{Name: "domain", err: errors.New(`ent: missing required field "WebDomain.domain"`)}
 	}
-	if v, ok := wdc.mutation.Domain(); ok {
+	if v, ok := _c.mutation.Domain(); ok {
 		if err := webdomain.DomainValidator(v); err != nil {
 			return &ValidationError{Name: "domain", err: fmt.Errorf(`ent: validator failed for field "WebDomain.domain": %w`, err)}
 		}
 	}
-	if _, ok := wdc.mutation.Hsts(); !ok {
+	if _, ok := _c.mutation.Hsts(); !ok {
 		return &ValidationError{Name: "hsts", err: errors.New(`ent: missing required field "WebDomain.hsts"`)}
 	}
-	if v, ok := wdc.mutation.Hsts(); ok {
+	if v, ok := _c.mutation.Hsts(); ok {
 		if err := webdomain.HstsValidator(v); err != nil {
 			return &ValidationError{Name: "hsts", err: fmt.Errorf(`ent: validator failed for field "WebDomain.hsts": %w`, err)}
 		}
 	}
-	if _, ok := wdc.mutation.ServeStatic(); !ok {
+	if _, ok := _c.mutation.ServeStatic(); !ok {
 		return &ValidationError{Name: "serve_static", err: errors.New(`ent: missing required field "WebDomain.serve_static"`)}
 	}
-	if _, ok := wdc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "WebDomain.created_at"`)}
 	}
-	if _, ok := wdc.mutation.TenantID(); !ok {
+	if len(_c.mutation.TenantIDs()) == 0 {
 		return &ValidationError{Name: "tenant", err: errors.New(`ent: missing required edge "WebDomain.tenant"`)}
 	}
 	return nil
 }
 
-func (wdc *WebDomainCreate) sqlSave(ctx context.Context) (*WebDomain, error) {
-	if err := wdc.check(); err != nil {
+func (_c *WebDomainCreate) sqlSave(ctx context.Context) (*WebDomain, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := wdc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, wdc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -190,34 +190,34 @@ func (wdc *WebDomainCreate) sqlSave(ctx context.Context) (*WebDomain, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	wdc.mutation.id = &_node.ID
-	wdc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (wdc *WebDomainCreate) createSpec() (*WebDomain, *sqlgraph.CreateSpec) {
+func (_c *WebDomainCreate) createSpec() (*WebDomain, *sqlgraph.CreateSpec) {
 	var (
-		_node = &WebDomain{config: wdc.config}
+		_node = &WebDomain{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(webdomain.Table, sqlgraph.NewFieldSpec(webdomain.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = wdc.conflict
-	if value, ok := wdc.mutation.Domain(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.Domain(); ok {
 		_spec.SetField(webdomain.FieldDomain, field.TypeString, value)
 		_node.Domain = value
 	}
-	if value, ok := wdc.mutation.Hsts(); ok {
+	if value, ok := _c.mutation.Hsts(); ok {
 		_spec.SetField(webdomain.FieldHsts, field.TypeEnum, value)
 		_node.Hsts = value
 	}
-	if value, ok := wdc.mutation.ServeStatic(); ok {
+	if value, ok := _c.mutation.ServeStatic(); ok {
 		_spec.SetField(webdomain.FieldServeStatic, field.TypeBool, value)
 		_node.ServeStatic = value
 	}
-	if value, ok := wdc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(webdomain.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if nodes := wdc.mutation.RulesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.RulesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -233,7 +233,7 @@ func (wdc *WebDomainCreate) createSpec() (*WebDomain, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := wdc.mutation.TenantIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.TenantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -269,10 +269,10 @@ func (wdc *WebDomainCreate) createSpec() (*WebDomain, *sqlgraph.CreateSpec) {
 //			SetDomain(v+v).
 //		}).
 //		Exec(ctx)
-func (wdc *WebDomainCreate) OnConflict(opts ...sql.ConflictOption) *WebDomainUpsertOne {
-	wdc.conflict = opts
+func (_c *WebDomainCreate) OnConflict(opts ...sql.ConflictOption) *WebDomainUpsertOne {
+	_c.conflict = opts
 	return &WebDomainUpsertOne{
-		create: wdc,
+		create: _c,
 	}
 }
 
@@ -282,10 +282,10 @@ func (wdc *WebDomainCreate) OnConflict(opts ...sql.ConflictOption) *WebDomainUps
 //	client.WebDomain.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (wdc *WebDomainCreate) OnConflictColumns(columns ...string) *WebDomainUpsertOne {
-	wdc.conflict = append(wdc.conflict, sql.ConflictColumns(columns...))
+func (_c *WebDomainCreate) OnConflictColumns(columns ...string) *WebDomainUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &WebDomainUpsertOne{
-		create: wdc,
+		create: _c,
 	}
 }
 
@@ -467,16 +467,16 @@ type WebDomainCreateBulk struct {
 }
 
 // Save creates the WebDomain entities in the database.
-func (wdcb *WebDomainCreateBulk) Save(ctx context.Context) ([]*WebDomain, error) {
-	if wdcb.err != nil {
-		return nil, wdcb.err
+func (_c *WebDomainCreateBulk) Save(ctx context.Context) ([]*WebDomain, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(wdcb.builders))
-	nodes := make([]*WebDomain, len(wdcb.builders))
-	mutators := make([]Mutator, len(wdcb.builders))
-	for i := range wdcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*WebDomain, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := wdcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*WebDomainMutation)
@@ -490,12 +490,12 @@ func (wdcb *WebDomainCreateBulk) Save(ctx context.Context) ([]*WebDomain, error)
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, wdcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = wdcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, wdcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -519,7 +519,7 @@ func (wdcb *WebDomainCreateBulk) Save(ctx context.Context) ([]*WebDomain, error)
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, wdcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -527,8 +527,8 @@ func (wdcb *WebDomainCreateBulk) Save(ctx context.Context) ([]*WebDomain, error)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (wdcb *WebDomainCreateBulk) SaveX(ctx context.Context) []*WebDomain {
-	v, err := wdcb.Save(ctx)
+func (_c *WebDomainCreateBulk) SaveX(ctx context.Context) []*WebDomain {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -536,14 +536,14 @@ func (wdcb *WebDomainCreateBulk) SaveX(ctx context.Context) []*WebDomain {
 }
 
 // Exec executes the query.
-func (wdcb *WebDomainCreateBulk) Exec(ctx context.Context) error {
-	_, err := wdcb.Save(ctx)
+func (_c *WebDomainCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wdcb *WebDomainCreateBulk) ExecX(ctx context.Context) {
-	if err := wdcb.Exec(ctx); err != nil {
+func (_c *WebDomainCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -563,10 +563,10 @@ func (wdcb *WebDomainCreateBulk) ExecX(ctx context.Context) {
 //			SetDomain(v+v).
 //		}).
 //		Exec(ctx)
-func (wdcb *WebDomainCreateBulk) OnConflict(opts ...sql.ConflictOption) *WebDomainUpsertBulk {
-	wdcb.conflict = opts
+func (_c *WebDomainCreateBulk) OnConflict(opts ...sql.ConflictOption) *WebDomainUpsertBulk {
+	_c.conflict = opts
 	return &WebDomainUpsertBulk{
-		create: wdcb,
+		create: _c,
 	}
 }
 
@@ -576,10 +576,10 @@ func (wdcb *WebDomainCreateBulk) OnConflict(opts ...sql.ConflictOption) *WebDoma
 //	client.WebDomain.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (wdcb *WebDomainCreateBulk) OnConflictColumns(columns ...string) *WebDomainUpsertBulk {
-	wdcb.conflict = append(wdcb.conflict, sql.ConflictColumns(columns...))
+func (_c *WebDomainCreateBulk) OnConflictColumns(columns ...string) *WebDomainUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &WebDomainUpsertBulk{
-		create: wdcb,
+		create: _c,
 	}
 }
 

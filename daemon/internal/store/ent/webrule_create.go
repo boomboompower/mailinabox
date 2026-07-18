@@ -23,104 +23,104 @@ type WebRuleCreate struct {
 }
 
 // SetKind sets the "kind" field.
-func (wrc *WebRuleCreate) SetKind(w webrule.Kind) *WebRuleCreate {
-	wrc.mutation.SetKind(w)
-	return wrc
+func (_c *WebRuleCreate) SetKind(v webrule.Kind) *WebRuleCreate {
+	_c.mutation.SetKind(v)
+	return _c
 }
 
 // SetPath sets the "path" field.
-func (wrc *WebRuleCreate) SetPath(s string) *WebRuleCreate {
-	wrc.mutation.SetPath(s)
-	return wrc
+func (_c *WebRuleCreate) SetPath(v string) *WebRuleCreate {
+	_c.mutation.SetPath(v)
+	return _c
 }
 
 // SetTarget sets the "target" field.
-func (wrc *WebRuleCreate) SetTarget(s string) *WebRuleCreate {
-	wrc.mutation.SetTarget(s)
-	return wrc
+func (_c *WebRuleCreate) SetTarget(v string) *WebRuleCreate {
+	_c.mutation.SetTarget(v)
+	return _c
 }
 
 // SetPassHostHeader sets the "pass_host_header" field.
-func (wrc *WebRuleCreate) SetPassHostHeader(b bool) *WebRuleCreate {
-	wrc.mutation.SetPassHostHeader(b)
-	return wrc
+func (_c *WebRuleCreate) SetPassHostHeader(v bool) *WebRuleCreate {
+	_c.mutation.SetPassHostHeader(v)
+	return _c
 }
 
 // SetNillablePassHostHeader sets the "pass_host_header" field if the given value is not nil.
-func (wrc *WebRuleCreate) SetNillablePassHostHeader(b *bool) *WebRuleCreate {
-	if b != nil {
-		wrc.SetPassHostHeader(*b)
+func (_c *WebRuleCreate) SetNillablePassHostHeader(v *bool) *WebRuleCreate {
+	if v != nil {
+		_c.SetPassHostHeader(*v)
 	}
-	return wrc
+	return _c
 }
 
 // SetNoProxyRedirect sets the "no_proxy_redirect" field.
-func (wrc *WebRuleCreate) SetNoProxyRedirect(b bool) *WebRuleCreate {
-	wrc.mutation.SetNoProxyRedirect(b)
-	return wrc
+func (_c *WebRuleCreate) SetNoProxyRedirect(v bool) *WebRuleCreate {
+	_c.mutation.SetNoProxyRedirect(v)
+	return _c
 }
 
 // SetNillableNoProxyRedirect sets the "no_proxy_redirect" field if the given value is not nil.
-func (wrc *WebRuleCreate) SetNillableNoProxyRedirect(b *bool) *WebRuleCreate {
-	if b != nil {
-		wrc.SetNoProxyRedirect(*b)
+func (_c *WebRuleCreate) SetNillableNoProxyRedirect(v *bool) *WebRuleCreate {
+	if v != nil {
+		_c.SetNoProxyRedirect(*v)
 	}
-	return wrc
+	return _c
 }
 
 // SetFrameSameOrigin sets the "frame_same_origin" field.
-func (wrc *WebRuleCreate) SetFrameSameOrigin(b bool) *WebRuleCreate {
-	wrc.mutation.SetFrameSameOrigin(b)
-	return wrc
+func (_c *WebRuleCreate) SetFrameSameOrigin(v bool) *WebRuleCreate {
+	_c.mutation.SetFrameSameOrigin(v)
+	return _c
 }
 
 // SetNillableFrameSameOrigin sets the "frame_same_origin" field if the given value is not nil.
-func (wrc *WebRuleCreate) SetNillableFrameSameOrigin(b *bool) *WebRuleCreate {
-	if b != nil {
-		wrc.SetFrameSameOrigin(*b)
+func (_c *WebRuleCreate) SetNillableFrameSameOrigin(v *bool) *WebRuleCreate {
+	if v != nil {
+		_c.SetFrameSameOrigin(*v)
 	}
-	return wrc
+	return _c
 }
 
 // SetWebSockets sets the "web_sockets" field.
-func (wrc *WebRuleCreate) SetWebSockets(b bool) *WebRuleCreate {
-	wrc.mutation.SetWebSockets(b)
-	return wrc
+func (_c *WebRuleCreate) SetWebSockets(v bool) *WebRuleCreate {
+	_c.mutation.SetWebSockets(v)
+	return _c
 }
 
 // SetNillableWebSockets sets the "web_sockets" field if the given value is not nil.
-func (wrc *WebRuleCreate) SetNillableWebSockets(b *bool) *WebRuleCreate {
-	if b != nil {
-		wrc.SetWebSockets(*b)
+func (_c *WebRuleCreate) SetNillableWebSockets(v *bool) *WebRuleCreate {
+	if v != nil {
+		_c.SetWebSockets(*v)
 	}
-	return wrc
+	return _c
 }
 
 // SetDomainID sets the "domain" edge to the WebDomain entity by ID.
-func (wrc *WebRuleCreate) SetDomainID(id int) *WebRuleCreate {
-	wrc.mutation.SetDomainID(id)
-	return wrc
+func (_c *WebRuleCreate) SetDomainID(id int) *WebRuleCreate {
+	_c.mutation.SetDomainID(id)
+	return _c
 }
 
 // SetDomain sets the "domain" edge to the WebDomain entity.
-func (wrc *WebRuleCreate) SetDomain(w *WebDomain) *WebRuleCreate {
-	return wrc.SetDomainID(w.ID)
+func (_c *WebRuleCreate) SetDomain(v *WebDomain) *WebRuleCreate {
+	return _c.SetDomainID(v.ID)
 }
 
 // Mutation returns the WebRuleMutation object of the builder.
-func (wrc *WebRuleCreate) Mutation() *WebRuleMutation {
-	return wrc.mutation
+func (_c *WebRuleCreate) Mutation() *WebRuleMutation {
+	return _c.mutation
 }
 
 // Save creates the WebRule in the database.
-func (wrc *WebRuleCreate) Save(ctx context.Context) (*WebRule, error) {
-	wrc.defaults()
-	return withHooks(ctx, wrc.sqlSave, wrc.mutation, wrc.hooks)
+func (_c *WebRuleCreate) Save(ctx context.Context) (*WebRule, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (wrc *WebRuleCreate) SaveX(ctx context.Context) *WebRule {
-	v, err := wrc.Save(ctx)
+func (_c *WebRuleCreate) SaveX(ctx context.Context) *WebRule {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -128,88 +128,88 @@ func (wrc *WebRuleCreate) SaveX(ctx context.Context) *WebRule {
 }
 
 // Exec executes the query.
-func (wrc *WebRuleCreate) Exec(ctx context.Context) error {
-	_, err := wrc.Save(ctx)
+func (_c *WebRuleCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wrc *WebRuleCreate) ExecX(ctx context.Context) {
-	if err := wrc.Exec(ctx); err != nil {
+func (_c *WebRuleCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (wrc *WebRuleCreate) defaults() {
-	if _, ok := wrc.mutation.PassHostHeader(); !ok {
+func (_c *WebRuleCreate) defaults() {
+	if _, ok := _c.mutation.PassHostHeader(); !ok {
 		v := webrule.DefaultPassHostHeader
-		wrc.mutation.SetPassHostHeader(v)
+		_c.mutation.SetPassHostHeader(v)
 	}
-	if _, ok := wrc.mutation.NoProxyRedirect(); !ok {
+	if _, ok := _c.mutation.NoProxyRedirect(); !ok {
 		v := webrule.DefaultNoProxyRedirect
-		wrc.mutation.SetNoProxyRedirect(v)
+		_c.mutation.SetNoProxyRedirect(v)
 	}
-	if _, ok := wrc.mutation.FrameSameOrigin(); !ok {
+	if _, ok := _c.mutation.FrameSameOrigin(); !ok {
 		v := webrule.DefaultFrameSameOrigin
-		wrc.mutation.SetFrameSameOrigin(v)
+		_c.mutation.SetFrameSameOrigin(v)
 	}
-	if _, ok := wrc.mutation.WebSockets(); !ok {
+	if _, ok := _c.mutation.WebSockets(); !ok {
 		v := webrule.DefaultWebSockets
-		wrc.mutation.SetWebSockets(v)
+		_c.mutation.SetWebSockets(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (wrc *WebRuleCreate) check() error {
-	if _, ok := wrc.mutation.Kind(); !ok {
+func (_c *WebRuleCreate) check() error {
+	if _, ok := _c.mutation.Kind(); !ok {
 		return &ValidationError{Name: "kind", err: errors.New(`ent: missing required field "WebRule.kind"`)}
 	}
-	if v, ok := wrc.mutation.Kind(); ok {
+	if v, ok := _c.mutation.Kind(); ok {
 		if err := webrule.KindValidator(v); err != nil {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "WebRule.kind": %w`, err)}
 		}
 	}
-	if _, ok := wrc.mutation.Path(); !ok {
+	if _, ok := _c.mutation.Path(); !ok {
 		return &ValidationError{Name: "path", err: errors.New(`ent: missing required field "WebRule.path"`)}
 	}
-	if v, ok := wrc.mutation.Path(); ok {
+	if v, ok := _c.mutation.Path(); ok {
 		if err := webrule.PathValidator(v); err != nil {
 			return &ValidationError{Name: "path", err: fmt.Errorf(`ent: validator failed for field "WebRule.path": %w`, err)}
 		}
 	}
-	if _, ok := wrc.mutation.Target(); !ok {
+	if _, ok := _c.mutation.Target(); !ok {
 		return &ValidationError{Name: "target", err: errors.New(`ent: missing required field "WebRule.target"`)}
 	}
-	if v, ok := wrc.mutation.Target(); ok {
+	if v, ok := _c.mutation.Target(); ok {
 		if err := webrule.TargetValidator(v); err != nil {
 			return &ValidationError{Name: "target", err: fmt.Errorf(`ent: validator failed for field "WebRule.target": %w`, err)}
 		}
 	}
-	if _, ok := wrc.mutation.PassHostHeader(); !ok {
+	if _, ok := _c.mutation.PassHostHeader(); !ok {
 		return &ValidationError{Name: "pass_host_header", err: errors.New(`ent: missing required field "WebRule.pass_host_header"`)}
 	}
-	if _, ok := wrc.mutation.NoProxyRedirect(); !ok {
+	if _, ok := _c.mutation.NoProxyRedirect(); !ok {
 		return &ValidationError{Name: "no_proxy_redirect", err: errors.New(`ent: missing required field "WebRule.no_proxy_redirect"`)}
 	}
-	if _, ok := wrc.mutation.FrameSameOrigin(); !ok {
+	if _, ok := _c.mutation.FrameSameOrigin(); !ok {
 		return &ValidationError{Name: "frame_same_origin", err: errors.New(`ent: missing required field "WebRule.frame_same_origin"`)}
 	}
-	if _, ok := wrc.mutation.WebSockets(); !ok {
+	if _, ok := _c.mutation.WebSockets(); !ok {
 		return &ValidationError{Name: "web_sockets", err: errors.New(`ent: missing required field "WebRule.web_sockets"`)}
 	}
-	if _, ok := wrc.mutation.DomainID(); !ok {
+	if len(_c.mutation.DomainIDs()) == 0 {
 		return &ValidationError{Name: "domain", err: errors.New(`ent: missing required edge "WebRule.domain"`)}
 	}
 	return nil
 }
 
-func (wrc *WebRuleCreate) sqlSave(ctx context.Context) (*WebRule, error) {
-	if err := wrc.check(); err != nil {
+func (_c *WebRuleCreate) sqlSave(ctx context.Context) (*WebRule, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := wrc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, wrc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -217,46 +217,46 @@ func (wrc *WebRuleCreate) sqlSave(ctx context.Context) (*WebRule, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	wrc.mutation.id = &_node.ID
-	wrc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (wrc *WebRuleCreate) createSpec() (*WebRule, *sqlgraph.CreateSpec) {
+func (_c *WebRuleCreate) createSpec() (*WebRule, *sqlgraph.CreateSpec) {
 	var (
-		_node = &WebRule{config: wrc.config}
+		_node = &WebRule{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(webrule.Table, sqlgraph.NewFieldSpec(webrule.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = wrc.conflict
-	if value, ok := wrc.mutation.Kind(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.Kind(); ok {
 		_spec.SetField(webrule.FieldKind, field.TypeEnum, value)
 		_node.Kind = value
 	}
-	if value, ok := wrc.mutation.Path(); ok {
+	if value, ok := _c.mutation.Path(); ok {
 		_spec.SetField(webrule.FieldPath, field.TypeString, value)
 		_node.Path = value
 	}
-	if value, ok := wrc.mutation.Target(); ok {
+	if value, ok := _c.mutation.Target(); ok {
 		_spec.SetField(webrule.FieldTarget, field.TypeString, value)
 		_node.Target = value
 	}
-	if value, ok := wrc.mutation.PassHostHeader(); ok {
+	if value, ok := _c.mutation.PassHostHeader(); ok {
 		_spec.SetField(webrule.FieldPassHostHeader, field.TypeBool, value)
 		_node.PassHostHeader = value
 	}
-	if value, ok := wrc.mutation.NoProxyRedirect(); ok {
+	if value, ok := _c.mutation.NoProxyRedirect(); ok {
 		_spec.SetField(webrule.FieldNoProxyRedirect, field.TypeBool, value)
 		_node.NoProxyRedirect = value
 	}
-	if value, ok := wrc.mutation.FrameSameOrigin(); ok {
+	if value, ok := _c.mutation.FrameSameOrigin(); ok {
 		_spec.SetField(webrule.FieldFrameSameOrigin, field.TypeBool, value)
 		_node.FrameSameOrigin = value
 	}
-	if value, ok := wrc.mutation.WebSockets(); ok {
+	if value, ok := _c.mutation.WebSockets(); ok {
 		_spec.SetField(webrule.FieldWebSockets, field.TypeBool, value)
 		_node.WebSockets = value
 	}
-	if nodes := wrc.mutation.DomainIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.DomainIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -292,10 +292,10 @@ func (wrc *WebRuleCreate) createSpec() (*WebRule, *sqlgraph.CreateSpec) {
 //			SetKind(v+v).
 //		}).
 //		Exec(ctx)
-func (wrc *WebRuleCreate) OnConflict(opts ...sql.ConflictOption) *WebRuleUpsertOne {
-	wrc.conflict = opts
+func (_c *WebRuleCreate) OnConflict(opts ...sql.ConflictOption) *WebRuleUpsertOne {
+	_c.conflict = opts
 	return &WebRuleUpsertOne{
-		create: wrc,
+		create: _c,
 	}
 }
 
@@ -305,10 +305,10 @@ func (wrc *WebRuleCreate) OnConflict(opts ...sql.ConflictOption) *WebRuleUpsertO
 //	client.WebRule.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (wrc *WebRuleCreate) OnConflictColumns(columns ...string) *WebRuleUpsertOne {
-	wrc.conflict = append(wrc.conflict, sql.ConflictColumns(columns...))
+func (_c *WebRuleCreate) OnConflictColumns(columns ...string) *WebRuleUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &WebRuleUpsertOne{
-		create: wrc,
+		create: _c,
 	}
 }
 
@@ -589,16 +589,16 @@ type WebRuleCreateBulk struct {
 }
 
 // Save creates the WebRule entities in the database.
-func (wrcb *WebRuleCreateBulk) Save(ctx context.Context) ([]*WebRule, error) {
-	if wrcb.err != nil {
-		return nil, wrcb.err
+func (_c *WebRuleCreateBulk) Save(ctx context.Context) ([]*WebRule, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(wrcb.builders))
-	nodes := make([]*WebRule, len(wrcb.builders))
-	mutators := make([]Mutator, len(wrcb.builders))
-	for i := range wrcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*WebRule, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := wrcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*WebRuleMutation)
@@ -612,12 +612,12 @@ func (wrcb *WebRuleCreateBulk) Save(ctx context.Context) ([]*WebRule, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, wrcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = wrcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, wrcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -641,7 +641,7 @@ func (wrcb *WebRuleCreateBulk) Save(ctx context.Context) ([]*WebRule, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, wrcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -649,8 +649,8 @@ func (wrcb *WebRuleCreateBulk) Save(ctx context.Context) ([]*WebRule, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (wrcb *WebRuleCreateBulk) SaveX(ctx context.Context) []*WebRule {
-	v, err := wrcb.Save(ctx)
+func (_c *WebRuleCreateBulk) SaveX(ctx context.Context) []*WebRule {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -658,14 +658,14 @@ func (wrcb *WebRuleCreateBulk) SaveX(ctx context.Context) []*WebRule {
 }
 
 // Exec executes the query.
-func (wrcb *WebRuleCreateBulk) Exec(ctx context.Context) error {
-	_, err := wrcb.Save(ctx)
+func (_c *WebRuleCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wrcb *WebRuleCreateBulk) ExecX(ctx context.Context) {
-	if err := wrcb.Exec(ctx); err != nil {
+func (_c *WebRuleCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -685,10 +685,10 @@ func (wrcb *WebRuleCreateBulk) ExecX(ctx context.Context) {
 //			SetKind(v+v).
 //		}).
 //		Exec(ctx)
-func (wrcb *WebRuleCreateBulk) OnConflict(opts ...sql.ConflictOption) *WebRuleUpsertBulk {
-	wrcb.conflict = opts
+func (_c *WebRuleCreateBulk) OnConflict(opts ...sql.ConflictOption) *WebRuleUpsertBulk {
+	_c.conflict = opts
 	return &WebRuleUpsertBulk{
-		create: wrcb,
+		create: _c,
 	}
 }
 
@@ -698,10 +698,10 @@ func (wrcb *WebRuleCreateBulk) OnConflict(opts ...sql.ConflictOption) *WebRuleUp
 //	client.WebRule.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (wrcb *WebRuleCreateBulk) OnConflictColumns(columns ...string) *WebRuleUpsertBulk {
-	wrcb.conflict = append(wrcb.conflict, sql.ConflictColumns(columns...))
+func (_c *WebRuleCreateBulk) OnConflictColumns(columns ...string) *WebRuleUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &WebRuleUpsertBulk{
-		create: wrcb,
+		create: _c,
 	}
 }
 

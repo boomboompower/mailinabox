@@ -23,83 +23,83 @@ type DNSRecordUpdate struct {
 }
 
 // Where appends a list predicates to the DNSRecordUpdate builder.
-func (dru *DNSRecordUpdate) Where(ps ...predicate.DNSRecord) *DNSRecordUpdate {
-	dru.mutation.Where(ps...)
-	return dru
+func (_u *DNSRecordUpdate) Where(ps ...predicate.DNSRecord) *DNSRecordUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetQname sets the "qname" field.
-func (dru *DNSRecordUpdate) SetQname(s string) *DNSRecordUpdate {
-	dru.mutation.SetQname(s)
-	return dru
+func (_u *DNSRecordUpdate) SetQname(v string) *DNSRecordUpdate {
+	_u.mutation.SetQname(v)
+	return _u
 }
 
 // SetNillableQname sets the "qname" field if the given value is not nil.
-func (dru *DNSRecordUpdate) SetNillableQname(s *string) *DNSRecordUpdate {
-	if s != nil {
-		dru.SetQname(*s)
+func (_u *DNSRecordUpdate) SetNillableQname(v *string) *DNSRecordUpdate {
+	if v != nil {
+		_u.SetQname(*v)
 	}
-	return dru
+	return _u
 }
 
 // SetRtype sets the "rtype" field.
-func (dru *DNSRecordUpdate) SetRtype(d dnsrecord.Rtype) *DNSRecordUpdate {
-	dru.mutation.SetRtype(d)
-	return dru
+func (_u *DNSRecordUpdate) SetRtype(v dnsrecord.Rtype) *DNSRecordUpdate {
+	_u.mutation.SetRtype(v)
+	return _u
 }
 
 // SetNillableRtype sets the "rtype" field if the given value is not nil.
-func (dru *DNSRecordUpdate) SetNillableRtype(d *dnsrecord.Rtype) *DNSRecordUpdate {
-	if d != nil {
-		dru.SetRtype(*d)
+func (_u *DNSRecordUpdate) SetNillableRtype(v *dnsrecord.Rtype) *DNSRecordUpdate {
+	if v != nil {
+		_u.SetRtype(*v)
 	}
-	return dru
+	return _u
 }
 
 // SetValue sets the "value" field.
-func (dru *DNSRecordUpdate) SetValue(s string) *DNSRecordUpdate {
-	dru.mutation.SetValue(s)
-	return dru
+func (_u *DNSRecordUpdate) SetValue(v string) *DNSRecordUpdate {
+	_u.mutation.SetValue(v)
+	return _u
 }
 
 // SetNillableValue sets the "value" field if the given value is not nil.
-func (dru *DNSRecordUpdate) SetNillableValue(s *string) *DNSRecordUpdate {
-	if s != nil {
-		dru.SetValue(*s)
+func (_u *DNSRecordUpdate) SetNillableValue(v *string) *DNSRecordUpdate {
+	if v != nil {
+		_u.SetValue(*v)
 	}
-	return dru
+	return _u
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
-func (dru *DNSRecordUpdate) SetTenantID(id int) *DNSRecordUpdate {
-	dru.mutation.SetTenantID(id)
-	return dru
+func (_u *DNSRecordUpdate) SetTenantID(id int) *DNSRecordUpdate {
+	_u.mutation.SetTenantID(id)
+	return _u
 }
 
 // SetTenant sets the "tenant" edge to the Tenant entity.
-func (dru *DNSRecordUpdate) SetTenant(t *Tenant) *DNSRecordUpdate {
-	return dru.SetTenantID(t.ID)
+func (_u *DNSRecordUpdate) SetTenant(v *Tenant) *DNSRecordUpdate {
+	return _u.SetTenantID(v.ID)
 }
 
 // Mutation returns the DNSRecordMutation object of the builder.
-func (dru *DNSRecordUpdate) Mutation() *DNSRecordMutation {
-	return dru.mutation
+func (_u *DNSRecordUpdate) Mutation() *DNSRecordMutation {
+	return _u.mutation
 }
 
 // ClearTenant clears the "tenant" edge to the Tenant entity.
-func (dru *DNSRecordUpdate) ClearTenant() *DNSRecordUpdate {
-	dru.mutation.ClearTenant()
-	return dru
+func (_u *DNSRecordUpdate) ClearTenant() *DNSRecordUpdate {
+	_u.mutation.ClearTenant()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (dru *DNSRecordUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, dru.sqlSave, dru.mutation, dru.hooks)
+func (_u *DNSRecordUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (dru *DNSRecordUpdate) SaveX(ctx context.Context) int {
-	affected, err := dru.Save(ctx)
+func (_u *DNSRecordUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -107,63 +107,63 @@ func (dru *DNSRecordUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (dru *DNSRecordUpdate) Exec(ctx context.Context) error {
-	_, err := dru.Save(ctx)
+func (_u *DNSRecordUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (dru *DNSRecordUpdate) ExecX(ctx context.Context) {
-	if err := dru.Exec(ctx); err != nil {
+func (_u *DNSRecordUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (dru *DNSRecordUpdate) check() error {
-	if v, ok := dru.mutation.Qname(); ok {
+func (_u *DNSRecordUpdate) check() error {
+	if v, ok := _u.mutation.Qname(); ok {
 		if err := dnsrecord.QnameValidator(v); err != nil {
 			return &ValidationError{Name: "qname", err: fmt.Errorf(`ent: validator failed for field "DNSRecord.qname": %w`, err)}
 		}
 	}
-	if v, ok := dru.mutation.Rtype(); ok {
+	if v, ok := _u.mutation.Rtype(); ok {
 		if err := dnsrecord.RtypeValidator(v); err != nil {
 			return &ValidationError{Name: "rtype", err: fmt.Errorf(`ent: validator failed for field "DNSRecord.rtype": %w`, err)}
 		}
 	}
-	if v, ok := dru.mutation.Value(); ok {
+	if v, ok := _u.mutation.Value(); ok {
 		if err := dnsrecord.ValueValidator(v); err != nil {
 			return &ValidationError{Name: "value", err: fmt.Errorf(`ent: validator failed for field "DNSRecord.value": %w`, err)}
 		}
 	}
-	if _, ok := dru.mutation.TenantID(); dru.mutation.TenantCleared() && !ok {
+	if _u.mutation.TenantCleared() && len(_u.mutation.TenantIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "DNSRecord.tenant"`)
 	}
 	return nil
 }
 
-func (dru *DNSRecordUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := dru.check(); err != nil {
-		return n, err
+func (_u *DNSRecordUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(dnsrecord.Table, dnsrecord.Columns, sqlgraph.NewFieldSpec(dnsrecord.FieldID, field.TypeInt))
-	if ps := dru.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := dru.mutation.Qname(); ok {
+	if value, ok := _u.mutation.Qname(); ok {
 		_spec.SetField(dnsrecord.FieldQname, field.TypeString, value)
 	}
-	if value, ok := dru.mutation.Rtype(); ok {
+	if value, ok := _u.mutation.Rtype(); ok {
 		_spec.SetField(dnsrecord.FieldRtype, field.TypeEnum, value)
 	}
-	if value, ok := dru.mutation.Value(); ok {
+	if value, ok := _u.mutation.Value(); ok {
 		_spec.SetField(dnsrecord.FieldValue, field.TypeString, value)
 	}
-	if dru.mutation.TenantCleared() {
+	if _u.mutation.TenantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -176,7 +176,7 @@ func (dru *DNSRecordUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := dru.mutation.TenantIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TenantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -192,7 +192,7 @@ func (dru *DNSRecordUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, dru.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{dnsrecord.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -200,8 +200,8 @@ func (dru *DNSRecordUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	dru.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // DNSRecordUpdateOne is the builder for updating a single DNSRecord entity.
@@ -213,90 +213,90 @@ type DNSRecordUpdateOne struct {
 }
 
 // SetQname sets the "qname" field.
-func (druo *DNSRecordUpdateOne) SetQname(s string) *DNSRecordUpdateOne {
-	druo.mutation.SetQname(s)
-	return druo
+func (_u *DNSRecordUpdateOne) SetQname(v string) *DNSRecordUpdateOne {
+	_u.mutation.SetQname(v)
+	return _u
 }
 
 // SetNillableQname sets the "qname" field if the given value is not nil.
-func (druo *DNSRecordUpdateOne) SetNillableQname(s *string) *DNSRecordUpdateOne {
-	if s != nil {
-		druo.SetQname(*s)
+func (_u *DNSRecordUpdateOne) SetNillableQname(v *string) *DNSRecordUpdateOne {
+	if v != nil {
+		_u.SetQname(*v)
 	}
-	return druo
+	return _u
 }
 
 // SetRtype sets the "rtype" field.
-func (druo *DNSRecordUpdateOne) SetRtype(d dnsrecord.Rtype) *DNSRecordUpdateOne {
-	druo.mutation.SetRtype(d)
-	return druo
+func (_u *DNSRecordUpdateOne) SetRtype(v dnsrecord.Rtype) *DNSRecordUpdateOne {
+	_u.mutation.SetRtype(v)
+	return _u
 }
 
 // SetNillableRtype sets the "rtype" field if the given value is not nil.
-func (druo *DNSRecordUpdateOne) SetNillableRtype(d *dnsrecord.Rtype) *DNSRecordUpdateOne {
-	if d != nil {
-		druo.SetRtype(*d)
+func (_u *DNSRecordUpdateOne) SetNillableRtype(v *dnsrecord.Rtype) *DNSRecordUpdateOne {
+	if v != nil {
+		_u.SetRtype(*v)
 	}
-	return druo
+	return _u
 }
 
 // SetValue sets the "value" field.
-func (druo *DNSRecordUpdateOne) SetValue(s string) *DNSRecordUpdateOne {
-	druo.mutation.SetValue(s)
-	return druo
+func (_u *DNSRecordUpdateOne) SetValue(v string) *DNSRecordUpdateOne {
+	_u.mutation.SetValue(v)
+	return _u
 }
 
 // SetNillableValue sets the "value" field if the given value is not nil.
-func (druo *DNSRecordUpdateOne) SetNillableValue(s *string) *DNSRecordUpdateOne {
-	if s != nil {
-		druo.SetValue(*s)
+func (_u *DNSRecordUpdateOne) SetNillableValue(v *string) *DNSRecordUpdateOne {
+	if v != nil {
+		_u.SetValue(*v)
 	}
-	return druo
+	return _u
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
-func (druo *DNSRecordUpdateOne) SetTenantID(id int) *DNSRecordUpdateOne {
-	druo.mutation.SetTenantID(id)
-	return druo
+func (_u *DNSRecordUpdateOne) SetTenantID(id int) *DNSRecordUpdateOne {
+	_u.mutation.SetTenantID(id)
+	return _u
 }
 
 // SetTenant sets the "tenant" edge to the Tenant entity.
-func (druo *DNSRecordUpdateOne) SetTenant(t *Tenant) *DNSRecordUpdateOne {
-	return druo.SetTenantID(t.ID)
+func (_u *DNSRecordUpdateOne) SetTenant(v *Tenant) *DNSRecordUpdateOne {
+	return _u.SetTenantID(v.ID)
 }
 
 // Mutation returns the DNSRecordMutation object of the builder.
-func (druo *DNSRecordUpdateOne) Mutation() *DNSRecordMutation {
-	return druo.mutation
+func (_u *DNSRecordUpdateOne) Mutation() *DNSRecordMutation {
+	return _u.mutation
 }
 
 // ClearTenant clears the "tenant" edge to the Tenant entity.
-func (druo *DNSRecordUpdateOne) ClearTenant() *DNSRecordUpdateOne {
-	druo.mutation.ClearTenant()
-	return druo
+func (_u *DNSRecordUpdateOne) ClearTenant() *DNSRecordUpdateOne {
+	_u.mutation.ClearTenant()
+	return _u
 }
 
 // Where appends a list predicates to the DNSRecordUpdate builder.
-func (druo *DNSRecordUpdateOne) Where(ps ...predicate.DNSRecord) *DNSRecordUpdateOne {
-	druo.mutation.Where(ps...)
-	return druo
+func (_u *DNSRecordUpdateOne) Where(ps ...predicate.DNSRecord) *DNSRecordUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (druo *DNSRecordUpdateOne) Select(field string, fields ...string) *DNSRecordUpdateOne {
-	druo.fields = append([]string{field}, fields...)
-	return druo
+func (_u *DNSRecordUpdateOne) Select(field string, fields ...string) *DNSRecordUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated DNSRecord entity.
-func (druo *DNSRecordUpdateOne) Save(ctx context.Context) (*DNSRecord, error) {
-	return withHooks(ctx, druo.sqlSave, druo.mutation, druo.hooks)
+func (_u *DNSRecordUpdateOne) Save(ctx context.Context) (*DNSRecord, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (druo *DNSRecordUpdateOne) SaveX(ctx context.Context) *DNSRecord {
-	node, err := druo.Save(ctx)
+func (_u *DNSRecordUpdateOne) SaveX(ctx context.Context) *DNSRecord {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -304,52 +304,52 @@ func (druo *DNSRecordUpdateOne) SaveX(ctx context.Context) *DNSRecord {
 }
 
 // Exec executes the query on the entity.
-func (druo *DNSRecordUpdateOne) Exec(ctx context.Context) error {
-	_, err := druo.Save(ctx)
+func (_u *DNSRecordUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (druo *DNSRecordUpdateOne) ExecX(ctx context.Context) {
-	if err := druo.Exec(ctx); err != nil {
+func (_u *DNSRecordUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (druo *DNSRecordUpdateOne) check() error {
-	if v, ok := druo.mutation.Qname(); ok {
+func (_u *DNSRecordUpdateOne) check() error {
+	if v, ok := _u.mutation.Qname(); ok {
 		if err := dnsrecord.QnameValidator(v); err != nil {
 			return &ValidationError{Name: "qname", err: fmt.Errorf(`ent: validator failed for field "DNSRecord.qname": %w`, err)}
 		}
 	}
-	if v, ok := druo.mutation.Rtype(); ok {
+	if v, ok := _u.mutation.Rtype(); ok {
 		if err := dnsrecord.RtypeValidator(v); err != nil {
 			return &ValidationError{Name: "rtype", err: fmt.Errorf(`ent: validator failed for field "DNSRecord.rtype": %w`, err)}
 		}
 	}
-	if v, ok := druo.mutation.Value(); ok {
+	if v, ok := _u.mutation.Value(); ok {
 		if err := dnsrecord.ValueValidator(v); err != nil {
 			return &ValidationError{Name: "value", err: fmt.Errorf(`ent: validator failed for field "DNSRecord.value": %w`, err)}
 		}
 	}
-	if _, ok := druo.mutation.TenantID(); druo.mutation.TenantCleared() && !ok {
+	if _u.mutation.TenantCleared() && len(_u.mutation.TenantIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "DNSRecord.tenant"`)
 	}
 	return nil
 }
 
-func (druo *DNSRecordUpdateOne) sqlSave(ctx context.Context) (_node *DNSRecord, err error) {
-	if err := druo.check(); err != nil {
+func (_u *DNSRecordUpdateOne) sqlSave(ctx context.Context) (_node *DNSRecord, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(dnsrecord.Table, dnsrecord.Columns, sqlgraph.NewFieldSpec(dnsrecord.FieldID, field.TypeInt))
-	id, ok := druo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "DNSRecord.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := druo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, dnsrecord.FieldID)
 		for _, f := range fields {
@@ -361,23 +361,23 @@ func (druo *DNSRecordUpdateOne) sqlSave(ctx context.Context) (_node *DNSRecord, 
 			}
 		}
 	}
-	if ps := druo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := druo.mutation.Qname(); ok {
+	if value, ok := _u.mutation.Qname(); ok {
 		_spec.SetField(dnsrecord.FieldQname, field.TypeString, value)
 	}
-	if value, ok := druo.mutation.Rtype(); ok {
+	if value, ok := _u.mutation.Rtype(); ok {
 		_spec.SetField(dnsrecord.FieldRtype, field.TypeEnum, value)
 	}
-	if value, ok := druo.mutation.Value(); ok {
+	if value, ok := _u.mutation.Value(); ok {
 		_spec.SetField(dnsrecord.FieldValue, field.TypeString, value)
 	}
-	if druo.mutation.TenantCleared() {
+	if _u.mutation.TenantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -390,7 +390,7 @@ func (druo *DNSRecordUpdateOne) sqlSave(ctx context.Context) (_node *DNSRecord, 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := druo.mutation.TenantIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TenantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -406,10 +406,10 @@ func (druo *DNSRecordUpdateOne) sqlSave(ctx context.Context) (_node *DNSRecord, 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &DNSRecord{config: druo.config}
+	_node = &DNSRecord{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, druo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{dnsrecord.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -417,6 +417,6 @@ func (druo *DNSRecordUpdateOne) sqlSave(ctx context.Context) (_node *DNSRecord, 
 		}
 		return nil, err
 	}
-	druo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

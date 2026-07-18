@@ -24,84 +24,84 @@ type WebAuthnCredentialCreate struct {
 }
 
 // SetCredentialID sets the "credential_id" field.
-func (wacc *WebAuthnCredentialCreate) SetCredentialID(b []byte) *WebAuthnCredentialCreate {
-	wacc.mutation.SetCredentialID(b)
-	return wacc
+func (_c *WebAuthnCredentialCreate) SetCredentialID(v []byte) *WebAuthnCredentialCreate {
+	_c.mutation.SetCredentialID(v)
+	return _c
 }
 
 // SetData sets the "data" field.
-func (wacc *WebAuthnCredentialCreate) SetData(s string) *WebAuthnCredentialCreate {
-	wacc.mutation.SetData(s)
-	return wacc
+func (_c *WebAuthnCredentialCreate) SetData(v string) *WebAuthnCredentialCreate {
+	_c.mutation.SetData(v)
+	return _c
 }
 
 // SetName sets the "name" field.
-func (wacc *WebAuthnCredentialCreate) SetName(s string) *WebAuthnCredentialCreate {
-	wacc.mutation.SetName(s)
-	return wacc
+func (_c *WebAuthnCredentialCreate) SetName(v string) *WebAuthnCredentialCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (wacc *WebAuthnCredentialCreate) SetNillableName(s *string) *WebAuthnCredentialCreate {
-	if s != nil {
-		wacc.SetName(*s)
+func (_c *WebAuthnCredentialCreate) SetNillableName(v *string) *WebAuthnCredentialCreate {
+	if v != nil {
+		_c.SetName(*v)
 	}
-	return wacc
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (wacc *WebAuthnCredentialCreate) SetCreatedAt(t time.Time) *WebAuthnCredentialCreate {
-	wacc.mutation.SetCreatedAt(t)
-	return wacc
+func (_c *WebAuthnCredentialCreate) SetCreatedAt(v time.Time) *WebAuthnCredentialCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (wacc *WebAuthnCredentialCreate) SetNillableCreatedAt(t *time.Time) *WebAuthnCredentialCreate {
-	if t != nil {
-		wacc.SetCreatedAt(*t)
+func (_c *WebAuthnCredentialCreate) SetNillableCreatedAt(v *time.Time) *WebAuthnCredentialCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return wacc
+	return _c
 }
 
 // SetLastUsed sets the "last_used" field.
-func (wacc *WebAuthnCredentialCreate) SetLastUsed(t time.Time) *WebAuthnCredentialCreate {
-	wacc.mutation.SetLastUsed(t)
-	return wacc
+func (_c *WebAuthnCredentialCreate) SetLastUsed(v time.Time) *WebAuthnCredentialCreate {
+	_c.mutation.SetLastUsed(v)
+	return _c
 }
 
 // SetNillableLastUsed sets the "last_used" field if the given value is not nil.
-func (wacc *WebAuthnCredentialCreate) SetNillableLastUsed(t *time.Time) *WebAuthnCredentialCreate {
-	if t != nil {
-		wacc.SetLastUsed(*t)
+func (_c *WebAuthnCredentialCreate) SetNillableLastUsed(v *time.Time) *WebAuthnCredentialCreate {
+	if v != nil {
+		_c.SetLastUsed(*v)
 	}
-	return wacc
+	return _c
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (wacc *WebAuthnCredentialCreate) SetUserID(id int) *WebAuthnCredentialCreate {
-	wacc.mutation.SetUserID(id)
-	return wacc
+func (_c *WebAuthnCredentialCreate) SetUserID(id int) *WebAuthnCredentialCreate {
+	_c.mutation.SetUserID(id)
+	return _c
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (wacc *WebAuthnCredentialCreate) SetUser(u *User) *WebAuthnCredentialCreate {
-	return wacc.SetUserID(u.ID)
+func (_c *WebAuthnCredentialCreate) SetUser(v *User) *WebAuthnCredentialCreate {
+	return _c.SetUserID(v.ID)
 }
 
 // Mutation returns the WebAuthnCredentialMutation object of the builder.
-func (wacc *WebAuthnCredentialCreate) Mutation() *WebAuthnCredentialMutation {
-	return wacc.mutation
+func (_c *WebAuthnCredentialCreate) Mutation() *WebAuthnCredentialMutation {
+	return _c.mutation
 }
 
 // Save creates the WebAuthnCredential in the database.
-func (wacc *WebAuthnCredentialCreate) Save(ctx context.Context) (*WebAuthnCredential, error) {
-	wacc.defaults()
-	return withHooks(ctx, wacc.sqlSave, wacc.mutation, wacc.hooks)
+func (_c *WebAuthnCredentialCreate) Save(ctx context.Context) (*WebAuthnCredential, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (wacc *WebAuthnCredentialCreate) SaveX(ctx context.Context) *WebAuthnCredential {
-	v, err := wacc.Save(ctx)
+func (_c *WebAuthnCredentialCreate) SaveX(ctx context.Context) *WebAuthnCredential {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -109,59 +109,59 @@ func (wacc *WebAuthnCredentialCreate) SaveX(ctx context.Context) *WebAuthnCreden
 }
 
 // Exec executes the query.
-func (wacc *WebAuthnCredentialCreate) Exec(ctx context.Context) error {
-	_, err := wacc.Save(ctx)
+func (_c *WebAuthnCredentialCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wacc *WebAuthnCredentialCreate) ExecX(ctx context.Context) {
-	if err := wacc.Exec(ctx); err != nil {
+func (_c *WebAuthnCredentialCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (wacc *WebAuthnCredentialCreate) defaults() {
-	if _, ok := wacc.mutation.CreatedAt(); !ok {
+func (_c *WebAuthnCredentialCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := webauthncredential.DefaultCreatedAt()
-		wacc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (wacc *WebAuthnCredentialCreate) check() error {
-	if _, ok := wacc.mutation.CredentialID(); !ok {
+func (_c *WebAuthnCredentialCreate) check() error {
+	if _, ok := _c.mutation.CredentialID(); !ok {
 		return &ValidationError{Name: "credential_id", err: errors.New(`ent: missing required field "WebAuthnCredential.credential_id"`)}
 	}
-	if v, ok := wacc.mutation.CredentialID(); ok {
+	if v, ok := _c.mutation.CredentialID(); ok {
 		if err := webauthncredential.CredentialIDValidator(v); err != nil {
 			return &ValidationError{Name: "credential_id", err: fmt.Errorf(`ent: validator failed for field "WebAuthnCredential.credential_id": %w`, err)}
 		}
 	}
-	if _, ok := wacc.mutation.Data(); !ok {
+	if _, ok := _c.mutation.Data(); !ok {
 		return &ValidationError{Name: "data", err: errors.New(`ent: missing required field "WebAuthnCredential.data"`)}
 	}
-	if v, ok := wacc.mutation.Data(); ok {
+	if v, ok := _c.mutation.Data(); ok {
 		if err := webauthncredential.DataValidator(v); err != nil {
 			return &ValidationError{Name: "data", err: fmt.Errorf(`ent: validator failed for field "WebAuthnCredential.data": %w`, err)}
 		}
 	}
-	if _, ok := wacc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "WebAuthnCredential.created_at"`)}
 	}
-	if _, ok := wacc.mutation.UserID(); !ok {
+	if len(_c.mutation.UserIDs()) == 0 {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "WebAuthnCredential.user"`)}
 	}
 	return nil
 }
 
-func (wacc *WebAuthnCredentialCreate) sqlSave(ctx context.Context) (*WebAuthnCredential, error) {
-	if err := wacc.check(); err != nil {
+func (_c *WebAuthnCredentialCreate) sqlSave(ctx context.Context) (*WebAuthnCredential, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := wacc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, wacc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -169,38 +169,38 @@ func (wacc *WebAuthnCredentialCreate) sqlSave(ctx context.Context) (*WebAuthnCre
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	wacc.mutation.id = &_node.ID
-	wacc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (wacc *WebAuthnCredentialCreate) createSpec() (*WebAuthnCredential, *sqlgraph.CreateSpec) {
+func (_c *WebAuthnCredentialCreate) createSpec() (*WebAuthnCredential, *sqlgraph.CreateSpec) {
 	var (
-		_node = &WebAuthnCredential{config: wacc.config}
+		_node = &WebAuthnCredential{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(webauthncredential.Table, sqlgraph.NewFieldSpec(webauthncredential.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = wacc.conflict
-	if value, ok := wacc.mutation.CredentialID(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.CredentialID(); ok {
 		_spec.SetField(webauthncredential.FieldCredentialID, field.TypeBytes, value)
 		_node.CredentialID = value
 	}
-	if value, ok := wacc.mutation.Data(); ok {
+	if value, ok := _c.mutation.Data(); ok {
 		_spec.SetField(webauthncredential.FieldData, field.TypeString, value)
 		_node.Data = value
 	}
-	if value, ok := wacc.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(webauthncredential.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := wacc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(webauthncredential.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := wacc.mutation.LastUsed(); ok {
+	if value, ok := _c.mutation.LastUsed(); ok {
 		_spec.SetField(webauthncredential.FieldLastUsed, field.TypeTime, value)
 		_node.LastUsed = &value
 	}
-	if nodes := wacc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -236,10 +236,10 @@ func (wacc *WebAuthnCredentialCreate) createSpec() (*WebAuthnCredential, *sqlgra
 //			SetCredentialID(v+v).
 //		}).
 //		Exec(ctx)
-func (wacc *WebAuthnCredentialCreate) OnConflict(opts ...sql.ConflictOption) *WebAuthnCredentialUpsertOne {
-	wacc.conflict = opts
+func (_c *WebAuthnCredentialCreate) OnConflict(opts ...sql.ConflictOption) *WebAuthnCredentialUpsertOne {
+	_c.conflict = opts
 	return &WebAuthnCredentialUpsertOne{
-		create: wacc,
+		create: _c,
 	}
 }
 
@@ -249,10 +249,10 @@ func (wacc *WebAuthnCredentialCreate) OnConflict(opts ...sql.ConflictOption) *We
 //	client.WebAuthnCredential.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (wacc *WebAuthnCredentialCreate) OnConflictColumns(columns ...string) *WebAuthnCredentialUpsertOne {
-	wacc.conflict = append(wacc.conflict, sql.ConflictColumns(columns...))
+func (_c *WebAuthnCredentialCreate) OnConflictColumns(columns ...string) *WebAuthnCredentialUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &WebAuthnCredentialUpsertOne{
-		create: wacc,
+		create: _c,
 	}
 }
 
@@ -486,16 +486,16 @@ type WebAuthnCredentialCreateBulk struct {
 }
 
 // Save creates the WebAuthnCredential entities in the database.
-func (waccb *WebAuthnCredentialCreateBulk) Save(ctx context.Context) ([]*WebAuthnCredential, error) {
-	if waccb.err != nil {
-		return nil, waccb.err
+func (_c *WebAuthnCredentialCreateBulk) Save(ctx context.Context) ([]*WebAuthnCredential, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(waccb.builders))
-	nodes := make([]*WebAuthnCredential, len(waccb.builders))
-	mutators := make([]Mutator, len(waccb.builders))
-	for i := range waccb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*WebAuthnCredential, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := waccb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*WebAuthnCredentialMutation)
@@ -509,12 +509,12 @@ func (waccb *WebAuthnCredentialCreateBulk) Save(ctx context.Context) ([]*WebAuth
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, waccb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = waccb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, waccb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -538,7 +538,7 @@ func (waccb *WebAuthnCredentialCreateBulk) Save(ctx context.Context) ([]*WebAuth
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, waccb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -546,8 +546,8 @@ func (waccb *WebAuthnCredentialCreateBulk) Save(ctx context.Context) ([]*WebAuth
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (waccb *WebAuthnCredentialCreateBulk) SaveX(ctx context.Context) []*WebAuthnCredential {
-	v, err := waccb.Save(ctx)
+func (_c *WebAuthnCredentialCreateBulk) SaveX(ctx context.Context) []*WebAuthnCredential {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -555,14 +555,14 @@ func (waccb *WebAuthnCredentialCreateBulk) SaveX(ctx context.Context) []*WebAuth
 }
 
 // Exec executes the query.
-func (waccb *WebAuthnCredentialCreateBulk) Exec(ctx context.Context) error {
-	_, err := waccb.Save(ctx)
+func (_c *WebAuthnCredentialCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (waccb *WebAuthnCredentialCreateBulk) ExecX(ctx context.Context) {
-	if err := waccb.Exec(ctx); err != nil {
+func (_c *WebAuthnCredentialCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -582,10 +582,10 @@ func (waccb *WebAuthnCredentialCreateBulk) ExecX(ctx context.Context) {
 //			SetCredentialID(v+v).
 //		}).
 //		Exec(ctx)
-func (waccb *WebAuthnCredentialCreateBulk) OnConflict(opts ...sql.ConflictOption) *WebAuthnCredentialUpsertBulk {
-	waccb.conflict = opts
+func (_c *WebAuthnCredentialCreateBulk) OnConflict(opts ...sql.ConflictOption) *WebAuthnCredentialUpsertBulk {
+	_c.conflict = opts
 	return &WebAuthnCredentialUpsertBulk{
-		create: waccb,
+		create: _c,
 	}
 }
 
@@ -595,10 +595,10 @@ func (waccb *WebAuthnCredentialCreateBulk) OnConflict(opts ...sql.ConflictOption
 //	client.WebAuthnCredential.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (waccb *WebAuthnCredentialCreateBulk) OnConflictColumns(columns ...string) *WebAuthnCredentialUpsertBulk {
-	waccb.conflict = append(waccb.conflict, sql.ConflictColumns(columns...))
+func (_c *WebAuthnCredentialCreateBulk) OnConflictColumns(columns ...string) *WebAuthnCredentialUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &WebAuthnCredentialUpsertBulk{
-		create: waccb,
+		create: _c,
 	}
 }
 

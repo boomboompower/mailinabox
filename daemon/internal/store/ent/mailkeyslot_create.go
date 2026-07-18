@@ -24,94 +24,94 @@ type MailKeySlotCreate struct {
 }
 
 // SetSlotType sets the "slot_type" field.
-func (mksc *MailKeySlotCreate) SetSlotType(mt mailkeyslot.SlotType) *MailKeySlotCreate {
-	mksc.mutation.SetSlotType(mt)
-	return mksc
+func (_c *MailKeySlotCreate) SetSlotType(v mailkeyslot.SlotType) *MailKeySlotCreate {
+	_c.mutation.SetSlotType(v)
+	return _c
 }
 
 // SetLabel sets the "label" field.
-func (mksc *MailKeySlotCreate) SetLabel(s string) *MailKeySlotCreate {
-	mksc.mutation.SetLabel(s)
-	return mksc
+func (_c *MailKeySlotCreate) SetLabel(v string) *MailKeySlotCreate {
+	_c.mutation.SetLabel(v)
+	return _c
 }
 
 // SetNillableLabel sets the "label" field if the given value is not nil.
-func (mksc *MailKeySlotCreate) SetNillableLabel(s *string) *MailKeySlotCreate {
-	if s != nil {
-		mksc.SetLabel(*s)
+func (_c *MailKeySlotCreate) SetNillableLabel(v *string) *MailKeySlotCreate {
+	if v != nil {
+		_c.SetLabel(*v)
 	}
-	return mksc
+	return _c
 }
 
 // SetVersion sets the "version" field.
-func (mksc *MailKeySlotCreate) SetVersion(i int) *MailKeySlotCreate {
-	mksc.mutation.SetVersion(i)
-	return mksc
+func (_c *MailKeySlotCreate) SetVersion(v int) *MailKeySlotCreate {
+	_c.mutation.SetVersion(v)
+	return _c
 }
 
 // SetWrappedKey sets the "wrapped_key" field.
-func (mksc *MailKeySlotCreate) SetWrappedKey(b []byte) *MailKeySlotCreate {
-	mksc.mutation.SetWrappedKey(b)
-	return mksc
+func (_c *MailKeySlotCreate) SetWrappedKey(v []byte) *MailKeySlotCreate {
+	_c.mutation.SetWrappedKey(v)
+	return _c
 }
 
 // SetNonce sets the "nonce" field.
-func (mksc *MailKeySlotCreate) SetNonce(b []byte) *MailKeySlotCreate {
-	mksc.mutation.SetNonce(b)
-	return mksc
+func (_c *MailKeySlotCreate) SetNonce(v []byte) *MailKeySlotCreate {
+	_c.mutation.SetNonce(v)
+	return _c
 }
 
 // SetKdfSalt sets the "kdf_salt" field.
-func (mksc *MailKeySlotCreate) SetKdfSalt(b []byte) *MailKeySlotCreate {
-	mksc.mutation.SetKdfSalt(b)
-	return mksc
+func (_c *MailKeySlotCreate) SetKdfSalt(v []byte) *MailKeySlotCreate {
+	_c.mutation.SetKdfSalt(v)
+	return _c
 }
 
 // SetPrfSalt sets the "prf_salt" field.
-func (mksc *MailKeySlotCreate) SetPrfSalt(b []byte) *MailKeySlotCreate {
-	mksc.mutation.SetPrfSalt(b)
-	return mksc
+func (_c *MailKeySlotCreate) SetPrfSalt(v []byte) *MailKeySlotCreate {
+	_c.mutation.SetPrfSalt(v)
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (mksc *MailKeySlotCreate) SetCreatedAt(t time.Time) *MailKeySlotCreate {
-	mksc.mutation.SetCreatedAt(t)
-	return mksc
+func (_c *MailKeySlotCreate) SetCreatedAt(v time.Time) *MailKeySlotCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (mksc *MailKeySlotCreate) SetNillableCreatedAt(t *time.Time) *MailKeySlotCreate {
-	if t != nil {
-		mksc.SetCreatedAt(*t)
+func (_c *MailKeySlotCreate) SetNillableCreatedAt(v *time.Time) *MailKeySlotCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return mksc
+	return _c
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (mksc *MailKeySlotCreate) SetUserID(id int) *MailKeySlotCreate {
-	mksc.mutation.SetUserID(id)
-	return mksc
+func (_c *MailKeySlotCreate) SetUserID(id int) *MailKeySlotCreate {
+	_c.mutation.SetUserID(id)
+	return _c
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (mksc *MailKeySlotCreate) SetUser(u *User) *MailKeySlotCreate {
-	return mksc.SetUserID(u.ID)
+func (_c *MailKeySlotCreate) SetUser(v *User) *MailKeySlotCreate {
+	return _c.SetUserID(v.ID)
 }
 
 // Mutation returns the MailKeySlotMutation object of the builder.
-func (mksc *MailKeySlotCreate) Mutation() *MailKeySlotMutation {
-	return mksc.mutation
+func (_c *MailKeySlotCreate) Mutation() *MailKeySlotMutation {
+	return _c.mutation
 }
 
 // Save creates the MailKeySlot in the database.
-func (mksc *MailKeySlotCreate) Save(ctx context.Context) (*MailKeySlot, error) {
-	mksc.defaults()
-	return withHooks(ctx, mksc.sqlSave, mksc.mutation, mksc.hooks)
+func (_c *MailKeySlotCreate) Save(ctx context.Context) (*MailKeySlot, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (mksc *MailKeySlotCreate) SaveX(ctx context.Context) *MailKeySlot {
-	v, err := mksc.Save(ctx)
+func (_c *MailKeySlotCreate) SaveX(ctx context.Context) *MailKeySlot {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -119,70 +119,70 @@ func (mksc *MailKeySlotCreate) SaveX(ctx context.Context) *MailKeySlot {
 }
 
 // Exec executes the query.
-func (mksc *MailKeySlotCreate) Exec(ctx context.Context) error {
-	_, err := mksc.Save(ctx)
+func (_c *MailKeySlotCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mksc *MailKeySlotCreate) ExecX(ctx context.Context) {
-	if err := mksc.Exec(ctx); err != nil {
+func (_c *MailKeySlotCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (mksc *MailKeySlotCreate) defaults() {
-	if _, ok := mksc.mutation.Label(); !ok {
+func (_c *MailKeySlotCreate) defaults() {
+	if _, ok := _c.mutation.Label(); !ok {
 		v := mailkeyslot.DefaultLabel
-		mksc.mutation.SetLabel(v)
+		_c.mutation.SetLabel(v)
 	}
-	if _, ok := mksc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := mailkeyslot.DefaultCreatedAt()
-		mksc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mksc *MailKeySlotCreate) check() error {
-	if _, ok := mksc.mutation.SlotType(); !ok {
+func (_c *MailKeySlotCreate) check() error {
+	if _, ok := _c.mutation.SlotType(); !ok {
 		return &ValidationError{Name: "slot_type", err: errors.New(`ent: missing required field "MailKeySlot.slot_type"`)}
 	}
-	if v, ok := mksc.mutation.SlotType(); ok {
+	if v, ok := _c.mutation.SlotType(); ok {
 		if err := mailkeyslot.SlotTypeValidator(v); err != nil {
 			return &ValidationError{Name: "slot_type", err: fmt.Errorf(`ent: validator failed for field "MailKeySlot.slot_type": %w`, err)}
 		}
 	}
-	if _, ok := mksc.mutation.Label(); !ok {
+	if _, ok := _c.mutation.Label(); !ok {
 		return &ValidationError{Name: "label", err: errors.New(`ent: missing required field "MailKeySlot.label"`)}
 	}
-	if _, ok := mksc.mutation.Version(); !ok {
+	if _, ok := _c.mutation.Version(); !ok {
 		return &ValidationError{Name: "version", err: errors.New(`ent: missing required field "MailKeySlot.version"`)}
 	}
-	if _, ok := mksc.mutation.WrappedKey(); !ok {
+	if _, ok := _c.mutation.WrappedKey(); !ok {
 		return &ValidationError{Name: "wrapped_key", err: errors.New(`ent: missing required field "MailKeySlot.wrapped_key"`)}
 	}
-	if _, ok := mksc.mutation.Nonce(); !ok {
+	if _, ok := _c.mutation.Nonce(); !ok {
 		return &ValidationError{Name: "nonce", err: errors.New(`ent: missing required field "MailKeySlot.nonce"`)}
 	}
-	if _, ok := mksc.mutation.KdfSalt(); !ok {
+	if _, ok := _c.mutation.KdfSalt(); !ok {
 		return &ValidationError{Name: "kdf_salt", err: errors.New(`ent: missing required field "MailKeySlot.kdf_salt"`)}
 	}
-	if _, ok := mksc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "MailKeySlot.created_at"`)}
 	}
-	if _, ok := mksc.mutation.UserID(); !ok {
+	if len(_c.mutation.UserIDs()) == 0 {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "MailKeySlot.user"`)}
 	}
 	return nil
 }
 
-func (mksc *MailKeySlotCreate) sqlSave(ctx context.Context) (*MailKeySlot, error) {
-	if err := mksc.check(); err != nil {
+func (_c *MailKeySlotCreate) sqlSave(ctx context.Context) (*MailKeySlot, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := mksc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, mksc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -190,50 +190,50 @@ func (mksc *MailKeySlotCreate) sqlSave(ctx context.Context) (*MailKeySlot, error
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	mksc.mutation.id = &_node.ID
-	mksc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (mksc *MailKeySlotCreate) createSpec() (*MailKeySlot, *sqlgraph.CreateSpec) {
+func (_c *MailKeySlotCreate) createSpec() (*MailKeySlot, *sqlgraph.CreateSpec) {
 	var (
-		_node = &MailKeySlot{config: mksc.config}
+		_node = &MailKeySlot{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(mailkeyslot.Table, sqlgraph.NewFieldSpec(mailkeyslot.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = mksc.conflict
-	if value, ok := mksc.mutation.SlotType(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.SlotType(); ok {
 		_spec.SetField(mailkeyslot.FieldSlotType, field.TypeEnum, value)
 		_node.SlotType = value
 	}
-	if value, ok := mksc.mutation.Label(); ok {
+	if value, ok := _c.mutation.Label(); ok {
 		_spec.SetField(mailkeyslot.FieldLabel, field.TypeString, value)
 		_node.Label = value
 	}
-	if value, ok := mksc.mutation.Version(); ok {
+	if value, ok := _c.mutation.Version(); ok {
 		_spec.SetField(mailkeyslot.FieldVersion, field.TypeInt, value)
 		_node.Version = value
 	}
-	if value, ok := mksc.mutation.WrappedKey(); ok {
+	if value, ok := _c.mutation.WrappedKey(); ok {
 		_spec.SetField(mailkeyslot.FieldWrappedKey, field.TypeBytes, value)
 		_node.WrappedKey = value
 	}
-	if value, ok := mksc.mutation.Nonce(); ok {
+	if value, ok := _c.mutation.Nonce(); ok {
 		_spec.SetField(mailkeyslot.FieldNonce, field.TypeBytes, value)
 		_node.Nonce = value
 	}
-	if value, ok := mksc.mutation.KdfSalt(); ok {
+	if value, ok := _c.mutation.KdfSalt(); ok {
 		_spec.SetField(mailkeyslot.FieldKdfSalt, field.TypeBytes, value)
 		_node.KdfSalt = value
 	}
-	if value, ok := mksc.mutation.PrfSalt(); ok {
+	if value, ok := _c.mutation.PrfSalt(); ok {
 		_spec.SetField(mailkeyslot.FieldPrfSalt, field.TypeBytes, value)
 		_node.PrfSalt = value
 	}
-	if value, ok := mksc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(mailkeyslot.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if nodes := mksc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -269,10 +269,10 @@ func (mksc *MailKeySlotCreate) createSpec() (*MailKeySlot, *sqlgraph.CreateSpec)
 //			SetSlotType(v+v).
 //		}).
 //		Exec(ctx)
-func (mksc *MailKeySlotCreate) OnConflict(opts ...sql.ConflictOption) *MailKeySlotUpsertOne {
-	mksc.conflict = opts
+func (_c *MailKeySlotCreate) OnConflict(opts ...sql.ConflictOption) *MailKeySlotUpsertOne {
+	_c.conflict = opts
 	return &MailKeySlotUpsertOne{
-		create: mksc,
+		create: _c,
 	}
 }
 
@@ -282,10 +282,10 @@ func (mksc *MailKeySlotCreate) OnConflict(opts ...sql.ConflictOption) *MailKeySl
 //	client.MailKeySlot.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (mksc *MailKeySlotCreate) OnConflictColumns(columns ...string) *MailKeySlotUpsertOne {
-	mksc.conflict = append(mksc.conflict, sql.ConflictColumns(columns...))
+func (_c *MailKeySlotCreate) OnConflictColumns(columns ...string) *MailKeySlotUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MailKeySlotUpsertOne{
-		create: mksc,
+		create: _c,
 	}
 }
 
@@ -597,16 +597,16 @@ type MailKeySlotCreateBulk struct {
 }
 
 // Save creates the MailKeySlot entities in the database.
-func (mkscb *MailKeySlotCreateBulk) Save(ctx context.Context) ([]*MailKeySlot, error) {
-	if mkscb.err != nil {
-		return nil, mkscb.err
+func (_c *MailKeySlotCreateBulk) Save(ctx context.Context) ([]*MailKeySlot, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(mkscb.builders))
-	nodes := make([]*MailKeySlot, len(mkscb.builders))
-	mutators := make([]Mutator, len(mkscb.builders))
-	for i := range mkscb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*MailKeySlot, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := mkscb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MailKeySlotMutation)
@@ -620,12 +620,12 @@ func (mkscb *MailKeySlotCreateBulk) Save(ctx context.Context) ([]*MailKeySlot, e
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, mkscb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = mkscb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, mkscb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -649,7 +649,7 @@ func (mkscb *MailKeySlotCreateBulk) Save(ctx context.Context) ([]*MailKeySlot, e
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, mkscb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -657,8 +657,8 @@ func (mkscb *MailKeySlotCreateBulk) Save(ctx context.Context) ([]*MailKeySlot, e
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mkscb *MailKeySlotCreateBulk) SaveX(ctx context.Context) []*MailKeySlot {
-	v, err := mkscb.Save(ctx)
+func (_c *MailKeySlotCreateBulk) SaveX(ctx context.Context) []*MailKeySlot {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -666,14 +666,14 @@ func (mkscb *MailKeySlotCreateBulk) SaveX(ctx context.Context) []*MailKeySlot {
 }
 
 // Exec executes the query.
-func (mkscb *MailKeySlotCreateBulk) Exec(ctx context.Context) error {
-	_, err := mkscb.Save(ctx)
+func (_c *MailKeySlotCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mkscb *MailKeySlotCreateBulk) ExecX(ctx context.Context) {
-	if err := mkscb.Exec(ctx); err != nil {
+func (_c *MailKeySlotCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -693,10 +693,10 @@ func (mkscb *MailKeySlotCreateBulk) ExecX(ctx context.Context) {
 //			SetSlotType(v+v).
 //		}).
 //		Exec(ctx)
-func (mkscb *MailKeySlotCreateBulk) OnConflict(opts ...sql.ConflictOption) *MailKeySlotUpsertBulk {
-	mkscb.conflict = opts
+func (_c *MailKeySlotCreateBulk) OnConflict(opts ...sql.ConflictOption) *MailKeySlotUpsertBulk {
+	_c.conflict = opts
 	return &MailKeySlotUpsertBulk{
-		create: mkscb,
+		create: _c,
 	}
 }
 
@@ -706,10 +706,10 @@ func (mkscb *MailKeySlotCreateBulk) OnConflict(opts ...sql.ConflictOption) *Mail
 //	client.MailKeySlot.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (mkscb *MailKeySlotCreateBulk) OnConflictColumns(columns ...string) *MailKeySlotUpsertBulk {
-	mkscb.conflict = append(mkscb.conflict, sql.ConflictColumns(columns...))
+func (_c *MailKeySlotCreateBulk) OnConflictColumns(columns ...string) *MailKeySlotUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &MailKeySlotUpsertBulk{
-		create: mkscb,
+		create: _c,
 	}
 }
 

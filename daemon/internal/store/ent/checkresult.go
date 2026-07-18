@@ -58,7 +58,7 @@ func (*CheckResult) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the CheckResult fields.
-func (cr *CheckResult) assignValues(columns []string, values []any) error {
+func (_m *CheckResult) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -69,64 +69,64 @@ func (cr *CheckResult) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			cr.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case checkresult.FieldCheck:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field check", values[i])
 			} else if value.Valid {
-				cr.Check = value.String
+				_m.Check = value.String
 			}
 		case checkresult.FieldDomain:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field domain", values[i])
 			} else if value.Valid {
-				cr.Domain = value.String
+				_m.Domain = value.String
 			}
 		case checkresult.FieldCategory:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field category", values[i])
 			} else if value.Valid {
-				cr.Category = value.String
+				_m.Category = value.String
 			}
 		case checkresult.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				cr.Status = value.String
+				_m.Status = value.String
 			}
 		case checkresult.FieldMessage:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field message", values[i])
 			} else if value.Valid {
-				cr.Message = value.String
+				_m.Message = value.String
 			}
 		case checkresult.FieldSteps:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field steps", values[i])
 			} else if value.Valid {
-				cr.Steps = value.String
+				_m.Steps = value.String
 			}
 		case checkresult.FieldRanAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field ran_at", values[i])
 			} else if value.Valid {
-				cr.RanAt = value.Time
+				_m.RanAt = value.Time
 			}
 		case checkresult.FieldElapsedMs:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field elapsed_ms", values[i])
 			} else if value.Valid {
-				cr.ElapsedMs = value.Int64
+				_m.ElapsedMs = value.Int64
 			}
 		case checkresult.FieldFirstFailedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field first_failed_at", values[i])
 			} else if value.Valid {
-				cr.FirstFailedAt = new(time.Time)
-				*cr.FirstFailedAt = value.Time
+				_m.FirstFailedAt = new(time.Time)
+				*_m.FirstFailedAt = value.Time
 			}
 		default:
-			cr.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -134,58 +134,58 @@ func (cr *CheckResult) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the CheckResult.
 // This includes values selected through modifiers, order, etc.
-func (cr *CheckResult) Value(name string) (ent.Value, error) {
-	return cr.selectValues.Get(name)
+func (_m *CheckResult) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this CheckResult.
 // Note that you need to call CheckResult.Unwrap() before calling this method if this CheckResult
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (cr *CheckResult) Update() *CheckResultUpdateOne {
-	return NewCheckResultClient(cr.config).UpdateOne(cr)
+func (_m *CheckResult) Update() *CheckResultUpdateOne {
+	return NewCheckResultClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the CheckResult entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (cr *CheckResult) Unwrap() *CheckResult {
-	_tx, ok := cr.config.driver.(*txDriver)
+func (_m *CheckResult) Unwrap() *CheckResult {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: CheckResult is not a transactional entity")
 	}
-	cr.config.driver = _tx.drv
-	return cr
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (cr *CheckResult) String() string {
+func (_m *CheckResult) String() string {
 	var builder strings.Builder
 	builder.WriteString("CheckResult(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", cr.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("check=")
-	builder.WriteString(cr.Check)
+	builder.WriteString(_m.Check)
 	builder.WriteString(", ")
 	builder.WriteString("domain=")
-	builder.WriteString(cr.Domain)
+	builder.WriteString(_m.Domain)
 	builder.WriteString(", ")
 	builder.WriteString("category=")
-	builder.WriteString(cr.Category)
+	builder.WriteString(_m.Category)
 	builder.WriteString(", ")
 	builder.WriteString("status=")
-	builder.WriteString(cr.Status)
+	builder.WriteString(_m.Status)
 	builder.WriteString(", ")
 	builder.WriteString("message=")
-	builder.WriteString(cr.Message)
+	builder.WriteString(_m.Message)
 	builder.WriteString(", ")
 	builder.WriteString("steps=")
-	builder.WriteString(cr.Steps)
+	builder.WriteString(_m.Steps)
 	builder.WriteString(", ")
 	builder.WriteString("ran_at=")
-	builder.WriteString(cr.RanAt.Format(time.ANSIC))
+	builder.WriteString(_m.RanAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("elapsed_ms=")
-	builder.WriteString(fmt.Sprintf("%v", cr.ElapsedMs))
+	builder.WriteString(fmt.Sprintf("%v", _m.ElapsedMs))
 	builder.WriteString(", ")
-	if v := cr.FirstFailedAt; v != nil {
+	if v := _m.FirstFailedAt; v != nil {
 		builder.WriteString("first_failed_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}

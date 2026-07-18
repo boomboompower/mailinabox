@@ -56,12 +56,10 @@ func (e WebDomainEdges) RulesOrErr() ([]*WebRule, error) {
 // TenantOrErr returns the Tenant value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e WebDomainEdges) TenantOrErr() (*Tenant, error) {
-	if e.loadedTypes[1] {
-		if e.Tenant == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: tenant.Label}
-		}
+	if e.Tenant != nil {
 		return e.Tenant, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: tenant.Label}
 	}
 	return nil, &NotLoadedError{edge: "tenant"}
 }
@@ -90,7 +88,7 @@ func (*WebDomain) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the WebDomain fields.
-func (wd *WebDomain) assignValues(columns []string, values []any) error {
+func (_m *WebDomain) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -101,40 +99,40 @@ func (wd *WebDomain) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			wd.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case webdomain.FieldDomain:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field domain", values[i])
 			} else if value.Valid {
-				wd.Domain = value.String
+				_m.Domain = value.String
 			}
 		case webdomain.FieldHsts:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field hsts", values[i])
 			} else if value.Valid {
-				wd.Hsts = webdomain.Hsts(value.String)
+				_m.Hsts = webdomain.Hsts(value.String)
 			}
 		case webdomain.FieldServeStatic:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field serve_static", values[i])
 			} else if value.Valid {
-				wd.ServeStatic = value.Bool
+				_m.ServeStatic = value.Bool
 			}
 		case webdomain.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				wd.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case webdomain.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field tenant_web_domains", value)
 			} else if value.Valid {
-				wd.tenant_web_domains = new(int)
-				*wd.tenant_web_domains = int(value.Int64)
+				_m.tenant_web_domains = new(int)
+				*_m.tenant_web_domains = int(value.Int64)
 			}
 		default:
-			wd.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -142,54 +140,54 @@ func (wd *WebDomain) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the WebDomain.
 // This includes values selected through modifiers, order, etc.
-func (wd *WebDomain) Value(name string) (ent.Value, error) {
-	return wd.selectValues.Get(name)
+func (_m *WebDomain) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryRules queries the "rules" edge of the WebDomain entity.
-func (wd *WebDomain) QueryRules() *WebRuleQuery {
-	return NewWebDomainClient(wd.config).QueryRules(wd)
+func (_m *WebDomain) QueryRules() *WebRuleQuery {
+	return NewWebDomainClient(_m.config).QueryRules(_m)
 }
 
 // QueryTenant queries the "tenant" edge of the WebDomain entity.
-func (wd *WebDomain) QueryTenant() *TenantQuery {
-	return NewWebDomainClient(wd.config).QueryTenant(wd)
+func (_m *WebDomain) QueryTenant() *TenantQuery {
+	return NewWebDomainClient(_m.config).QueryTenant(_m)
 }
 
 // Update returns a builder for updating this WebDomain.
 // Note that you need to call WebDomain.Unwrap() before calling this method if this WebDomain
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (wd *WebDomain) Update() *WebDomainUpdateOne {
-	return NewWebDomainClient(wd.config).UpdateOne(wd)
+func (_m *WebDomain) Update() *WebDomainUpdateOne {
+	return NewWebDomainClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the WebDomain entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (wd *WebDomain) Unwrap() *WebDomain {
-	_tx, ok := wd.config.driver.(*txDriver)
+func (_m *WebDomain) Unwrap() *WebDomain {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: WebDomain is not a transactional entity")
 	}
-	wd.config.driver = _tx.drv
-	return wd
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (wd *WebDomain) String() string {
+func (_m *WebDomain) String() string {
 	var builder strings.Builder
 	builder.WriteString("WebDomain(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", wd.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("domain=")
-	builder.WriteString(wd.Domain)
+	builder.WriteString(_m.Domain)
 	builder.WriteString(", ")
 	builder.WriteString("hsts=")
-	builder.WriteString(fmt.Sprintf("%v", wd.Hsts))
+	builder.WriteString(fmt.Sprintf("%v", _m.Hsts))
 	builder.WriteString(", ")
 	builder.WriteString("serve_static=")
-	builder.WriteString(fmt.Sprintf("%v", wd.ServeStatic))
+	builder.WriteString(fmt.Sprintf("%v", _m.ServeStatic))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(wd.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

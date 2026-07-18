@@ -22,73 +22,73 @@ type ZoneSerialUpdate struct {
 }
 
 // Where appends a list predicates to the ZoneSerialUpdate builder.
-func (zsu *ZoneSerialUpdate) Where(ps ...predicate.ZoneSerial) *ZoneSerialUpdate {
-	zsu.mutation.Where(ps...)
-	return zsu
+func (_u *ZoneSerialUpdate) Where(ps ...predicate.ZoneSerial) *ZoneSerialUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetZone sets the "zone" field.
-func (zsu *ZoneSerialUpdate) SetZone(s string) *ZoneSerialUpdate {
-	zsu.mutation.SetZone(s)
-	return zsu
+func (_u *ZoneSerialUpdate) SetZone(v string) *ZoneSerialUpdate {
+	_u.mutation.SetZone(v)
+	return _u
 }
 
 // SetNillableZone sets the "zone" field if the given value is not nil.
-func (zsu *ZoneSerialUpdate) SetNillableZone(s *string) *ZoneSerialUpdate {
-	if s != nil {
-		zsu.SetZone(*s)
+func (_u *ZoneSerialUpdate) SetNillableZone(v *string) *ZoneSerialUpdate {
+	if v != nil {
+		_u.SetZone(*v)
 	}
-	return zsu
+	return _u
 }
 
 // SetSerial sets the "serial" field.
-func (zsu *ZoneSerialUpdate) SetSerial(i int64) *ZoneSerialUpdate {
-	zsu.mutation.ResetSerial()
-	zsu.mutation.SetSerial(i)
-	return zsu
+func (_u *ZoneSerialUpdate) SetSerial(v int64) *ZoneSerialUpdate {
+	_u.mutation.ResetSerial()
+	_u.mutation.SetSerial(v)
+	return _u
 }
 
 // SetNillableSerial sets the "serial" field if the given value is not nil.
-func (zsu *ZoneSerialUpdate) SetNillableSerial(i *int64) *ZoneSerialUpdate {
-	if i != nil {
-		zsu.SetSerial(*i)
+func (_u *ZoneSerialUpdate) SetNillableSerial(v *int64) *ZoneSerialUpdate {
+	if v != nil {
+		_u.SetSerial(*v)
 	}
-	return zsu
+	return _u
 }
 
-// AddSerial adds i to the "serial" field.
-func (zsu *ZoneSerialUpdate) AddSerial(i int64) *ZoneSerialUpdate {
-	zsu.mutation.AddSerial(i)
-	return zsu
+// AddSerial adds value to the "serial" field.
+func (_u *ZoneSerialUpdate) AddSerial(v int64) *ZoneSerialUpdate {
+	_u.mutation.AddSerial(v)
+	return _u
 }
 
 // SetContentHash sets the "content_hash" field.
-func (zsu *ZoneSerialUpdate) SetContentHash(s string) *ZoneSerialUpdate {
-	zsu.mutation.SetContentHash(s)
-	return zsu
+func (_u *ZoneSerialUpdate) SetContentHash(v string) *ZoneSerialUpdate {
+	_u.mutation.SetContentHash(v)
+	return _u
 }
 
 // SetNillableContentHash sets the "content_hash" field if the given value is not nil.
-func (zsu *ZoneSerialUpdate) SetNillableContentHash(s *string) *ZoneSerialUpdate {
-	if s != nil {
-		zsu.SetContentHash(*s)
+func (_u *ZoneSerialUpdate) SetNillableContentHash(v *string) *ZoneSerialUpdate {
+	if v != nil {
+		_u.SetContentHash(*v)
 	}
-	return zsu
+	return _u
 }
 
 // Mutation returns the ZoneSerialMutation object of the builder.
-func (zsu *ZoneSerialUpdate) Mutation() *ZoneSerialMutation {
-	return zsu.mutation
+func (_u *ZoneSerialUpdate) Mutation() *ZoneSerialMutation {
+	return _u.mutation
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (zsu *ZoneSerialUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, zsu.sqlSave, zsu.mutation, zsu.hooks)
+func (_u *ZoneSerialUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (zsu *ZoneSerialUpdate) SaveX(ctx context.Context) int {
-	affected, err := zsu.Save(ctx)
+func (_u *ZoneSerialUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -96,31 +96,31 @@ func (zsu *ZoneSerialUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (zsu *ZoneSerialUpdate) Exec(ctx context.Context) error {
-	_, err := zsu.Save(ctx)
+func (_u *ZoneSerialUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (zsu *ZoneSerialUpdate) ExecX(ctx context.Context) {
-	if err := zsu.Exec(ctx); err != nil {
+func (_u *ZoneSerialUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (zsu *ZoneSerialUpdate) check() error {
-	if v, ok := zsu.mutation.Zone(); ok {
+func (_u *ZoneSerialUpdate) check() error {
+	if v, ok := _u.mutation.Zone(); ok {
 		if err := zoneserial.ZoneValidator(v); err != nil {
 			return &ValidationError{Name: "zone", err: fmt.Errorf(`ent: validator failed for field "ZoneSerial.zone": %w`, err)}
 		}
 	}
-	if v, ok := zsu.mutation.Serial(); ok {
+	if v, ok := _u.mutation.Serial(); ok {
 		if err := zoneserial.SerialValidator(v); err != nil {
 			return &ValidationError{Name: "serial", err: fmt.Errorf(`ent: validator failed for field "ZoneSerial.serial": %w`, err)}
 		}
 	}
-	if v, ok := zsu.mutation.ContentHash(); ok {
+	if v, ok := _u.mutation.ContentHash(); ok {
 		if err := zoneserial.ContentHashValidator(v); err != nil {
 			return &ValidationError{Name: "content_hash", err: fmt.Errorf(`ent: validator failed for field "ZoneSerial.content_hash": %w`, err)}
 		}
@@ -128,31 +128,31 @@ func (zsu *ZoneSerialUpdate) check() error {
 	return nil
 }
 
-func (zsu *ZoneSerialUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := zsu.check(); err != nil {
-		return n, err
+func (_u *ZoneSerialUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(zoneserial.Table, zoneserial.Columns, sqlgraph.NewFieldSpec(zoneserial.FieldID, field.TypeInt))
-	if ps := zsu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := zsu.mutation.Zone(); ok {
+	if value, ok := _u.mutation.Zone(); ok {
 		_spec.SetField(zoneserial.FieldZone, field.TypeString, value)
 	}
-	if value, ok := zsu.mutation.Serial(); ok {
+	if value, ok := _u.mutation.Serial(); ok {
 		_spec.SetField(zoneserial.FieldSerial, field.TypeInt64, value)
 	}
-	if value, ok := zsu.mutation.AddedSerial(); ok {
+	if value, ok := _u.mutation.AddedSerial(); ok {
 		_spec.AddField(zoneserial.FieldSerial, field.TypeInt64, value)
 	}
-	if value, ok := zsu.mutation.ContentHash(); ok {
+	if value, ok := _u.mutation.ContentHash(); ok {
 		_spec.SetField(zoneserial.FieldContentHash, field.TypeString, value)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, zsu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{zoneserial.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -160,8 +160,8 @@ func (zsu *ZoneSerialUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	zsu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // ZoneSerialUpdateOne is the builder for updating a single ZoneSerial entity.
@@ -173,80 +173,80 @@ type ZoneSerialUpdateOne struct {
 }
 
 // SetZone sets the "zone" field.
-func (zsuo *ZoneSerialUpdateOne) SetZone(s string) *ZoneSerialUpdateOne {
-	zsuo.mutation.SetZone(s)
-	return zsuo
+func (_u *ZoneSerialUpdateOne) SetZone(v string) *ZoneSerialUpdateOne {
+	_u.mutation.SetZone(v)
+	return _u
 }
 
 // SetNillableZone sets the "zone" field if the given value is not nil.
-func (zsuo *ZoneSerialUpdateOne) SetNillableZone(s *string) *ZoneSerialUpdateOne {
-	if s != nil {
-		zsuo.SetZone(*s)
+func (_u *ZoneSerialUpdateOne) SetNillableZone(v *string) *ZoneSerialUpdateOne {
+	if v != nil {
+		_u.SetZone(*v)
 	}
-	return zsuo
+	return _u
 }
 
 // SetSerial sets the "serial" field.
-func (zsuo *ZoneSerialUpdateOne) SetSerial(i int64) *ZoneSerialUpdateOne {
-	zsuo.mutation.ResetSerial()
-	zsuo.mutation.SetSerial(i)
-	return zsuo
+func (_u *ZoneSerialUpdateOne) SetSerial(v int64) *ZoneSerialUpdateOne {
+	_u.mutation.ResetSerial()
+	_u.mutation.SetSerial(v)
+	return _u
 }
 
 // SetNillableSerial sets the "serial" field if the given value is not nil.
-func (zsuo *ZoneSerialUpdateOne) SetNillableSerial(i *int64) *ZoneSerialUpdateOne {
-	if i != nil {
-		zsuo.SetSerial(*i)
+func (_u *ZoneSerialUpdateOne) SetNillableSerial(v *int64) *ZoneSerialUpdateOne {
+	if v != nil {
+		_u.SetSerial(*v)
 	}
-	return zsuo
+	return _u
 }
 
-// AddSerial adds i to the "serial" field.
-func (zsuo *ZoneSerialUpdateOne) AddSerial(i int64) *ZoneSerialUpdateOne {
-	zsuo.mutation.AddSerial(i)
-	return zsuo
+// AddSerial adds value to the "serial" field.
+func (_u *ZoneSerialUpdateOne) AddSerial(v int64) *ZoneSerialUpdateOne {
+	_u.mutation.AddSerial(v)
+	return _u
 }
 
 // SetContentHash sets the "content_hash" field.
-func (zsuo *ZoneSerialUpdateOne) SetContentHash(s string) *ZoneSerialUpdateOne {
-	zsuo.mutation.SetContentHash(s)
-	return zsuo
+func (_u *ZoneSerialUpdateOne) SetContentHash(v string) *ZoneSerialUpdateOne {
+	_u.mutation.SetContentHash(v)
+	return _u
 }
 
 // SetNillableContentHash sets the "content_hash" field if the given value is not nil.
-func (zsuo *ZoneSerialUpdateOne) SetNillableContentHash(s *string) *ZoneSerialUpdateOne {
-	if s != nil {
-		zsuo.SetContentHash(*s)
+func (_u *ZoneSerialUpdateOne) SetNillableContentHash(v *string) *ZoneSerialUpdateOne {
+	if v != nil {
+		_u.SetContentHash(*v)
 	}
-	return zsuo
+	return _u
 }
 
 // Mutation returns the ZoneSerialMutation object of the builder.
-func (zsuo *ZoneSerialUpdateOne) Mutation() *ZoneSerialMutation {
-	return zsuo.mutation
+func (_u *ZoneSerialUpdateOne) Mutation() *ZoneSerialMutation {
+	return _u.mutation
 }
 
 // Where appends a list predicates to the ZoneSerialUpdate builder.
-func (zsuo *ZoneSerialUpdateOne) Where(ps ...predicate.ZoneSerial) *ZoneSerialUpdateOne {
-	zsuo.mutation.Where(ps...)
-	return zsuo
+func (_u *ZoneSerialUpdateOne) Where(ps ...predicate.ZoneSerial) *ZoneSerialUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (zsuo *ZoneSerialUpdateOne) Select(field string, fields ...string) *ZoneSerialUpdateOne {
-	zsuo.fields = append([]string{field}, fields...)
-	return zsuo
+func (_u *ZoneSerialUpdateOne) Select(field string, fields ...string) *ZoneSerialUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated ZoneSerial entity.
-func (zsuo *ZoneSerialUpdateOne) Save(ctx context.Context) (*ZoneSerial, error) {
-	return withHooks(ctx, zsuo.sqlSave, zsuo.mutation, zsuo.hooks)
+func (_u *ZoneSerialUpdateOne) Save(ctx context.Context) (*ZoneSerial, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (zsuo *ZoneSerialUpdateOne) SaveX(ctx context.Context) *ZoneSerial {
-	node, err := zsuo.Save(ctx)
+func (_u *ZoneSerialUpdateOne) SaveX(ctx context.Context) *ZoneSerial {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -254,31 +254,31 @@ func (zsuo *ZoneSerialUpdateOne) SaveX(ctx context.Context) *ZoneSerial {
 }
 
 // Exec executes the query on the entity.
-func (zsuo *ZoneSerialUpdateOne) Exec(ctx context.Context) error {
-	_, err := zsuo.Save(ctx)
+func (_u *ZoneSerialUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (zsuo *ZoneSerialUpdateOne) ExecX(ctx context.Context) {
-	if err := zsuo.Exec(ctx); err != nil {
+func (_u *ZoneSerialUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (zsuo *ZoneSerialUpdateOne) check() error {
-	if v, ok := zsuo.mutation.Zone(); ok {
+func (_u *ZoneSerialUpdateOne) check() error {
+	if v, ok := _u.mutation.Zone(); ok {
 		if err := zoneserial.ZoneValidator(v); err != nil {
 			return &ValidationError{Name: "zone", err: fmt.Errorf(`ent: validator failed for field "ZoneSerial.zone": %w`, err)}
 		}
 	}
-	if v, ok := zsuo.mutation.Serial(); ok {
+	if v, ok := _u.mutation.Serial(); ok {
 		if err := zoneserial.SerialValidator(v); err != nil {
 			return &ValidationError{Name: "serial", err: fmt.Errorf(`ent: validator failed for field "ZoneSerial.serial": %w`, err)}
 		}
 	}
-	if v, ok := zsuo.mutation.ContentHash(); ok {
+	if v, ok := _u.mutation.ContentHash(); ok {
 		if err := zoneserial.ContentHashValidator(v); err != nil {
 			return &ValidationError{Name: "content_hash", err: fmt.Errorf(`ent: validator failed for field "ZoneSerial.content_hash": %w`, err)}
 		}
@@ -286,17 +286,17 @@ func (zsuo *ZoneSerialUpdateOne) check() error {
 	return nil
 }
 
-func (zsuo *ZoneSerialUpdateOne) sqlSave(ctx context.Context) (_node *ZoneSerial, err error) {
-	if err := zsuo.check(); err != nil {
+func (_u *ZoneSerialUpdateOne) sqlSave(ctx context.Context) (_node *ZoneSerial, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(zoneserial.Table, zoneserial.Columns, sqlgraph.NewFieldSpec(zoneserial.FieldID, field.TypeInt))
-	id, ok := zsuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ZoneSerial.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := zsuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, zoneserial.FieldID)
 		for _, f := range fields {
@@ -308,29 +308,29 @@ func (zsuo *ZoneSerialUpdateOne) sqlSave(ctx context.Context) (_node *ZoneSerial
 			}
 		}
 	}
-	if ps := zsuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := zsuo.mutation.Zone(); ok {
+	if value, ok := _u.mutation.Zone(); ok {
 		_spec.SetField(zoneserial.FieldZone, field.TypeString, value)
 	}
-	if value, ok := zsuo.mutation.Serial(); ok {
+	if value, ok := _u.mutation.Serial(); ok {
 		_spec.SetField(zoneserial.FieldSerial, field.TypeInt64, value)
 	}
-	if value, ok := zsuo.mutation.AddedSerial(); ok {
+	if value, ok := _u.mutation.AddedSerial(); ok {
 		_spec.AddField(zoneserial.FieldSerial, field.TypeInt64, value)
 	}
-	if value, ok := zsuo.mutation.ContentHash(); ok {
+	if value, ok := _u.mutation.ContentHash(); ok {
 		_spec.SetField(zoneserial.FieldContentHash, field.TypeString, value)
 	}
-	_node = &ZoneSerial{config: zsuo.config}
+	_node = &ZoneSerial{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, zsuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{zoneserial.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -338,6 +338,6 @@ func (zsuo *ZoneSerialUpdateOne) sqlSave(ctx context.Context) (_node *ZoneSerial
 		}
 		return nil, err
 	}
-	zsuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

@@ -24,62 +24,62 @@ type EncryptionSetupCreate struct {
 }
 
 // SetMode sets the "mode" field.
-func (esc *EncryptionSetupCreate) SetMode(e encryptionsetup.Mode) *EncryptionSetupCreate {
-	esc.mutation.SetMode(e)
-	return esc
+func (_c *EncryptionSetupCreate) SetMode(v encryptionsetup.Mode) *EncryptionSetupCreate {
+	_c.mutation.SetMode(v)
+	return _c
 }
 
 // SetPrepared sets the "prepared" field.
-func (esc *EncryptionSetupCreate) SetPrepared(s string) *EncryptionSetupCreate {
-	esc.mutation.SetPrepared(s)
-	return esc
+func (_c *EncryptionSetupCreate) SetPrepared(v string) *EncryptionSetupCreate {
+	_c.mutation.SetPrepared(v)
+	return _c
 }
 
 // SetAttempts sets the "attempts" field.
-func (esc *EncryptionSetupCreate) SetAttempts(i int) *EncryptionSetupCreate {
-	esc.mutation.SetAttempts(i)
-	return esc
+func (_c *EncryptionSetupCreate) SetAttempts(v int) *EncryptionSetupCreate {
+	_c.mutation.SetAttempts(v)
+	return _c
 }
 
 // SetNillableAttempts sets the "attempts" field if the given value is not nil.
-func (esc *EncryptionSetupCreate) SetNillableAttempts(i *int) *EncryptionSetupCreate {
-	if i != nil {
-		esc.SetAttempts(*i)
+func (_c *EncryptionSetupCreate) SetNillableAttempts(v *int) *EncryptionSetupCreate {
+	if v != nil {
+		_c.SetAttempts(*v)
 	}
-	return esc
+	return _c
 }
 
 // SetExpiresAt sets the "expires_at" field.
-func (esc *EncryptionSetupCreate) SetExpiresAt(t time.Time) *EncryptionSetupCreate {
-	esc.mutation.SetExpiresAt(t)
-	return esc
+func (_c *EncryptionSetupCreate) SetExpiresAt(v time.Time) *EncryptionSetupCreate {
+	_c.mutation.SetExpiresAt(v)
+	return _c
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (esc *EncryptionSetupCreate) SetUserID(id int) *EncryptionSetupCreate {
-	esc.mutation.SetUserID(id)
-	return esc
+func (_c *EncryptionSetupCreate) SetUserID(id int) *EncryptionSetupCreate {
+	_c.mutation.SetUserID(id)
+	return _c
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (esc *EncryptionSetupCreate) SetUser(u *User) *EncryptionSetupCreate {
-	return esc.SetUserID(u.ID)
+func (_c *EncryptionSetupCreate) SetUser(v *User) *EncryptionSetupCreate {
+	return _c.SetUserID(v.ID)
 }
 
 // Mutation returns the EncryptionSetupMutation object of the builder.
-func (esc *EncryptionSetupCreate) Mutation() *EncryptionSetupMutation {
-	return esc.mutation
+func (_c *EncryptionSetupCreate) Mutation() *EncryptionSetupMutation {
+	return _c.mutation
 }
 
 // Save creates the EncryptionSetup in the database.
-func (esc *EncryptionSetupCreate) Save(ctx context.Context) (*EncryptionSetup, error) {
-	esc.defaults()
-	return withHooks(ctx, esc.sqlSave, esc.mutation, esc.hooks)
+func (_c *EncryptionSetupCreate) Save(ctx context.Context) (*EncryptionSetup, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (esc *EncryptionSetupCreate) SaveX(ctx context.Context) *EncryptionSetup {
-	v, err := esc.Save(ctx)
+func (_c *EncryptionSetupCreate) SaveX(ctx context.Context) *EncryptionSetup {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -87,62 +87,62 @@ func (esc *EncryptionSetupCreate) SaveX(ctx context.Context) *EncryptionSetup {
 }
 
 // Exec executes the query.
-func (esc *EncryptionSetupCreate) Exec(ctx context.Context) error {
-	_, err := esc.Save(ctx)
+func (_c *EncryptionSetupCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (esc *EncryptionSetupCreate) ExecX(ctx context.Context) {
-	if err := esc.Exec(ctx); err != nil {
+func (_c *EncryptionSetupCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (esc *EncryptionSetupCreate) defaults() {
-	if _, ok := esc.mutation.Attempts(); !ok {
+func (_c *EncryptionSetupCreate) defaults() {
+	if _, ok := _c.mutation.Attempts(); !ok {
 		v := encryptionsetup.DefaultAttempts
-		esc.mutation.SetAttempts(v)
+		_c.mutation.SetAttempts(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (esc *EncryptionSetupCreate) check() error {
-	if _, ok := esc.mutation.Mode(); !ok {
+func (_c *EncryptionSetupCreate) check() error {
+	if _, ok := _c.mutation.Mode(); !ok {
 		return &ValidationError{Name: "mode", err: errors.New(`ent: missing required field "EncryptionSetup.mode"`)}
 	}
-	if v, ok := esc.mutation.Mode(); ok {
+	if v, ok := _c.mutation.Mode(); ok {
 		if err := encryptionsetup.ModeValidator(v); err != nil {
 			return &ValidationError{Name: "mode", err: fmt.Errorf(`ent: validator failed for field "EncryptionSetup.mode": %w`, err)}
 		}
 	}
-	if _, ok := esc.mutation.Prepared(); !ok {
+	if _, ok := _c.mutation.Prepared(); !ok {
 		return &ValidationError{Name: "prepared", err: errors.New(`ent: missing required field "EncryptionSetup.prepared"`)}
 	}
-	if v, ok := esc.mutation.Prepared(); ok {
+	if v, ok := _c.mutation.Prepared(); ok {
 		if err := encryptionsetup.PreparedValidator(v); err != nil {
 			return &ValidationError{Name: "prepared", err: fmt.Errorf(`ent: validator failed for field "EncryptionSetup.prepared": %w`, err)}
 		}
 	}
-	if _, ok := esc.mutation.Attempts(); !ok {
+	if _, ok := _c.mutation.Attempts(); !ok {
 		return &ValidationError{Name: "attempts", err: errors.New(`ent: missing required field "EncryptionSetup.attempts"`)}
 	}
-	if _, ok := esc.mutation.ExpiresAt(); !ok {
+	if _, ok := _c.mutation.ExpiresAt(); !ok {
 		return &ValidationError{Name: "expires_at", err: errors.New(`ent: missing required field "EncryptionSetup.expires_at"`)}
 	}
-	if _, ok := esc.mutation.UserID(); !ok {
+	if len(_c.mutation.UserIDs()) == 0 {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "EncryptionSetup.user"`)}
 	}
 	return nil
 }
 
-func (esc *EncryptionSetupCreate) sqlSave(ctx context.Context) (*EncryptionSetup, error) {
-	if err := esc.check(); err != nil {
+func (_c *EncryptionSetupCreate) sqlSave(ctx context.Context) (*EncryptionSetup, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := esc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, esc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -150,34 +150,34 @@ func (esc *EncryptionSetupCreate) sqlSave(ctx context.Context) (*EncryptionSetup
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	esc.mutation.id = &_node.ID
-	esc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (esc *EncryptionSetupCreate) createSpec() (*EncryptionSetup, *sqlgraph.CreateSpec) {
+func (_c *EncryptionSetupCreate) createSpec() (*EncryptionSetup, *sqlgraph.CreateSpec) {
 	var (
-		_node = &EncryptionSetup{config: esc.config}
+		_node = &EncryptionSetup{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(encryptionsetup.Table, sqlgraph.NewFieldSpec(encryptionsetup.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = esc.conflict
-	if value, ok := esc.mutation.Mode(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.Mode(); ok {
 		_spec.SetField(encryptionsetup.FieldMode, field.TypeEnum, value)
 		_node.Mode = value
 	}
-	if value, ok := esc.mutation.Prepared(); ok {
+	if value, ok := _c.mutation.Prepared(); ok {
 		_spec.SetField(encryptionsetup.FieldPrepared, field.TypeString, value)
 		_node.Prepared = value
 	}
-	if value, ok := esc.mutation.Attempts(); ok {
+	if value, ok := _c.mutation.Attempts(); ok {
 		_spec.SetField(encryptionsetup.FieldAttempts, field.TypeInt, value)
 		_node.Attempts = value
 	}
-	if value, ok := esc.mutation.ExpiresAt(); ok {
+	if value, ok := _c.mutation.ExpiresAt(); ok {
 		_spec.SetField(encryptionsetup.FieldExpiresAt, field.TypeTime, value)
 		_node.ExpiresAt = value
 	}
-	if nodes := esc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -213,10 +213,10 @@ func (esc *EncryptionSetupCreate) createSpec() (*EncryptionSetup, *sqlgraph.Crea
 //			SetMode(v+v).
 //		}).
 //		Exec(ctx)
-func (esc *EncryptionSetupCreate) OnConflict(opts ...sql.ConflictOption) *EncryptionSetupUpsertOne {
-	esc.conflict = opts
+func (_c *EncryptionSetupCreate) OnConflict(opts ...sql.ConflictOption) *EncryptionSetupUpsertOne {
+	_c.conflict = opts
 	return &EncryptionSetupUpsertOne{
-		create: esc,
+		create: _c,
 	}
 }
 
@@ -226,10 +226,10 @@ func (esc *EncryptionSetupCreate) OnConflict(opts ...sql.ConflictOption) *Encryp
 //	client.EncryptionSetup.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (esc *EncryptionSetupCreate) OnConflictColumns(columns ...string) *EncryptionSetupUpsertOne {
-	esc.conflict = append(esc.conflict, sql.ConflictColumns(columns...))
+func (_c *EncryptionSetupCreate) OnConflictColumns(columns ...string) *EncryptionSetupUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &EncryptionSetupUpsertOne{
-		create: esc,
+		create: _c,
 	}
 }
 
@@ -445,16 +445,16 @@ type EncryptionSetupCreateBulk struct {
 }
 
 // Save creates the EncryptionSetup entities in the database.
-func (escb *EncryptionSetupCreateBulk) Save(ctx context.Context) ([]*EncryptionSetup, error) {
-	if escb.err != nil {
-		return nil, escb.err
+func (_c *EncryptionSetupCreateBulk) Save(ctx context.Context) ([]*EncryptionSetup, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(escb.builders))
-	nodes := make([]*EncryptionSetup, len(escb.builders))
-	mutators := make([]Mutator, len(escb.builders))
-	for i := range escb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*EncryptionSetup, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := escb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*EncryptionSetupMutation)
@@ -468,12 +468,12 @@ func (escb *EncryptionSetupCreateBulk) Save(ctx context.Context) ([]*EncryptionS
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, escb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = escb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, escb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -497,7 +497,7 @@ func (escb *EncryptionSetupCreateBulk) Save(ctx context.Context) ([]*EncryptionS
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, escb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -505,8 +505,8 @@ func (escb *EncryptionSetupCreateBulk) Save(ctx context.Context) ([]*EncryptionS
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (escb *EncryptionSetupCreateBulk) SaveX(ctx context.Context) []*EncryptionSetup {
-	v, err := escb.Save(ctx)
+func (_c *EncryptionSetupCreateBulk) SaveX(ctx context.Context) []*EncryptionSetup {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -514,14 +514,14 @@ func (escb *EncryptionSetupCreateBulk) SaveX(ctx context.Context) []*EncryptionS
 }
 
 // Exec executes the query.
-func (escb *EncryptionSetupCreateBulk) Exec(ctx context.Context) error {
-	_, err := escb.Save(ctx)
+func (_c *EncryptionSetupCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (escb *EncryptionSetupCreateBulk) ExecX(ctx context.Context) {
-	if err := escb.Exec(ctx); err != nil {
+func (_c *EncryptionSetupCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -541,10 +541,10 @@ func (escb *EncryptionSetupCreateBulk) ExecX(ctx context.Context) {
 //			SetMode(v+v).
 //		}).
 //		Exec(ctx)
-func (escb *EncryptionSetupCreateBulk) OnConflict(opts ...sql.ConflictOption) *EncryptionSetupUpsertBulk {
-	escb.conflict = opts
+func (_c *EncryptionSetupCreateBulk) OnConflict(opts ...sql.ConflictOption) *EncryptionSetupUpsertBulk {
+	_c.conflict = opts
 	return &EncryptionSetupUpsertBulk{
-		create: escb,
+		create: _c,
 	}
 }
 
@@ -554,10 +554,10 @@ func (escb *EncryptionSetupCreateBulk) OnConflict(opts ...sql.ConflictOption) *E
 //	client.EncryptionSetup.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (escb *EncryptionSetupCreateBulk) OnConflictColumns(columns ...string) *EncryptionSetupUpsertBulk {
-	escb.conflict = append(escb.conflict, sql.ConflictColumns(columns...))
+func (_c *EncryptionSetupCreateBulk) OnConflictColumns(columns ...string) *EncryptionSetupUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &EncryptionSetupUpsertBulk{
-		create: escb,
+		create: _c,
 	}
 }
 

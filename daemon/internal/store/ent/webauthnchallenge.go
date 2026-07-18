@@ -45,12 +45,10 @@ type WebAuthnChallengeEdges struct {
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e WebAuthnChallengeEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[0] {
-		if e.User == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.User != nil {
 		return e.User, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "user"}
 }
@@ -77,7 +75,7 @@ func (*WebAuthnChallenge) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the WebAuthnChallenge fields.
-func (wac *WebAuthnChallenge) assignValues(columns []string, values []any) error {
+func (_m *WebAuthnChallenge) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -88,40 +86,40 @@ func (wac *WebAuthnChallenge) assignValues(columns []string, values []any) error
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			wac.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case webauthnchallenge.FieldNonceHash:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field nonce_hash", values[i])
 			} else if value.Valid {
-				wac.NonceHash = value.String
+				_m.NonceHash = value.String
 			}
 		case webauthnchallenge.FieldSessionData:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field session_data", values[i])
 			} else if value.Valid {
-				wac.SessionData = value.String
+				_m.SessionData = value.String
 			}
 		case webauthnchallenge.FieldKind:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field kind", values[i])
 			} else if value.Valid {
-				wac.Kind = webauthnchallenge.Kind(value.String)
+				_m.Kind = webauthnchallenge.Kind(value.String)
 			}
 		case webauthnchallenge.FieldExpiresAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field expires_at", values[i])
 			} else if value.Valid {
-				wac.ExpiresAt = value.Time
+				_m.ExpiresAt = value.Time
 			}
 		case webauthnchallenge.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_webauthn_challenges", value)
 			} else if value.Valid {
-				wac.user_webauthn_challenges = new(int)
-				*wac.user_webauthn_challenges = int(value.Int64)
+				_m.user_webauthn_challenges = new(int)
+				*_m.user_webauthn_challenges = int(value.Int64)
 			}
 		default:
-			wac.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -129,47 +127,47 @@ func (wac *WebAuthnChallenge) assignValues(columns []string, values []any) error
 
 // Value returns the ent.Value that was dynamically selected and assigned to the WebAuthnChallenge.
 // This includes values selected through modifiers, order, etc.
-func (wac *WebAuthnChallenge) Value(name string) (ent.Value, error) {
-	return wac.selectValues.Get(name)
+func (_m *WebAuthnChallenge) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryUser queries the "user" edge of the WebAuthnChallenge entity.
-func (wac *WebAuthnChallenge) QueryUser() *UserQuery {
-	return NewWebAuthnChallengeClient(wac.config).QueryUser(wac)
+func (_m *WebAuthnChallenge) QueryUser() *UserQuery {
+	return NewWebAuthnChallengeClient(_m.config).QueryUser(_m)
 }
 
 // Update returns a builder for updating this WebAuthnChallenge.
 // Note that you need to call WebAuthnChallenge.Unwrap() before calling this method if this WebAuthnChallenge
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (wac *WebAuthnChallenge) Update() *WebAuthnChallengeUpdateOne {
-	return NewWebAuthnChallengeClient(wac.config).UpdateOne(wac)
+func (_m *WebAuthnChallenge) Update() *WebAuthnChallengeUpdateOne {
+	return NewWebAuthnChallengeClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the WebAuthnChallenge entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (wac *WebAuthnChallenge) Unwrap() *WebAuthnChallenge {
-	_tx, ok := wac.config.driver.(*txDriver)
+func (_m *WebAuthnChallenge) Unwrap() *WebAuthnChallenge {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: WebAuthnChallenge is not a transactional entity")
 	}
-	wac.config.driver = _tx.drv
-	return wac
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (wac *WebAuthnChallenge) String() string {
+func (_m *WebAuthnChallenge) String() string {
 	var builder strings.Builder
 	builder.WriteString("WebAuthnChallenge(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", wac.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("nonce_hash=<sensitive>")
 	builder.WriteString(", ")
 	builder.WriteString("session_data=<sensitive>")
 	builder.WriteString(", ")
 	builder.WriteString("kind=")
-	builder.WriteString(fmt.Sprintf("%v", wac.Kind))
+	builder.WriteString(fmt.Sprintf("%v", _m.Kind))
 	builder.WriteString(", ")
 	builder.WriteString("expires_at=")
-	builder.WriteString(wac.ExpiresAt.Format(time.ANSIC))
+	builder.WriteString(_m.ExpiresAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

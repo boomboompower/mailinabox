@@ -47,12 +47,10 @@ type APITokenEdges struct {
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e APITokenEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[0] {
-		if e.User == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.User != nil {
 		return e.User, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "user"}
 }
@@ -79,7 +77,7 @@ func (*APIToken) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the APIToken fields.
-func (at *APIToken) assignValues(columns []string, values []any) error {
+func (_m *APIToken) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -90,47 +88,47 @@ func (at *APIToken) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			at.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case apitoken.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				at.Name = value.String
+				_m.Name = value.String
 			}
 		case apitoken.FieldTokenHash:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field token_hash", values[i])
 			} else if value.Valid {
-				at.TokenHash = value.String
+				_m.TokenHash = value.String
 			}
 		case apitoken.FieldScope:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field scope", values[i])
 			} else if value.Valid {
-				at.Scope = apitoken.Scope(value.String)
+				_m.Scope = apitoken.Scope(value.String)
 			}
 		case apitoken.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				at.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case apitoken.FieldLastUsed:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field last_used", values[i])
 			} else if value.Valid {
-				at.LastUsed = new(time.Time)
-				*at.LastUsed = value.Time
+				_m.LastUsed = new(time.Time)
+				*_m.LastUsed = value.Time
 			}
 		case apitoken.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_api_tokens", value)
 			} else if value.Valid {
-				at.user_api_tokens = new(int)
-				*at.user_api_tokens = int(value.Int64)
+				_m.user_api_tokens = new(int)
+				*_m.user_api_tokens = int(value.Int64)
 			}
 		default:
-			at.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -138,50 +136,50 @@ func (at *APIToken) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the APIToken.
 // This includes values selected through modifiers, order, etc.
-func (at *APIToken) Value(name string) (ent.Value, error) {
-	return at.selectValues.Get(name)
+func (_m *APIToken) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryUser queries the "user" edge of the APIToken entity.
-func (at *APIToken) QueryUser() *UserQuery {
-	return NewAPITokenClient(at.config).QueryUser(at)
+func (_m *APIToken) QueryUser() *UserQuery {
+	return NewAPITokenClient(_m.config).QueryUser(_m)
 }
 
 // Update returns a builder for updating this APIToken.
 // Note that you need to call APIToken.Unwrap() before calling this method if this APIToken
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (at *APIToken) Update() *APITokenUpdateOne {
-	return NewAPITokenClient(at.config).UpdateOne(at)
+func (_m *APIToken) Update() *APITokenUpdateOne {
+	return NewAPITokenClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the APIToken entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (at *APIToken) Unwrap() *APIToken {
-	_tx, ok := at.config.driver.(*txDriver)
+func (_m *APIToken) Unwrap() *APIToken {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: APIToken is not a transactional entity")
 	}
-	at.config.driver = _tx.drv
-	return at
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (at *APIToken) String() string {
+func (_m *APIToken) String() string {
 	var builder strings.Builder
 	builder.WriteString("APIToken(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", at.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("name=")
-	builder.WriteString(at.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("token_hash=<sensitive>")
 	builder.WriteString(", ")
 	builder.WriteString("scope=")
-	builder.WriteString(fmt.Sprintf("%v", at.Scope))
+	builder.WriteString(fmt.Sprintf("%v", _m.Scope))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
-	builder.WriteString(at.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := at.LastUsed; v != nil {
+	if v := _m.LastUsed; v != nil {
 		builder.WriteString("last_used=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}

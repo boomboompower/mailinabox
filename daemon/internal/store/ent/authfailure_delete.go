@@ -20,56 +20,56 @@ type AuthFailureDelete struct {
 }
 
 // Where appends a list predicates to the AuthFailureDelete builder.
-func (afd *AuthFailureDelete) Where(ps ...predicate.AuthFailure) *AuthFailureDelete {
-	afd.mutation.Where(ps...)
-	return afd
+func (_d *AuthFailureDelete) Where(ps ...predicate.AuthFailure) *AuthFailureDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (afd *AuthFailureDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, afd.sqlExec, afd.mutation, afd.hooks)
+func (_d *AuthFailureDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (afd *AuthFailureDelete) ExecX(ctx context.Context) int {
-	n, err := afd.Exec(ctx)
+func (_d *AuthFailureDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (afd *AuthFailureDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *AuthFailureDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(authfailure.Table, sqlgraph.NewFieldSpec(authfailure.FieldID, field.TypeInt))
-	if ps := afd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, afd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	afd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // AuthFailureDeleteOne is the builder for deleting a single AuthFailure entity.
 type AuthFailureDeleteOne struct {
-	afd *AuthFailureDelete
+	_d *AuthFailureDelete
 }
 
 // Where appends a list predicates to the AuthFailureDelete builder.
-func (afdo *AuthFailureDeleteOne) Where(ps ...predicate.AuthFailure) *AuthFailureDeleteOne {
-	afdo.afd.mutation.Where(ps...)
-	return afdo
+func (_d *AuthFailureDeleteOne) Where(ps ...predicate.AuthFailure) *AuthFailureDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (afdo *AuthFailureDeleteOne) Exec(ctx context.Context) error {
-	n, err := afdo.afd.Exec(ctx)
+func (_d *AuthFailureDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (afdo *AuthFailureDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (afdo *AuthFailureDeleteOne) ExecX(ctx context.Context) {
-	if err := afdo.Exec(ctx); err != nil {
+func (_d *AuthFailureDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

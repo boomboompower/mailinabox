@@ -50,12 +50,10 @@ type WebRuleEdges struct {
 // DomainOrErr returns the Domain value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e WebRuleEdges) DomainOrErr() (*WebDomain, error) {
-	if e.loadedTypes[0] {
-		if e.Domain == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: webdomain.Label}
-		}
+	if e.Domain != nil {
 		return e.Domain, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: webdomain.Label}
 	}
 	return nil, &NotLoadedError{edge: "domain"}
 }
@@ -82,7 +80,7 @@ func (*WebRule) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the WebRule fields.
-func (wr *WebRule) assignValues(columns []string, values []any) error {
+func (_m *WebRule) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -93,58 +91,58 @@ func (wr *WebRule) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			wr.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case webrule.FieldKind:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field kind", values[i])
 			} else if value.Valid {
-				wr.Kind = webrule.Kind(value.String)
+				_m.Kind = webrule.Kind(value.String)
 			}
 		case webrule.FieldPath:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field path", values[i])
 			} else if value.Valid {
-				wr.Path = value.String
+				_m.Path = value.String
 			}
 		case webrule.FieldTarget:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field target", values[i])
 			} else if value.Valid {
-				wr.Target = value.String
+				_m.Target = value.String
 			}
 		case webrule.FieldPassHostHeader:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field pass_host_header", values[i])
 			} else if value.Valid {
-				wr.PassHostHeader = value.Bool
+				_m.PassHostHeader = value.Bool
 			}
 		case webrule.FieldNoProxyRedirect:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field no_proxy_redirect", values[i])
 			} else if value.Valid {
-				wr.NoProxyRedirect = value.Bool
+				_m.NoProxyRedirect = value.Bool
 			}
 		case webrule.FieldFrameSameOrigin:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field frame_same_origin", values[i])
 			} else if value.Valid {
-				wr.FrameSameOrigin = value.Bool
+				_m.FrameSameOrigin = value.Bool
 			}
 		case webrule.FieldWebSockets:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field web_sockets", values[i])
 			} else if value.Valid {
-				wr.WebSockets = value.Bool
+				_m.WebSockets = value.Bool
 			}
 		case webrule.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field web_domain_rules", value)
 			} else if value.Valid {
-				wr.web_domain_rules = new(int)
-				*wr.web_domain_rules = int(value.Int64)
+				_m.web_domain_rules = new(int)
+				*_m.web_domain_rules = int(value.Int64)
 			}
 		default:
-			wr.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -152,58 +150,58 @@ func (wr *WebRule) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the WebRule.
 // This includes values selected through modifiers, order, etc.
-func (wr *WebRule) Value(name string) (ent.Value, error) {
-	return wr.selectValues.Get(name)
+func (_m *WebRule) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryDomain queries the "domain" edge of the WebRule entity.
-func (wr *WebRule) QueryDomain() *WebDomainQuery {
-	return NewWebRuleClient(wr.config).QueryDomain(wr)
+func (_m *WebRule) QueryDomain() *WebDomainQuery {
+	return NewWebRuleClient(_m.config).QueryDomain(_m)
 }
 
 // Update returns a builder for updating this WebRule.
 // Note that you need to call WebRule.Unwrap() before calling this method if this WebRule
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (wr *WebRule) Update() *WebRuleUpdateOne {
-	return NewWebRuleClient(wr.config).UpdateOne(wr)
+func (_m *WebRule) Update() *WebRuleUpdateOne {
+	return NewWebRuleClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the WebRule entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (wr *WebRule) Unwrap() *WebRule {
-	_tx, ok := wr.config.driver.(*txDriver)
+func (_m *WebRule) Unwrap() *WebRule {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: WebRule is not a transactional entity")
 	}
-	wr.config.driver = _tx.drv
-	return wr
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (wr *WebRule) String() string {
+func (_m *WebRule) String() string {
 	var builder strings.Builder
 	builder.WriteString("WebRule(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", wr.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("kind=")
-	builder.WriteString(fmt.Sprintf("%v", wr.Kind))
+	builder.WriteString(fmt.Sprintf("%v", _m.Kind))
 	builder.WriteString(", ")
 	builder.WriteString("path=")
-	builder.WriteString(wr.Path)
+	builder.WriteString(_m.Path)
 	builder.WriteString(", ")
 	builder.WriteString("target=")
-	builder.WriteString(wr.Target)
+	builder.WriteString(_m.Target)
 	builder.WriteString(", ")
 	builder.WriteString("pass_host_header=")
-	builder.WriteString(fmt.Sprintf("%v", wr.PassHostHeader))
+	builder.WriteString(fmt.Sprintf("%v", _m.PassHostHeader))
 	builder.WriteString(", ")
 	builder.WriteString("no_proxy_redirect=")
-	builder.WriteString(fmt.Sprintf("%v", wr.NoProxyRedirect))
+	builder.WriteString(fmt.Sprintf("%v", _m.NoProxyRedirect))
 	builder.WriteString(", ")
 	builder.WriteString("frame_same_origin=")
-	builder.WriteString(fmt.Sprintf("%v", wr.FrameSameOrigin))
+	builder.WriteString(fmt.Sprintf("%v", _m.FrameSameOrigin))
 	builder.WriteString(", ")
 	builder.WriteString("web_sockets=")
-	builder.WriteString(fmt.Sprintf("%v", wr.WebSockets))
+	builder.WriteString(fmt.Sprintf("%v", _m.WebSockets))
 	builder.WriteByte(')')
 	return builder.String()
 }

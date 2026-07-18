@@ -9,6 +9,7 @@ import (
 	"naust/daemon/internal/store/ent/metricsample"
 	"naust/daemon/internal/store/ent/predicate"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -27,40 +28,40 @@ type MetricSampleQuery struct {
 }
 
 // Where adds a new predicate for the MetricSampleQuery builder.
-func (msq *MetricSampleQuery) Where(ps ...predicate.MetricSample) *MetricSampleQuery {
-	msq.predicates = append(msq.predicates, ps...)
-	return msq
+func (_q *MetricSampleQuery) Where(ps ...predicate.MetricSample) *MetricSampleQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (msq *MetricSampleQuery) Limit(limit int) *MetricSampleQuery {
-	msq.ctx.Limit = &limit
-	return msq
+func (_q *MetricSampleQuery) Limit(limit int) *MetricSampleQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (msq *MetricSampleQuery) Offset(offset int) *MetricSampleQuery {
-	msq.ctx.Offset = &offset
-	return msq
+func (_q *MetricSampleQuery) Offset(offset int) *MetricSampleQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (msq *MetricSampleQuery) Unique(unique bool) *MetricSampleQuery {
-	msq.ctx.Unique = &unique
-	return msq
+func (_q *MetricSampleQuery) Unique(unique bool) *MetricSampleQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (msq *MetricSampleQuery) Order(o ...metricsample.OrderOption) *MetricSampleQuery {
-	msq.order = append(msq.order, o...)
-	return msq
+func (_q *MetricSampleQuery) Order(o ...metricsample.OrderOption) *MetricSampleQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // First returns the first MetricSample entity from the query.
 // Returns a *NotFoundError when no MetricSample was found.
-func (msq *MetricSampleQuery) First(ctx context.Context) (*MetricSample, error) {
-	nodes, err := msq.Limit(1).All(setContextOp(ctx, msq.ctx, "First"))
+func (_q *MetricSampleQuery) First(ctx context.Context) (*MetricSample, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +72,8 @@ func (msq *MetricSampleQuery) First(ctx context.Context) (*MetricSample, error) 
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (msq *MetricSampleQuery) FirstX(ctx context.Context) *MetricSample {
-	node, err := msq.First(ctx)
+func (_q *MetricSampleQuery) FirstX(ctx context.Context) *MetricSample {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -81,9 +82,9 @@ func (msq *MetricSampleQuery) FirstX(ctx context.Context) *MetricSample {
 
 // FirstID returns the first MetricSample ID from the query.
 // Returns a *NotFoundError when no MetricSample ID was found.
-func (msq *MetricSampleQuery) FirstID(ctx context.Context) (id int, err error) {
+func (_q *MetricSampleQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = msq.Limit(1).IDs(setContextOp(ctx, msq.ctx, "FirstID")); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -94,8 +95,8 @@ func (msq *MetricSampleQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (msq *MetricSampleQuery) FirstIDX(ctx context.Context) int {
-	id, err := msq.FirstID(ctx)
+func (_q *MetricSampleQuery) FirstIDX(ctx context.Context) int {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -105,8 +106,8 @@ func (msq *MetricSampleQuery) FirstIDX(ctx context.Context) int {
 // Only returns a single MetricSample entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one MetricSample entity is found.
 // Returns a *NotFoundError when no MetricSample entities are found.
-func (msq *MetricSampleQuery) Only(ctx context.Context) (*MetricSample, error) {
-	nodes, err := msq.Limit(2).All(setContextOp(ctx, msq.ctx, "Only"))
+func (_q *MetricSampleQuery) Only(ctx context.Context) (*MetricSample, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -121,8 +122,8 @@ func (msq *MetricSampleQuery) Only(ctx context.Context) (*MetricSample, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (msq *MetricSampleQuery) OnlyX(ctx context.Context) *MetricSample {
-	node, err := msq.Only(ctx)
+func (_q *MetricSampleQuery) OnlyX(ctx context.Context) *MetricSample {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -132,9 +133,9 @@ func (msq *MetricSampleQuery) OnlyX(ctx context.Context) *MetricSample {
 // OnlyID is like Only, but returns the only MetricSample ID in the query.
 // Returns a *NotSingularError when more than one MetricSample ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (msq *MetricSampleQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (_q *MetricSampleQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = msq.Limit(2).IDs(setContextOp(ctx, msq.ctx, "OnlyID")); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -149,8 +150,8 @@ func (msq *MetricSampleQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (msq *MetricSampleQuery) OnlyIDX(ctx context.Context) int {
-	id, err := msq.OnlyID(ctx)
+func (_q *MetricSampleQuery) OnlyIDX(ctx context.Context) int {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -158,18 +159,18 @@ func (msq *MetricSampleQuery) OnlyIDX(ctx context.Context) int {
 }
 
 // All executes the query and returns a list of MetricSamples.
-func (msq *MetricSampleQuery) All(ctx context.Context) ([]*MetricSample, error) {
-	ctx = setContextOp(ctx, msq.ctx, "All")
-	if err := msq.prepareQuery(ctx); err != nil {
+func (_q *MetricSampleQuery) All(ctx context.Context) ([]*MetricSample, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*MetricSample, *MetricSampleQuery]()
-	return withInterceptors[[]*MetricSample](ctx, msq, qr, msq.inters)
+	return withInterceptors[[]*MetricSample](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (msq *MetricSampleQuery) AllX(ctx context.Context) []*MetricSample {
-	nodes, err := msq.All(ctx)
+func (_q *MetricSampleQuery) AllX(ctx context.Context) []*MetricSample {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -177,20 +178,20 @@ func (msq *MetricSampleQuery) AllX(ctx context.Context) []*MetricSample {
 }
 
 // IDs executes the query and returns a list of MetricSample IDs.
-func (msq *MetricSampleQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if msq.ctx.Unique == nil && msq.path != nil {
-		msq.Unique(true)
+func (_q *MetricSampleQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, msq.ctx, "IDs")
-	if err = msq.Select(metricsample.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(metricsample.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (msq *MetricSampleQuery) IDsX(ctx context.Context) []int {
-	ids, err := msq.IDs(ctx)
+func (_q *MetricSampleQuery) IDsX(ctx context.Context) []int {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -198,17 +199,17 @@ func (msq *MetricSampleQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (msq *MetricSampleQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, msq.ctx, "Count")
-	if err := msq.prepareQuery(ctx); err != nil {
+func (_q *MetricSampleQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, msq, querierCount[*MetricSampleQuery](), msq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*MetricSampleQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (msq *MetricSampleQuery) CountX(ctx context.Context) int {
-	count, err := msq.Count(ctx)
+func (_q *MetricSampleQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -216,9 +217,9 @@ func (msq *MetricSampleQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (msq *MetricSampleQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, msq.ctx, "Exist")
-	switch _, err := msq.FirstID(ctx); {
+func (_q *MetricSampleQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -229,8 +230,8 @@ func (msq *MetricSampleQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (msq *MetricSampleQuery) ExistX(ctx context.Context) bool {
-	exist, err := msq.Exist(ctx)
+func (_q *MetricSampleQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -239,19 +240,19 @@ func (msq *MetricSampleQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the MetricSampleQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (msq *MetricSampleQuery) Clone() *MetricSampleQuery {
-	if msq == nil {
+func (_q *MetricSampleQuery) Clone() *MetricSampleQuery {
+	if _q == nil {
 		return nil
 	}
 	return &MetricSampleQuery{
-		config:     msq.config,
-		ctx:        msq.ctx.Clone(),
-		order:      append([]metricsample.OrderOption{}, msq.order...),
-		inters:     append([]Interceptor{}, msq.inters...),
-		predicates: append([]predicate.MetricSample{}, msq.predicates...),
+		config:     _q.config,
+		ctx:        _q.ctx.Clone(),
+		order:      append([]metricsample.OrderOption{}, _q.order...),
+		inters:     append([]Interceptor{}, _q.inters...),
+		predicates: append([]predicate.MetricSample{}, _q.predicates...),
 		// clone intermediate query.
-		sql:  msq.sql.Clone(),
-		path: msq.path,
+		sql:  _q.sql.Clone(),
+		path: _q.path,
 	}
 }
 
@@ -269,10 +270,10 @@ func (msq *MetricSampleQuery) Clone() *MetricSampleQuery {
 //		GroupBy(metricsample.FieldMetric).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (msq *MetricSampleQuery) GroupBy(field string, fields ...string) *MetricSampleGroupBy {
-	msq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &MetricSampleGroupBy{build: msq}
-	grbuild.flds = &msq.ctx.Fields
+func (_q *MetricSampleQuery) GroupBy(field string, fields ...string) *MetricSampleGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &MetricSampleGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = metricsample.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -290,62 +291,62 @@ func (msq *MetricSampleQuery) GroupBy(field string, fields ...string) *MetricSam
 //	client.MetricSample.Query().
 //		Select(metricsample.FieldMetric).
 //		Scan(ctx, &v)
-func (msq *MetricSampleQuery) Select(fields ...string) *MetricSampleSelect {
-	msq.ctx.Fields = append(msq.ctx.Fields, fields...)
-	sbuild := &MetricSampleSelect{MetricSampleQuery: msq}
+func (_q *MetricSampleQuery) Select(fields ...string) *MetricSampleSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &MetricSampleSelect{MetricSampleQuery: _q}
 	sbuild.label = metricsample.Label
-	sbuild.flds, sbuild.scan = &msq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a MetricSampleSelect configured with the given aggregations.
-func (msq *MetricSampleQuery) Aggregate(fns ...AggregateFunc) *MetricSampleSelect {
-	return msq.Select().Aggregate(fns...)
+func (_q *MetricSampleQuery) Aggregate(fns ...AggregateFunc) *MetricSampleSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (msq *MetricSampleQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range msq.inters {
+func (_q *MetricSampleQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, msq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range msq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !metricsample.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if msq.path != nil {
-		prev, err := msq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		msq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (msq *MetricSampleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MetricSample, error) {
+func (_q *MetricSampleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MetricSample, error) {
 	var (
 		nodes = []*MetricSample{}
-		_spec = msq.querySpec()
+		_spec = _q.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*MetricSample).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &MetricSample{config: msq.config}
+		node := &MetricSample{config: _q.config}
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, msq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
@@ -354,24 +355,24 @@ func (msq *MetricSampleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	return nodes, nil
 }
 
-func (msq *MetricSampleQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := msq.querySpec()
-	_spec.Node.Columns = msq.ctx.Fields
-	if len(msq.ctx.Fields) > 0 {
-		_spec.Unique = msq.ctx.Unique != nil && *msq.ctx.Unique
+func (_q *MetricSampleQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, msq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (msq *MetricSampleQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *MetricSampleQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(metricsample.Table, metricsample.Columns, sqlgraph.NewFieldSpec(metricsample.FieldID, field.TypeInt))
-	_spec.From = msq.sql
-	if unique := msq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if msq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := msq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, metricsample.FieldID)
 		for i := range fields {
@@ -380,20 +381,20 @@ func (msq *MetricSampleQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if ps := msq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := msq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := msq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := msq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -403,33 +404,33 @@ func (msq *MetricSampleQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (msq *MetricSampleQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(msq.driver.Dialect())
+func (_q *MetricSampleQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(metricsample.Table)
-	columns := msq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = metricsample.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if msq.sql != nil {
-		selector = msq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if msq.ctx.Unique != nil && *msq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, p := range msq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range msq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := msq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := msq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -442,41 +443,41 @@ type MetricSampleGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (msgb *MetricSampleGroupBy) Aggregate(fns ...AggregateFunc) *MetricSampleGroupBy {
-	msgb.fns = append(msgb.fns, fns...)
-	return msgb
+func (_g *MetricSampleGroupBy) Aggregate(fns ...AggregateFunc) *MetricSampleGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (msgb *MetricSampleGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, msgb.build.ctx, "GroupBy")
-	if err := msgb.build.prepareQuery(ctx); err != nil {
+func (_g *MetricSampleGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MetricSampleQuery, *MetricSampleGroupBy](ctx, msgb.build, msgb, msgb.build.inters, v)
+	return scanWithInterceptors[*MetricSampleQuery, *MetricSampleGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (msgb *MetricSampleGroupBy) sqlScan(ctx context.Context, root *MetricSampleQuery, v any) error {
+func (_g *MetricSampleGroupBy) sqlScan(ctx context.Context, root *MetricSampleQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(msgb.fns))
-	for _, fn := range msgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*msgb.flds)+len(msgb.fns))
-		for _, f := range *msgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*msgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := msgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -490,27 +491,27 @@ type MetricSampleSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (mss *MetricSampleSelect) Aggregate(fns ...AggregateFunc) *MetricSampleSelect {
-	mss.fns = append(mss.fns, fns...)
-	return mss
+func (_s *MetricSampleSelect) Aggregate(fns ...AggregateFunc) *MetricSampleSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (mss *MetricSampleSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mss.ctx, "Select")
-	if err := mss.prepareQuery(ctx); err != nil {
+func (_s *MetricSampleSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MetricSampleQuery, *MetricSampleSelect](ctx, mss.MetricSampleQuery, mss, mss.inters, v)
+	return scanWithInterceptors[*MetricSampleQuery, *MetricSampleSelect](ctx, _s.MetricSampleQuery, _s, _s.inters, v)
 }
 
-func (mss *MetricSampleSelect) sqlScan(ctx context.Context, root *MetricSampleQuery, v any) error {
+func (_s *MetricSampleSelect) sqlScan(ctx context.Context, root *MetricSampleQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(mss.fns))
-	for _, fn := range mss.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*mss.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -518,7 +519,7 @@ func (mss *MetricSampleSelect) sqlScan(ctx context.Context, root *MetricSampleQu
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := mss.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()

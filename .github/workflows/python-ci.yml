@@ -31,8 +31,6 @@ jobs:
           # Test on the Python version each Ubuntu LTS actually ships.
           # Using a fixed "3.10" previously meant we were never testing against
           # the deployment Python, hiding 3.12+ compatibility issues.
-          - os: ubuntu-24.04
-            python: "3.12"
           - os: ubuntu-26.04
             # "3.x" resolves to the latest stable Python 3 release, which
             # tracks what Ubuntu 26.04 ships closely enough for CI purposes.

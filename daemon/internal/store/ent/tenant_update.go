@@ -27,218 +27,218 @@ type TenantUpdate struct {
 }
 
 // Where appends a list predicates to the TenantUpdate builder.
-func (tu *TenantUpdate) Where(ps ...predicate.Tenant) *TenantUpdate {
-	tu.mutation.Where(ps...)
-	return tu
+func (_u *TenantUpdate) Where(ps ...predicate.Tenant) *TenantUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetName sets the "name" field.
-func (tu *TenantUpdate) SetName(s string) *TenantUpdate {
-	tu.mutation.SetName(s)
-	return tu
+func (_u *TenantUpdate) SetName(v string) *TenantUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (tu *TenantUpdate) SetNillableName(s *string) *TenantUpdate {
-	if s != nil {
-		tu.SetName(*s)
+func (_u *TenantUpdate) SetNillableName(v *string) *TenantUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return tu
+	return _u
 }
 
 // AddUserIDs adds the "users" edge to the User entity by IDs.
-func (tu *TenantUpdate) AddUserIDs(ids ...int) *TenantUpdate {
-	tu.mutation.AddUserIDs(ids...)
-	return tu
+func (_u *TenantUpdate) AddUserIDs(ids ...int) *TenantUpdate {
+	_u.mutation.AddUserIDs(ids...)
+	return _u
 }
 
 // AddUsers adds the "users" edges to the User entity.
-func (tu *TenantUpdate) AddUsers(u ...*User) *TenantUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *TenantUpdate) AddUsers(v ...*User) *TenantUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.AddUserIDs(ids...)
+	return _u.AddUserIDs(ids...)
 }
 
 // AddAliasIDs adds the "aliases" edge to the Alias entity by IDs.
-func (tu *TenantUpdate) AddAliasIDs(ids ...int) *TenantUpdate {
-	tu.mutation.AddAliasIDs(ids...)
-	return tu
+func (_u *TenantUpdate) AddAliasIDs(ids ...int) *TenantUpdate {
+	_u.mutation.AddAliasIDs(ids...)
+	return _u
 }
 
 // AddAliases adds the "aliases" edges to the Alias entity.
-func (tu *TenantUpdate) AddAliases(a ...*Alias) *TenantUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *TenantUpdate) AddAliases(v ...*Alias) *TenantUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.AddAliasIDs(ids...)
+	return _u.AddAliasIDs(ids...)
 }
 
 // AddWebDomainIDs adds the "web_domains" edge to the WebDomain entity by IDs.
-func (tu *TenantUpdate) AddWebDomainIDs(ids ...int) *TenantUpdate {
-	tu.mutation.AddWebDomainIDs(ids...)
-	return tu
+func (_u *TenantUpdate) AddWebDomainIDs(ids ...int) *TenantUpdate {
+	_u.mutation.AddWebDomainIDs(ids...)
+	return _u
 }
 
 // AddWebDomains adds the "web_domains" edges to the WebDomain entity.
-func (tu *TenantUpdate) AddWebDomains(w ...*WebDomain) *TenantUpdate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
+func (_u *TenantUpdate) AddWebDomains(v ...*WebDomain) *TenantUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.AddWebDomainIDs(ids...)
+	return _u.AddWebDomainIDs(ids...)
 }
 
 // AddDNSRecordIDs adds the "dns_records" edge to the DNSRecord entity by IDs.
-func (tu *TenantUpdate) AddDNSRecordIDs(ids ...int) *TenantUpdate {
-	tu.mutation.AddDNSRecordIDs(ids...)
-	return tu
+func (_u *TenantUpdate) AddDNSRecordIDs(ids ...int) *TenantUpdate {
+	_u.mutation.AddDNSRecordIDs(ids...)
+	return _u
 }
 
 // AddDNSRecords adds the "dns_records" edges to the DNSRecord entity.
-func (tu *TenantUpdate) AddDNSRecords(d ...*DNSRecord) *TenantUpdate {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *TenantUpdate) AddDNSRecords(v ...*DNSRecord) *TenantUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.AddDNSRecordIDs(ids...)
+	return _u.AddDNSRecordIDs(ids...)
 }
 
 // AddDNSZoneProviderIDs adds the "dns_zone_providers" edge to the DNSZoneProvider entity by IDs.
-func (tu *TenantUpdate) AddDNSZoneProviderIDs(ids ...int) *TenantUpdate {
-	tu.mutation.AddDNSZoneProviderIDs(ids...)
-	return tu
+func (_u *TenantUpdate) AddDNSZoneProviderIDs(ids ...int) *TenantUpdate {
+	_u.mutation.AddDNSZoneProviderIDs(ids...)
+	return _u
 }
 
 // AddDNSZoneProviders adds the "dns_zone_providers" edges to the DNSZoneProvider entity.
-func (tu *TenantUpdate) AddDNSZoneProviders(d ...*DNSZoneProvider) *TenantUpdate {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *TenantUpdate) AddDNSZoneProviders(v ...*DNSZoneProvider) *TenantUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.AddDNSZoneProviderIDs(ids...)
+	return _u.AddDNSZoneProviderIDs(ids...)
 }
 
 // Mutation returns the TenantMutation object of the builder.
-func (tu *TenantUpdate) Mutation() *TenantMutation {
-	return tu.mutation
+func (_u *TenantUpdate) Mutation() *TenantMutation {
+	return _u.mutation
 }
 
 // ClearUsers clears all "users" edges to the User entity.
-func (tu *TenantUpdate) ClearUsers() *TenantUpdate {
-	tu.mutation.ClearUsers()
-	return tu
+func (_u *TenantUpdate) ClearUsers() *TenantUpdate {
+	_u.mutation.ClearUsers()
+	return _u
 }
 
 // RemoveUserIDs removes the "users" edge to User entities by IDs.
-func (tu *TenantUpdate) RemoveUserIDs(ids ...int) *TenantUpdate {
-	tu.mutation.RemoveUserIDs(ids...)
-	return tu
+func (_u *TenantUpdate) RemoveUserIDs(ids ...int) *TenantUpdate {
+	_u.mutation.RemoveUserIDs(ids...)
+	return _u
 }
 
 // RemoveUsers removes "users" edges to User entities.
-func (tu *TenantUpdate) RemoveUsers(u ...*User) *TenantUpdate {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *TenantUpdate) RemoveUsers(v ...*User) *TenantUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.RemoveUserIDs(ids...)
+	return _u.RemoveUserIDs(ids...)
 }
 
 // ClearAliases clears all "aliases" edges to the Alias entity.
-func (tu *TenantUpdate) ClearAliases() *TenantUpdate {
-	tu.mutation.ClearAliases()
-	return tu
+func (_u *TenantUpdate) ClearAliases() *TenantUpdate {
+	_u.mutation.ClearAliases()
+	return _u
 }
 
 // RemoveAliasIDs removes the "aliases" edge to Alias entities by IDs.
-func (tu *TenantUpdate) RemoveAliasIDs(ids ...int) *TenantUpdate {
-	tu.mutation.RemoveAliasIDs(ids...)
-	return tu
+func (_u *TenantUpdate) RemoveAliasIDs(ids ...int) *TenantUpdate {
+	_u.mutation.RemoveAliasIDs(ids...)
+	return _u
 }
 
 // RemoveAliases removes "aliases" edges to Alias entities.
-func (tu *TenantUpdate) RemoveAliases(a ...*Alias) *TenantUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *TenantUpdate) RemoveAliases(v ...*Alias) *TenantUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.RemoveAliasIDs(ids...)
+	return _u.RemoveAliasIDs(ids...)
 }
 
 // ClearWebDomains clears all "web_domains" edges to the WebDomain entity.
-func (tu *TenantUpdate) ClearWebDomains() *TenantUpdate {
-	tu.mutation.ClearWebDomains()
-	return tu
+func (_u *TenantUpdate) ClearWebDomains() *TenantUpdate {
+	_u.mutation.ClearWebDomains()
+	return _u
 }
 
 // RemoveWebDomainIDs removes the "web_domains" edge to WebDomain entities by IDs.
-func (tu *TenantUpdate) RemoveWebDomainIDs(ids ...int) *TenantUpdate {
-	tu.mutation.RemoveWebDomainIDs(ids...)
-	return tu
+func (_u *TenantUpdate) RemoveWebDomainIDs(ids ...int) *TenantUpdate {
+	_u.mutation.RemoveWebDomainIDs(ids...)
+	return _u
 }
 
 // RemoveWebDomains removes "web_domains" edges to WebDomain entities.
-func (tu *TenantUpdate) RemoveWebDomains(w ...*WebDomain) *TenantUpdate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
+func (_u *TenantUpdate) RemoveWebDomains(v ...*WebDomain) *TenantUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.RemoveWebDomainIDs(ids...)
+	return _u.RemoveWebDomainIDs(ids...)
 }
 
 // ClearDNSRecords clears all "dns_records" edges to the DNSRecord entity.
-func (tu *TenantUpdate) ClearDNSRecords() *TenantUpdate {
-	tu.mutation.ClearDNSRecords()
-	return tu
+func (_u *TenantUpdate) ClearDNSRecords() *TenantUpdate {
+	_u.mutation.ClearDNSRecords()
+	return _u
 }
 
 // RemoveDNSRecordIDs removes the "dns_records" edge to DNSRecord entities by IDs.
-func (tu *TenantUpdate) RemoveDNSRecordIDs(ids ...int) *TenantUpdate {
-	tu.mutation.RemoveDNSRecordIDs(ids...)
-	return tu
+func (_u *TenantUpdate) RemoveDNSRecordIDs(ids ...int) *TenantUpdate {
+	_u.mutation.RemoveDNSRecordIDs(ids...)
+	return _u
 }
 
 // RemoveDNSRecords removes "dns_records" edges to DNSRecord entities.
-func (tu *TenantUpdate) RemoveDNSRecords(d ...*DNSRecord) *TenantUpdate {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *TenantUpdate) RemoveDNSRecords(v ...*DNSRecord) *TenantUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.RemoveDNSRecordIDs(ids...)
+	return _u.RemoveDNSRecordIDs(ids...)
 }
 
 // ClearDNSZoneProviders clears all "dns_zone_providers" edges to the DNSZoneProvider entity.
-func (tu *TenantUpdate) ClearDNSZoneProviders() *TenantUpdate {
-	tu.mutation.ClearDNSZoneProviders()
-	return tu
+func (_u *TenantUpdate) ClearDNSZoneProviders() *TenantUpdate {
+	_u.mutation.ClearDNSZoneProviders()
+	return _u
 }
 
 // RemoveDNSZoneProviderIDs removes the "dns_zone_providers" edge to DNSZoneProvider entities by IDs.
-func (tu *TenantUpdate) RemoveDNSZoneProviderIDs(ids ...int) *TenantUpdate {
-	tu.mutation.RemoveDNSZoneProviderIDs(ids...)
-	return tu
+func (_u *TenantUpdate) RemoveDNSZoneProviderIDs(ids ...int) *TenantUpdate {
+	_u.mutation.RemoveDNSZoneProviderIDs(ids...)
+	return _u
 }
 
 // RemoveDNSZoneProviders removes "dns_zone_providers" edges to DNSZoneProvider entities.
-func (tu *TenantUpdate) RemoveDNSZoneProviders(d ...*DNSZoneProvider) *TenantUpdate {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *TenantUpdate) RemoveDNSZoneProviders(v ...*DNSZoneProvider) *TenantUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.RemoveDNSZoneProviderIDs(ids...)
+	return _u.RemoveDNSZoneProviderIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (tu *TenantUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, tu.sqlSave, tu.mutation, tu.hooks)
+func (_u *TenantUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (tu *TenantUpdate) SaveX(ctx context.Context) int {
-	affected, err := tu.Save(ctx)
+func (_u *TenantUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -246,21 +246,21 @@ func (tu *TenantUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (tu *TenantUpdate) Exec(ctx context.Context) error {
-	_, err := tu.Save(ctx)
+func (_u *TenantUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tu *TenantUpdate) ExecX(ctx context.Context) {
-	if err := tu.Exec(ctx); err != nil {
+func (_u *TenantUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (tu *TenantUpdate) check() error {
-	if v, ok := tu.mutation.Name(); ok {
+func (_u *TenantUpdate) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := tenant.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Tenant.name": %w`, err)}
 		}
@@ -268,22 +268,22 @@ func (tu *TenantUpdate) check() error {
 	return nil
 }
 
-func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := tu.check(); err != nil {
-		return n, err
+func (_u *TenantUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(tenant.Table, tenant.Columns, sqlgraph.NewFieldSpec(tenant.FieldID, field.TypeInt))
-	if ps := tu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := tu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(tenant.FieldName, field.TypeString, value)
 	}
-	if tu.mutation.UsersCleared() {
+	if _u.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -296,23 +296,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedUsersIDs(); len(nodes) > 0 && !tu.mutation.UsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   tenant.UsersTable,
-			Columns: []string{tenant.UsersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedUsersIDs(); len(nodes) > 0 && !_u.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -326,9 +310,25 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.UsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tenant.UsersTable,
+			Columns: []string{tenant.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.AliasesCleared() {
+	if _u.mutation.AliasesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -341,7 +341,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedAliasesIDs(); len(nodes) > 0 && !tu.mutation.AliasesCleared() {
+	if nodes := _u.mutation.RemovedAliasesIDs(); len(nodes) > 0 && !_u.mutation.AliasesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -357,7 +357,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.AliasesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AliasesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -373,7 +373,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.WebDomainsCleared() {
+	if _u.mutation.WebDomainsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -386,7 +386,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedWebDomainsIDs(); len(nodes) > 0 && !tu.mutation.WebDomainsCleared() {
+	if nodes := _u.mutation.RemovedWebDomainsIDs(); len(nodes) > 0 && !_u.mutation.WebDomainsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -402,7 +402,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.WebDomainsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.WebDomainsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -418,7 +418,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.DNSRecordsCleared() {
+	if _u.mutation.DNSRecordsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -431,7 +431,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedDNSRecordsIDs(); len(nodes) > 0 && !tu.mutation.DNSRecordsCleared() {
+	if nodes := _u.mutation.RemovedDNSRecordsIDs(); len(nodes) > 0 && !_u.mutation.DNSRecordsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -447,7 +447,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.DNSRecordsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DNSRecordsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -463,7 +463,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.DNSZoneProvidersCleared() {
+	if _u.mutation.DNSZoneProvidersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -476,7 +476,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedDNSZoneProvidersIDs(); len(nodes) > 0 && !tu.mutation.DNSZoneProvidersCleared() {
+	if nodes := _u.mutation.RemovedDNSZoneProvidersIDs(); len(nodes) > 0 && !_u.mutation.DNSZoneProvidersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -492,7 +492,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.DNSZoneProvidersIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DNSZoneProvidersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -508,7 +508,7 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{tenant.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -516,8 +516,8 @@ func (tu *TenantUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	tu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // TenantUpdateOne is the builder for updating a single Tenant entity.
@@ -529,225 +529,225 @@ type TenantUpdateOne struct {
 }
 
 // SetName sets the "name" field.
-func (tuo *TenantUpdateOne) SetName(s string) *TenantUpdateOne {
-	tuo.mutation.SetName(s)
-	return tuo
+func (_u *TenantUpdateOne) SetName(v string) *TenantUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (tuo *TenantUpdateOne) SetNillableName(s *string) *TenantUpdateOne {
-	if s != nil {
-		tuo.SetName(*s)
+func (_u *TenantUpdateOne) SetNillableName(v *string) *TenantUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return tuo
+	return _u
 }
 
 // AddUserIDs adds the "users" edge to the User entity by IDs.
-func (tuo *TenantUpdateOne) AddUserIDs(ids ...int) *TenantUpdateOne {
-	tuo.mutation.AddUserIDs(ids...)
-	return tuo
+func (_u *TenantUpdateOne) AddUserIDs(ids ...int) *TenantUpdateOne {
+	_u.mutation.AddUserIDs(ids...)
+	return _u
 }
 
 // AddUsers adds the "users" edges to the User entity.
-func (tuo *TenantUpdateOne) AddUsers(u ...*User) *TenantUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *TenantUpdateOne) AddUsers(v ...*User) *TenantUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.AddUserIDs(ids...)
+	return _u.AddUserIDs(ids...)
 }
 
 // AddAliasIDs adds the "aliases" edge to the Alias entity by IDs.
-func (tuo *TenantUpdateOne) AddAliasIDs(ids ...int) *TenantUpdateOne {
-	tuo.mutation.AddAliasIDs(ids...)
-	return tuo
+func (_u *TenantUpdateOne) AddAliasIDs(ids ...int) *TenantUpdateOne {
+	_u.mutation.AddAliasIDs(ids...)
+	return _u
 }
 
 // AddAliases adds the "aliases" edges to the Alias entity.
-func (tuo *TenantUpdateOne) AddAliases(a ...*Alias) *TenantUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *TenantUpdateOne) AddAliases(v ...*Alias) *TenantUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.AddAliasIDs(ids...)
+	return _u.AddAliasIDs(ids...)
 }
 
 // AddWebDomainIDs adds the "web_domains" edge to the WebDomain entity by IDs.
-func (tuo *TenantUpdateOne) AddWebDomainIDs(ids ...int) *TenantUpdateOne {
-	tuo.mutation.AddWebDomainIDs(ids...)
-	return tuo
+func (_u *TenantUpdateOne) AddWebDomainIDs(ids ...int) *TenantUpdateOne {
+	_u.mutation.AddWebDomainIDs(ids...)
+	return _u
 }
 
 // AddWebDomains adds the "web_domains" edges to the WebDomain entity.
-func (tuo *TenantUpdateOne) AddWebDomains(w ...*WebDomain) *TenantUpdateOne {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
+func (_u *TenantUpdateOne) AddWebDomains(v ...*WebDomain) *TenantUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.AddWebDomainIDs(ids...)
+	return _u.AddWebDomainIDs(ids...)
 }
 
 // AddDNSRecordIDs adds the "dns_records" edge to the DNSRecord entity by IDs.
-func (tuo *TenantUpdateOne) AddDNSRecordIDs(ids ...int) *TenantUpdateOne {
-	tuo.mutation.AddDNSRecordIDs(ids...)
-	return tuo
+func (_u *TenantUpdateOne) AddDNSRecordIDs(ids ...int) *TenantUpdateOne {
+	_u.mutation.AddDNSRecordIDs(ids...)
+	return _u
 }
 
 // AddDNSRecords adds the "dns_records" edges to the DNSRecord entity.
-func (tuo *TenantUpdateOne) AddDNSRecords(d ...*DNSRecord) *TenantUpdateOne {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *TenantUpdateOne) AddDNSRecords(v ...*DNSRecord) *TenantUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.AddDNSRecordIDs(ids...)
+	return _u.AddDNSRecordIDs(ids...)
 }
 
 // AddDNSZoneProviderIDs adds the "dns_zone_providers" edge to the DNSZoneProvider entity by IDs.
-func (tuo *TenantUpdateOne) AddDNSZoneProviderIDs(ids ...int) *TenantUpdateOne {
-	tuo.mutation.AddDNSZoneProviderIDs(ids...)
-	return tuo
+func (_u *TenantUpdateOne) AddDNSZoneProviderIDs(ids ...int) *TenantUpdateOne {
+	_u.mutation.AddDNSZoneProviderIDs(ids...)
+	return _u
 }
 
 // AddDNSZoneProviders adds the "dns_zone_providers" edges to the DNSZoneProvider entity.
-func (tuo *TenantUpdateOne) AddDNSZoneProviders(d ...*DNSZoneProvider) *TenantUpdateOne {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *TenantUpdateOne) AddDNSZoneProviders(v ...*DNSZoneProvider) *TenantUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.AddDNSZoneProviderIDs(ids...)
+	return _u.AddDNSZoneProviderIDs(ids...)
 }
 
 // Mutation returns the TenantMutation object of the builder.
-func (tuo *TenantUpdateOne) Mutation() *TenantMutation {
-	return tuo.mutation
+func (_u *TenantUpdateOne) Mutation() *TenantMutation {
+	return _u.mutation
 }
 
 // ClearUsers clears all "users" edges to the User entity.
-func (tuo *TenantUpdateOne) ClearUsers() *TenantUpdateOne {
-	tuo.mutation.ClearUsers()
-	return tuo
+func (_u *TenantUpdateOne) ClearUsers() *TenantUpdateOne {
+	_u.mutation.ClearUsers()
+	return _u
 }
 
 // RemoveUserIDs removes the "users" edge to User entities by IDs.
-func (tuo *TenantUpdateOne) RemoveUserIDs(ids ...int) *TenantUpdateOne {
-	tuo.mutation.RemoveUserIDs(ids...)
-	return tuo
+func (_u *TenantUpdateOne) RemoveUserIDs(ids ...int) *TenantUpdateOne {
+	_u.mutation.RemoveUserIDs(ids...)
+	return _u
 }
 
 // RemoveUsers removes "users" edges to User entities.
-func (tuo *TenantUpdateOne) RemoveUsers(u ...*User) *TenantUpdateOne {
-	ids := make([]int, len(u))
-	for i := range u {
-		ids[i] = u[i].ID
+func (_u *TenantUpdateOne) RemoveUsers(v ...*User) *TenantUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.RemoveUserIDs(ids...)
+	return _u.RemoveUserIDs(ids...)
 }
 
 // ClearAliases clears all "aliases" edges to the Alias entity.
-func (tuo *TenantUpdateOne) ClearAliases() *TenantUpdateOne {
-	tuo.mutation.ClearAliases()
-	return tuo
+func (_u *TenantUpdateOne) ClearAliases() *TenantUpdateOne {
+	_u.mutation.ClearAliases()
+	return _u
 }
 
 // RemoveAliasIDs removes the "aliases" edge to Alias entities by IDs.
-func (tuo *TenantUpdateOne) RemoveAliasIDs(ids ...int) *TenantUpdateOne {
-	tuo.mutation.RemoveAliasIDs(ids...)
-	return tuo
+func (_u *TenantUpdateOne) RemoveAliasIDs(ids ...int) *TenantUpdateOne {
+	_u.mutation.RemoveAliasIDs(ids...)
+	return _u
 }
 
 // RemoveAliases removes "aliases" edges to Alias entities.
-func (tuo *TenantUpdateOne) RemoveAliases(a ...*Alias) *TenantUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *TenantUpdateOne) RemoveAliases(v ...*Alias) *TenantUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.RemoveAliasIDs(ids...)
+	return _u.RemoveAliasIDs(ids...)
 }
 
 // ClearWebDomains clears all "web_domains" edges to the WebDomain entity.
-func (tuo *TenantUpdateOne) ClearWebDomains() *TenantUpdateOne {
-	tuo.mutation.ClearWebDomains()
-	return tuo
+func (_u *TenantUpdateOne) ClearWebDomains() *TenantUpdateOne {
+	_u.mutation.ClearWebDomains()
+	return _u
 }
 
 // RemoveWebDomainIDs removes the "web_domains" edge to WebDomain entities by IDs.
-func (tuo *TenantUpdateOne) RemoveWebDomainIDs(ids ...int) *TenantUpdateOne {
-	tuo.mutation.RemoveWebDomainIDs(ids...)
-	return tuo
+func (_u *TenantUpdateOne) RemoveWebDomainIDs(ids ...int) *TenantUpdateOne {
+	_u.mutation.RemoveWebDomainIDs(ids...)
+	return _u
 }
 
 // RemoveWebDomains removes "web_domains" edges to WebDomain entities.
-func (tuo *TenantUpdateOne) RemoveWebDomains(w ...*WebDomain) *TenantUpdateOne {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
+func (_u *TenantUpdateOne) RemoveWebDomains(v ...*WebDomain) *TenantUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.RemoveWebDomainIDs(ids...)
+	return _u.RemoveWebDomainIDs(ids...)
 }
 
 // ClearDNSRecords clears all "dns_records" edges to the DNSRecord entity.
-func (tuo *TenantUpdateOne) ClearDNSRecords() *TenantUpdateOne {
-	tuo.mutation.ClearDNSRecords()
-	return tuo
+func (_u *TenantUpdateOne) ClearDNSRecords() *TenantUpdateOne {
+	_u.mutation.ClearDNSRecords()
+	return _u
 }
 
 // RemoveDNSRecordIDs removes the "dns_records" edge to DNSRecord entities by IDs.
-func (tuo *TenantUpdateOne) RemoveDNSRecordIDs(ids ...int) *TenantUpdateOne {
-	tuo.mutation.RemoveDNSRecordIDs(ids...)
-	return tuo
+func (_u *TenantUpdateOne) RemoveDNSRecordIDs(ids ...int) *TenantUpdateOne {
+	_u.mutation.RemoveDNSRecordIDs(ids...)
+	return _u
 }
 
 // RemoveDNSRecords removes "dns_records" edges to DNSRecord entities.
-func (tuo *TenantUpdateOne) RemoveDNSRecords(d ...*DNSRecord) *TenantUpdateOne {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *TenantUpdateOne) RemoveDNSRecords(v ...*DNSRecord) *TenantUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.RemoveDNSRecordIDs(ids...)
+	return _u.RemoveDNSRecordIDs(ids...)
 }
 
 // ClearDNSZoneProviders clears all "dns_zone_providers" edges to the DNSZoneProvider entity.
-func (tuo *TenantUpdateOne) ClearDNSZoneProviders() *TenantUpdateOne {
-	tuo.mutation.ClearDNSZoneProviders()
-	return tuo
+func (_u *TenantUpdateOne) ClearDNSZoneProviders() *TenantUpdateOne {
+	_u.mutation.ClearDNSZoneProviders()
+	return _u
 }
 
 // RemoveDNSZoneProviderIDs removes the "dns_zone_providers" edge to DNSZoneProvider entities by IDs.
-func (tuo *TenantUpdateOne) RemoveDNSZoneProviderIDs(ids ...int) *TenantUpdateOne {
-	tuo.mutation.RemoveDNSZoneProviderIDs(ids...)
-	return tuo
+func (_u *TenantUpdateOne) RemoveDNSZoneProviderIDs(ids ...int) *TenantUpdateOne {
+	_u.mutation.RemoveDNSZoneProviderIDs(ids...)
+	return _u
 }
 
 // RemoveDNSZoneProviders removes "dns_zone_providers" edges to DNSZoneProvider entities.
-func (tuo *TenantUpdateOne) RemoveDNSZoneProviders(d ...*DNSZoneProvider) *TenantUpdateOne {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+func (_u *TenantUpdateOne) RemoveDNSZoneProviders(v ...*DNSZoneProvider) *TenantUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.RemoveDNSZoneProviderIDs(ids...)
+	return _u.RemoveDNSZoneProviderIDs(ids...)
 }
 
 // Where appends a list predicates to the TenantUpdate builder.
-func (tuo *TenantUpdateOne) Where(ps ...predicate.Tenant) *TenantUpdateOne {
-	tuo.mutation.Where(ps...)
-	return tuo
+func (_u *TenantUpdateOne) Where(ps ...predicate.Tenant) *TenantUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (tuo *TenantUpdateOne) Select(field string, fields ...string) *TenantUpdateOne {
-	tuo.fields = append([]string{field}, fields...)
-	return tuo
+func (_u *TenantUpdateOne) Select(field string, fields ...string) *TenantUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Tenant entity.
-func (tuo *TenantUpdateOne) Save(ctx context.Context) (*Tenant, error) {
-	return withHooks(ctx, tuo.sqlSave, tuo.mutation, tuo.hooks)
+func (_u *TenantUpdateOne) Save(ctx context.Context) (*Tenant, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (tuo *TenantUpdateOne) SaveX(ctx context.Context) *Tenant {
-	node, err := tuo.Save(ctx)
+func (_u *TenantUpdateOne) SaveX(ctx context.Context) *Tenant {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -755,21 +755,21 @@ func (tuo *TenantUpdateOne) SaveX(ctx context.Context) *Tenant {
 }
 
 // Exec executes the query on the entity.
-func (tuo *TenantUpdateOne) Exec(ctx context.Context) error {
-	_, err := tuo.Save(ctx)
+func (_u *TenantUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tuo *TenantUpdateOne) ExecX(ctx context.Context) {
-	if err := tuo.Exec(ctx); err != nil {
+func (_u *TenantUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (tuo *TenantUpdateOne) check() error {
-	if v, ok := tuo.mutation.Name(); ok {
+func (_u *TenantUpdateOne) check() error {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := tenant.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Tenant.name": %w`, err)}
 		}
@@ -777,17 +777,17 @@ func (tuo *TenantUpdateOne) check() error {
 	return nil
 }
 
-func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err error) {
-	if err := tuo.check(); err != nil {
+func (_u *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(tenant.Table, tenant.Columns, sqlgraph.NewFieldSpec(tenant.FieldID, field.TypeInt))
-	id, ok := tuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Tenant.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := tuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, tenant.FieldID)
 		for _, f := range fields {
@@ -799,17 +799,17 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 			}
 		}
 	}
-	if ps := tuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := tuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(tenant.FieldName, field.TypeString, value)
 	}
-	if tuo.mutation.UsersCleared() {
+	if _u.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -822,23 +822,7 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedUsersIDs(); len(nodes) > 0 && !tuo.mutation.UsersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   tenant.UsersTable,
-			Columns: []string{tenant.UsersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.UsersIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedUsersIDs(); len(nodes) > 0 && !_u.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -852,9 +836,25 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.UsersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   tenant.UsersTable,
+			Columns: []string{tenant.UsersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tuo.mutation.AliasesCleared() {
+	if _u.mutation.AliasesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -867,7 +867,7 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedAliasesIDs(); len(nodes) > 0 && !tuo.mutation.AliasesCleared() {
+	if nodes := _u.mutation.RemovedAliasesIDs(); len(nodes) > 0 && !_u.mutation.AliasesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -883,7 +883,7 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.AliasesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AliasesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -899,7 +899,7 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tuo.mutation.WebDomainsCleared() {
+	if _u.mutation.WebDomainsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -912,7 +912,7 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedWebDomainsIDs(); len(nodes) > 0 && !tuo.mutation.WebDomainsCleared() {
+	if nodes := _u.mutation.RemovedWebDomainsIDs(); len(nodes) > 0 && !_u.mutation.WebDomainsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -928,7 +928,7 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.WebDomainsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.WebDomainsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -944,7 +944,7 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tuo.mutation.DNSRecordsCleared() {
+	if _u.mutation.DNSRecordsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -957,7 +957,7 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedDNSRecordsIDs(); len(nodes) > 0 && !tuo.mutation.DNSRecordsCleared() {
+	if nodes := _u.mutation.RemovedDNSRecordsIDs(); len(nodes) > 0 && !_u.mutation.DNSRecordsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -973,7 +973,7 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.DNSRecordsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DNSRecordsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -989,7 +989,7 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tuo.mutation.DNSZoneProvidersCleared() {
+	if _u.mutation.DNSZoneProvidersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1002,7 +1002,7 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedDNSZoneProvidersIDs(); len(nodes) > 0 && !tuo.mutation.DNSZoneProvidersCleared() {
+	if nodes := _u.mutation.RemovedDNSZoneProvidersIDs(); len(nodes) > 0 && !_u.mutation.DNSZoneProvidersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1018,7 +1018,7 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.DNSZoneProvidersIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DNSZoneProvidersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1034,10 +1034,10 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &Tenant{config: tuo.config}
+	_node = &Tenant{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, tuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{tenant.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -1045,6 +1045,6 @@ func (tuo *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err err
 		}
 		return nil, err
 	}
-	tuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

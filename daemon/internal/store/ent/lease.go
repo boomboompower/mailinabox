@@ -46,7 +46,7 @@ func (*Lease) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Lease fields.
-func (l *Lease) assignValues(columns []string, values []any) error {
+func (_m *Lease) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -57,27 +57,27 @@ func (l *Lease) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			l.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case lease.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				l.Name = value.String
+				_m.Name = value.String
 			}
 		case lease.FieldHolder:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field holder", values[i])
 			} else if value.Valid {
-				l.Holder = value.String
+				_m.Holder = value.String
 			}
 		case lease.FieldExpiresAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field expires_at", values[i])
 			} else if value.Valid {
-				l.ExpiresAt = value.Time
+				_m.ExpiresAt = value.Time
 			}
 		default:
-			l.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -85,41 +85,41 @@ func (l *Lease) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Lease.
 // This includes values selected through modifiers, order, etc.
-func (l *Lease) Value(name string) (ent.Value, error) {
-	return l.selectValues.Get(name)
+func (_m *Lease) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // Update returns a builder for updating this Lease.
 // Note that you need to call Lease.Unwrap() before calling this method if this Lease
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (l *Lease) Update() *LeaseUpdateOne {
-	return NewLeaseClient(l.config).UpdateOne(l)
+func (_m *Lease) Update() *LeaseUpdateOne {
+	return NewLeaseClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Lease entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (l *Lease) Unwrap() *Lease {
-	_tx, ok := l.config.driver.(*txDriver)
+func (_m *Lease) Unwrap() *Lease {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Lease is not a transactional entity")
 	}
-	l.config.driver = _tx.drv
-	return l
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (l *Lease) String() string {
+func (_m *Lease) String() string {
 	var builder strings.Builder
 	builder.WriteString("Lease(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", l.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("name=")
-	builder.WriteString(l.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("holder=")
-	builder.WriteString(l.Holder)
+	builder.WriteString(_m.Holder)
 	builder.WriteString(", ")
 	builder.WriteString("expires_at=")
-	builder.WriteString(l.ExpiresAt.Format(time.ANSIC))
+	builder.WriteString(_m.ExpiresAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

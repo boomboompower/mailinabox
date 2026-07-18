@@ -24,84 +24,84 @@ type APITokenCreate struct {
 }
 
 // SetName sets the "name" field.
-func (atc *APITokenCreate) SetName(s string) *APITokenCreate {
-	atc.mutation.SetName(s)
-	return atc
+func (_c *APITokenCreate) SetName(v string) *APITokenCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetTokenHash sets the "token_hash" field.
-func (atc *APITokenCreate) SetTokenHash(s string) *APITokenCreate {
-	atc.mutation.SetTokenHash(s)
-	return atc
+func (_c *APITokenCreate) SetTokenHash(v string) *APITokenCreate {
+	_c.mutation.SetTokenHash(v)
+	return _c
 }
 
 // SetScope sets the "scope" field.
-func (atc *APITokenCreate) SetScope(a apitoken.Scope) *APITokenCreate {
-	atc.mutation.SetScope(a)
-	return atc
+func (_c *APITokenCreate) SetScope(v apitoken.Scope) *APITokenCreate {
+	_c.mutation.SetScope(v)
+	return _c
 }
 
 // SetNillableScope sets the "scope" field if the given value is not nil.
-func (atc *APITokenCreate) SetNillableScope(a *apitoken.Scope) *APITokenCreate {
-	if a != nil {
-		atc.SetScope(*a)
+func (_c *APITokenCreate) SetNillableScope(v *apitoken.Scope) *APITokenCreate {
+	if v != nil {
+		_c.SetScope(*v)
 	}
-	return atc
+	return _c
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (atc *APITokenCreate) SetCreatedAt(t time.Time) *APITokenCreate {
-	atc.mutation.SetCreatedAt(t)
-	return atc
+func (_c *APITokenCreate) SetCreatedAt(v time.Time) *APITokenCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (atc *APITokenCreate) SetNillableCreatedAt(t *time.Time) *APITokenCreate {
-	if t != nil {
-		atc.SetCreatedAt(*t)
+func (_c *APITokenCreate) SetNillableCreatedAt(v *time.Time) *APITokenCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return atc
+	return _c
 }
 
 // SetLastUsed sets the "last_used" field.
-func (atc *APITokenCreate) SetLastUsed(t time.Time) *APITokenCreate {
-	atc.mutation.SetLastUsed(t)
-	return atc
+func (_c *APITokenCreate) SetLastUsed(v time.Time) *APITokenCreate {
+	_c.mutation.SetLastUsed(v)
+	return _c
 }
 
 // SetNillableLastUsed sets the "last_used" field if the given value is not nil.
-func (atc *APITokenCreate) SetNillableLastUsed(t *time.Time) *APITokenCreate {
-	if t != nil {
-		atc.SetLastUsed(*t)
+func (_c *APITokenCreate) SetNillableLastUsed(v *time.Time) *APITokenCreate {
+	if v != nil {
+		_c.SetLastUsed(*v)
 	}
-	return atc
+	return _c
 }
 
 // SetUserID sets the "user" edge to the User entity by ID.
-func (atc *APITokenCreate) SetUserID(id int) *APITokenCreate {
-	atc.mutation.SetUserID(id)
-	return atc
+func (_c *APITokenCreate) SetUserID(id int) *APITokenCreate {
+	_c.mutation.SetUserID(id)
+	return _c
 }
 
 // SetUser sets the "user" edge to the User entity.
-func (atc *APITokenCreate) SetUser(u *User) *APITokenCreate {
-	return atc.SetUserID(u.ID)
+func (_c *APITokenCreate) SetUser(v *User) *APITokenCreate {
+	return _c.SetUserID(v.ID)
 }
 
 // Mutation returns the APITokenMutation object of the builder.
-func (atc *APITokenCreate) Mutation() *APITokenMutation {
-	return atc.mutation
+func (_c *APITokenCreate) Mutation() *APITokenMutation {
+	return _c.mutation
 }
 
 // Save creates the APIToken in the database.
-func (atc *APITokenCreate) Save(ctx context.Context) (*APIToken, error) {
-	atc.defaults()
-	return withHooks(ctx, atc.sqlSave, atc.mutation, atc.hooks)
+func (_c *APITokenCreate) Save(ctx context.Context) (*APIToken, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (atc *APITokenCreate) SaveX(ctx context.Context) *APIToken {
-	v, err := atc.Save(ctx)
+func (_c *APITokenCreate) SaveX(ctx context.Context) *APIToken {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -109,71 +109,71 @@ func (atc *APITokenCreate) SaveX(ctx context.Context) *APIToken {
 }
 
 // Exec executes the query.
-func (atc *APITokenCreate) Exec(ctx context.Context) error {
-	_, err := atc.Save(ctx)
+func (_c *APITokenCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (atc *APITokenCreate) ExecX(ctx context.Context) {
-	if err := atc.Exec(ctx); err != nil {
+func (_c *APITokenCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (atc *APITokenCreate) defaults() {
-	if _, ok := atc.mutation.Scope(); !ok {
+func (_c *APITokenCreate) defaults() {
+	if _, ok := _c.mutation.Scope(); !ok {
 		v := apitoken.DefaultScope
-		atc.mutation.SetScope(v)
+		_c.mutation.SetScope(v)
 	}
-	if _, ok := atc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := apitoken.DefaultCreatedAt()
-		atc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (atc *APITokenCreate) check() error {
-	if _, ok := atc.mutation.Name(); !ok {
+func (_c *APITokenCreate) check() error {
+	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "APIToken.name"`)}
 	}
-	if v, ok := atc.mutation.Name(); ok {
+	if v, ok := _c.mutation.Name(); ok {
 		if err := apitoken.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "APIToken.name": %w`, err)}
 		}
 	}
-	if _, ok := atc.mutation.TokenHash(); !ok {
+	if _, ok := _c.mutation.TokenHash(); !ok {
 		return &ValidationError{Name: "token_hash", err: errors.New(`ent: missing required field "APIToken.token_hash"`)}
 	}
-	if v, ok := atc.mutation.TokenHash(); ok {
+	if v, ok := _c.mutation.TokenHash(); ok {
 		if err := apitoken.TokenHashValidator(v); err != nil {
 			return &ValidationError{Name: "token_hash", err: fmt.Errorf(`ent: validator failed for field "APIToken.token_hash": %w`, err)}
 		}
 	}
-	if _, ok := atc.mutation.Scope(); !ok {
+	if _, ok := _c.mutation.Scope(); !ok {
 		return &ValidationError{Name: "scope", err: errors.New(`ent: missing required field "APIToken.scope"`)}
 	}
-	if v, ok := atc.mutation.Scope(); ok {
+	if v, ok := _c.mutation.Scope(); ok {
 		if err := apitoken.ScopeValidator(v); err != nil {
 			return &ValidationError{Name: "scope", err: fmt.Errorf(`ent: validator failed for field "APIToken.scope": %w`, err)}
 		}
 	}
-	if _, ok := atc.mutation.CreatedAt(); !ok {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "APIToken.created_at"`)}
 	}
-	if _, ok := atc.mutation.UserID(); !ok {
+	if len(_c.mutation.UserIDs()) == 0 {
 		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "APIToken.user"`)}
 	}
 	return nil
 }
 
-func (atc *APITokenCreate) sqlSave(ctx context.Context) (*APIToken, error) {
-	if err := atc.check(); err != nil {
+func (_c *APITokenCreate) sqlSave(ctx context.Context) (*APIToken, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := atc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, atc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -181,38 +181,38 @@ func (atc *APITokenCreate) sqlSave(ctx context.Context) (*APIToken, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = int(id)
-	atc.mutation.id = &_node.ID
-	atc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (atc *APITokenCreate) createSpec() (*APIToken, *sqlgraph.CreateSpec) {
+func (_c *APITokenCreate) createSpec() (*APIToken, *sqlgraph.CreateSpec) {
 	var (
-		_node = &APIToken{config: atc.config}
+		_node = &APIToken{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(apitoken.Table, sqlgraph.NewFieldSpec(apitoken.FieldID, field.TypeInt))
 	)
-	_spec.OnConflict = atc.conflict
-	if value, ok := atc.mutation.Name(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(apitoken.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := atc.mutation.TokenHash(); ok {
+	if value, ok := _c.mutation.TokenHash(); ok {
 		_spec.SetField(apitoken.FieldTokenHash, field.TypeString, value)
 		_node.TokenHash = value
 	}
-	if value, ok := atc.mutation.Scope(); ok {
+	if value, ok := _c.mutation.Scope(); ok {
 		_spec.SetField(apitoken.FieldScope, field.TypeEnum, value)
 		_node.Scope = value
 	}
-	if value, ok := atc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(apitoken.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := atc.mutation.LastUsed(); ok {
+	if value, ok := _c.mutation.LastUsed(); ok {
 		_spec.SetField(apitoken.FieldLastUsed, field.TypeTime, value)
 		_node.LastUsed = &value
 	}
-	if nodes := atc.mutation.UserIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -248,10 +248,10 @@ func (atc *APITokenCreate) createSpec() (*APIToken, *sqlgraph.CreateSpec) {
 //			SetName(v+v).
 //		}).
 //		Exec(ctx)
-func (atc *APITokenCreate) OnConflict(opts ...sql.ConflictOption) *APITokenUpsertOne {
-	atc.conflict = opts
+func (_c *APITokenCreate) OnConflict(opts ...sql.ConflictOption) *APITokenUpsertOne {
+	_c.conflict = opts
 	return &APITokenUpsertOne{
-		create: atc,
+		create: _c,
 	}
 }
 
@@ -261,10 +261,10 @@ func (atc *APITokenCreate) OnConflict(opts ...sql.ConflictOption) *APITokenUpser
 //	client.APIToken.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (atc *APITokenCreate) OnConflictColumns(columns ...string) *APITokenUpsertOne {
-	atc.conflict = append(atc.conflict, sql.ConflictColumns(columns...))
+func (_c *APITokenCreate) OnConflictColumns(columns ...string) *APITokenUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &APITokenUpsertOne{
-		create: atc,
+		create: _c,
 	}
 }
 
@@ -485,16 +485,16 @@ type APITokenCreateBulk struct {
 }
 
 // Save creates the APIToken entities in the database.
-func (atcb *APITokenCreateBulk) Save(ctx context.Context) ([]*APIToken, error) {
-	if atcb.err != nil {
-		return nil, atcb.err
+func (_c *APITokenCreateBulk) Save(ctx context.Context) ([]*APIToken, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(atcb.builders))
-	nodes := make([]*APIToken, len(atcb.builders))
-	mutators := make([]Mutator, len(atcb.builders))
-	for i := range atcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*APIToken, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := atcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*APITokenMutation)
@@ -508,12 +508,12 @@ func (atcb *APITokenCreateBulk) Save(ctx context.Context) ([]*APIToken, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, atcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = atcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, atcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -537,7 +537,7 @@ func (atcb *APITokenCreateBulk) Save(ctx context.Context) ([]*APIToken, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, atcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -545,8 +545,8 @@ func (atcb *APITokenCreateBulk) Save(ctx context.Context) ([]*APIToken, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (atcb *APITokenCreateBulk) SaveX(ctx context.Context) []*APIToken {
-	v, err := atcb.Save(ctx)
+func (_c *APITokenCreateBulk) SaveX(ctx context.Context) []*APIToken {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -554,14 +554,14 @@ func (atcb *APITokenCreateBulk) SaveX(ctx context.Context) []*APIToken {
 }
 
 // Exec executes the query.
-func (atcb *APITokenCreateBulk) Exec(ctx context.Context) error {
-	_, err := atcb.Save(ctx)
+func (_c *APITokenCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (atcb *APITokenCreateBulk) ExecX(ctx context.Context) {
-	if err := atcb.Exec(ctx); err != nil {
+func (_c *APITokenCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -581,10 +581,10 @@ func (atcb *APITokenCreateBulk) ExecX(ctx context.Context) {
 //			SetName(v+v).
 //		}).
 //		Exec(ctx)
-func (atcb *APITokenCreateBulk) OnConflict(opts ...sql.ConflictOption) *APITokenUpsertBulk {
-	atcb.conflict = opts
+func (_c *APITokenCreateBulk) OnConflict(opts ...sql.ConflictOption) *APITokenUpsertBulk {
+	_c.conflict = opts
 	return &APITokenUpsertBulk{
-		create: atcb,
+		create: _c,
 	}
 }
 
@@ -594,10 +594,10 @@ func (atcb *APITokenCreateBulk) OnConflict(opts ...sql.ConflictOption) *APIToken
 //	client.APIToken.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (atcb *APITokenCreateBulk) OnConflictColumns(columns ...string) *APITokenUpsertBulk {
-	atcb.conflict = append(atcb.conflict, sql.ConflictColumns(columns...))
+func (_c *APITokenCreateBulk) OnConflictColumns(columns ...string) *APITokenUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &APITokenUpsertBulk{
-		create: atcb,
+		create: _c,
 	}
 }
 

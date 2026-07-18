@@ -20,56 +20,56 @@ type WebRuleDelete struct {
 }
 
 // Where appends a list predicates to the WebRuleDelete builder.
-func (wrd *WebRuleDelete) Where(ps ...predicate.WebRule) *WebRuleDelete {
-	wrd.mutation.Where(ps...)
-	return wrd
+func (_d *WebRuleDelete) Where(ps ...predicate.WebRule) *WebRuleDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (wrd *WebRuleDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, wrd.sqlExec, wrd.mutation, wrd.hooks)
+func (_d *WebRuleDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wrd *WebRuleDelete) ExecX(ctx context.Context) int {
-	n, err := wrd.Exec(ctx)
+func (_d *WebRuleDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (wrd *WebRuleDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *WebRuleDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(webrule.Table, sqlgraph.NewFieldSpec(webrule.FieldID, field.TypeInt))
-	if ps := wrd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, wrd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	wrd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // WebRuleDeleteOne is the builder for deleting a single WebRule entity.
 type WebRuleDeleteOne struct {
-	wrd *WebRuleDelete
+	_d *WebRuleDelete
 }
 
 // Where appends a list predicates to the WebRuleDelete builder.
-func (wrdo *WebRuleDeleteOne) Where(ps ...predicate.WebRule) *WebRuleDeleteOne {
-	wrdo.wrd.mutation.Where(ps...)
-	return wrdo
+func (_d *WebRuleDeleteOne) Where(ps ...predicate.WebRule) *WebRuleDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (wrdo *WebRuleDeleteOne) Exec(ctx context.Context) error {
-	n, err := wrdo.wrd.Exec(ctx)
+func (_d *WebRuleDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (wrdo *WebRuleDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wrdo *WebRuleDeleteOne) ExecX(ctx context.Context) {
-	if err := wrdo.Exec(ctx); err != nil {
+func (_d *WebRuleDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

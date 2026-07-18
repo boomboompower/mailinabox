@@ -45,12 +45,10 @@ type EncryptionSetupEdges struct {
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EncryptionSetupEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[0] {
-		if e.User == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.User != nil {
 		return e.User, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "user"}
 }
@@ -77,7 +75,7 @@ func (*EncryptionSetup) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the EncryptionSetup fields.
-func (es *EncryptionSetup) assignValues(columns []string, values []any) error {
+func (_m *EncryptionSetup) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -88,40 +86,40 @@ func (es *EncryptionSetup) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			es.ID = int(value.Int64)
+			_m.ID = int(value.Int64)
 		case encryptionsetup.FieldMode:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field mode", values[i])
 			} else if value.Valid {
-				es.Mode = encryptionsetup.Mode(value.String)
+				_m.Mode = encryptionsetup.Mode(value.String)
 			}
 		case encryptionsetup.FieldPrepared:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field prepared", values[i])
 			} else if value.Valid {
-				es.Prepared = value.String
+				_m.Prepared = value.String
 			}
 		case encryptionsetup.FieldAttempts:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field attempts", values[i])
 			} else if value.Valid {
-				es.Attempts = int(value.Int64)
+				_m.Attempts = int(value.Int64)
 			}
 		case encryptionsetup.FieldExpiresAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field expires_at", values[i])
 			} else if value.Valid {
-				es.ExpiresAt = value.Time
+				_m.ExpiresAt = value.Time
 			}
 		case encryptionsetup.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field user_encryption_setups", value)
 			} else if value.Valid {
-				es.user_encryption_setups = new(int)
-				*es.user_encryption_setups = int(value.Int64)
+				_m.user_encryption_setups = new(int)
+				*_m.user_encryption_setups = int(value.Int64)
 			}
 		default:
-			es.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -129,48 +127,48 @@ func (es *EncryptionSetup) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the EncryptionSetup.
 // This includes values selected through modifiers, order, etc.
-func (es *EncryptionSetup) Value(name string) (ent.Value, error) {
-	return es.selectValues.Get(name)
+func (_m *EncryptionSetup) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryUser queries the "user" edge of the EncryptionSetup entity.
-func (es *EncryptionSetup) QueryUser() *UserQuery {
-	return NewEncryptionSetupClient(es.config).QueryUser(es)
+func (_m *EncryptionSetup) QueryUser() *UserQuery {
+	return NewEncryptionSetupClient(_m.config).QueryUser(_m)
 }
 
 // Update returns a builder for updating this EncryptionSetup.
 // Note that you need to call EncryptionSetup.Unwrap() before calling this method if this EncryptionSetup
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (es *EncryptionSetup) Update() *EncryptionSetupUpdateOne {
-	return NewEncryptionSetupClient(es.config).UpdateOne(es)
+func (_m *EncryptionSetup) Update() *EncryptionSetupUpdateOne {
+	return NewEncryptionSetupClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the EncryptionSetup entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (es *EncryptionSetup) Unwrap() *EncryptionSetup {
-	_tx, ok := es.config.driver.(*txDriver)
+func (_m *EncryptionSetup) Unwrap() *EncryptionSetup {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: EncryptionSetup is not a transactional entity")
 	}
-	es.config.driver = _tx.drv
-	return es
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (es *EncryptionSetup) String() string {
+func (_m *EncryptionSetup) String() string {
 	var builder strings.Builder
 	builder.WriteString("EncryptionSetup(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", es.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("mode=")
-	builder.WriteString(fmt.Sprintf("%v", es.Mode))
+	builder.WriteString(fmt.Sprintf("%v", _m.Mode))
 	builder.WriteString(", ")
 	builder.WriteString("prepared=<sensitive>")
 	builder.WriteString(", ")
 	builder.WriteString("attempts=")
-	builder.WriteString(fmt.Sprintf("%v", es.Attempts))
+	builder.WriteString(fmt.Sprintf("%v", _m.Attempts))
 	builder.WriteString(", ")
 	builder.WriteString("expires_at=")
-	builder.WriteString(es.ExpiresAt.Format(time.ANSIC))
+	builder.WriteString(_m.ExpiresAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

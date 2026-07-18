@@ -23,139 +23,139 @@ type WebRuleUpdate struct {
 }
 
 // Where appends a list predicates to the WebRuleUpdate builder.
-func (wru *WebRuleUpdate) Where(ps ...predicate.WebRule) *WebRuleUpdate {
-	wru.mutation.Where(ps...)
-	return wru
+func (_u *WebRuleUpdate) Where(ps ...predicate.WebRule) *WebRuleUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetKind sets the "kind" field.
-func (wru *WebRuleUpdate) SetKind(w webrule.Kind) *WebRuleUpdate {
-	wru.mutation.SetKind(w)
-	return wru
+func (_u *WebRuleUpdate) SetKind(v webrule.Kind) *WebRuleUpdate {
+	_u.mutation.SetKind(v)
+	return _u
 }
 
 // SetNillableKind sets the "kind" field if the given value is not nil.
-func (wru *WebRuleUpdate) SetNillableKind(w *webrule.Kind) *WebRuleUpdate {
-	if w != nil {
-		wru.SetKind(*w)
+func (_u *WebRuleUpdate) SetNillableKind(v *webrule.Kind) *WebRuleUpdate {
+	if v != nil {
+		_u.SetKind(*v)
 	}
-	return wru
+	return _u
 }
 
 // SetPath sets the "path" field.
-func (wru *WebRuleUpdate) SetPath(s string) *WebRuleUpdate {
-	wru.mutation.SetPath(s)
-	return wru
+func (_u *WebRuleUpdate) SetPath(v string) *WebRuleUpdate {
+	_u.mutation.SetPath(v)
+	return _u
 }
 
 // SetNillablePath sets the "path" field if the given value is not nil.
-func (wru *WebRuleUpdate) SetNillablePath(s *string) *WebRuleUpdate {
-	if s != nil {
-		wru.SetPath(*s)
+func (_u *WebRuleUpdate) SetNillablePath(v *string) *WebRuleUpdate {
+	if v != nil {
+		_u.SetPath(*v)
 	}
-	return wru
+	return _u
 }
 
 // SetTarget sets the "target" field.
-func (wru *WebRuleUpdate) SetTarget(s string) *WebRuleUpdate {
-	wru.mutation.SetTarget(s)
-	return wru
+func (_u *WebRuleUpdate) SetTarget(v string) *WebRuleUpdate {
+	_u.mutation.SetTarget(v)
+	return _u
 }
 
 // SetNillableTarget sets the "target" field if the given value is not nil.
-func (wru *WebRuleUpdate) SetNillableTarget(s *string) *WebRuleUpdate {
-	if s != nil {
-		wru.SetTarget(*s)
+func (_u *WebRuleUpdate) SetNillableTarget(v *string) *WebRuleUpdate {
+	if v != nil {
+		_u.SetTarget(*v)
 	}
-	return wru
+	return _u
 }
 
 // SetPassHostHeader sets the "pass_host_header" field.
-func (wru *WebRuleUpdate) SetPassHostHeader(b bool) *WebRuleUpdate {
-	wru.mutation.SetPassHostHeader(b)
-	return wru
+func (_u *WebRuleUpdate) SetPassHostHeader(v bool) *WebRuleUpdate {
+	_u.mutation.SetPassHostHeader(v)
+	return _u
 }
 
 // SetNillablePassHostHeader sets the "pass_host_header" field if the given value is not nil.
-func (wru *WebRuleUpdate) SetNillablePassHostHeader(b *bool) *WebRuleUpdate {
-	if b != nil {
-		wru.SetPassHostHeader(*b)
+func (_u *WebRuleUpdate) SetNillablePassHostHeader(v *bool) *WebRuleUpdate {
+	if v != nil {
+		_u.SetPassHostHeader(*v)
 	}
-	return wru
+	return _u
 }
 
 // SetNoProxyRedirect sets the "no_proxy_redirect" field.
-func (wru *WebRuleUpdate) SetNoProxyRedirect(b bool) *WebRuleUpdate {
-	wru.mutation.SetNoProxyRedirect(b)
-	return wru
+func (_u *WebRuleUpdate) SetNoProxyRedirect(v bool) *WebRuleUpdate {
+	_u.mutation.SetNoProxyRedirect(v)
+	return _u
 }
 
 // SetNillableNoProxyRedirect sets the "no_proxy_redirect" field if the given value is not nil.
-func (wru *WebRuleUpdate) SetNillableNoProxyRedirect(b *bool) *WebRuleUpdate {
-	if b != nil {
-		wru.SetNoProxyRedirect(*b)
+func (_u *WebRuleUpdate) SetNillableNoProxyRedirect(v *bool) *WebRuleUpdate {
+	if v != nil {
+		_u.SetNoProxyRedirect(*v)
 	}
-	return wru
+	return _u
 }
 
 // SetFrameSameOrigin sets the "frame_same_origin" field.
-func (wru *WebRuleUpdate) SetFrameSameOrigin(b bool) *WebRuleUpdate {
-	wru.mutation.SetFrameSameOrigin(b)
-	return wru
+func (_u *WebRuleUpdate) SetFrameSameOrigin(v bool) *WebRuleUpdate {
+	_u.mutation.SetFrameSameOrigin(v)
+	return _u
 }
 
 // SetNillableFrameSameOrigin sets the "frame_same_origin" field if the given value is not nil.
-func (wru *WebRuleUpdate) SetNillableFrameSameOrigin(b *bool) *WebRuleUpdate {
-	if b != nil {
-		wru.SetFrameSameOrigin(*b)
+func (_u *WebRuleUpdate) SetNillableFrameSameOrigin(v *bool) *WebRuleUpdate {
+	if v != nil {
+		_u.SetFrameSameOrigin(*v)
 	}
-	return wru
+	return _u
 }
 
 // SetWebSockets sets the "web_sockets" field.
-func (wru *WebRuleUpdate) SetWebSockets(b bool) *WebRuleUpdate {
-	wru.mutation.SetWebSockets(b)
-	return wru
+func (_u *WebRuleUpdate) SetWebSockets(v bool) *WebRuleUpdate {
+	_u.mutation.SetWebSockets(v)
+	return _u
 }
 
 // SetNillableWebSockets sets the "web_sockets" field if the given value is not nil.
-func (wru *WebRuleUpdate) SetNillableWebSockets(b *bool) *WebRuleUpdate {
-	if b != nil {
-		wru.SetWebSockets(*b)
+func (_u *WebRuleUpdate) SetNillableWebSockets(v *bool) *WebRuleUpdate {
+	if v != nil {
+		_u.SetWebSockets(*v)
 	}
-	return wru
+	return _u
 }
 
 // SetDomainID sets the "domain" edge to the WebDomain entity by ID.
-func (wru *WebRuleUpdate) SetDomainID(id int) *WebRuleUpdate {
-	wru.mutation.SetDomainID(id)
-	return wru
+func (_u *WebRuleUpdate) SetDomainID(id int) *WebRuleUpdate {
+	_u.mutation.SetDomainID(id)
+	return _u
 }
 
 // SetDomain sets the "domain" edge to the WebDomain entity.
-func (wru *WebRuleUpdate) SetDomain(w *WebDomain) *WebRuleUpdate {
-	return wru.SetDomainID(w.ID)
+func (_u *WebRuleUpdate) SetDomain(v *WebDomain) *WebRuleUpdate {
+	return _u.SetDomainID(v.ID)
 }
 
 // Mutation returns the WebRuleMutation object of the builder.
-func (wru *WebRuleUpdate) Mutation() *WebRuleMutation {
-	return wru.mutation
+func (_u *WebRuleUpdate) Mutation() *WebRuleMutation {
+	return _u.mutation
 }
 
 // ClearDomain clears the "domain" edge to the WebDomain entity.
-func (wru *WebRuleUpdate) ClearDomain() *WebRuleUpdate {
-	wru.mutation.ClearDomain()
-	return wru
+func (_u *WebRuleUpdate) ClearDomain() *WebRuleUpdate {
+	_u.mutation.ClearDomain()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (wru *WebRuleUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, wru.sqlSave, wru.mutation, wru.hooks)
+func (_u *WebRuleUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (wru *WebRuleUpdate) SaveX(ctx context.Context) int {
-	affected, err := wru.Save(ctx)
+func (_u *WebRuleUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -163,75 +163,75 @@ func (wru *WebRuleUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (wru *WebRuleUpdate) Exec(ctx context.Context) error {
-	_, err := wru.Save(ctx)
+func (_u *WebRuleUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wru *WebRuleUpdate) ExecX(ctx context.Context) {
-	if err := wru.Exec(ctx); err != nil {
+func (_u *WebRuleUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (wru *WebRuleUpdate) check() error {
-	if v, ok := wru.mutation.Kind(); ok {
+func (_u *WebRuleUpdate) check() error {
+	if v, ok := _u.mutation.Kind(); ok {
 		if err := webrule.KindValidator(v); err != nil {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "WebRule.kind": %w`, err)}
 		}
 	}
-	if v, ok := wru.mutation.Path(); ok {
+	if v, ok := _u.mutation.Path(); ok {
 		if err := webrule.PathValidator(v); err != nil {
 			return &ValidationError{Name: "path", err: fmt.Errorf(`ent: validator failed for field "WebRule.path": %w`, err)}
 		}
 	}
-	if v, ok := wru.mutation.Target(); ok {
+	if v, ok := _u.mutation.Target(); ok {
 		if err := webrule.TargetValidator(v); err != nil {
 			return &ValidationError{Name: "target", err: fmt.Errorf(`ent: validator failed for field "WebRule.target": %w`, err)}
 		}
 	}
-	if _, ok := wru.mutation.DomainID(); wru.mutation.DomainCleared() && !ok {
+	if _u.mutation.DomainCleared() && len(_u.mutation.DomainIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "WebRule.domain"`)
 	}
 	return nil
 }
 
-func (wru *WebRuleUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := wru.check(); err != nil {
-		return n, err
+func (_u *WebRuleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(webrule.Table, webrule.Columns, sqlgraph.NewFieldSpec(webrule.FieldID, field.TypeInt))
-	if ps := wru.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := wru.mutation.Kind(); ok {
+	if value, ok := _u.mutation.Kind(); ok {
 		_spec.SetField(webrule.FieldKind, field.TypeEnum, value)
 	}
-	if value, ok := wru.mutation.Path(); ok {
+	if value, ok := _u.mutation.Path(); ok {
 		_spec.SetField(webrule.FieldPath, field.TypeString, value)
 	}
-	if value, ok := wru.mutation.Target(); ok {
+	if value, ok := _u.mutation.Target(); ok {
 		_spec.SetField(webrule.FieldTarget, field.TypeString, value)
 	}
-	if value, ok := wru.mutation.PassHostHeader(); ok {
+	if value, ok := _u.mutation.PassHostHeader(); ok {
 		_spec.SetField(webrule.FieldPassHostHeader, field.TypeBool, value)
 	}
-	if value, ok := wru.mutation.NoProxyRedirect(); ok {
+	if value, ok := _u.mutation.NoProxyRedirect(); ok {
 		_spec.SetField(webrule.FieldNoProxyRedirect, field.TypeBool, value)
 	}
-	if value, ok := wru.mutation.FrameSameOrigin(); ok {
+	if value, ok := _u.mutation.FrameSameOrigin(); ok {
 		_spec.SetField(webrule.FieldFrameSameOrigin, field.TypeBool, value)
 	}
-	if value, ok := wru.mutation.WebSockets(); ok {
+	if value, ok := _u.mutation.WebSockets(); ok {
 		_spec.SetField(webrule.FieldWebSockets, field.TypeBool, value)
 	}
-	if wru.mutation.DomainCleared() {
+	if _u.mutation.DomainCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -244,7 +244,7 @@ func (wru *WebRuleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wru.mutation.DomainIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DomainIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -260,7 +260,7 @@ func (wru *WebRuleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, wru.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{webrule.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -268,8 +268,8 @@ func (wru *WebRuleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	wru.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // WebRuleUpdateOne is the builder for updating a single WebRule entity.
@@ -281,146 +281,146 @@ type WebRuleUpdateOne struct {
 }
 
 // SetKind sets the "kind" field.
-func (wruo *WebRuleUpdateOne) SetKind(w webrule.Kind) *WebRuleUpdateOne {
-	wruo.mutation.SetKind(w)
-	return wruo
+func (_u *WebRuleUpdateOne) SetKind(v webrule.Kind) *WebRuleUpdateOne {
+	_u.mutation.SetKind(v)
+	return _u
 }
 
 // SetNillableKind sets the "kind" field if the given value is not nil.
-func (wruo *WebRuleUpdateOne) SetNillableKind(w *webrule.Kind) *WebRuleUpdateOne {
-	if w != nil {
-		wruo.SetKind(*w)
+func (_u *WebRuleUpdateOne) SetNillableKind(v *webrule.Kind) *WebRuleUpdateOne {
+	if v != nil {
+		_u.SetKind(*v)
 	}
-	return wruo
+	return _u
 }
 
 // SetPath sets the "path" field.
-func (wruo *WebRuleUpdateOne) SetPath(s string) *WebRuleUpdateOne {
-	wruo.mutation.SetPath(s)
-	return wruo
+func (_u *WebRuleUpdateOne) SetPath(v string) *WebRuleUpdateOne {
+	_u.mutation.SetPath(v)
+	return _u
 }
 
 // SetNillablePath sets the "path" field if the given value is not nil.
-func (wruo *WebRuleUpdateOne) SetNillablePath(s *string) *WebRuleUpdateOne {
-	if s != nil {
-		wruo.SetPath(*s)
+func (_u *WebRuleUpdateOne) SetNillablePath(v *string) *WebRuleUpdateOne {
+	if v != nil {
+		_u.SetPath(*v)
 	}
-	return wruo
+	return _u
 }
 
 // SetTarget sets the "target" field.
-func (wruo *WebRuleUpdateOne) SetTarget(s string) *WebRuleUpdateOne {
-	wruo.mutation.SetTarget(s)
-	return wruo
+func (_u *WebRuleUpdateOne) SetTarget(v string) *WebRuleUpdateOne {
+	_u.mutation.SetTarget(v)
+	return _u
 }
 
 // SetNillableTarget sets the "target" field if the given value is not nil.
-func (wruo *WebRuleUpdateOne) SetNillableTarget(s *string) *WebRuleUpdateOne {
-	if s != nil {
-		wruo.SetTarget(*s)
+func (_u *WebRuleUpdateOne) SetNillableTarget(v *string) *WebRuleUpdateOne {
+	if v != nil {
+		_u.SetTarget(*v)
 	}
-	return wruo
+	return _u
 }
 
 // SetPassHostHeader sets the "pass_host_header" field.
-func (wruo *WebRuleUpdateOne) SetPassHostHeader(b bool) *WebRuleUpdateOne {
-	wruo.mutation.SetPassHostHeader(b)
-	return wruo
+func (_u *WebRuleUpdateOne) SetPassHostHeader(v bool) *WebRuleUpdateOne {
+	_u.mutation.SetPassHostHeader(v)
+	return _u
 }
 
 // SetNillablePassHostHeader sets the "pass_host_header" field if the given value is not nil.
-func (wruo *WebRuleUpdateOne) SetNillablePassHostHeader(b *bool) *WebRuleUpdateOne {
-	if b != nil {
-		wruo.SetPassHostHeader(*b)
+func (_u *WebRuleUpdateOne) SetNillablePassHostHeader(v *bool) *WebRuleUpdateOne {
+	if v != nil {
+		_u.SetPassHostHeader(*v)
 	}
-	return wruo
+	return _u
 }
 
 // SetNoProxyRedirect sets the "no_proxy_redirect" field.
-func (wruo *WebRuleUpdateOne) SetNoProxyRedirect(b bool) *WebRuleUpdateOne {
-	wruo.mutation.SetNoProxyRedirect(b)
-	return wruo
+func (_u *WebRuleUpdateOne) SetNoProxyRedirect(v bool) *WebRuleUpdateOne {
+	_u.mutation.SetNoProxyRedirect(v)
+	return _u
 }
 
 // SetNillableNoProxyRedirect sets the "no_proxy_redirect" field if the given value is not nil.
-func (wruo *WebRuleUpdateOne) SetNillableNoProxyRedirect(b *bool) *WebRuleUpdateOne {
-	if b != nil {
-		wruo.SetNoProxyRedirect(*b)
+func (_u *WebRuleUpdateOne) SetNillableNoProxyRedirect(v *bool) *WebRuleUpdateOne {
+	if v != nil {
+		_u.SetNoProxyRedirect(*v)
 	}
-	return wruo
+	return _u
 }
 
 // SetFrameSameOrigin sets the "frame_same_origin" field.
-func (wruo *WebRuleUpdateOne) SetFrameSameOrigin(b bool) *WebRuleUpdateOne {
-	wruo.mutation.SetFrameSameOrigin(b)
-	return wruo
+func (_u *WebRuleUpdateOne) SetFrameSameOrigin(v bool) *WebRuleUpdateOne {
+	_u.mutation.SetFrameSameOrigin(v)
+	return _u
 }
 
 // SetNillableFrameSameOrigin sets the "frame_same_origin" field if the given value is not nil.
-func (wruo *WebRuleUpdateOne) SetNillableFrameSameOrigin(b *bool) *WebRuleUpdateOne {
-	if b != nil {
-		wruo.SetFrameSameOrigin(*b)
+func (_u *WebRuleUpdateOne) SetNillableFrameSameOrigin(v *bool) *WebRuleUpdateOne {
+	if v != nil {
+		_u.SetFrameSameOrigin(*v)
 	}
-	return wruo
+	return _u
 }
 
 // SetWebSockets sets the "web_sockets" field.
-func (wruo *WebRuleUpdateOne) SetWebSockets(b bool) *WebRuleUpdateOne {
-	wruo.mutation.SetWebSockets(b)
-	return wruo
+func (_u *WebRuleUpdateOne) SetWebSockets(v bool) *WebRuleUpdateOne {
+	_u.mutation.SetWebSockets(v)
+	return _u
 }
 
 // SetNillableWebSockets sets the "web_sockets" field if the given value is not nil.
-func (wruo *WebRuleUpdateOne) SetNillableWebSockets(b *bool) *WebRuleUpdateOne {
-	if b != nil {
-		wruo.SetWebSockets(*b)
+func (_u *WebRuleUpdateOne) SetNillableWebSockets(v *bool) *WebRuleUpdateOne {
+	if v != nil {
+		_u.SetWebSockets(*v)
 	}
-	return wruo
+	return _u
 }
 
 // SetDomainID sets the "domain" edge to the WebDomain entity by ID.
-func (wruo *WebRuleUpdateOne) SetDomainID(id int) *WebRuleUpdateOne {
-	wruo.mutation.SetDomainID(id)
-	return wruo
+func (_u *WebRuleUpdateOne) SetDomainID(id int) *WebRuleUpdateOne {
+	_u.mutation.SetDomainID(id)
+	return _u
 }
 
 // SetDomain sets the "domain" edge to the WebDomain entity.
-func (wruo *WebRuleUpdateOne) SetDomain(w *WebDomain) *WebRuleUpdateOne {
-	return wruo.SetDomainID(w.ID)
+func (_u *WebRuleUpdateOne) SetDomain(v *WebDomain) *WebRuleUpdateOne {
+	return _u.SetDomainID(v.ID)
 }
 
 // Mutation returns the WebRuleMutation object of the builder.
-func (wruo *WebRuleUpdateOne) Mutation() *WebRuleMutation {
-	return wruo.mutation
+func (_u *WebRuleUpdateOne) Mutation() *WebRuleMutation {
+	return _u.mutation
 }
 
 // ClearDomain clears the "domain" edge to the WebDomain entity.
-func (wruo *WebRuleUpdateOne) ClearDomain() *WebRuleUpdateOne {
-	wruo.mutation.ClearDomain()
-	return wruo
+func (_u *WebRuleUpdateOne) ClearDomain() *WebRuleUpdateOne {
+	_u.mutation.ClearDomain()
+	return _u
 }
 
 // Where appends a list predicates to the WebRuleUpdate builder.
-func (wruo *WebRuleUpdateOne) Where(ps ...predicate.WebRule) *WebRuleUpdateOne {
-	wruo.mutation.Where(ps...)
-	return wruo
+func (_u *WebRuleUpdateOne) Where(ps ...predicate.WebRule) *WebRuleUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (wruo *WebRuleUpdateOne) Select(field string, fields ...string) *WebRuleUpdateOne {
-	wruo.fields = append([]string{field}, fields...)
-	return wruo
+func (_u *WebRuleUpdateOne) Select(field string, fields ...string) *WebRuleUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated WebRule entity.
-func (wruo *WebRuleUpdateOne) Save(ctx context.Context) (*WebRule, error) {
-	return withHooks(ctx, wruo.sqlSave, wruo.mutation, wruo.hooks)
+func (_u *WebRuleUpdateOne) Save(ctx context.Context) (*WebRule, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (wruo *WebRuleUpdateOne) SaveX(ctx context.Context) *WebRule {
-	node, err := wruo.Save(ctx)
+func (_u *WebRuleUpdateOne) SaveX(ctx context.Context) *WebRule {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -428,52 +428,52 @@ func (wruo *WebRuleUpdateOne) SaveX(ctx context.Context) *WebRule {
 }
 
 // Exec executes the query on the entity.
-func (wruo *WebRuleUpdateOne) Exec(ctx context.Context) error {
-	_, err := wruo.Save(ctx)
+func (_u *WebRuleUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (wruo *WebRuleUpdateOne) ExecX(ctx context.Context) {
-	if err := wruo.Exec(ctx); err != nil {
+func (_u *WebRuleUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (wruo *WebRuleUpdateOne) check() error {
-	if v, ok := wruo.mutation.Kind(); ok {
+func (_u *WebRuleUpdateOne) check() error {
+	if v, ok := _u.mutation.Kind(); ok {
 		if err := webrule.KindValidator(v); err != nil {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "WebRule.kind": %w`, err)}
 		}
 	}
-	if v, ok := wruo.mutation.Path(); ok {
+	if v, ok := _u.mutation.Path(); ok {
 		if err := webrule.PathValidator(v); err != nil {
 			return &ValidationError{Name: "path", err: fmt.Errorf(`ent: validator failed for field "WebRule.path": %w`, err)}
 		}
 	}
-	if v, ok := wruo.mutation.Target(); ok {
+	if v, ok := _u.mutation.Target(); ok {
 		if err := webrule.TargetValidator(v); err != nil {
 			return &ValidationError{Name: "target", err: fmt.Errorf(`ent: validator failed for field "WebRule.target": %w`, err)}
 		}
 	}
-	if _, ok := wruo.mutation.DomainID(); wruo.mutation.DomainCleared() && !ok {
+	if _u.mutation.DomainCleared() && len(_u.mutation.DomainIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "WebRule.domain"`)
 	}
 	return nil
 }
 
-func (wruo *WebRuleUpdateOne) sqlSave(ctx context.Context) (_node *WebRule, err error) {
-	if err := wruo.check(); err != nil {
+func (_u *WebRuleUpdateOne) sqlSave(ctx context.Context) (_node *WebRule, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(webrule.Table, webrule.Columns, sqlgraph.NewFieldSpec(webrule.FieldID, field.TypeInt))
-	id, ok := wruo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "WebRule.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := wruo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, webrule.FieldID)
 		for _, f := range fields {
@@ -485,35 +485,35 @@ func (wruo *WebRuleUpdateOne) sqlSave(ctx context.Context) (_node *WebRule, err 
 			}
 		}
 	}
-	if ps := wruo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := wruo.mutation.Kind(); ok {
+	if value, ok := _u.mutation.Kind(); ok {
 		_spec.SetField(webrule.FieldKind, field.TypeEnum, value)
 	}
-	if value, ok := wruo.mutation.Path(); ok {
+	if value, ok := _u.mutation.Path(); ok {
 		_spec.SetField(webrule.FieldPath, field.TypeString, value)
 	}
-	if value, ok := wruo.mutation.Target(); ok {
+	if value, ok := _u.mutation.Target(); ok {
 		_spec.SetField(webrule.FieldTarget, field.TypeString, value)
 	}
-	if value, ok := wruo.mutation.PassHostHeader(); ok {
+	if value, ok := _u.mutation.PassHostHeader(); ok {
 		_spec.SetField(webrule.FieldPassHostHeader, field.TypeBool, value)
 	}
-	if value, ok := wruo.mutation.NoProxyRedirect(); ok {
+	if value, ok := _u.mutation.NoProxyRedirect(); ok {
 		_spec.SetField(webrule.FieldNoProxyRedirect, field.TypeBool, value)
 	}
-	if value, ok := wruo.mutation.FrameSameOrigin(); ok {
+	if value, ok := _u.mutation.FrameSameOrigin(); ok {
 		_spec.SetField(webrule.FieldFrameSameOrigin, field.TypeBool, value)
 	}
-	if value, ok := wruo.mutation.WebSockets(); ok {
+	if value, ok := _u.mutation.WebSockets(); ok {
 		_spec.SetField(webrule.FieldWebSockets, field.TypeBool, value)
 	}
-	if wruo.mutation.DomainCleared() {
+	if _u.mutation.DomainCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -526,7 +526,7 @@ func (wruo *WebRuleUpdateOne) sqlSave(ctx context.Context) (_node *WebRule, err 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := wruo.mutation.DomainIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.DomainIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -542,10 +542,10 @@ func (wruo *WebRuleUpdateOne) sqlSave(ctx context.Context) (_node *WebRule, err 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &WebRule{config: wruo.config}
+	_node = &WebRule{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, wruo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{webrule.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -553,6 +553,6 @@ func (wruo *WebRuleUpdateOne) sqlSave(ctx context.Context) (_node *WebRule, err 
 		}
 		return nil, err
 	}
-	wruo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

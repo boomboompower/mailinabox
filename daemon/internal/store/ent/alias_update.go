@@ -24,99 +24,99 @@ type AliasUpdate struct {
 }
 
 // Where appends a list predicates to the AliasUpdate builder.
-func (au *AliasUpdate) Where(ps ...predicate.Alias) *AliasUpdate {
-	au.mutation.Where(ps...)
-	return au
+func (_u *AliasUpdate) Where(ps ...predicate.Alias) *AliasUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetSource sets the "source" field.
-func (au *AliasUpdate) SetSource(s string) *AliasUpdate {
-	au.mutation.SetSource(s)
-	return au
+func (_u *AliasUpdate) SetSource(v string) *AliasUpdate {
+	_u.mutation.SetSource(v)
+	return _u
 }
 
 // SetNillableSource sets the "source" field if the given value is not nil.
-func (au *AliasUpdate) SetNillableSource(s *string) *AliasUpdate {
-	if s != nil {
-		au.SetSource(*s)
+func (_u *AliasUpdate) SetNillableSource(v *string) *AliasUpdate {
+	if v != nil {
+		_u.SetSource(*v)
 	}
-	return au
+	return _u
 }
 
 // SetDestinations sets the "destinations" field.
-func (au *AliasUpdate) SetDestinations(s []string) *AliasUpdate {
-	au.mutation.SetDestinations(s)
-	return au
+func (_u *AliasUpdate) SetDestinations(v []string) *AliasUpdate {
+	_u.mutation.SetDestinations(v)
+	return _u
 }
 
-// AppendDestinations appends s to the "destinations" field.
-func (au *AliasUpdate) AppendDestinations(s []string) *AliasUpdate {
-	au.mutation.AppendDestinations(s)
-	return au
+// AppendDestinations appends value to the "destinations" field.
+func (_u *AliasUpdate) AppendDestinations(v []string) *AliasUpdate {
+	_u.mutation.AppendDestinations(v)
+	return _u
 }
 
 // SetPermittedSenders sets the "permitted_senders" field.
-func (au *AliasUpdate) SetPermittedSenders(s []string) *AliasUpdate {
-	au.mutation.SetPermittedSenders(s)
-	return au
+func (_u *AliasUpdate) SetPermittedSenders(v []string) *AliasUpdate {
+	_u.mutation.SetPermittedSenders(v)
+	return _u
 }
 
-// AppendPermittedSenders appends s to the "permitted_senders" field.
-func (au *AliasUpdate) AppendPermittedSenders(s []string) *AliasUpdate {
-	au.mutation.AppendPermittedSenders(s)
-	return au
+// AppendPermittedSenders appends value to the "permitted_senders" field.
+func (_u *AliasUpdate) AppendPermittedSenders(v []string) *AliasUpdate {
+	_u.mutation.AppendPermittedSenders(v)
+	return _u
 }
 
 // ClearPermittedSenders clears the value of the "permitted_senders" field.
-func (au *AliasUpdate) ClearPermittedSenders() *AliasUpdate {
-	au.mutation.ClearPermittedSenders()
-	return au
+func (_u *AliasUpdate) ClearPermittedSenders() *AliasUpdate {
+	_u.mutation.ClearPermittedSenders()
+	return _u
 }
 
 // SetAuto sets the "auto" field.
-func (au *AliasUpdate) SetAuto(b bool) *AliasUpdate {
-	au.mutation.SetAuto(b)
-	return au
+func (_u *AliasUpdate) SetAuto(v bool) *AliasUpdate {
+	_u.mutation.SetAuto(v)
+	return _u
 }
 
 // SetNillableAuto sets the "auto" field if the given value is not nil.
-func (au *AliasUpdate) SetNillableAuto(b *bool) *AliasUpdate {
-	if b != nil {
-		au.SetAuto(*b)
+func (_u *AliasUpdate) SetNillableAuto(v *bool) *AliasUpdate {
+	if v != nil {
+		_u.SetAuto(*v)
 	}
-	return au
+	return _u
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
-func (au *AliasUpdate) SetTenantID(id int) *AliasUpdate {
-	au.mutation.SetTenantID(id)
-	return au
+func (_u *AliasUpdate) SetTenantID(id int) *AliasUpdate {
+	_u.mutation.SetTenantID(id)
+	return _u
 }
 
 // SetTenant sets the "tenant" edge to the Tenant entity.
-func (au *AliasUpdate) SetTenant(t *Tenant) *AliasUpdate {
-	return au.SetTenantID(t.ID)
+func (_u *AliasUpdate) SetTenant(v *Tenant) *AliasUpdate {
+	return _u.SetTenantID(v.ID)
 }
 
 // Mutation returns the AliasMutation object of the builder.
-func (au *AliasUpdate) Mutation() *AliasMutation {
-	return au.mutation
+func (_u *AliasUpdate) Mutation() *AliasMutation {
+	return _u.mutation
 }
 
 // ClearTenant clears the "tenant" edge to the Tenant entity.
-func (au *AliasUpdate) ClearTenant() *AliasUpdate {
-	au.mutation.ClearTenant()
-	return au
+func (_u *AliasUpdate) ClearTenant() *AliasUpdate {
+	_u.mutation.ClearTenant()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (au *AliasUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, au.sqlSave, au.mutation, au.hooks)
+func (_u *AliasUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (au *AliasUpdate) SaveX(ctx context.Context) int {
-	affected, err := au.Save(ctx)
+func (_u *AliasUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -124,69 +124,69 @@ func (au *AliasUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (au *AliasUpdate) Exec(ctx context.Context) error {
-	_, err := au.Save(ctx)
+func (_u *AliasUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (au *AliasUpdate) ExecX(ctx context.Context) {
-	if err := au.Exec(ctx); err != nil {
+func (_u *AliasUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (au *AliasUpdate) check() error {
-	if v, ok := au.mutation.Source(); ok {
+func (_u *AliasUpdate) check() error {
+	if v, ok := _u.mutation.Source(); ok {
 		if err := alias.SourceValidator(v); err != nil {
 			return &ValidationError{Name: "source", err: fmt.Errorf(`ent: validator failed for field "Alias.source": %w`, err)}
 		}
 	}
-	if _, ok := au.mutation.TenantID(); au.mutation.TenantCleared() && !ok {
+	if _u.mutation.TenantCleared() && len(_u.mutation.TenantIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Alias.tenant"`)
 	}
 	return nil
 }
 
-func (au *AliasUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := au.check(); err != nil {
-		return n, err
+func (_u *AliasUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(alias.Table, alias.Columns, sqlgraph.NewFieldSpec(alias.FieldID, field.TypeInt))
-	if ps := au.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := au.mutation.Source(); ok {
+	if value, ok := _u.mutation.Source(); ok {
 		_spec.SetField(alias.FieldSource, field.TypeString, value)
 	}
-	if value, ok := au.mutation.Destinations(); ok {
+	if value, ok := _u.mutation.Destinations(); ok {
 		_spec.SetField(alias.FieldDestinations, field.TypeJSON, value)
 	}
-	if value, ok := au.mutation.AppendedDestinations(); ok {
+	if value, ok := _u.mutation.AppendedDestinations(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, alias.FieldDestinations, value)
 		})
 	}
-	if value, ok := au.mutation.PermittedSenders(); ok {
+	if value, ok := _u.mutation.PermittedSenders(); ok {
 		_spec.SetField(alias.FieldPermittedSenders, field.TypeJSON, value)
 	}
-	if value, ok := au.mutation.AppendedPermittedSenders(); ok {
+	if value, ok := _u.mutation.AppendedPermittedSenders(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, alias.FieldPermittedSenders, value)
 		})
 	}
-	if au.mutation.PermittedSendersCleared() {
+	if _u.mutation.PermittedSendersCleared() {
 		_spec.ClearField(alias.FieldPermittedSenders, field.TypeJSON)
 	}
-	if value, ok := au.mutation.Auto(); ok {
+	if value, ok := _u.mutation.Auto(); ok {
 		_spec.SetField(alias.FieldAuto, field.TypeBool, value)
 	}
-	if au.mutation.TenantCleared() {
+	if _u.mutation.TenantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -199,7 +199,7 @@ func (au *AliasUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.TenantIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TenantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -215,7 +215,7 @@ func (au *AliasUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{alias.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -223,8 +223,8 @@ func (au *AliasUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	au.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // AliasUpdateOne is the builder for updating a single Alias entity.
@@ -236,106 +236,106 @@ type AliasUpdateOne struct {
 }
 
 // SetSource sets the "source" field.
-func (auo *AliasUpdateOne) SetSource(s string) *AliasUpdateOne {
-	auo.mutation.SetSource(s)
-	return auo
+func (_u *AliasUpdateOne) SetSource(v string) *AliasUpdateOne {
+	_u.mutation.SetSource(v)
+	return _u
 }
 
 // SetNillableSource sets the "source" field if the given value is not nil.
-func (auo *AliasUpdateOne) SetNillableSource(s *string) *AliasUpdateOne {
-	if s != nil {
-		auo.SetSource(*s)
+func (_u *AliasUpdateOne) SetNillableSource(v *string) *AliasUpdateOne {
+	if v != nil {
+		_u.SetSource(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetDestinations sets the "destinations" field.
-func (auo *AliasUpdateOne) SetDestinations(s []string) *AliasUpdateOne {
-	auo.mutation.SetDestinations(s)
-	return auo
+func (_u *AliasUpdateOne) SetDestinations(v []string) *AliasUpdateOne {
+	_u.mutation.SetDestinations(v)
+	return _u
 }
 
-// AppendDestinations appends s to the "destinations" field.
-func (auo *AliasUpdateOne) AppendDestinations(s []string) *AliasUpdateOne {
-	auo.mutation.AppendDestinations(s)
-	return auo
+// AppendDestinations appends value to the "destinations" field.
+func (_u *AliasUpdateOne) AppendDestinations(v []string) *AliasUpdateOne {
+	_u.mutation.AppendDestinations(v)
+	return _u
 }
 
 // SetPermittedSenders sets the "permitted_senders" field.
-func (auo *AliasUpdateOne) SetPermittedSenders(s []string) *AliasUpdateOne {
-	auo.mutation.SetPermittedSenders(s)
-	return auo
+func (_u *AliasUpdateOne) SetPermittedSenders(v []string) *AliasUpdateOne {
+	_u.mutation.SetPermittedSenders(v)
+	return _u
 }
 
-// AppendPermittedSenders appends s to the "permitted_senders" field.
-func (auo *AliasUpdateOne) AppendPermittedSenders(s []string) *AliasUpdateOne {
-	auo.mutation.AppendPermittedSenders(s)
-	return auo
+// AppendPermittedSenders appends value to the "permitted_senders" field.
+func (_u *AliasUpdateOne) AppendPermittedSenders(v []string) *AliasUpdateOne {
+	_u.mutation.AppendPermittedSenders(v)
+	return _u
 }
 
 // ClearPermittedSenders clears the value of the "permitted_senders" field.
-func (auo *AliasUpdateOne) ClearPermittedSenders() *AliasUpdateOne {
-	auo.mutation.ClearPermittedSenders()
-	return auo
+func (_u *AliasUpdateOne) ClearPermittedSenders() *AliasUpdateOne {
+	_u.mutation.ClearPermittedSenders()
+	return _u
 }
 
 // SetAuto sets the "auto" field.
-func (auo *AliasUpdateOne) SetAuto(b bool) *AliasUpdateOne {
-	auo.mutation.SetAuto(b)
-	return auo
+func (_u *AliasUpdateOne) SetAuto(v bool) *AliasUpdateOne {
+	_u.mutation.SetAuto(v)
+	return _u
 }
 
 // SetNillableAuto sets the "auto" field if the given value is not nil.
-func (auo *AliasUpdateOne) SetNillableAuto(b *bool) *AliasUpdateOne {
-	if b != nil {
-		auo.SetAuto(*b)
+func (_u *AliasUpdateOne) SetNillableAuto(v *bool) *AliasUpdateOne {
+	if v != nil {
+		_u.SetAuto(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetTenantID sets the "tenant" edge to the Tenant entity by ID.
-func (auo *AliasUpdateOne) SetTenantID(id int) *AliasUpdateOne {
-	auo.mutation.SetTenantID(id)
-	return auo
+func (_u *AliasUpdateOne) SetTenantID(id int) *AliasUpdateOne {
+	_u.mutation.SetTenantID(id)
+	return _u
 }
 
 // SetTenant sets the "tenant" edge to the Tenant entity.
-func (auo *AliasUpdateOne) SetTenant(t *Tenant) *AliasUpdateOne {
-	return auo.SetTenantID(t.ID)
+func (_u *AliasUpdateOne) SetTenant(v *Tenant) *AliasUpdateOne {
+	return _u.SetTenantID(v.ID)
 }
 
 // Mutation returns the AliasMutation object of the builder.
-func (auo *AliasUpdateOne) Mutation() *AliasMutation {
-	return auo.mutation
+func (_u *AliasUpdateOne) Mutation() *AliasMutation {
+	return _u.mutation
 }
 
 // ClearTenant clears the "tenant" edge to the Tenant entity.
-func (auo *AliasUpdateOne) ClearTenant() *AliasUpdateOne {
-	auo.mutation.ClearTenant()
-	return auo
+func (_u *AliasUpdateOne) ClearTenant() *AliasUpdateOne {
+	_u.mutation.ClearTenant()
+	return _u
 }
 
 // Where appends a list predicates to the AliasUpdate builder.
-func (auo *AliasUpdateOne) Where(ps ...predicate.Alias) *AliasUpdateOne {
-	auo.mutation.Where(ps...)
-	return auo
+func (_u *AliasUpdateOne) Where(ps ...predicate.Alias) *AliasUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (auo *AliasUpdateOne) Select(field string, fields ...string) *AliasUpdateOne {
-	auo.fields = append([]string{field}, fields...)
-	return auo
+func (_u *AliasUpdateOne) Select(field string, fields ...string) *AliasUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Alias entity.
-func (auo *AliasUpdateOne) Save(ctx context.Context) (*Alias, error) {
-	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
+func (_u *AliasUpdateOne) Save(ctx context.Context) (*Alias, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (auo *AliasUpdateOne) SaveX(ctx context.Context) *Alias {
-	node, err := auo.Save(ctx)
+func (_u *AliasUpdateOne) SaveX(ctx context.Context) *Alias {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -343,42 +343,42 @@ func (auo *AliasUpdateOne) SaveX(ctx context.Context) *Alias {
 }
 
 // Exec executes the query on the entity.
-func (auo *AliasUpdateOne) Exec(ctx context.Context) error {
-	_, err := auo.Save(ctx)
+func (_u *AliasUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (auo *AliasUpdateOne) ExecX(ctx context.Context) {
-	if err := auo.Exec(ctx); err != nil {
+func (_u *AliasUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (auo *AliasUpdateOne) check() error {
-	if v, ok := auo.mutation.Source(); ok {
+func (_u *AliasUpdateOne) check() error {
+	if v, ok := _u.mutation.Source(); ok {
 		if err := alias.SourceValidator(v); err != nil {
 			return &ValidationError{Name: "source", err: fmt.Errorf(`ent: validator failed for field "Alias.source": %w`, err)}
 		}
 	}
-	if _, ok := auo.mutation.TenantID(); auo.mutation.TenantCleared() && !ok {
+	if _u.mutation.TenantCleared() && len(_u.mutation.TenantIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Alias.tenant"`)
 	}
 	return nil
 }
 
-func (auo *AliasUpdateOne) sqlSave(ctx context.Context) (_node *Alias, err error) {
-	if err := auo.check(); err != nil {
+func (_u *AliasUpdateOne) sqlSave(ctx context.Context) (_node *Alias, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(alias.Table, alias.Columns, sqlgraph.NewFieldSpec(alias.FieldID, field.TypeInt))
-	id, ok := auo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Alias.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := auo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, alias.FieldID)
 		for _, f := range fields {
@@ -390,39 +390,39 @@ func (auo *AliasUpdateOne) sqlSave(ctx context.Context) (_node *Alias, err error
 			}
 		}
 	}
-	if ps := auo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := auo.mutation.Source(); ok {
+	if value, ok := _u.mutation.Source(); ok {
 		_spec.SetField(alias.FieldSource, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.Destinations(); ok {
+	if value, ok := _u.mutation.Destinations(); ok {
 		_spec.SetField(alias.FieldDestinations, field.TypeJSON, value)
 	}
-	if value, ok := auo.mutation.AppendedDestinations(); ok {
+	if value, ok := _u.mutation.AppendedDestinations(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, alias.FieldDestinations, value)
 		})
 	}
-	if value, ok := auo.mutation.PermittedSenders(); ok {
+	if value, ok := _u.mutation.PermittedSenders(); ok {
 		_spec.SetField(alias.FieldPermittedSenders, field.TypeJSON, value)
 	}
-	if value, ok := auo.mutation.AppendedPermittedSenders(); ok {
+	if value, ok := _u.mutation.AppendedPermittedSenders(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, alias.FieldPermittedSenders, value)
 		})
 	}
-	if auo.mutation.PermittedSendersCleared() {
+	if _u.mutation.PermittedSendersCleared() {
 		_spec.ClearField(alias.FieldPermittedSenders, field.TypeJSON)
 	}
-	if value, ok := auo.mutation.Auto(); ok {
+	if value, ok := _u.mutation.Auto(); ok {
 		_spec.SetField(alias.FieldAuto, field.TypeBool, value)
 	}
-	if auo.mutation.TenantCleared() {
+	if _u.mutation.TenantCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -435,7 +435,7 @@ func (auo *AliasUpdateOne) sqlSave(ctx context.Context) (_node *Alias, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.TenantIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TenantIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -451,10 +451,10 @@ func (auo *AliasUpdateOne) sqlSave(ctx context.Context) (_node *Alias, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_node = &Alias{config: auo.config}
+	_node = &Alias{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, auo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{alias.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -462,6 +462,6 @@ func (auo *AliasUpdateOne) sqlSave(ctx context.Context) (_node *Alias, err error
 		}
 		return nil, err
 	}
-	auo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }
